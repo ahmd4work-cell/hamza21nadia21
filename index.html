@@ -2,130 +2,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام CRM الاتصالات - حمزة</title>
+    <title>CRM الاتصالات - الرئيسية</title>
+    <!-- استدعاء خط كايرو -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; }
-        .dashboard-header { background-color: #001f3f; color: white; padding: 20px; text-align: center; border-radius: 15px; margin-bottom: 20px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { padding: 20px; border-radius: 15px; text-align: center; color: white; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .bg-target { background-color: #333; } /* الهدف الشهري */
-        .bg-achieved { background-color: #28a745; } /* المحقق */
-        .bg-progress { background-color: #ff9800; } /* جاري التنفيذ */
-        .main-content { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        input, select, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #ccc; font-size: 16px; }
-        button { background-color: #001f3f; color: white; border: none; cursor: pointer; font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #eee; padding: 12px; text-align: center; }
-        th { background-color: #001f3f; color: white; }
+        :root {
+            --nav-navy: #001f3f;
+            --nav-light-navy: #003366;
+            --stat-black: #333333;
+            --stat-green: #28a745;
+            --stat-yellow: #ffc107;
+            --bg-color: #f8f9fa;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* شريط الصفحة العلوي الكحلي */
+        .navbar {
+            background-color: var(--nav-navy);
+            display: flex;
+            justify-content: center;
+            padding: 15px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 18px;
+            margin: 0 8px;
+            font-weight: 700;
+            font-size: 15px;
+            transition: 0.3s;
+            border-radius: 12px; /* زوايا مستديرة */
+        }
+
+        /* المربع المستدير عند الضغط أو التمرير */
+        .navbar a:hover, .navbar a.active {
+            background-color: var(--nav-light-navy);
+        }
+
+        .container {
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        /* المربعات الملونة المستوحاة من image_8ec83c.png */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            padding: 25px;
+            border-radius: 15px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        }
+
+        .card-title { font-size: 18px; margin-bottom: 10px; opacity: 0.9; }
+        .card-value { font-size: 28px; font-weight: 700; }
+        .card-percent { font-size: 22px; margin-top: 5px; display: block; }
+
+        .black-card { background-color: var(--stat-black); }
+        .green-card { background-color: var(--stat-green); }
+        .yellow-card { background-color: var(--stat-yellow); color: #333; }
+
+        .welcome-msg { text-align: center; margin-bottom: 35px; color: var(--nav-navy); }
+
+        @media (max-width: 768px) {
+            .navbar { overflow-x: auto; justify-content: flex-start; padding: 10px; }
+            .navbar a { white-space: nowrap; font-size: 13px; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="dashboard-header">
-        <h1>لوحة أداء مبيعات الاتصالات</h1>
-        <p>مشروع حمزة - الرياض 2027</p>
+    <nav class="navbar">
+        <a href="#" class="active">الصفحة الرئيسية</a>
+        <a href="#">الزيارات</a>
+        <a href="#">مبيعات متوقعة</a>
+        <a href="#">العملاء</a>
+        <a href="#">المبيعات</a>
+        <a href="#">تذكيرات</a>
+    </nav>
+
+    <div class="container">
+        <div class="welcome-msg">
+            <h2>مرحباً بك في لوحة تحكم CRM الاتصالات</h2>
+        </div>
+
+        <div class="stats-grid">
+            <!-- المربع الأسود: الهدف السنوي -->
+            <div class="card black-card">
+                <div class="card-title">الهدف السنوي</div>
+                <div class="card-value">180,000 SAR</div>
+            </div>
+
+            <!-- المربع الأخضر: مكتمل -->
+            <div class="card green-card">
+                <div class="card-title">مكتمل</div>
+                <div class="card-value">45,000 SAR</div>
+                <span class="card-percent">25%</span>
+            </div>
+
+            <!-- المربع الأصفر: معلق -->
+            <div class="card yellow-card">
+                <div class="card-title">معلق</div>
+                <div class="card-value">12,500 SAR</div>
+                <span class="card-percent">7%</span>
+            </div>
+        </div>
     </div>
 
-    <div class="stats-grid">
-        <div class="stat-card bg-target">
-            <div>الهدف الشهري</div>
-            <div style="font-size: 24px;">15,000 SAR</div>
-        </div>
-        <div class="stat-card bg-achieved">
-            <div>إجمالي المحقق</div>
-            <div id="totalAmount" style="font-size: 24px;">0</div>
-        </div>
-        <div class="stat-card bg-progress">
-            <div>نسبة الإنجاز</div>
-            <div id="achievementRatio" style="font-size: 24px;">0%</div>
-        </div>
-    </div>
-
-    <div class="main-content">
-        <h3>➕ تسجيل عقد اتصالات جديد</h3>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <input type="text" id="clientName" placeholder="اسم العميل">
-            <input type="text" id="orderID" placeholder="رقم طلب الخدمة (Order ID)">
-            <select id="serviceType">
-                <option>ألياف بصرية (Fiber)</option>
-                <option>5G منزلي</option>
-                <option>إنترنت أعمال (Business)</option>
-            </select>
-            <input type="number" id="commission" placeholder="قيمة العمولة المتوقعة">
-        </div>
-        <button id="saveButton">حفظ العقد في السحابة</button>
-        <div id="statusMsg" style="text-align: center; margin-top: 10px; font-weight: bold;"></div>
-
-        <h3>📋 آخر العقود المسجلة</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>العميل</th>
-                    <th>نوع الخدمة</th>
-                    <th>العمولة</th>
-                    <th>التاريخ</th>
-                </tr>
-            </thead>
-            <tbody id="salesTable"></tbody>
-        </table>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBMXRePjUZrzXIt7snGsN47VxVfZNMotO0",
-            authDomain: "hamza21nadia.firebaseapp.com",
-            projectId: "hamza21nadia",
-            storageBucket: "hamza21nadia.firebasestorage.app",
-            messagingSenderId: "1060687982979",
-            appId: "1:1060687982979:web:2f62a378e2ba4f84a306b6"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        // وظيفة الحفظ
-        document.getElementById("saveButton").onclick = async () => {
-            const client = document.getElementById("clientName").value;
-            const order = document.getElementById("orderID").value;
-            const type = document.getElementById("serviceType").value;
-            const amt = document.getElementById("commission").value;
-            const msg = document.getElementById("statusMsg");
-
-            if(!client || !amt) { msg.innerText = "⚠️ يرجى إدخال البيانات الأساسية"; return; }
-
-            try {
-                await addDoc(collection(db, "sales"), {
-                    client, order, type, amount: parseFloat(amt), date: new Date()
-                });
-                msg.style.color = "green";
-                msg.innerText = "✅ تم حفظ العقد بنجاح";
-                document.getElementById("clientName").value = "";
-                document.getElementById("commission").value = "";
-            } catch (e) {
-                msg.innerText = "❌ خطأ في الاتصال";
-            }
-        };
-
-        // تحديث اللوحة تلقائياً
-        onSnapshot(query(collection(db, "sales"), orderBy("date", "desc")), (snapshot) => {
-            let total = 0;
-            const table = document.getElementById("salesTable");
-            table.innerHTML = "";
-            
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                total += data.amount;
-                const row = `<tr><td>${data.client}</td><td>${data.type}</td><td>${data.amount}</td><td>${new Date(data.date.seconds*1000).toLocaleDateString()}</td></tr>`;
-                table.innerHTML += row;
-            });
-
-            document.getElementById("totalAmount").innerText = total.toLocaleString() + " SAR";
-            const ratio = (total / 15000) * 100;
-            document.getElementById("achievementRatio").innerText = Math.round(ratio) + "%";
-        });
-    </script>
 </body>
 </html>
