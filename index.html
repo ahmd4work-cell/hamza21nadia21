@@ -8,7 +8,7 @@
     <style>
         :root {
             --nav-navy: #001f3f;
-            --stat-black: #000000;
+            --stat-black: #1a1a1a;
             --stat-green: #00b050;
             --stat-yellow: #ffc000;
             --bg-color: #f4f7f6;
@@ -30,21 +30,22 @@
         .value-part { width: 50%; text-align: center; font-weight: bold; font-size: 15px; }
         .percent-part { width: 20%; text-align: left; font-size: 12px; opacity: 0.9; }
 
-        .dashboard-main { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 15px; margin-bottom: 20px; }
-        .content-box { background: white; padding: 12px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .dashboard-main { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .content-box { background: white; padding: 12px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
 
-        /* جدول الأهداف بـ 6 أعمدة وخط 12px */
-        .yearly-table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: center; table-layout: fixed; }
-        .yearly-table th { color: white; padding: 4px 2px; border: 1px solid #ddd; font-size: 11px; }
-        .yearly-table td { padding: 4px 2px; border: 1px solid #ddd; font-weight: bold; }
+        .yearly-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: center; }
+        .yearly-table th { color: white; padding: 6px 2px; border: 1px solid #eee; }
+        .yearly-table td { padding: 5px 2px; border: 1px solid #eee; font-weight: bold; }
 
-        /* سجل النشاطات - تصغير الكتابة درجة */
+        /* ستايل الرسم البياني المحدث */
+        .chart-wrapper { position: relative; height: 200px; width: 100%; } /* تقليل الارتفاع */
+
         .timeline-section { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .timeline-item { border-right: 3px solid var(--nav-navy); padding-right: 15px; margin-bottom: 12px; }
         .timeline-stamp { background: #e9ecef; display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-bottom: 4px; color: var(--nav-navy); }
         .timeline-content { font-size: 11px; color: #444; }
 
-        h3 { font-size: 13px; margin-bottom: 10px; color: var(--nav-navy); }
+        h3 { font-size: 13px; margin-bottom: 15px; color: var(--nav-navy); font-weight: 700; display: flex; align-items: center; gap: 5px; }
 
         @media (max-width: 1000px) { .dashboard-main { grid-template-columns: 1fr; } }
     </style>
@@ -89,17 +90,19 @@
 
         <div class="dashboard-main">
             <div class="content-box">
-                <h3>📊 الأداء الشهري</h3>
-                <canvas id="performanceChart" style="max-height: 250px;"></canvas>
+                <h3><span>📈</span> مؤشر الأداء الشهري</h3>
+                <div class="chart-wrapper">
+                    <canvas id="performanceChart"></canvas>
+                </div>
             </div>
 
             <div class="content-box">
-                <h3>📅 الأهداف والنسب</h3>
+                <h3><span>📅</span> تفاصيل الأهداف</h3>
                 <table class="yearly-table">
                     <thead>
                         <tr>
-                            <th style="background: black; width: 18%;">الشهر</th>
-                            <th style="background: black;">الهدف</th>
+                            <th style="background: #1a1a1a;">الشهر</th>
+                            <th style="background: #1a1a1a;">الهدف</th>
                             <th style="background: #00b050;">مكتمل</th>
                             <th style="background: #00b050;">%</th>
                             <th style="background: #ffc000; color: black;">معلق</th>
@@ -114,11 +117,11 @@
         </div>
 
         <div class="timeline-section">
-            <h3>🕒 سجل النشاطات الأخير</h3>
+            <h3>🕒 سجل النشاطات</h3>
             <div id="timeline-container">
                 <div class="timeline-item">
-                    <div class="timeline-stamp">الأربعاء، 13 مايو 2026 - 12:15 ص</div>
-                    <div class="timeline-content">تم تحديث واجهة المستخدم وتحسين تناسق أعمدة الرسم البياني والجدول.</div>
+                    <div class="timeline-stamp">الأربعاء، 13 مايو 2026 - 12:20 ص</div>
+                    <div class="timeline-content">تحسين المظهر البصري للرسوم البيانية وتنسيق الجداول.</div>
                 </div>
             </div>
         </div>
@@ -129,7 +132,14 @@
         const tbody = document.getElementById('yearlyDataBody');
         months.forEach(m => { tbody.innerHTML += `<tr><td>${m}</td><td>15,000</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>`; });
 
+        // إعداد الرسم البياني الاحترافي
         const ctx = document.getElementById('performanceChart').getContext('2d');
+        
+        // إنشاء تدرج لوني للأعمدة
+        const gradientGreen = ctx.createLinearGradient(0, 0, 0, 300);
+        gradientGreen.addColorStop(0, '#00b050');
+        gradientGreen.addColorStop(1, '#008a3e');
+
         new Chart(ctx, {
             type: 'bar',
             data: {
@@ -138,20 +148,40 @@
                     { 
                         label: 'الهدف', 
                         data: Array(12).fill(15000), 
-                        backgroundColor: '#000000', 
-                        barPercentage: 0.6, // تقليل عرض العمود الأسود
-                        categoryPercentage: 0.4 
+                        backgroundColor: '#e9ecef', // لون رمادي خفيف للهدف ليعطي طابعاً عصرياً
+                        borderRadius: 4,
+                        barPercentage: 0.5,
+                        categoryPercentage: 0.8
                     },
                     { 
                         label: 'المحقق', 
                         data: [14210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
-                        backgroundColor: '#00b050', 
-                        barPercentage: 0.3, // تقليل عرض العمود الأخضر (نصف الأسود)
-                        categoryPercentage: 0.4 
+                        backgroundColor: gradientGreen,
+                        borderRadius: 4,
+                        barPercentage: 0.3,
+                        categoryPercentage: 0.8
                     }
                 ]
             },
-            options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { beginAtZero: true } } }
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false } // إخفاء الليجند لتقليل الزحمة
+                },
+                scales: { 
+                    x: { 
+                        stacked: true, 
+                        grid: { display: false },
+                        ticks: { font: { size: 10 } }
+                    }, 
+                    y: { 
+                        beginAtZero: true,
+                        grid: { color: '#f0f0f0' },
+                        ticks: { font: { size: 10 } }
+                    } 
+                }
+            }
         });
     </script>
 </body>
