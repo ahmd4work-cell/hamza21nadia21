@@ -16,49 +16,58 @@
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; }
 
-        /* شريط التنقل */
-        .navbar { background-color: var(--nav-navy); display: flex; justify-content: center; padding: 6px 0; position: sticky; top: 0; z-index: 1000; }
-        .navbar a { color: white; text-decoration: none; padding: 5px 12px; margin: 0 3px; font-weight: 700; font-size: 12px; border-radius: 6px; transition: 0.3s; }
+        /* شريط التنقل - محاذاة لليمين */
+        .navbar { 
+            background-color: var(--nav-navy); 
+            display: flex; 
+            justify-content: flex-start; /* محاذاة لليمين في RTL */
+            padding: 6px 20px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+        }
+        .navbar a { color: white; text-decoration: none; padding: 5px 15px; margin-left: 10px; font-weight: 700; font-size: 12px; border-radius: 6px; transition: 0.3s; }
         .navbar a.active { background-color: #003366; }
 
-        /* شريط البيانات الوظيفية الاحترافي */
+        /* شريط البيانات الوظيفية */
         .user-info-bar { 
             background: white; 
             display: flex; 
             justify-content: space-around; 
             padding: 8px 15px; 
             border-bottom: 1px solid #ddd; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            font-size: 12px;
+            font-size: 11px;
             color: var(--nav-navy);
         }
-        .info-item { display: flex; gap: 5px; }
-        .info-label { font-weight: 700; color: #666; }
+        .info-label { font-weight: 700; color: #666; margin-left: 4px; }
         .info-value { font-weight: 700; }
 
         .container { padding: 15px; max-width: 1400px; margin: auto; }
 
-        /* المربعات الصغيرة (سطر واحد) */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        /* المربعات رشيقة التنسيق */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; margin-bottom: 20px; }
         .small-card { 
             display: flex; 
-            justify-content: space-between; 
             align-items: center; 
-            padding: 8px 15px; 
+            padding: 6px 15px; 
             border-radius: 8px; 
             color: white; 
             font-size: 13px; 
         }
-        .small-card span { font-weight: bold; }
+        .label-part { width: 30%; font-weight: bold; }
+        .value-part { width: 50%; text-align: center; font-weight: bold; font-size: 15px; }
+        .percent-part { width: 20%; text-align: left; font-size: 12px; opacity: 0.9; }
 
-        .dashboard-main { display: grid; grid-template-columns: 1fr 1.2fr; gap: 15px; }
+        .dashboard-main { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 15px; } /* تقليل عرض جهة الجدول */
         .content-box { background: white; padding: 12px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
 
+        /* جدول الشهور - تقليل العرض بالكامل */
+        .table-wrapper { overflow-x: auto; max-width: 100%; }
         .yearly-table { width: 100%; border-collapse: collapse; font-size: 10px; text-align: center; }
-        .yearly-table th { color: white; padding: 6px; border: 1px solid #ddd; }
-        .yearly-table td { padding: 4px; border: 1px solid #ddd; font-weight: bold; }
+        .yearly-table th { color: white; padding: 4px; border: 1px solid #ddd; }
+        .yearly-table td { padding: 3px; border: 1px solid #ddd; font-weight: bold; width: 16%; } /* تحديد عرض ثابت وقليل للأعمدة */
 
-        @media (max-width: 1000px) { .dashboard-main { grid-template-columns: 1fr; } .user-info-bar { flex-direction: column; gap: 5px; } }
+        @media (max-width: 1000px) { .dashboard-main { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -72,30 +81,30 @@
         <a href="#">تذكيرات</a>
     </nav>
 
-    <!-- شريط البيانات الشخصية -->
     <div class="user-info-bar">
-        <div class="info-item"><span class="info-label">الرقم الوظيفي:</span> <span class="info-value">12345</span></div>
-        <div class="info-item"><span class="info-label">الاسم:</span> <span class="info-value">حمزة</span></div>
-        <div class="info-item"><span class="info-label">الموبايل:</span> <span class="info-value">05XXXXXXX</span></div>
-        <div class="info-item"><span class="info-label">الايميل:</span> <span class="info-value">user@mail.com</span></div>
-        <div class="info-item"><span class="info-label">المدير المباشر:</span> <span class="info-value">أحمد علي</span></div>
-        <div class="info-item"><span class="info-label">مدير المبيعات:</span> <span class="info-value">خالد حسن</span></div>
+        <div><span class="info-label">الرقم:</span><span class="info-value">12345</span></div>
+        <div><span class="info-label">الاسم:</span><span class="info-value">حمزة</span></div>
+        <div><span class="info-label">الموبايل:</span><span class="info-value">05XXXXXXX</span></div>
+        <div><span class="info-label">المدير:</span><span class="info-value">أحمد علي</span></div>
+        <div><span class="info-label">م. المبيعات:</span><span class="info-value">خالد حسن</span></div>
     </div>
 
     <div class="container">
-        <!-- المربعات الصغيرة في سطر واحد -->
         <div class="stats-grid">
             <div class="small-card" style="background-color: var(--stat-black);">
-                <span>الهدف السنوي:</span>
-                <span>180,000 SAR | 100%</span>
+                <div class="label-part">الهدف السنوي</div>
+                <div class="value-part">180,000</div>
+                <div class="percent-part">100%</div>
             </div>
             <div class="small-card" style="background-color: var(--stat-green);">
-                <span>مكتمل:</span>
-                <span>14,210 SAR | 95%</span>
+                <div class="label-part">مكتمل</div>
+                <div class="value-part">14,210</div>
+                <div class="percent-part">95%</div>
             </div>
             <div class="small-card" style="background-color: var(--stat-yellow); color: black;">
-                <span>معلق:</span>
-                <span>790 SAR | 5%</span>
+                <div class="label-part">معلق</div>
+                <div class="value-part">790</div>
+                <div class="percent-part">5%</div>
             </div>
         </div>
 
@@ -105,23 +114,25 @@
                 <canvas id="performanceChart" style="max-height: 280px;"></canvas>
             </div>
 
-            <div class="content-box" style="overflow-x: auto;">
-                <h3 style="font-size: 13px;">📅 تفاصيل الأهداف</h3>
-                <table class="yearly-table">
-                    <thead>
-                        <tr>
-                            <th style="background: black;">الشهر</th>
-                            <th style="background: black;">الهدف</th>
-                            <th style="background: #00b050;">مكتمل</th>
-                            <th style="background: #00b050;">الإنجاز %</th>
-                            <th style="background: #ffc000; color: black;">معلق</th>
-                            <th style="background: #ffc000; color: black;">المعلق %</th>
-                        </tr>
-                    </thead>
-                    <tbody id="yearlyDataBody">
-                        <tr><td>يناير</td><td>15,000</td><td>14,210</td><td>95%</td><td>790</td><td>5%</td></tr>
-                    </tbody>
-                </table>
+            <div class="content-box">
+                <h3 style="font-size: 13px;">📅 الأهداف</h3>
+                <div class="table-wrapper">
+                    <table class="yearly-table">
+                        <thead>
+                            <tr>
+                                <th style="background: black;">الشهر</th>
+                                <th style="background: black;">الهدف</th>
+                                <th style="background: #00b050;">مكتمل</th>
+                                <th style="background: #00b050;">%</th>
+                                <th style="background: #ffc000; color: black;">معلق</th>
+                                <th style="background: #ffc000; color: black;">%</th>
+                            </tr>
+                        </thead>
+                        <tbody id="yearlyDataBody">
+                            <tr><td>يناير</td><td>15,000</td><td>14,210</td><td>95%</td><td>790</td><td>5%</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -141,14 +152,14 @@
                         label: 'الهدف', 
                         data: Array(12).fill(15000), 
                         backgroundColor: '#000000',
-                        barPercentage: 1.0, // إلغاء الفاصل بين الأعمدة
+                        barPercentage: 1.0, 
                         categoryPercentage: 0.5 
                     },
                     { 
                         label: 'المحقق', 
                         data: [14210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
                         backgroundColor: '#00b050',
-                        barPercentage: 0.5, // عرض العمود الأخضر نصف الأسود
+                        barPercentage: 0.5, 
                         categoryPercentage: 0.5
                     }
                 ]
@@ -156,10 +167,7 @@
             options: { 
                 responsive: true, 
                 maintainAspectRatio: false,
-                scales: {
-                    x: { stacked: true }, // دمج الأعمدة بجانب بعضها بدون فواصل
-                    y: { beginAtZero: true }
-                }
+                scales: { x: { stacked: true }, y: { beginAtZero: true } }
             }
         });
     </script>
