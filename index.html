@@ -30,20 +30,19 @@
         .value-part { width: 50%; text-align: center; font-weight: bold; font-size: 15px; }
         .percent-part { width: 20%; text-align: left; font-size: 12px; opacity: 0.9; }
 
-        /* تعديل عرض الجدول والرسم البياني */
-        .dashboard-main { display: grid; grid-template-columns: 1.4fr 0.6fr; gap: 15px; margin-bottom: 20px; }
+        .dashboard-main { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 15px; margin-bottom: 20px; }
         .content-box { background: white; padding: 12px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
 
-        /* تكبير الخط وتقليص عرض جدول الأهداف */
+        /* جدول الأهداف بـ 6 أعمدة وخط 12px */
         .yearly-table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: center; table-layout: fixed; }
-        .yearly-table th { color: white; padding: 4px 2px; border: 1px solid #ddd; }
+        .yearly-table th { color: white; padding: 4px 2px; border: 1px solid #ddd; font-size: 11px; }
         .yearly-table td { padding: 4px 2px; border: 1px solid #ddd; font-weight: bold; }
 
-        /* ستايل الجدول الزمني (Timeline) */
+        /* سجل النشاطات - تصغير الكتابة درجة */
         .timeline-section { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .timeline-item { border-right: 3px solid var(--nav-navy); padding-right: 15px; margin-bottom: 15px; position: relative; }
-        .timeline-stamp { background: #e9ecef; display: inline-block; padding: 4px 10px; border-radius: 5px; font-size: 11px; font-weight: bold; margin-bottom: 5px; color: var(--nav-navy); }
-        .timeline-content { font-size: 13px; color: #333; }
+        .timeline-item { border-right: 3px solid var(--nav-navy); padding-right: 15px; margin-bottom: 12px; }
+        .timeline-stamp { background: #e9ecef; display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-bottom: 4px; color: var(--nav-navy); }
+        .timeline-content { font-size: 11px; color: #444; }
 
         h3 { font-size: 13px; margin-bottom: 10px; color: var(--nav-navy); }
 
@@ -95,34 +94,31 @@
             </div>
 
             <div class="content-box">
-                <h3>📅 الأهداف</h3>
+                <h3>📅 الأهداف والنسب</h3>
                 <table class="yearly-table">
                     <thead>
                         <tr>
-                            <th style="background: black; width: 25%;">الشهر</th>
+                            <th style="background: black; width: 18%;">الشهر</th>
                             <th style="background: black;">الهدف</th>
                             <th style="background: #00b050;">مكتمل</th>
                             <th style="background: #00b050;">%</th>
+                            <th style="background: #ffc000; color: black;">معلق</th>
+                            <th style="background: #ffc000; color: black;">%</th>
                         </tr>
                     </thead>
                     <tbody id="yearlyDataBody">
-                        <tr><td>يناير</td><td>15,000</td><td>14,210</td><td>95%</td></tr>
+                        <tr><td>يناير</td><td>15,000</td><td>14,210</td><td>95%</td><td>790</td><td>5%</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- الخط الزمني للنشاطات -->
         <div class="timeline-section">
             <h3>🕒 سجل النشاطات الأخير</h3>
             <div id="timeline-container">
                 <div class="timeline-item">
-                    <div class="timeline-stamp">الأربعاء، 13 مايو 2026 - 12:08 ص</div>
-                    <div class="timeline-content">تم تحديث بيانات شهر يناير وإضافة نسبة الإنجاز الجديدة.</div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-stamp">الثلاثاء، 12 مايو 2026 - 10:30 م</div>
-                    <div class="timeline-content">تم إضافة عميل جديد: شركة الأمل التجاري.</div>
+                    <div class="timeline-stamp">الأربعاء، 13 مايو 2026 - 12:15 ص</div>
+                    <div class="timeline-content">تم تحديث واجهة المستخدم وتحسين تناسق أعمدة الرسم البياني والجدول.</div>
                 </div>
             </div>
         </div>
@@ -131,7 +127,7 @@
     <script>
         const months = ["فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
         const tbody = document.getElementById('yearlyDataBody');
-        months.forEach(m => { tbody.innerHTML += `<tr><td>${m}</td><td>15,000</td><td>-</td><td>-</td></tr>`; });
+        months.forEach(m => { tbody.innerHTML += `<tr><td>${m}</td><td>15,000</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>`; });
 
         const ctx = document.getElementById('performanceChart').getContext('2d');
         new Chart(ctx, {
@@ -139,8 +135,20 @@
             data: {
                 labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
                 datasets: [
-                    { label: 'الهدف', data: Array(12).fill(15000), backgroundColor: '#000000', barPercentage: 1.0, categoryPercentage: 0.5 },
-                    { label: 'المحقق', data: [14210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], backgroundColor: '#00b050', barPercentage: 0.5, categoryPercentage: 0.5 }
+                    { 
+                        label: 'الهدف', 
+                        data: Array(12).fill(15000), 
+                        backgroundColor: '#000000', 
+                        barPercentage: 0.6, // تقليل عرض العمود الأسود
+                        categoryPercentage: 0.4 
+                    },
+                    { 
+                        label: 'المحقق', 
+                        data: [14210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+                        backgroundColor: '#00b050', 
+                        barPercentage: 0.3, // تقليل عرض العمود الأخضر (نصف الأسود)
+                        categoryPercentage: 0.4 
+                    }
                 ]
             },
             options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { beginAtZero: true } } }
