@@ -16,34 +16,35 @@
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; }
 
+        /* شريط التنقل العلوي */
         .navbar { background-color: var(--nav-navy); display: flex; justify-content: center; padding: 8px 0; position: sticky; top: 0; z-index: 1000; }
         .navbar a { color: white; text-decoration: none; padding: 6px 15px; margin: 0 4px; font-weight: 700; font-size: 13px; border-radius: 8px; transition: 0.3s; }
         .navbar a:hover, .navbar a.active { background-color: #003366; }
 
-        .container { padding: 20px; max-width: 1300px; margin: auto; }
+        .container { padding: 20px; max-width: 1400px; margin: auto; }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .card { padding: 12px; border-radius: 10px; color: white; text-align: center; }
-        .card-title { font-size: 13px; margin-bottom: 5px; }
-        .card-value { font-size: 16px; font-weight: bold; }
+        /* المربعات العلوية */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .card { padding: 10px; border-radius: 10px; color: white; text-align: center; }
+        .card-title { font-size: 12px; margin-bottom: 3px; }
+        .card-value { font-size: 15px; font-weight: bold; }
 
-        /* تقسيم الشاشة للرسم البياني والجدول الجانبي */
-        .dashboard-main { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-
+        /* التقسيم الرئيسي */
+        .dashboard-main { display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; align-items: start; }
         .content-box { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
 
-        /* ستايل جدول البيانات السنوي المستوحى من الصورة */
+        /* ستايل الجدول الجديد (6 أعمدة) */
         .yearly-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: center; }
-        .yearly-table th { color: white; padding: 6px; border: 1px solid #ddd; }
-        .yearly-table td { padding: 4px; border: 1px solid #ddd; font-weight: bold; }
+        .yearly-table th { color: white; padding: 8px 4px; border: 1px solid #ddd; }
+        .yearly-table td { padding: 5px; border: 1px solid #ddd; font-weight: bold; }
         
         .bg-black { background-color: var(--stat-black); }
         .bg-green { background-color: var(--stat-green); }
         .bg-yellow { background-color: var(--stat-yellow); color: black; }
 
-        h3 { font-size: 14px; margin-bottom: 10px; color: var(--nav-navy); border-right: 4px solid var(--stat-green); padding-right: 8px; }
+        h3 { font-size: 14px; margin-bottom: 12px; color: var(--nav-navy); }
 
-        @media (max-width: 900px) { .dashboard-main { grid-template-columns: 1fr; } }
+        @media (max-width: 1000px) { .dashboard-main { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -68,7 +69,7 @@
                 <div class="card-value">14,210 SAR</div>
             </div>
             <div class="card" style="background-color: var(--stat-yellow); color: black;">
-                <div class="card-title">تحت التنفيذ</div>
+                <div class="card-title">معلق</div>
                 <div class="card-value">0 SAR</div>
             </div>
         </div>
@@ -76,33 +77,34 @@
         <div class="dashboard-main">
             <!-- الرسم البياني -->
             <div class="content-box">
-                <h3>📊 تحليل الأداء</h3>
-                <canvas id="performanceChart" style="max-height: 300px;"></canvas>
+                <h3>📊 الأداء الشهري</h3>
+                <canvas id="performanceChart" style="max-height: 350px;"></canvas>
             </div>
 
-            <!-- جدول البيانات السنوي المضاف (image_8de65e.png) -->
+            <!-- جدول الـ 6 أعمدة (image_8de65e.png) -->
             <div class="content-box" style="overflow-x: auto;">
-                <h3>📅 تفاصيل الأهداف الشهرية</h3>
+                <h3>📅 تفاصيل الأهداف والنسب</h3>
                 <table class="yearly-table">
                     <thead>
                         <tr>
                             <th class="bg-black">الشهر</th>
                             <th class="bg-black">الهدف</th>
-                            <th class="bg-green">Completed</th>
-                            <th class="bg-green">التحقيق</th>
-                            <th class="bg-yellow">تحت التنفيذ</th>
+                            <th class="bg-green">مكتمل</th>
+                            <th class="bg-green">نسبة الإنجاز</th>
+                            <th class="bg-yellow">معلق</th>
+                            <th class="bg-yellow">نسبة المعلق</th>
                         </tr>
                     </thead>
                     <tbody id="yearlyDataBody">
-                        <!-- عينة لبيانات شهر يناير -->
                         <tr>
                             <td>يناير</td>
                             <td>15,000</td>
                             <td>14,210</td>
                             <td>95%</td>
-                            <td>0</td>
+                            <td>790</td>
+                            <td>5%</td>
                         </tr>
-                        <!-- سيتم تكرار الصفوف لبقية الشهور -->
+                        <!-- باقي الشهور ستضاف عبر السكريبت -->
                     </tbody>
                 </table>
             </div>
@@ -110,25 +112,44 @@
     </div>
 
     <script>
-        // إكمال بقية شهور السنة في الجدول تلقائياً
+        // تعبئة الجدول لبقية السنة
         const months = ["فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
         const tbody = document.getElementById('yearlyDataBody');
         months.forEach(m => {
-            tbody.innerHTML += `<tr><td>${m}</td><td>15,000</td><td>-</td><td>-</td><td>-</td></tr>`;
+            tbody.innerHTML += `<tr><td>${m}</td><td>15,000</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>`;
         });
 
-        // الرسم البياني
+        // إعداد الرسم البياني
         const ctx = document.getElementById('performanceChart').getContext('2d');
         new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
                 datasets: [
-                    { label: 'الهدف', data: Array(12).fill(15000), backgroundColor: '#000000' },
-                    { label: 'المحقق', data: [14210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], backgroundColor: '#00b050' }
+                    { 
+                        label: 'الهدف', 
+                        data: Array(12).fill(15000), 
+                        backgroundColor: '#000000',
+                        barPercentage: 0.8, // عرض العمود الأسود
+                        categoryPercentage: 0.6
+                    },
+                    { 
+                        label: 'المحقق', 
+                        data: [14210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+                        backgroundColor: '#00b050',
+                        barPercentage: 0.4, // العمود الأخضر بنصف عرض الأسود تقريباً
+                        categoryPercentage: 0.6
+                    }
                 ]
             },
-            options: { responsive: true, maintainAspectRatio: false }
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false,
+                scales: {
+                    x: { stacked: false }, // جعل الأعمدة بجانب بعضها
+                    y: { beginAtZero: true }
+                }
+            }
         });
     </script>
 </body>
