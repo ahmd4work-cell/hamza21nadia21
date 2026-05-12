@@ -16,35 +16,49 @@
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; }
 
-        /* شريط التنقل العلوي */
-        .navbar { background-color: var(--nav-navy); display: flex; justify-content: center; padding: 8px 0; position: sticky; top: 0; z-index: 1000; }
-        .navbar a { color: white; text-decoration: none; padding: 6px 15px; margin: 0 4px; font-weight: 700; font-size: 13px; border-radius: 8px; transition: 0.3s; }
-        .navbar a:hover, .navbar a.active { background-color: #003366; }
+        /* شريط التنقل */
+        .navbar { background-color: var(--nav-navy); display: flex; justify-content: center; padding: 6px 0; position: sticky; top: 0; z-index: 1000; }
+        .navbar a { color: white; text-decoration: none; padding: 5px 12px; margin: 0 3px; font-weight: 700; font-size: 12px; border-radius: 6px; transition: 0.3s; }
+        .navbar a.active { background-color: #003366; }
 
-        .container { padding: 20px; max-width: 1400px; margin: auto; }
+        /* شريط البيانات الوظيفية الاحترافي */
+        .user-info-bar { 
+            background: white; 
+            display: flex; 
+            justify-content: space-around; 
+            padding: 8px 15px; 
+            border-bottom: 1px solid #ddd; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            font-size: 12px;
+            color: var(--nav-navy);
+        }
+        .info-item { display: flex; gap: 5px; }
+        .info-label { font-weight: 700; color: #666; }
+        .info-value { font-weight: 700; }
 
-        /* المربعات العلوية */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .card { padding: 10px; border-radius: 10px; color: white; text-align: center; }
-        .card-title { font-size: 12px; margin-bottom: 3px; }
-        .card-value { font-size: 15px; font-weight: bold; }
+        .container { padding: 15px; max-width: 1400px; margin: auto; }
 
-        /* التقسيم الرئيسي */
-        .dashboard-main { display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; align-items: start; }
-        .content-box { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        /* المربعات الصغيرة (سطر واحد) */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .small-card { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 8px 15px; 
+            border-radius: 8px; 
+            color: white; 
+            font-size: 13px; 
+        }
+        .small-card span { font-weight: bold; }
 
-        /* ستايل الجدول الجديد (6 أعمدة) */
-        .yearly-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: center; }
-        .yearly-table th { color: white; padding: 8px 4px; border: 1px solid #ddd; }
-        .yearly-table td { padding: 5px; border: 1px solid #ddd; font-weight: bold; }
-        
-        .bg-black { background-color: var(--stat-black); }
-        .bg-green { background-color: var(--stat-green); }
-        .bg-yellow { background-color: var(--stat-yellow); color: black; }
+        .dashboard-main { display: grid; grid-template-columns: 1fr 1.2fr; gap: 15px; }
+        .content-box { background: white; padding: 12px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
 
-        h3 { font-size: 14px; margin-bottom: 12px; color: var(--nav-navy); }
+        .yearly-table { width: 100%; border-collapse: collapse; font-size: 10px; text-align: center; }
+        .yearly-table th { color: white; padding: 6px; border: 1px solid #ddd; }
+        .yearly-table td { padding: 4px; border: 1px solid #ddd; font-weight: bold; }
 
-        @media (max-width: 1000px) { .dashboard-main { grid-template-columns: 1fr; } }
+        @media (max-width: 1000px) { .dashboard-main { grid-template-columns: 1fr; } .user-info-bar { flex-direction: column; gap: 5px; } }
     </style>
 </head>
 <body>
@@ -58,53 +72,54 @@
         <a href="#">تذكيرات</a>
     </nav>
 
+    <!-- شريط البيانات الشخصية -->
+    <div class="user-info-bar">
+        <div class="info-item"><span class="info-label">الرقم الوظيفي:</span> <span class="info-value">12345</span></div>
+        <div class="info-item"><span class="info-label">الاسم:</span> <span class="info-value">حمزة</span></div>
+        <div class="info-item"><span class="info-label">الموبايل:</span> <span class="info-value">05XXXXXXX</span></div>
+        <div class="info-item"><span class="info-label">الايميل:</span> <span class="info-value">user@mail.com</span></div>
+        <div class="info-item"><span class="info-label">المدير المباشر:</span> <span class="info-value">أحمد علي</span></div>
+        <div class="info-item"><span class="info-label">مدير المبيعات:</span> <span class="info-value">خالد حسن</span></div>
+    </div>
+
     <div class="container">
+        <!-- المربعات الصغيرة في سطر واحد -->
         <div class="stats-grid">
-            <div class="card" style="background-color: var(--stat-black);">
-                <div class="card-title">الهدف السنوي</div>
-                <div class="card-value">180,000 SAR</div>
+            <div class="small-card" style="background-color: var(--stat-black);">
+                <span>الهدف السنوي:</span>
+                <span>180,000 SAR | 100%</span>
             </div>
-            <div class="card" style="background-color: var(--stat-green);">
-                <div class="card-title">مكتمل</div>
-                <div class="card-value">14,210 SAR</div>
+            <div class="small-card" style="background-color: var(--stat-green);">
+                <span>مكتمل:</span>
+                <span>14,210 SAR | 95%</span>
             </div>
-            <div class="card" style="background-color: var(--stat-yellow); color: black;">
-                <div class="card-title">معلق</div>
-                <div class="card-value">0 SAR</div>
+            <div class="small-card" style="background-color: var(--stat-yellow); color: black;">
+                <span>معلق:</span>
+                <span>790 SAR | 5%</span>
             </div>
         </div>
 
         <div class="dashboard-main">
-            <!-- الرسم البياني -->
             <div class="content-box">
-                <h3>📊 الأداء الشهري</h3>
-                <canvas id="performanceChart" style="max-height: 350px;"></canvas>
+                <h3 style="font-size: 13px;">📊 الأداء الشهري</h3>
+                <canvas id="performanceChart" style="max-height: 280px;"></canvas>
             </div>
 
-            <!-- جدول الـ 6 أعمدة (image_8de65e.png) -->
             <div class="content-box" style="overflow-x: auto;">
-                <h3>📅 تفاصيل الأهداف والنسب</h3>
+                <h3 style="font-size: 13px;">📅 تفاصيل الأهداف</h3>
                 <table class="yearly-table">
                     <thead>
                         <tr>
-                            <th class="bg-black">الشهر</th>
-                            <th class="bg-black">الهدف</th>
-                            <th class="bg-green">مكتمل</th>
-                            <th class="bg-green">نسبة الإنجاز</th>
-                            <th class="bg-yellow">معلق</th>
-                            <th class="bg-yellow">نسبة المعلق</th>
+                            <th style="background: black;">الشهر</th>
+                            <th style="background: black;">الهدف</th>
+                            <th style="background: #00b050;">مكتمل</th>
+                            <th style="background: #00b050;">الإنجاز %</th>
+                            <th style="background: #ffc000; color: black;">معلق</th>
+                            <th style="background: #ffc000; color: black;">المعلق %</th>
                         </tr>
                     </thead>
                     <tbody id="yearlyDataBody">
-                        <tr>
-                            <td>يناير</td>
-                            <td>15,000</td>
-                            <td>14,210</td>
-                            <td>95%</td>
-                            <td>790</td>
-                            <td>5%</td>
-                        </tr>
-                        <!-- باقي الشهور ستضاف عبر السكريبت -->
+                        <tr><td>يناير</td><td>15,000</td><td>14,210</td><td>95%</td><td>790</td><td>5%</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -112,14 +127,10 @@
     </div>
 
     <script>
-        // تعبئة الجدول لبقية السنة
         const months = ["فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
         const tbody = document.getElementById('yearlyDataBody');
-        months.forEach(m => {
-            tbody.innerHTML += `<tr><td>${m}</td><td>15,000</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>`;
-        });
+        months.forEach(m => { tbody.innerHTML += `<tr><td>${m}</td><td>15,000</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>`; });
 
-        // إعداد الرسم البياني
         const ctx = document.getElementById('performanceChart').getContext('2d');
         new Chart(ctx, {
             type: 'bar',
@@ -130,15 +141,15 @@
                         label: 'الهدف', 
                         data: Array(12).fill(15000), 
                         backgroundColor: '#000000',
-                        barPercentage: 0.8, // عرض العمود الأسود
-                        categoryPercentage: 0.6
+                        barPercentage: 1.0, // إلغاء الفاصل بين الأعمدة
+                        categoryPercentage: 0.5 
                     },
                     { 
                         label: 'المحقق', 
                         data: [14210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
                         backgroundColor: '#00b050',
-                        barPercentage: 0.4, // العمود الأخضر بنصف عرض الأسود تقريباً
-                        categoryPercentage: 0.6
+                        barPercentage: 0.5, // عرض العمود الأخضر نصف الأسود
+                        categoryPercentage: 0.5
                     }
                 ]
             },
@@ -146,7 +157,7 @@
                 responsive: true, 
                 maintainAspectRatio: false,
                 scales: {
-                    x: { stacked: false }, // جعل الأعمدة بجانب بعضها
+                    x: { stacked: true }, // دمج الأعمدة بجانب بعضها بدون فواصل
                     y: { beginAtZero: true }
                 }
             }
