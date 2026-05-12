@@ -5,7 +5,6 @@
     <title>CRM الاتصالات - الرئيسية</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <style>
         :root {
             --nav-navy: #001f3f;
@@ -23,12 +22,12 @@
             padding: 0;
         }
 
-        /* شريط التنقل */
+        /* تقليل ارتفاع شريط التنقل */
         .navbar {
             background-color: var(--nav-navy);
             display: flex;
             justify-content: center;
-            padding: 15px 0;
+            padding: 8px 0; /* تقليل الحشو */
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -37,4 +36,150 @@
         .navbar a {
             color: white;
             text-decoration: none;
-            padding: 10px 20
+            padding: 6px 15px; /* تصغير حجم الأزرار */
+            margin: 0 4px;
+            font-weight: 700;
+            font-size: 13px; /* تصغير الخط */
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .navbar a:hover, .navbar a.active {
+            background-color: var(--nav-light-navy);
+        }
+
+        .container {
+            padding: 20px; /* تقليل المساحة الجانبية */
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        /* تصغير المربعات الإحصائية */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            padding: 15px; /* تقليل الحشو الداخلي */
+            border-radius: 12px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .card-title { font-size: 14px; opacity: 0.9; margin-bottom: 5px; }
+        .card-value { font-size: 18px; font-weight: bold; }
+
+        .black-card { background-color: var(--stat-black); }
+        .green-card { background-color: var(--stat-green); }
+        .yellow-card { background-color: var(--stat-yellow); color: #333; }
+
+        /* تصغير منطقة الرسم البياني */
+        .chart-container {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            max-width: 800px; /* تقليل عرض الرسم البياني */
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        canvas {
+            max-height: 250px; /* تحديد أقصى ارتفاع للرسم البياني */
+        }
+
+        .table-container {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        table { width: 100%; border-collapse: collapse; text-align: right; font-size: 14px; }
+        th { background-color: #f8f9fa; color: var(--nav-navy); padding: 10px; border-bottom: 2px solid #eee; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+
+        h3 { font-size: 16px; color: var(--nav-navy); margin-bottom: 15px; }
+
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="#" class="active">الرئيسية</a>
+        <a href="#">الزيارات</a>
+        <a href="#">المتوقعة</a>
+        <a href="#">العملاء</a>
+        <a href="#">المبيعات</a>
+        <a href="#">تذكيرات</a>
+    </nav>
+
+    <div class="container">
+        <div class="stats-grid">
+            <div class="card black-card">
+                <div class="card-title">الهدف السنوي</div>
+                <div class="card-value">180,000 SAR</div>
+            </div>
+            <div class="card green-card">
+                <div class="card-title">مكتمل (25%)</div>
+                <div class="card-value">45,000 SAR</div>
+            </div>
+            <div class="card yellow-card">
+                <div class="card-title">معلق (7%)</div>
+                <div class="card-value">12,500 SAR</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3>📊 الأداء الشهري</h3>
+            <canvas id="performanceChart"></canvas>
+        </div>
+
+        <div class="table-container">
+            <h3>📑 أحدث العمليات</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>التاريخ</th>
+                        <th>العميل</th>
+                        <th>الخدمة</th>
+                        <th>المبلغ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2026-05-12</td>
+                        <td>شركة النخبة</td>
+                        <td>Fiber</td>
+                        <td>2,500 SAR</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+                datasets: [
+                    { label: 'الهدف', data: [15000, 15000, 15000, 15000, 15000, 15000, 15000, 15000, 15000, 15000, 15000, 15000], backgroundColor: '#333333' },
+                    { label: 'المحقق', data: [14200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], backgroundColor: '#28a745' }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true }, x: { grid: { display: false } } }
+            }
+        });
+    </script>
+</body>
+</html>
