@@ -33,7 +33,7 @@
         .btn-add { background-color: var(--accent-blue); color: white; border: none; padding: 5px 15px; border-radius: 6px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 11px; }
 
         table { width: 100%; border-collapse: collapse; table-layout: fixed; background: white; border: 1px solid var(--border-color); }
-        th { background-color: #e2e8f0; padding: 6px 2px; color: var(--nav-navy); font-size: 10.5px; font-weight: 800; border: 1px solid var(--border-color); }
+        th { background-color: #e2e8f0; padding: 4px 2px; color: var(--nav-navy); font-size: 10.5px; font-weight: 800; border: 1px solid var(--border-color); }
         td { padding: 0; border: 1px solid var(--border-color); text-align: center; height: 32px; font-size: 11px; }
 
         .excel-input {
@@ -91,7 +91,6 @@
 <script>
     let isDirty = false;
 
-    // حماية البيانات عند إعادة التحميل
     window.addEventListener('beforeunload', (e) => {
         if (isDirty) { e.preventDefault(); e.returnValue = ''; }
     });
@@ -105,16 +104,21 @@
     }
 
     function insertNewRow() {
+        // تاريخ الإنشاء هو تاريخ اليوم
+        const todayStr = new Date().toISOString().split('T')[0];
         renderRow({ 
             comp:'', mgr:'', mob:'', cr:'', curr:'', prop:'', status:'50%', 
-            date: new Date().toISOString().split('T')[0], 
-            updated: '-' 
+            date: todayStr, 
+            updated: '-',
+            created: todayStr // نخزن تاريخ الإنشاء للمقارنة لاحقاً
         }, true);
     }
 
     function renderRow(v, isNew = false) {
         const tbody = document.getElementById('tableBody');
         const row = tbody.insertRow(isNew ? 0 : -1);
+        row.setAttribute('data-created', v.created || v.date); // حفظ تاريخ الإنشاء في الخاصية
+
         row.innerHTML = `
             <td><input type="text" class="excel-input" value="${v.comp}" oninput="markAsChanged(this)"></td>
             <td><input type="text" class="excel-input" value="${v.mgr}" oninput="markAsChanged(this)"></td>
@@ -137,22 +141,29 @@
         if(isNew) isDirty = true;
     }
 
-    // وظيفة رصد التعديل في أي "مربع"
     function markAsChanged(el) {
         isDirty = true;
         const row = el.closest('tr');
         row.querySelector('.btn-save').classList.add('active');
         
-        // تجهيز تاريخ اليوم تلقائياً عند أول تعديل
-        const today = new Date().toLocaleDateString('en-GB'); 
-        row.setAttribute('data-pending-update', today); 
+        const createdDate = row.getAttribute('data-created');
+        const today = new Date().toISOString().split('T')[0];
+        const todayDisplay = new Date().toLocaleDateString('en-GB');
+
+        // المنطق: إذا كان تاريخ اليوم مختلف عن تاريخ الإنشاء، نجهز التاريخ للتعديل
+        if (today !== createdDate) {
+            row.setAttribute('data-pending-update', todayDisplay);
+        } else {
+            // إذا كان نفس اليوم، نتأكد من مسح أي تاريخ معلق ليبقى "-"
+            row.removeAttribute('data-pending-update');
+        }
     }
 
     function saveAllData(btn) {
         const currentRow = btn.closest('tr');
-        
-        // وضع تاريخ التعديل التلقائي في الخلية عند الحفظ
         const pendingDate = currentRow.getAttribute('data-pending-update');
+        
+        // تحديث النص فقط إذا وجد تاريخ تعديل معلق (أي بعد يوم الإنشاء)
         if (pendingDate) {
             currentRow.querySelector('.updated-at').innerText = pendingDate;
         }
@@ -166,14 +177,14 @@
                 comp: ins[0].value, mgr: ins[1].value, mob: ins[2].value,
                 cr: ins[3].value, curr: ins[4].value, prop: ins[5].value,
                 status: ins[6].value, date: ins[7].value,
-                updated: row.querySelector('.updated-at').innerText
+                updated: row.querySelector('.updated-at').innerText,
+                created: row.getAttribute('data-created')
             });
         });
 
         localStorage.setItem('asgate_visits', JSON.stringify(allVisits));
         isDirty = false;
         btn.classList.remove('active');
-        currentRow.removeAttribute('data-pending-update');
     }
 </script>
 </body>
