@@ -3,196 +3,272 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASGate - إدارة الزيارات</title>
+    <title>ASGate - لوحة التحكم</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --nav-navy: #001f3f;
-            --main-blue: #0056b3;
-            --bg-light: #f8f9fa;
+            --stat-black: #1a1a1a;
+            --stat-green: #00b050;
+            --stat-yellow: #ffc000;
+            --bg-color: #f4f7f6;
         }
 
-        body { background-color: var(--bg-light); font-family: 'Cairo', sans-serif; margin: 0; }
-
-        /* شريط التنقل */
-        .navbar { background-color: var(--nav-navy); display: flex; padding: 8px 20px; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
-        .navbar a { color: white; text-decoration: none; padding: 6px 15px; font-weight: 700; font-size: 11px; }
-
-        /* شريط الإجراءات المحدث - اليمين */
-        .action-bar {
-            display: flex;
-            flex-direction: row-reverse; /* عكس الاتجاه ليصبح الزر يميناً */
-            justify-content: flex-start;
-            align-items: center;
-            background: white;
-            padding: 10px 20px;
-            gap: 15px;
-            border-bottom: 1px solid #dee2e6;
+        body { 
+            background-color: var(--bg-color); 
+            font-family: 'Cairo', sans-serif; 
+            margin: 0; 
         }
-        .btn-add {
+
+        /* شريط التنقل بحواف دائرية وروابط متصلة */
+        .navbar { 
+            background-color: var(--nav-navy); 
+            display: flex; 
+            padding: 8px 20px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            border-bottom-left-radius: 12px; 
+            border-bottom-right-radius: 12px;
+        }
+        .navbar a { 
+            color: white; 
+            text-decoration: none; 
+            padding: 6px 15px; 
+            margin-left: 10px; 
+            font-weight: 700; 
+            font-size: 11px; 
+            border-radius: 6px; 
+        }
+        .navbar a.active { background-color: #003366; }
+
+        .user-info-bar { 
+            background: white; 
+            display: flex; 
+            justify-content: space-around; 
+            padding: 8px 15px; 
+            border-bottom: 1px solid #ddd; 
+            font-size: 11px; 
+            color: var(--nav-navy); 
+        }
+
+        .container { padding: 15px; max-width: 1400px; margin: auto; }
+
+        /* الكروت العلوية */
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 15px; 
+            margin-bottom: 20px; 
+        }
+        .small-card { 
+            display: flex; 
+            align-items: center; 
+            padding: 10px 15px; 
+            border-radius: 8px; 
+            color: white; 
+            font-size: 13px; 
+        }
+
+        /* التوزيع الرئيسي: رسوم (يمين)، جدول (وسط)، فرز (يسار) */
+        .dashboard-main { 
+            display: grid; 
+            grid-template-columns: 320px 600px 1fr; 
+            gap: 25px; 
+            margin-bottom: 20px; 
+            align-items: start; 
+        }
+        
+        .charts-column { display: flex; flex-direction: column; gap: 20px; }
+        .content-box { 
+            background: white; 
+            padding: 12px; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03); 
+        }
+
+        /* شريط العنوان الكحلي بحواف دائرية */
+        h3 { 
+            font-size: 12px; 
+            margin-top: 0;
+            margin-bottom: 12px; 
+            color: white; 
             background-color: var(--nav-navy);
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 4px;
-            font-family: 'Cairo';
-            font-weight: bold;
-            font-size: 13px;
-            cursor: pointer;
-        }
-        .search-input {
-            width: 250px;
-            padding: 6px 12px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            font-family: 'Cairo';
-            font-size: 12px;
-        }
-
-        /* الجدول */
-        .table-container { padding: 20px; overflow-x: auto; }
-        .custom-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .custom-table thead tr { background-color: var(--nav-navy); color: white; }
-        .custom-table th { padding: 12px 8px; font-size: 11px; border-left: 1px solid rgba(255,255,255,0.1); }
-        .custom-table td { padding: 10px 8px; text-align: center; border-bottom: 1px solid #eee; font-size: 11px; font-weight: bold; }
-
-        /* سجل النشاط - لليمين كما في الصورة */
-        .activity-log {
-            margin-top: 20px;
-            background: white;
-            border: 1px solid #b2d7ff;
+            padding: 8px 15px;
             border-radius: 8px;
-            min-height: 80px;
-            position: relative;
-            padding: 15px;
-        }
-        .activity-log-title {
-            position: absolute;
-            top: 10px;
-            right: 15px; /* تم النقل لليمين */
-            font-size: 12px;
-            font-weight: bold;
-            color: #333;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-direction: row-reverse;
+            font-weight: 700; 
         }
 
-        /* النافذة المنبثقة (Modal) */
-        .modal {
-            display: none; 
-            position: fixed;
-            z-index: 2000;
-            right: 0; top: 0;
-            width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.5);
-        }
-        .modal-content {
-            background-color: white;
-            margin: 5% auto;
-            padding: 20px;
-            width: 400px;
+        /* جدول الأهداف الرشيق */
+        .table-area .content-box { border-right: 4px solid var(--nav-navy); }
+        .yearly-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: center; table-layout: fixed; }
+        .yearly-table th { color: white; padding: 5px 2px; border: 1px solid #eee; font-size: 10px; }
+        .yearly-table td { padding: 4px 2px; border: 1px solid #eee; font-weight: bold; }
+
+        /* صندوق البحث والفرز الجانبي */
+        .search-filter-box {
+            background: white;
+            padding: 15px;
             border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            border: 1px solid #eee;
         }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; }
-        .form-control { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-family: 'Cairo'; box-sizing: border-box; }
-        .btn-save { width: 100%; padding: 10px; background: var(--nav-navy); color: white; border: none; border-radius: 6px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
+        .filter-group { margin-bottom: 15px; }
+        .filter-group label { display: block; font-size: 11px; font-weight: bold; margin-bottom: 5px; color: var(--nav-navy); }
+        .filter-input {
+            width: 100%;
+            padding: 8px;
+            font-family: 'Cairo';
+            font-size: 11px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .chart-wrapper { position: relative; height: 150px; width: 100%; }
+
+        /* سجل النشاطات */
+        .timeline-section { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .timeline-item { border-right: 3px solid var(--nav-navy); padding-right: 15px; margin-bottom: 12px; }
+        .timeline-stamp { background: #e9ecef; display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-bottom: 4px; color: var(--nav-navy); }
+        .timeline-content { font-size: 11px; color: #444; }
+
+        @media (max-width: 1300px) { 
+            .dashboard-main { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
     <nav class="navbar">
-        <a href="index.html">الرئيسية</a>
-        <a href="visits.html" style="background: #003366; border-radius: 6px;">الزيارات</a>
+        <a href="index.html" class="active">الرئيسية</a>
+        <a href="visits.html">الزيارات</a>
+        <a href="#">المتوقعة</a>
+        <a href="#">العملاء</a>
+        <a href="#">المبيعات</a>
+        <a href="#">تذكيرات</a>
     </nav>
 
-    <div class="action-bar">
-        <button class="btn-add" id="openModalBtn">+ إضافة جديدة</button>
-        <input type="text" class="search-input" placeholder="بحث سريع...">
+    <div class="user-info-bar">
+        <div><span style="font-weight:700">الرقم:</span> 12345</div>
+        <div><span style="font-weight:700">الاسم:</span> حمزة</div>
+        <div><span style="font-weight:700">الموبايل:</span> 05XXXXXXX</div>
     </div>
 
-    <div class="table-container">
-        <table class="custom-table">
-            <thead>
-                <tr>
-                    <th style="width: 15%;">الشركة</th>
-                    <th>العنوان</th>
-                    <th>المسؤول</th>
-                    <th>موبايل</th>
-                    <th>الإيميل</th>
-                    <th>السجل</th>
-                    <th>الحالة</th>
-                    <th>التاريخ</th>
-                    <th>إجراء</th>
-                </tr>
-            </thead>
-            <tbody id="visitTableBody">
-                <!-- سيتم إضافة البيانات هنا -->
-            </tbody>
-        </table>
-
-        <div class="activity-log">
-            <div class="activity-log-title">
-                <span>سجل النشاط</span>
-                <span style="font-size: 16px;">🕒</span>
+    <div class="container">
+        <!-- الكروت العلوية -->
+        <div class="stats-grid">
+            <div class="small-card" style="background-color: var(--stat-black);">
+                <div style="width:30%">الهدف</div><div style="width:50%; text-align:center; font-weight:bold">180,000</div>
+            </div>
+            <div class="small-card" style="background-color: var(--stat-green);">
+                <div style="width:30%">مكتمل</div><div style="width:50%; text-align:center; font-weight:bold">14,210</div>
+            </div>
+            <div class="small-card" style="background-color: var(--stat-yellow); color: black;">
+                <div style="width:30%">معلق</div><div style="width:50%; text-align:center; font-weight:bold">790</div>
             </div>
         </div>
-    </div>
 
-    <!-- نافذة إضافة زيارة -->
-    <div id="visitModal" class="modal">
-        <div class="modal-content">
-            <h3 style="margin-top:0; color: var(--nav-navy);">تسجيل زيارة جديدة</h3>
-            <div class="form-group">
-                <label>اسم الشركة</label>
-                <input type="text" id="compName" class="form-control">
+        <div class="dashboard-main">
+            <!-- عمود الرسوم -->
+            <div class="charts-column">
+                <div class="content-box">
+                    <h3>📈 الأداء الشهري</h3>
+                    <div class="chart-wrapper"><canvas id="performanceChart"></canvas></div>
+                </div>
+                <div class="content-box">
+                    <h3>📊 توزيع الإنجاز</h3>
+                    <div class="chart-wrapper"><canvas id="pieChart"></canvas></div>
+                </div>
             </div>
-            <div class="form-group">
-                <label>المسؤول</label>
-                <input type="text" id="manager" class="form-control">
+
+            <!-- عمود الجدول المقلص -->
+            <div class="table-area">
+                <div class="content-box">
+                    <h3>📅 تفاصيل الأهداف السنوية</h3>
+                    <table class="yearly-table">
+                        <thead>
+                            <tr>
+                                <th style="background: #1a1a1a; width: 18%;">الشهر</th>
+                                <th style="background: #1a1a1a;">الهدف</th>
+                                <th style="background: #00b050;">مكتمل</th>
+                                <th style="background: #00b050;">%</th>
+                                <th style="background: #ffc000; color: black;">معلق</th>
+                                <th style="background: #ffc000; color: black;">%</th>
+                            </tr>
+                        </thead>
+                        <tbody id="yearlyDataBody">
+                            <tr><td>يناير</td><td>15,000</td><td>14,210</td><td>95%</td><td>790</td><td>5%</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div class="form-group">
-                <label>الحالة</label>
-                <select id="status" class="form-control">
-                    <option>متابع</option>
-                    <option>غير مهتم</option>
-                    <option>تم التعميد</option>
-                </select>
+
+            <!-- عمود البحث والفرز (يسار) -->
+            <div class="search-filter-box">
+                <h3>🔍 فلترة وتخصيص</h3>
+                <div class="filter-group">
+                    <label>بحث سريع</label>
+                    <input type="text" class="filter-input" placeholder="اسم العميل أو الرقم...">
+                </div>
+                <div class="filter-group">
+                    <label>المشرف</label>
+                    <select class="filter-input">
+                        <option>الكل</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>المندوب</label>
+                    <select class="filter-input">
+                        <option>الكل</option>
+                        <option>حمزة</option>
+                    </select>
+                </div>
             </div>
-            <button class="btn-save" onclick="saveVisit()">حفظ البيانات</button>
-            <button style="width: 100%; margin-top: 10px; background: #eee; border:none; padding: 8px; border-radius: 6px; cursor: pointer;" onclick="closeModal()">إلغاء</button>
+        </div>
+
+        <!-- سجل النشاطات -->
+        <div class="timeline-section">
+            <h3>🕒 آخر التحديثات</h3>
+            <div id="timeline-container">
+                <div class="timeline-item">
+                    <div class="timeline-stamp">13 مايو 2026</div>
+                    <div class="timeline-content">تم تحديث الروابط وربط صفحة الزيارات بنجاح.</div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        const modal = document.getElementById("visitModal");
-        const btn = document.getElementById("openModalBtn");
+        // ملء باقي شهور السنة برمجياً لتوفير مساحة الكود
+        const months = ["فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+        const tbody = document.getElementById('yearlyDataBody');
+        months.forEach(m => { tbody.innerHTML += `<tr><td>${m}</td><td>15,000</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>`; });
 
-        // تفعيل فتح النافذة
-        btn.onclick = function() { modal.style.display = "block"; }
+        // إعدادات الرسوم البيانية
+        const ctxBar = document.getElementById('performanceChart').getContext('2d');
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: ['1','2','3','4','5','6','7','8','9','10','11','12'],
+                datasets: [
+                    { label: 'الهدف', data: Array(12).fill(15000), backgroundColor: '#e9ecef', borderRadius: 4, barPercentage: 0.5 },
+                    { label: 'المحقق', data: [14210,0,0,0,0,0,0,0,0,0,0,0], backgroundColor: '#00b050', borderRadius: 4, barPercentage: 0.3 }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { beginAtZero: true } } }
+        });
 
-        function closeModal() { modal.style.display = "none"; }
-
-        window.onclick = function(event) {
-            if (event.target == modal) { closeModal(); }
-        }
-
-        // دالة تجريبية لحفظ البيانات في الجدول
-        function saveVisit() {
-            const name = document.getElementById("compName").value;
-            const manager = document.getElementById("manager").value;
-            const status = document.getElementById("status").value;
-
-            if(name) {
-                const table = document.getElementById("visitTableBody");
-                const row = table.insertRow();
-                row.innerHTML = `<td>${name}</td><td>الرياض</td><td>${manager}</td><td>-</td><td>-</td><td>-</td><td>${status}</td><td>2026-05-13</td><td><button>تعديل</button></td>`;
-                closeModal();
-            }
-        }
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        new Chart(ctxPie, {
+            type: 'doughnut',
+            data: {
+                labels: ['مكتمل', 'معلق'],
+                datasets: [{ data: [95, 5], backgroundColor: ['#00b050', '#ffc000'], borderWidth: 0 }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } }
+        });
     </script>
 </body>
 </html>
