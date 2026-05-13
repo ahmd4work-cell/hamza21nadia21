@@ -8,52 +8,85 @@
     <style>
         :root {
             --nav-navy: #001f3f;
-            --bg-color: #f8fafc;
+            --bg-color: #f4f7f9;
             --accent-green: #22c55e;
-            --accent-red: #ef4444;
             --accent-blue: #3b82f6;
+            --border-color: #cbd5e1;
         }
 
-        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.1; }
+        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1; }
 
-        .navbar { background-color: var(--nav-navy); display: flex; padding: 5px 20px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; }
-        .navbar a { color: white; text-decoration: none; padding: 4px 12px; font-weight: 700; font-size: 13px; }
+        .navbar { background-color: var(--nav-navy); display: flex; padding: 4px 15px; border-bottom: 2px solid #00152b; }
+        .navbar a { color: white; text-decoration: none; padding: 3px 10px; font-weight: 700; font-size: 12px; }
 
-        .container { padding: 10px 15px; max-width: 100%; }
+        .container { padding: 5px; max-width: 100%; }
 
-        .action-bar { display: flex; align-items: center; margin-bottom: 10px; gap: 10px; }
-        .btn-add { background-color: var(--accent-blue); color: white; border: none; padding: 5px 15px; border-radius: 6px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; }
+        .action-bar { display: flex; align-items: center; margin-bottom: 5px; gap: 8px; padding: 0 5px; }
+        .btn-add { background-color: var(--accent-blue); color: white; border: none; padding: 4px 12px; border-radius: 4px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 11px; }
         
-        .search-container { display: flex; align-items: center; background: white; border: 1px solid #e2e8f0; border-radius: 6px; padding: 0 8px; width: 180px; }
-        .search-input { border: none; padding: 4px; font-family: 'Cairo'; outline: none; width: 100%; font-size: 11px; }
+        .search-container { display: flex; align-items: center; background: white; border: 1px solid var(--border-color); border-radius: 4px; padding: 0 5px; width: 150px; }
+        .search-input { border: none; padding: 2px; font-family: 'Cairo'; outline: none; width: 100%; font-size: 11px; }
 
-        .table-card { background: white; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden; }
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th { background-color: #f1f5f9; padding: 6px 3px; color: var(--nav-navy); font-size: 11px; font-weight: 800; border-bottom: 1px solid #e2e8f0; }
-        td { padding: 4px 3px; border-bottom: 1px solid #f1f5f9; text-align: center; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; font-weight: bold; }
-
-        /* حقول الإدخال داخل الجدول */
-        .row-input { width: 92%; padding: 3px; border: 1px solid #3b82f6; border-radius: 3px; font-family: 'Cairo'; font-size: 11px; text-align: center; outline: none; }
+        /* الجدول - إلغاء الفراغات تماماً */
+        .table-card { background: white; border: 1px solid var(--border-color); border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; border-spacing: 0; }
         
-        .status-pill { padding: 1px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; }
+        th { 
+            background-color: #e2e8f0; 
+            padding: 4px 2px; 
+            color: var(--nav-navy); 
+            font-size: 10.5px; 
+            font-weight: 800; 
+            border: 1px solid var(--border-color); /* حدود رفيعة جداً لتمييز الأعمدة دون فراغات */
+        }
+        
+        td { 
+            padding: 3px 2px; 
+            border: 1px solid #edf2f7; 
+            text-align: center; 
+            font-size: 11px; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            font-weight: bold;
+            color: #1e293b;
+        }
+
+        tr:hover { background-color: #f1f5f9; }
+
+        /* حقول الإدخال المدمجة */
+        .row-input { 
+            width: 98%; 
+            padding: 2px; 
+            border: 1px solid var(--accent-blue); 
+            border-radius: 2px; 
+            font-family: 'Cairo'; 
+            font-size: 10.5px; 
+            text-align: center; 
+            outline: none;
+            background-color: #fff;
+        }
+        
+        .status-pill { padding: 1px 6px; border-radius: 8px; font-size: 9.5px; font-weight: bold; }
         .status-50 { background: #dcfce7; color: #15803d; }
-        .status-lost { background: #fee2e2; color: #b91c1c; }
 
-        .btn-action { border: none; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; margin: 0 1px; color: white; }
-        .bg-save { background-color: var(--accent-green); }
+        .btn-action { 
+            border: none; 
+            padding: 1px 5px; 
+            border-radius: 3px; 
+            font-size: 9.5px; 
+            font-family: 'Cairo'; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin: 0; 
+            color: white; 
+        }
+        .bg-save { background-color: var(--accent-green); margin-left: 2px; }
         .bg-edit { background-color: var(--accent-blue); }
-        .bg-transfer { background-color: #f59e0b; }
-        
-        /* Tooltip */
-        td:hover::after { content: attr(data-tooltip); position: absolute; z-index: 100; bottom: 100%; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 3px 8px; border-radius: 4px; font-size: 10px; white-space: normal; width: max-content; }
+        .bg-transfer { background-color: #f59e0b; margin-right: 2px; }
     </style>
 </head>
 <body>
-
-<nav class="navbar">
-    <a href="#">الزيارات</a>
-    <a href="#">الفرص البيعية</a>
-</nav>
 
 <div class="container">
     <div class="action-bar">
@@ -67,65 +100,56 @@
         <table id="visitsTable">
             <thead>
                 <tr>
-                    <th style="width: 12%;">الشركة</th>
+                    <th style="width: 13%;">الشركة</th>
                     <th>المسؤول</th>
                     <th>الموبايل</th>
                     <th>السجل</th>
                     <th>الخدمة الحالية</th>
                     <th>الخدمة المقترحة</th>
-                    <th style="width: 80px;">الحالة</th>
-                    <th style="width: 90px;">التاريخ</th>
-                    <th style="width: 130px;">إجراء</th>
+                    <th style="width: 70px;">الحالة</th>
+                    <th style="width: 85px;">التاريخ</th>
+                    <th style="width: 110px;">إجراء</th>
                 </tr>
             </thead>
-            <tbody id="tableBody"></tbody>
+            <tbody id="tableBody">
+                <!-- الصفوف ستظهر هنا ملتصقة وبدون فراغات -->
+            </tbody>
         </table>
     </div>
 </div>
 
 <script>
-    let isEditing = false; // لمتابعة حالة التعديل
+    let isEditing = false;
 
-    // منع الخروج من الصفحة إذا كان هناك تعديل غير محفوظ
-    window.addEventListener('beforeunload', function (e) {
-        if (isEditing) {
-            e.preventDefault();
-            e.returnValue = 'لديك تغييرات غير محفوظة، هل أنت متأكد من المغادرة؟';
-        }
-    });
+    // تنبيه الخروج إذا لم يتم الحفظ
+    window.onbeforeunload = function() {
+        if (isEditing) return "لم يتم حفظ التغييرات!";
+    };
 
     function insertNewRow() {
-        if (isEditing) {
-            alert("يرجى حفظ الصف الحالي أولاً");
-            return;
-        }
+        if (isEditing) return alert("احفظ التعديل الحالي أولاً");
         
         isEditing = true;
         const tbody = document.getElementById('tableBody');
-        const today = new Date().toISOString().split('T')[0];
         const row = tbody.insertRow(0);
         row.setAttribute('data-new', 'true');
 
         row.innerHTML = `
-            <td><input type="text" class="row-input" placeholder="الشركة"></td>
-            <td><input type="text" class="row-input" placeholder="المسؤول"></td>
-            <td><input type="text" class="row-input" placeholder="05xxxx"></td>
-            <td><input type="text" class="row-input" placeholder="السجل"></td>
-            <td><input type="text" class="row-input" placeholder="الحالية"></td>
-            <td><input type="text" class="row-input" placeholder="المقترحة"></td>
+            <td><input type="text" class="row-input"></td>
+            <td><input type="text" class="row-input"></td>
+            <td><input type="text" class="row-input"></td>
+            <td><input type="text" class="row-input"></td>
+            <td><input type="text" class="row-input"></td>
+            <td><input type="text" class="row-input"></td>
             <td>
                 <select class="row-input">
-                    <option value="50%">50%</option>
-                    <option value="20%">20%</option>
-                    <option value="مهتم">مهتم</option>
-                    <option value="فقدان">فقدان</option>
+                    <option>50%</option><option>20%</option><option>مهتم</option><option>فقدان</option>
                 </select>
             </td>
-            <td><input type="date" class="row-input" value="${today}"></td>
+            <td><input type="date" class="row-input" value="${new Date().toISOString().split('T')[0]}"></td>
             <td>
                 <button class="btn-action bg-save" onclick="saveRow(this)">حفظ</button>
-                <button class="btn-action bg-edit" style="opacity:0.5" disabled>تعديل</button>
-                <button class="btn-action bg-transfer" style="opacity:0.5" disabled>نقل</button>
+                <button class="btn-action bg-edit" style="opacity:0.3" disabled>تعديل</button>
             </td>
         `;
     }
@@ -133,63 +157,23 @@
     function saveRow(btn) {
         const row = btn.closest('tr');
         const inputs = row.querySelectorAll('.row-input');
-        const data = Array.from(inputs).map(i => i.value);
-        
-        // تحويل المدخلات إلى نصوص عرض
-        const phone = data[2];
-        const cleanPhone = phone.startsWith('0') ? '966' + phone.substring(1) : phone;
-        const status = data[6];
-        const statusClass = (status === '50%') ? 'status-50' : (status === 'فقدان') ? 'status-lost' : '';
-
-        row.innerHTML = `
-            <td data-tooltip="${data[0]}">${data[0]}</td>
-            <td data-tooltip="${data[1]}">${data[1]}</td>
-            <td><a href="https://wa.me/${cleanPhone}" target="_blank" style="color:var(--accent-green); text-decoration:none;">${phone}</a></td>
-            <td data-tooltip="${data[3]}">${data[3]}</td>
-            <td data-tooltip="${data[4]}">${data[4]}</td>
-            <td data-tooltip="${data[5]}">${data[5]}</td>
-            <td><span class="status-pill ${statusClass}">${status}</span></td>
-            <td>${data[7]}</td>
-            <td>
-                <button class="btn-action bg-save" style="display:none" onclick="saveRow(this)">حفظ</button>
-                <button class="btn-action bg-edit" onclick="editExistingRow(this)">تعديل</button>
-                <button class="btn-action bg-transfer" onclick="confirmTransfer(this)">نقل</button>
-            </td>
-        `;
+        const v = Array.from(inputs).map(i => i.value);
         
         isEditing = false;
-        row.removeAttribute('data-new');
-        sortRows();
-    }
-
-    function editExistingRow(btn) {
-        if (isEditing) {
-            alert("يرجى حفظ التعديلات الحالية أولاً");
-            return;
-        }
-        isEditing = true;
-        const row = btn.closest('tr');
-        // منطق تحويل الصف لخلايا قابلة للتعديل...
-        alert("الصف الآن جاهز للتعديل"); 
-    }
-
-    function confirmTransfer(btn) {
-        if (confirm("هل ترغب بنقل الزيارة إلى الفرص البيعية؟")) {
-            btn.closest('tr').remove();
-        }
-    }
-
-    function sortRows() {
-        const tbody = document.getElementById('tableBody');
-        const rows = Array.from(tbody.querySelectorAll('tr:not([data-new="true"])'));
-        const priority = { "50%": 4, "20%": 3, "مهتم": 2, "فقدان": 1 };
-
-        rows.sort((a, b) => {
-            const sA = a.querySelector('.status-pill')?.innerText || "";
-            const sB = b.querySelector('.status-pill')?.innerText || "";
-            return (priority[sB] || 0) - (priority[sA] || 0);
-        });
-        rows.forEach(row => tbody.appendChild(row));
+        row.innerHTML = `
+            <td>${v[0]}</td>
+            <td>${v[1]}</td>
+            <td>${v[2]}</td>
+            <td>${v[3]}</td>
+            <td>${v[4]}</td>
+            <td>${v[5]}</td>
+            <td><span class="status-pill status-50">${v[6]}</span></td>
+            <td>${v[7]}</td>
+            <td>
+                <button class="btn-action bg-edit" onclick="editRow(this)">تعديل</button>
+                <button class="btn-action bg-transfer" onclick="this.closest('tr').remove()">نقل</button>
+            </td>
+        `;
     }
 </script>
 </body>
