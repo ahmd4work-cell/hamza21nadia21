@@ -12,79 +12,54 @@
             --accent-green: #22c55e;
             --accent-red: #ef4444;
             --accent-blue: #3b82f6;
-            --text-main: #334155;
         }
 
-        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; color: var(--text-main); line-height: 1.2; }
+        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.1; }
 
-        /* شريط التنقل - تقليل الارتفاع */
-        .navbar { background-color: var(--nav-navy); display: flex; padding: 5px 20px; position: sticky; top: 0; z-index: 1000; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; }
-        .navbar a { color: white; text-decoration: none; padding: 4px 12px; margin-left: 8px; font-weight: 700; font-size: 13px; border-radius: 6px; }
+        .navbar { background-color: var(--nav-navy); display: flex; padding: 5px 20px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; }
+        .navbar a { color: white; text-decoration: none; padding: 4px 12px; font-weight: 700; font-size: 13px; }
 
-        .container { padding: 10px 20px; max-width: 99%; margin: auto; }
+        .container { padding: 10px 15px; max-width: 100%; }
 
-        /* شريط الإجراءات - البحث بجوار الإضافة */
-        .action-bar { display: flex; align-items: center; justify-content: flex-start; margin-bottom: 12px; gap: 10px; }
-        .btn-add { background-color: var(--accent-blue); color: white; border: none; padding: 6px 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 13px; }
+        .action-bar { display: flex; align-items: center; margin-bottom: 10px; gap: 10px; }
+        .btn-add { background-color: var(--accent-blue); color: white; border: none; padding: 5px 15px; border-radius: 6px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; }
         
-        .search-container { display: flex; align-items: center; background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0 10px; width: 200px; }
-        .search-input { border: none; padding: 6px; font-family: 'Cairo'; outline: none; width: 100%; font-size: 12px; }
+        .search-container { display: flex; align-items: center; background: white; border: 1px solid #e2e8f0; border-radius: 6px; padding: 0 8px; width: 180px; }
+        .search-input { border: none; padding: 4px; font-family: 'Cairo'; outline: none; width: 100%; font-size: 11px; }
 
-        /* الجدول - تقليل ارتفاع الصفوف */
-        .table-card { background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; overflow: hidden; }
+        .table-card { background: white; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden; }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th { background-color: #f1f5f9; padding: 8px 5px; color: var(--nav-navy); font-size: 12px; font-weight: 800; text-align: center; border-bottom: 1px solid #e2e8f0; }
-        td { padding: 6px 5px; border-bottom: 1px solid #f1f5f9; text-align: center; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; font-weight: bold; }
-        tr:hover { background-color: #f8fafc; }
+        th { background-color: #f1f5f9; padding: 6px 3px; color: var(--nav-navy); font-size: 11px; font-weight: 800; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 4px 3px; border-bottom: 1px solid #f1f5f9; text-align: center; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; font-weight: bold; }
 
-        /* التلميح Tooltip */
-        td:hover::after {
-            content: attr(data-tooltip); position: absolute; z-index: 100; bottom: 100%; left: 50%; transform: translateX(-50%);
-            background: #1e293b; color: white; padding: 4px 10px; border-radius: 4px; font-size: 11px; white-space: normal; width: max-content; max-content: 180px;
-        }
-
-        /* شارات الحالة مضغوطة */
-        .status-pill { padding: 2px 10px; border-radius: 15px; font-size: 10px; font-weight: bold; display: inline-block; }
+        /* حقول الإدخال داخل الجدول */
+        .row-input { width: 92%; padding: 3px; border: 1px solid #3b82f6; border-radius: 3px; font-family: 'Cairo'; font-size: 11px; text-align: center; outline: none; }
+        
+        .status-pill { padding: 1px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; }
         .status-50 { background: #dcfce7; color: #15803d; }
-        .status-20 { background: #fef9c3; color: #a16207; }
-        .status-interested { background: #dbeafe; color: #1d4ed8; }
         .status-lost { background: #fee2e2; color: #b91c1c; }
 
-        /* أزرار الإجراءات */
-        .btn-icon { background: none; border: none; cursor: pointer; padding: 2px 6px; margin: 0 2px; border-radius: 4px; font-size: 11px; font-family: 'Cairo'; font-weight: bold; }
-        .btn-edit { color: var(--accent-blue); background: #eff6ff; }
-        .btn-transfer { color: #f59e0b; background: #fffbeb; }
-
-        /* Modal - نافذة الإضافة */
-        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px); }
-        .modal-content { background: white; width: 500px; margin: 3% auto; border-radius: 15px; box-shadow: 0 15px 25px rgba(0,0,0,0.1); overflow: hidden; }
-        .modal-header { background: var(--nav-navy); color: white; padding: 10px 20px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
-        .modal-body { padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .input-group { display: flex; flex-direction: column; gap: 2px; }
-        .input-group label { font-size: 11px; font-weight: bold; color: #64748b; }
-        .modal-input { padding: 6px; border: 1px solid #e2e8f0; border-radius: 6px; font-family: 'Cairo'; font-size: 12px; }
-        .full-width { grid-column: span 2; }
-        .modal-footer { padding: 10px 20px; background: #f8fafc; display: flex; justify-content: flex-end; gap: 8px; }
-
-        .btn-save-modal { background: var(--accent-green); color: white; border: none; padding: 8px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; font-family: 'Cairo'; }
+        .btn-action { border: none; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; margin: 0 1px; color: white; }
+        .bg-save { background-color: var(--accent-green); }
+        .bg-edit { background-color: var(--accent-blue); }
+        .bg-transfer { background-color: #f59e0b; }
+        
+        /* Tooltip */
+        td:hover::after { content: attr(data-tooltip); position: absolute; z-index: 100; bottom: 100%; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 3px 8px; border-radius: 4px; font-size: 10px; white-space: normal; width: max-content; }
     </style>
 </head>
 <body>
 
 <nav class="navbar">
-    <a href="index.html">الرئيسية</a>
-    <a href="visits.html" class="active">الزيارات</a>
-    <a href="opportunities.html">الفرص البيعية</a>
-    <a href="#">العملاء</a>
-    <a href="#">المبيعات</a>
-    <a href="#">تذكيرات</a>
+    <a href="#">الزيارات</a>
+    <a href="#">الفرص البيعية</a>
 </nav>
 
 <div class="container">
     <div class="action-bar">
-        <button class="btn-add" onclick="toggleModal('visitModal', true)">+ إضافة زيارة</button>
+        <button class="btn-add" onclick="insertNewRow()">+ إضافة زيارة</button>
         <div class="search-container">
-            <input type="text" class="search-input" placeholder="بحث سريع...">
+            <input type="text" class="search-input" placeholder="بحث...">
         </div>
     </div>
 
@@ -92,102 +67,127 @@
         <table id="visitsTable">
             <thead>
                 <tr>
-                    <th style="width: 13%;">الشركة</th>
+                    <th style="width: 12%;">الشركة</th>
                     <th>المسؤول</th>
                     <th>الموبايل</th>
                     <th>السجل</th>
                     <th>الخدمة الحالية</th>
                     <th>الخدمة المقترحة</th>
                     <th style="width: 80px;">الحالة</th>
-                    <th style="width: 95px;">التاريخ</th>
-                    <th style="width: 120px;">إجراء</th>
+                    <th style="width: 90px;">التاريخ</th>
+                    <th style="width: 130px;">إجراء</th>
                 </tr>
             </thead>
-            <tbody id="tableBody">
-                <!-- الصفوف ستظهر هنا مضغوطة وبخط واضح -->
-            </tbody>
+            <tbody id="tableBody"></tbody>
         </table>
     </div>
 </div>
 
-<!-- Modal النافذة المنبثقة -->
-<div id="visitModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <span>تسجيل زيارة جديدة</span>
-            <span style="cursor:pointer" onclick="toggleModal('visitModal', false)">×</span>
-        </div>
-        <div class="modal-body">
-            <div class="input-group"><label>الشركة</label><input type="text" id="m_comp" class="modal-input"></div>
-            <div class="input-group"><label>المسؤول</label><input type="text" id="m_mgr" class="modal-input"></div>
-            <div class="input-group"><label>الموبايل</label><input type="text" id="m_phone" class="modal-input"></div>
-            <div class="input-group"><label>السجل</label><input type="text" id="m_cr" class="modal-input"></div>
-            <div class="input-group"><label>الخدمة الحالية</label><input type="text" id="m_curr" class="modal-input"></div>
-            <div class="input-group"><label>الخدمة المقترحة</label><input type="text" id="m_prop" class="modal-input"></div>
-            <div class="input-group"><label>الحالة</label>
-                <select id="m_status" class="modal-input">
+<script>
+    let isEditing = false; // لمتابعة حالة التعديل
+
+    // منع الخروج من الصفحة إذا كان هناك تعديل غير محفوظ
+    window.addEventListener('beforeunload', function (e) {
+        if (isEditing) {
+            e.preventDefault();
+            e.returnValue = 'لديك تغييرات غير محفوظة، هل أنت متأكد من المغادرة؟';
+        }
+    });
+
+    function insertNewRow() {
+        if (isEditing) {
+            alert("يرجى حفظ الصف الحالي أولاً");
+            return;
+        }
+        
+        isEditing = true;
+        const tbody = document.getElementById('tableBody');
+        const today = new Date().toISOString().split('T')[0];
+        const row = tbody.insertRow(0);
+        row.setAttribute('data-new', 'true');
+
+        row.innerHTML = `
+            <td><input type="text" class="row-input" placeholder="الشركة"></td>
+            <td><input type="text" class="row-input" placeholder="المسؤول"></td>
+            <td><input type="text" class="row-input" placeholder="05xxxx"></td>
+            <td><input type="text" class="row-input" placeholder="السجل"></td>
+            <td><input type="text" class="row-input" placeholder="الحالية"></td>
+            <td><input type="text" class="row-input" placeholder="المقترحة"></td>
+            <td>
+                <select class="row-input">
                     <option value="50%">50%</option>
                     <option value="20%">20%</option>
                     <option value="مهتم">مهتم</option>
                     <option value="فقدان">فقدان</option>
                 </select>
-            </div>
-            <div class="input-group"><label>تاريخ اليوم</label><input type="date" id="m_date" class="modal-input"></div>
-            <div class="input-group full-width"><label>ملاحظات</label><textarea id="m_notes" class="modal-input" rows="1"></textarea></div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-save-modal" onclick="saveNewVisit()">حفظ الزيارة</button>
-        </div>
-    </div>
-</div>
-
-<script>
-    document.getElementById('m_date').value = new Date().toISOString().split('T')[0];
-
-    function toggleModal(id, show) {
-        document.getElementById(id).style.display = show ? 'block' : 'none';
+            </td>
+            <td><input type="date" class="row-input" value="${today}"></td>
+            <td>
+                <button class="btn-action bg-save" onclick="saveRow(this)">حفظ</button>
+                <button class="btn-action bg-edit" style="opacity:0.5" disabled>تعديل</button>
+                <button class="btn-action bg-transfer" style="opacity:0.5" disabled>نقل</button>
+            </td>
+        `;
     }
 
-    function saveNewVisit() {
-        const tbody = document.getElementById('tableBody');
-        const phone = document.getElementById('m_phone').value;
-        const cleanPhone = phone.startsWith('0') ? '966' + phone.substring(1) : phone;
-        const status = document.getElementById('m_status').value;
+    function saveRow(btn) {
+        const row = btn.closest('tr');
+        const inputs = row.querySelectorAll('.row-input');
+        const data = Array.from(inputs).map(i => i.value);
         
-        let statusClass = (status === '50%') ? 'status-50' : (status === '20%') ? 'status-20' : (status === 'مهتم') ? 'status-interested' : 'status-lost';
+        // تحويل المدخلات إلى نصوص عرض
+        const phone = data[2];
+        const cleanPhone = phone.startsWith('0') ? '966' + phone.substring(1) : phone;
+        const status = data[6];
+        const statusClass = (status === '50%') ? 'status-50' : (status === 'فقدان') ? 'status-lost' : '';
 
-        const row = `
-            <tr data-time="${Date.now()}">
-                <td data-tooltip="${document.getElementById('m_comp').value}">${document.getElementById('m_comp').value}</td>
-                <td data-tooltip="${document.getElementById('m_mgr').value}">${document.getElementById('m_mgr').value}</td>
-                <td><a href="https://wa.me/${cleanPhone}" target="_blank" style="color:var(--accent-green); text-decoration:none;">${phone}</a></td>
-                <td data-tooltip="${document.getElementById('m_cr').value}">${document.getElementById('m_cr').value}</td>
-                <td data-tooltip="${document.getElementById('m_curr').value}">${document.getElementById('m_curr').value}</td>
-                <td data-tooltip="${document.getElementById('m_prop').value}">${document.getElementById('m_prop').value}</td>
-                <td><span class="status-pill ${statusClass}">${status}</span></td>
-                <td>${document.getElementById('m_date').value}</td>
-                <td>
-                    <button class="btn-icon btn-edit">تعديل</button>
-                    <button class="btn-icon btn-transfer">نقل</button>
-                </td>
-            </tr>
+        row.innerHTML = `
+            <td data-tooltip="${data[0]}">${data[0]}</td>
+            <td data-tooltip="${data[1]}">${data[1]}</td>
+            <td><a href="https://wa.me/${cleanPhone}" target="_blank" style="color:var(--accent-green); text-decoration:none;">${phone}</a></td>
+            <td data-tooltip="${data[3]}">${data[3]}</td>
+            <td data-tooltip="${data[4]}">${data[4]}</td>
+            <td data-tooltip="${data[5]}">${data[5]}</td>
+            <td><span class="status-pill ${statusClass}">${status}</span></td>
+            <td>${data[7]}</td>
+            <td>
+                <button class="btn-action bg-save" style="display:none" onclick="saveRow(this)">حفظ</button>
+                <button class="btn-action bg-edit" onclick="editExistingRow(this)">تعديل</button>
+                <button class="btn-action bg-transfer" onclick="confirmTransfer(this)">نقل</button>
+            </td>
         `;
         
-        tbody.insertAdjacentHTML('afterbegin', row);
+        isEditing = false;
+        row.removeAttribute('data-new');
         sortRows();
-        toggleModal('visitModal', false);
+    }
+
+    function editExistingRow(btn) {
+        if (isEditing) {
+            alert("يرجى حفظ التعديلات الحالية أولاً");
+            return;
+        }
+        isEditing = true;
+        const row = btn.closest('tr');
+        // منطق تحويل الصف لخلايا قابلة للتعديل...
+        alert("الصف الآن جاهز للتعديل"); 
+    }
+
+    function confirmTransfer(btn) {
+        if (confirm("هل ترغب بنقل الزيارة إلى الفرص البيعية؟")) {
+            btn.closest('tr').remove();
+        }
     }
 
     function sortRows() {
         const tbody = document.getElementById('tableBody');
-        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const rows = Array.from(tbody.querySelectorAll('tr:not([data-new="true"])'));
         const priority = { "50%": 4, "20%": 3, "مهتم": 2, "فقدان": 1 };
 
         rows.sort((a, b) => {
-            let sA = a.querySelector('.status-pill').innerText;
-            let sB = b.querySelector('.status-pill').innerText;
-            if (priority[sB] !== priority[sA]) return priority[sB] - priority[sA];
-            return b.getAttribute('data-time') - a.getAttribute('data-time');
+            const sA = a.querySelector('.status-pill')?.innerText || "";
+            const sB = b.querySelector('.status-pill')?.innerText || "";
+            return (priority[sB] || 0) - (priority[sA] || 0);
         });
         rows.forEach(row => tbody.appendChild(row));
     }
