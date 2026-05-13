@@ -9,92 +9,232 @@
         :root {
             --nav-navy: #001f3f;
             --bg-color: #f4f7f6;
-            --accent-green: #00b050;
+            --accent-green: #28a745;
+            --accent-red: #dc3545;
+            --accent-blue: #007bff;
+            --accent-orange: #fd7e14;
         }
 
-        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; }
+        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; padding-bottom: 60px; }
 
-        /* الهيدر وشريط التنقل */
+        /* شريط التنقل */
         .navbar { background-color: var(--nav-navy); display: flex; padding: 6px 20px; position: sticky; top: 0; z-index: 1000; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
         .navbar a { color: white; text-decoration: none; padding: 5px 15px; margin-left: 10px; font-weight: 700; font-size: 11px; border-radius: 6px; }
         .navbar a.active { background-color: #003366; }
 
-        .container { padding: 20px; max-width: 1200px; margin: auto; }
+        .container { padding: 20px; max-width: 98%; margin: auto; }
 
-        /* منطقة الإجراءات (بحث وإضافة) */
-        .action-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 15px; }
+        /* شريط الإجراءات */
+        .action-bar { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .btn-add { background-color: var(--nav-navy); color: white; border: none; padding: 8px 20px; border-radius: 6px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; }
+        .search-input { flex-grow: 1; padding: 8px 15px; border: 1px solid #ddd; border-radius: 6px; font-family: 'Cairo'; outline: none; }
+
+        /* الجدول والتلميح */
+        .table-container { background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; table-layout: fixed; }
+        th { background-color: #f8f9fa; padding: 12px 5px; border-bottom: 2px solid #eee; color: var(--nav-navy); text-align: center; }
+        td { padding: 8px 5px; border-bottom: 1px solid #eee; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; font-weight: bold; }
         
-        .search-box { flex-grow: 1; position: relative; }
-        .search-box input { width: 100%; padding: 10px 15px; border-radius: 8px; border: 1px solid #ddd; font-family: 'Cairo'; outline: none; }
+        /* Tooltip style */
+        td:hover::after {
+            content: attr(data-tooltip);
+            position: absolute; z-index: 100; bottom: 100%; right: 50%; transform: translateX(50%);
+            background: #333; color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 10px; white-space: normal; width: 150px;
+        }
 
-        .btn-add { background-color: var(--accent-green); color: white; border: none; padding: 10px 25px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-add:hover { opacity: 0.9; }
+        /* مدخلات الجدول */
+        .editable-input, .editable-select { width: 95%; padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-family: 'Cairo'; font-size: 11px; text-align: center; }
+        .row-display input { border: none; background: transparent; pointer-events: none; }
 
-        /* الجدول */
-        .content-box { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: right; }
-        th { background-color: #f8f9fa; padding: 12px; border-bottom: 2px solid #eee; color: var(--nav-navy); }
-        td { padding: 12px; border-bottom: 1px solid #eee; }
-        tr:hover { background-color: #fcfcfc; }
+        /* الأزرار */
+        .btn-row { border: none; padding: 4px 8px; border-radius: 4px; color: white; cursor: pointer; font-family: 'Cairo'; font-size: 10px; font-weight: bold; margin: 0 2px; }
+        .btn-edit { background-color: var(--accent-blue); }
+        .btn-transfer { background-color: var(--accent-orange); }
+        .btn-save { background-color: var(--accent-green); display: none; }
 
-        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
-        .status-completed { background: #e6f7ed; color: #00b050; }
+        .whatsapp-link { color: #25D366; text-decoration: none; }
+
+        /* نافذة النقل */
+        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; width: 300px; margin: 15% auto; padding: 20px; border-radius: 15px; text-align: center; }
+        .modal-btns { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
+        .btn-yes { background: var(--accent-green); color: white; border: none; padding: 8px 25px; border-radius: 20px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
+        .btn-no { background: var(--accent-red); color: white; border: none; padding: 8px 25px; border-radius: 20px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
+
+        /* الخط الزمني */
+        .timeline-bar { position: fixed; bottom: 0; width: 100%; background: white; border-top: 1px solid #ddd; padding: 8px 20px; font-size: 11px; display: flex; align-items: center; gap: 20px; }
+        .timeline-item { border-right: 2px solid var(--nav-navy); padding-right: 10px; }
     </style>
 </head>
 <body>
 
-    <nav class="navbar">
-        <a href="index.html">الرئيسية</a>
-        <a href="visits.html" class="active">الزيارات</a>
-        <a href="opportunities.html">الفرص البيعية</a>
-        <a href="#">العملاء</a>
-        <a href="#">المبيعات</a>
-        <a href="#">تذكيرات</a>
-    </nav>
+<nav class="navbar">
+    <a href="index.html">الرئيسية</a>
+    <a href="visits.html" class="active">الزيارات</a>
+    <a href="opportunities.html">الفرص البيعية</a>
+    <a href="#">العملاء</a>
+    <a href="#">المبيعات</a>
+    <a href="#">تذكيرات</a>
+</nav>
 
-    <div class="container">
-        <div class="action-bar">
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="بحث عن زيارة، عميل، أو مندوب...">
-            </div>
-            <button class="btn-add" onclick="openVisitModal()">+ إضافة زيارة جديدة</button>
-        </div>
-
-        <div class="content-box">
-            <table>
-                <thead>
-                    <tr>
-                        <th>التاريخ</th>
-                        <th>العميل</th>
-                        <th>المندوب</th>
-                        <th>نوع الزيارة</th>
-                        <th>الحالة</th>
-                        <th>الإجراءات</th>
-                    </tr>
-                </thead>
-                <tbody id="visitsTableBody">
-                    <!-- سيتم جلب البيانات من Firebase هنا -->
-                    <tr>
-                        <td>2026-05-13</td>
-                        <td>شركة الرياض للخدمات</td>
-                        <td>حمزة</td>
-                        <td>ميدانية</td>
-                        <td><span class="status-badge status-completed">تمت</span></td>
-                        <td><button style="border:none; background:none; color:blue; cursor:pointer;">تعديل</button></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+<div class="container">
+    <div class="action-bar">
+        <button class="btn-add" onclick="addNewVisit()">+ إضافة زيارة</button>
+        <input type="text" class="search-input" placeholder="بحث باسم الشركة أو العميل...">
     </div>
 
-    <script>
-        // دالة لفتح نافذة إضافة زيارة (سنبرمجها لاحقاً)
-        function openVisitModal() {
-            alert("هنا سنقوم بفتح نافذة الإضافة المخصصة لـ ASGate");
+    <div class="table-container">
+        <table id="visitsTable">
+            <thead>
+                <tr>
+                    <th style="width: 100px;">الشركة</th>
+                    <th>العنوان</th>
+                    <th>المسؤول</th>
+                    <th>الموبايل</th>
+                    <th>الايميل</th>
+                    <th>السجل</th>
+                    <th>الخدمة الحالية</th>
+                    <th>الخدمة المقترحة</th>
+                    <th style="width: 80px;">الحالة</th>
+                    <th>ملاحظات</th>
+                    <th style="width: 90px;">التاريخ</th>
+                    <th style="width: 110px;">إجراء</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- نافذة النقل -->
+<div id="transferModal" class="modal">
+    <div class="modal-content">
+        <p style="font-weight: bold;">هل ترغب بنقل الزيارة؟</p>
+        <div class="modal-btns">
+            <button class="btn-yes" onclick="confirmTransfer()">نعم</button>
+            <button class="btn-no" onclick="closeModal()">لا</button>
+        </div>
+    </div>
+</div>
+
+<div class="timeline-bar">
+    <div class="timeline-item"><strong>المستخدم:</strong> حمزة</div>
+    <div id="lastAction" class="timeline-item"><strong>آخر نشاط:</strong> جاهز للعمل</div>
+</div>
+
+<script>
+    let currentRowForTransfer = null;
+
+    function addNewVisit() {
+        const tbody = document.getElementById('tableBody');
+        const row = tbody.insertRow(0);
+        row.className = 'editing';
+        row.setAttribute('data-time', Date.now());
+        const today = new Date().toISOString().split('T')[0];
+
+        row.innerHTML = `
+            <td data-tooltip="اسم الشركة"><input type="text" class="editable-input" oninput="updateTooltip(this)"></td>
+            <td data-tooltip="العنوان"><input type="text" class="editable-input" oninput="updateTooltip(this)"></td>
+            <td data-tooltip="المسؤول"><input type="text" class="editable-input" oninput="updateTooltip(this)"></td>
+            <td data-tooltip="الموبايل"><input type="text" class="editable-input" placeholder="05xxx"></td>
+            <td data-tooltip="الايميل"><input type="text" class="editable-input" oninput="updateTooltip(this)"></td>
+            <td data-tooltip="السجل"><input type="text" class="editable-input" oninput="updateTooltip(this)"></td>
+            <td data-tooltip="الخدمة الحالية"><input type="text" class="editable-input" oninput="updateTooltip(this)"></td>
+            <td data-tooltip="الخدمة المقترحة"><input type="text" class="editable-input" oninput="updateTooltip(this)"></td>
+            <td>
+                <select class="editable-select">
+                    <option value="50%">50%</option>
+                    <option value="20%">20%</option>
+                    <option value="مهتم">مهتم</option>
+                    <option value="فقدان">فقدان</option>
+                </select>
+            </td>
+            <td data-tooltip="ملاحظات"><input type="text" class="editable-input" oninput="updateTooltip(this)"></td>
+            <td><input type="date" class="editable-input" value="${today}"></td>
+            <td>
+                <button class="btn-row btn-save" onclick="saveRow(this)">حفظ</button>
+                <button class="btn-row btn-edit" onclick="editRow(this)" style="display:none">تعديل</button>
+                <button class="btn-row btn-transfer" onclick="openModal(this)">نقل</button>
+            </td>
+        `;
+        updateTimeline("إضافة زيارة جديدة");
+    }
+
+    function saveRow(btn) {
+        const row = btn.closest('tr');
+        const phoneInput = row.cells[3].querySelector('input');
+        let phone = phoneInput.value.trim();
+        
+        // معالجة رابط الواتساب
+        if(phone) {
+            let cleanPhone = phone.startsWith('0') ? '966' + phone.substring(1) : phone;
+            row.cells[3].innerHTML = `<a href="https://wa.me/${cleanPhone}" target="_blank" class="whatsapp-link">${phone}</a>`;
+            row.cells[3].setAttribute('data-tooltip', 'واتساب: ' + phone);
         }
 
-        // مكان مخصص لأكواد Firebase المستقبلي
-        // TODO: Initialize Firebase and Fetch Visits
-    </script>
+        row.classList.remove('editing');
+        row.querySelectorAll('input, select').forEach(el => {
+            if(!el.closest('td').classList.contains('whatsapp-link')) {
+                 // تحويل المدخلات لنص عرض فقط
+            }
+        });
+
+        btn.style.display = 'none';
+        row.querySelector('.btn-edit').style.display = 'inline-block';
+        sortAndStyleTable();
+        updateTimeline("تم حفظ البيانات");
+    }
+
+    function editRow(btn) {
+        const row = btn.closest('tr');
+        row.classList.add('editing');
+        btn.style.display = 'none';
+        row.querySelector('.btn-save').style.display = 'inline-block';
+    }
+
+    function openModal(btn) {
+        currentRowForTransfer = btn.closest('tr');
+        document.getElementById('transferModal').style.display = 'block';
+    }
+
+    function closeModal() {
+        document.getElementById('transferModal').style.display = 'none';
+    }
+
+    function confirmTransfer() {
+        currentRowForTransfer.remove();
+        closeModal();
+        updateTimeline("تم نقل الزيارة إلى الفرص البيعية");
+    }
+
+    function updateTooltip(input) {
+        input.parentElement.setAttribute('data-tooltip', input.value);
+    }
+
+    function sortAndStyleTable() {
+        const tbody = document.getElementById('tableBody');
+        const rows = Array.from(tbody.rows);
+        const priority = { "50%": 4, "20%": 3, "مهتم": 2, "فقدان": 1 };
+
+        rows.sort((a, b) => {
+            let valA = a.querySelector('select')?.value || "";
+            let valB = b.querySelector('select')?.value || "";
+            if (priority[valB] !== priority[valA]) return priority[valB] - priority[valA];
+            return b.getAttribute('data-time') - a.getAttribute('data-time');
+        });
+
+        rows.forEach(row => tbody.appendChild(row));
+    }
+
+    function updateTimeline(msg) {
+        const now = new Date().toLocaleTimeString('ar-SA');
+        document.getElementById('lastAction').innerHTML = `<strong>آخر نشاط:</strong> ${msg} (${now})`;
+    }
+
+    window.onclick = function(event) {
+        if (event.target == document.getElementById('transferModal')) closeModal();
+    }
+</script>
+
 </body>
 </html>
