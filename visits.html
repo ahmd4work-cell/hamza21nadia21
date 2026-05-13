@@ -1,145 +1,190 @@
+<!DOCTYPE html>
 <html dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASGate - إدارة الزيارات</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
             --nav-navy: #001f3f;
-            --stat-green: #00b050;
-            --bg-color: #f4f7f6;
+            --main-blue: #0056b3;
+            --bg-light: #f8f9fa;
         }
 
-        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; }
+        body { 
+            background-color: var(--bg-light); 
+            font-family: 'Cairo', sans-serif; 
+            margin: 0; 
+        }
 
-        /* الهيدر مع حواف دائرية كما طلبت سابقاً */
+        /* شريط التنقل العلوي */
         .navbar { 
             background-color: var(--nav-navy); 
             display: flex; 
             padding: 8px 20px; 
-            position: sticky; 
-            top: 0; 
-            z-index: 1000; 
             border-bottom-left-radius: 12px; 
-            border-bottom-right-radius: 12px; 
+            border-bottom-right-radius: 12px;
         }
-        .navbar a { color: white; text-decoration: none; padding: 6px 12px; margin-left: 8px; font-weight: 700; font-size: 11px; border-radius: 6px; }
-        .navbar a.active { background-color: #003366; }
-
-        .container { padding: 15px; max-width: 1300px; margin: auto; }
-
-        /* تقسيم الصفحة: نموذج الإدخال (يمين) والجدول (يسار) */
-        .visits-grid { 
-            display: grid; 
-            grid-template-columns: 350px 1fr; 
-            gap: 20px; 
-            align-items: start; 
-        }
-
-        .card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.04); }
-        h3 { font-size: 13px; color: var(--nav-navy); margin-top: 0; margin-bottom: 15px; border-right: 3px solid var(--stat-green); padding-right: 10px; }
-
-        /* تنسيق النموذج */
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-size: 11px; font-weight: bold; margin-bottom: 5px; color: #555; }
-        .form-input { 
-            width: 100%; 
-            padding: 8px; 
-            border: 1px solid #ddd; 
-            border-radius: 6px; 
-            font-family: 'Cairo'; 
-            font-size: 12px; 
-            outline: none; 
-        }
-        .form-input:focus { border-color: var(--stat-green); }
-
-        .btn-save { 
-            width: 100%; 
-            padding: 10px; 
-            background: var(--stat-green); 
+        .navbar a { 
             color: white; 
-            border: none; 
-            border-radius: 6px; 
-            font-family: 'Cairo'; 
+            text-decoration: none; 
+            padding: 6px 15px; 
             font-weight: 700; 
-            cursor: pointer; 
-            margin-top: 10px; 
+            font-size: 11px; 
         }
 
-        /* تنسيق الجدول الرشيق */
-        .visits-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: center; }
-        .visits-table th { background: #1a1a1a; color: white; padding: 8px; border: 1px solid #eee; }
-        .visits-table td { padding: 8px; border: 1px solid #eee; font-weight: bold; }
-        
-        .status-done { color: var(--stat-green); }
+        /* شريط الإجراءات (البحث والإضافة) */
+        .action-bar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            background: white;
+            padding: 10px 20px;
+            gap: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .search-container {
+            position: relative;
+            width: 250px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 6px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-family: 'Cairo';
+            font-size: 12px;
+            text-align: right;
+        }
+        .btn-add {
+            background-color: var(--nav-navy);
+            color: white;
+            border: none;
+            padding: 6px 15px;
+            border-radius: 4px;
+            font-family: 'Cairo';
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+        }
 
-        @media (max-width: 900px) { .visits-grid { grid-template-columns: 1fr; } }
+        /* تصميم الجدول المطبق من الصورة */
+        .table-container {
+            padding: 20px;
+            overflow-x: auto;
+        }
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .custom-table thead tr {
+            background-color: var(--nav-navy);
+            color: white;
+            text-align: center;
+        }
+        .custom-table th {
+            padding: 12px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            border-left: 1px solid rgba(255,255,255,0.1);
+        }
+        .custom-table td {
+            padding: 12px 8px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            font-size: 11px;
+            color: #333;
+        }
+
+        /* قسم سجل النشاط المفرغ كما في الصورة */
+        .activity-log {
+            margin-top: 20px;
+            background: white;
+            border: 1px solid #b2d7ff;
+            border-radius: 8px;
+            min-height: 100px;
+            position: relative;
+            padding: 15px;
+        }
+        .activity-log-title {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
     </style>
 </head>
 <body>
 
     <nav class="navbar">
         <a href="index.html">الرئيسية</a>
-        <a href="visits.html" class="active">الزيارات</a>
+        <a href="visits.html" style="background: #003366; border-radius: 6px;">الزيارات</a>
         <a href="#">المتوقعة</a>
         <a href="#">العملاء</a>
         <a href="#">المبيعات</a>
         <a href="#">تذكيرات</a>
     </nav>
 
-    <div class="container">
-        <div class="visits-grid">
-            <!-- قسم إضافة زيارة -->
-            <div class="card">
-                <h3>إضافة زيارة جديدة</h3>
-                <div class="form-group">
-                    <label>اسم العميل</label>
-                    <input type="text" class="form-input" placeholder="اسم الشركة أو العميل">
-                </div>
-                <div class="form-group">
-                    <label>نوع الزيارة</label>
-                    <select class="form-input">
-                        <option>عرض تسويقي</option>
-                        <option>تحصيل</option>
-                        <option>متابعة</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>الموقع (GPS)</label>
-                    <input type="text" class="form-input" placeholder="سيتم جلبه تلقائياً" readonly>
-                </div>
-                <div class="form-group">
-                    <label>الملاحظات</label>
-                    <textarea class="form-input" rows="3"></textarea>
-                </div>
-                <button class="btn-save">حفظ الزيارة</button>
-            </div>
+    <!-- شريط البحث والإضافة العلوي -->
+    <div class="action-bar">
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="بحث سريع...">
+        </div>
+        <button class="btn-add">+ إضافة جديدة</button>
+    </div>
 
-            <!-- جدول الزيارات المنفذ -->
-            <div class="card">
-                <h3>سجل زيارات اليوم</h3>
-                <table class="visits-table">
-                    <thead>
-                        <tr>
-                            <th>العميل</th>
-                            <th>الوقت</th>
-                            <th>النوع</th>
-                            <th>الملاحظات</th>
-                            <th>الحالة</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>شركة الابتكار</td>
-                            <td>09:30 ص</td>
-                            <td>تسويق</td>
-                            <td>تم تقديم العرض المبدئي</td>
-                            <td class="status-done">مكتملة</td>
-                        </tr>
-                    </tbody>
-                </table>
+    <div class="table-container">
+        <!-- الجدول الرئيسي كما في الصورة -->
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th style="width: 15%;">الشركة</th>
+                    <th>العنوان</th>
+                    <th>المسؤول</th>
+                    <th>موبايل (واتساب)</th>
+                    <th>الإيميل</th>
+                    <th>السجل</th>
+                    <th>الخدمة الحالية</th>
+                    <th>الخدمة المقترحة</th>
+                    <th>الحالة</th>
+                    <th>ملاحظات</th>
+                    <th>التاريخ</th>
+                    <th>إجراء</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- بيانات تجريبية -->
+                <tr>
+                    <td>شركة الحلول المتكاملة</td>
+                    <td>الرياض - العليا</td>
+                    <td>أحمد السعيد</td>
+                    <td>050XXXXXXX</td>
+                    <td>info@example.com</td>
+                    <td>1010XXXX</td>
+                    <td>لا يوجد</td>
+                    <td>CRM Pro</td>
+                    <td><span style="color: green;">متابع</span></td>
+                    <td>مهتم بالعرض</td>
+                    <td>2026-05-13</td>
+                    <td><button style="font-size: 10px; cursor: pointer;">تعديل</button></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- مساحة سجل النشاط -->
+        <div class="activity-log">
+            <div class="activity-log-title">
+                سجل النشاط 🕒
             </div>
         </div>
     </div>
