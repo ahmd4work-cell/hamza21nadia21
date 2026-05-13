@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>ASGate - الفرص البيعية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --nav-navy: #001f3f; --bg-light: #f4f7f6; }
+        body { background-color: var(--bg-light); font-family: 'Cairo', sans-serif; margin: 0; }
+        .navbar { background-color: var(--nav-navy); display: flex; padding: 8px 20px; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; position: sticky; top: 0; z-index: 1000; }
+        .navbar a { color: white; text-decoration: none; padding: 6px 15px; font-weight: 700; font-size: 11px; border-radius: 6px; margin-left: 5px; }
+        .active-link { background: #003366 !important; }
+        .content { padding: 20px; }
+        .bottom-taskbar { position: fixed; bottom: 0; width: 100%; background: #eee; padding: 8px; display: flex; justify-content: center; gap: 30px; border-top: 1px solid #ccc; font-size: 11px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html">الرئيسية</a>
+        <a href="visits.html">الزيارات</a>
+        <a href="opportunities.html" class="active-link">الفرص البيعية</a>
+        <a href="#">العملاء</a>
+        <a href="#">المبيعات</a>
+        <a href="#">تذكيرات</a>
+    </nav>
+
+    <div class="content">
+        <h2>سجل الفرص البيعية</h2>
+        <p>هنا تظهر جميع الزيارات التي تم تحويلها لفرص بيعية (قيد الإنشاء).</p>
+    </div>
+
+    <div class="bottom-taskbar"><span>المستخدم: حمزة</span> | <span>نظام ASGate v1.0</span></div>
+</body>
+</html>
