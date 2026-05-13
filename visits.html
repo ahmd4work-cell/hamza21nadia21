@@ -9,55 +9,45 @@
         :root {
             --nav-navy: #001f3f;
             --bg-color: #f4f7f9;
-            --accent-green: #22c55e;
+            --accent-green-dim: #a7f3d0; /* أخضر خافت جداً */
+            --accent-green-active: #22c55e; /* أخضر فاتح نشط */
             --accent-blue: #3b82f6;
             --border-color: #cbd5e1;
         }
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1; }
 
-        .navbar { background-color: var(--nav-navy); display: flex; padding: 4px 15px; border-bottom: 2px solid #00152b; }
-        .navbar a { color: white; text-decoration: none; padding: 3px 10px; font-weight: 700; font-size: 12px; }
-
+        /* شريط الإجراءات */
         .container { padding: 5px; max-width: 100%; }
-
-        .action-bar { display: flex; align-items: center; margin-bottom: 5px; gap: 8px; padding: 0 5px; }
+        .action-bar { display: flex; align-items: center; margin-bottom: 5px; gap: 8px; }
         .btn-add { background-color: var(--accent-blue); color: white; border: none; padding: 4px 12px; border-radius: 4px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 11px; }
-        
-        .search-container { display: flex; align-items: center; background: white; border: 1px solid var(--border-color); border-radius: 4px; padding: 0 5px; width: 150px; }
-        .search-input { border: none; padding: 2px; font-family: 'Cairo'; outline: none; width: 100%; font-size: 11px; }
 
-        /* الجدول بنمط الإكسل - بدون فراغات */
-        .table-card { background: white; border: 1px solid var(--border-color); border-radius: 4px; }
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; border-spacing: 0; }
-        
+        /* الجدول بنمط الإكسل */
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; border-spacing: 0; background: white; border: 1px solid var(--border-color); }
         th { background-color: #e2e8f0; padding: 4px 2px; color: var(--nav-navy); font-size: 10.5px; font-weight: 800; border: 1px solid var(--border-color); }
-        
-        td { padding: 0; border: 1px solid var(--border-color); text-align: center; font-size: 11px; height: 28px; }
+        td { padding: 0; border: 1px solid var(--border-color); text-align: center; height: 28px; }
 
-        /* حقول الإدخال لتشبه خلايا الإكسل تماماً */
+        /* مدخلات الإكسل */
         .excel-input {
-            width: 100%;
-            height: 100%;
-            border: none;
-            padding: 0 5px;
-            font-family: 'Cairo';
-            font-size: 11px;
-            text-align: center;
-            outline: none;
-            box-sizing: border-box;
-            background-color: #fffdec; /* لون خفيف لتمييز وضع التعديل */
-            display: block;
+            width: 100%; height: 100%; border: none; padding: 0 5px; font-family: 'Cairo';
+            font-size: 11px; text-align: center; outline: none; box-sizing: border-box; background: transparent;
+        }
+        .excel-input:focus { background-color: #fffdec; box-shadow: inset 0 0 0 1px var(--accent-blue); }
+
+        /* أزرار الإجراءات */
+        .btn-save { 
+            border: none; padding: 2px 10px; border-radius: 3px; font-size: 10px; font-family: 'Cairo'; 
+            font-weight: bold; cursor: pointer; color: white; transition: 0.3s;
+            background-color: var(--accent-green-dim); /* الافتراضي خافت */
+            pointer-events: none; /* غير قابل للضغط في الحالة الخافتة */
+        }
+        .btn-save.active { 
+            background-color: var(--accent-green-active); 
+            pointer-events: auto; /* يصبح قابل للضغط */
+            box-shadow: 0 2px 4px rgba(34, 197, 94, 0.3);
         }
 
-        .excel-input:focus { background-color: #fff; border: 2px solid var(--accent-blue); }
-
-        .status-pill { padding: 1px 6px; border-radius: 8px; font-size: 9.5px; font-weight: bold; }
-        .status-50 { background: #dcfce7; color: #15803d; }
-
-        .btn-action { border: none; padding: 2px 8px; border-radius: 3px; font-size: 10px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; }
-        .bg-save { background-color: var(--accent-green); }
-        .bg-edit { background-color: var(--accent-blue); }
+        .status-pill { padding: 1px 6px; border-radius: 8px; font-size: 9.5px; font-weight: bold; background: #eee; }
     </style>
 </head>
 <body>
@@ -65,87 +55,75 @@
 <div class="container">
     <div class="action-bar">
         <button class="btn-add" onclick="insertNewRow()">+ إضافة زيارة</button>
-        <div class="search-container">
-            <input type="text" class="search-input" placeholder="بحث...">
-        </div>
     </div>
 
-    <div class="table-card">
-        <table id="visitsTable">
-            <thead>
-                <tr>
-                    <th style="width: 13%;">الشركة</th>
-                    <th>المسؤول</th>
-                    <th>الموبايل</th>
-                    <th>السجل</th>
-                    <th>الخدمة الحالية</th>
-                    <th>الخدمة المقترحة</th>
-                    <th style="width: 70px;">الحالة</th>
-                    <th style="width: 85px;">التاريخ</th>
-                    <th style="width: 110px;">إجراء</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-        </table>
-    </div>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 15%;">الشركة</th>
+                <th>المسؤول</th>
+                <th>الموبايل</th>
+                <th>السجل</th>
+                <th>الخدمة الحالية</th>
+                <th>الخدمة المقترحة</th>
+                <th style="width: 80px;">الحالة</th>
+                <th style="width: 90px;">التاريخ</th>
+                <th style="width: 80px;">إجراء</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <!-- الصفوف تضاف هنا -->
+        </tbody>
+    </table>
 </div>
 
 <script>
-    let isEditing = false;
+    let isDirty = false; // لمتابعة وجود تغييرات غير محفوظة
 
-    // تنبيه عند محاولة إغلاق الصفحة دون حفظ
-    window.addEventListener('beforeunload', (event) => {
-        if (isEditing) {
-            event.preventDefault();
-            event.returnValue = ''; // يظهر رسالة المتصفح الافتراضية
+    // تنبيه المتصفح عند الخروج
+    window.addEventListener('beforeunload', (e) => {
+        if (isDirty) {
+            e.preventDefault();
+            e.returnValue = '';
         }
     });
 
     function insertNewRow() {
-        if (isEditing) return alert("يرجى حفظ البيانات الحالية أولاً");
-        
-        isEditing = true;
         const tbody = document.getElementById('tableBody');
         const row = tbody.insertRow(0);
-
+        
         row.innerHTML = `
-            <td><input type="text" class="excel-input"></td>
-            <td><input type="text" class="excel-input"></td>
-            <td><input type="text" class="excel-input"></td>
-            <td><input type="text" class="excel-input"></td>
-            <td><input type="text" class="excel-input"></td>
-            <td><input type="text" class="excel-input"></td>
+            <td><input type="text" class="excel-input" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" oninput="markAsChanged(this)"></td>
             <td>
-                <select class="excel-input">
+                <select class="excel-input" onchange="markAsChanged(this)">
                     <option>50%</option><option>20%</option><option>مهتم</option><option>فقدان</option>
                 </select>
             </td>
-            <td><input type="date" class="excel-input" value="${new Date().toISOString().split('T')[0]}"></td>
-            <td style="padding: 2px;">
-                <button class="btn-action bg-save" onclick="saveRow(this)">حفظ</button>
+            <td><input type="date" class="excel-input" value="${new Date().toISOString().split('T')[0]}" oninput="markAsChanged(this)"></td>
+            <td>
+                <button class="btn-save" onclick="saveData(this)">حفظ</button>
             </td>
         `;
     }
 
-    function saveRow(btn) {
-        const row = btn.closest('tr');
-        const inputs = row.querySelectorAll('.excel-input');
-        const v = Array.from(inputs).map(i => i.value);
-        
-        isEditing = false;
-        row.innerHTML = `
-            <td style="padding: 0 5px;">${v[0]}</td>
-            <td style="padding: 0 5px;">${v[1]}</td>
-            <td style="padding: 0 5px;">${v[2]}</td>
-            <td style="padding: 0 5px;">${v[3]}</td>
-            <td style="padding: 0 5px;">${v[4]}</td>
-            <td style="padding: 0 5px;">${v[5]}</td>
-            <td><span class="status-pill status-50">${v[6]}</span></td>
-            <td>${v[7]}</td>
-            <td style="padding: 2px;">
-                <button class="btn-action bg-edit" onclick="editRow(this)">تعديل</button>
-            </td>
-        `;
+    // وظيفة تحويل الزر للأخضر الفاتح عند أي تغيير
+    function markAsChanged(element) {
+        isDirty = true;
+        const row = element.closest('tr');
+        const saveBtn = row.querySelector('.btn-save');
+        saveBtn.classList.add('active'); // تحويل الزر للون الأخضر الفاتح والنشط
+    }
+
+    function saveData(btn) {
+        // هنا يتم استدعاء Firebase مستقبلاً لحفظ البيانات
+        isDirty = false;
+        btn.classList.remove('active'); // يعود للون الخافت بعد الحفظ
+        alert("تم حفظ التغييرات بنجاح");
     }
 </script>
 </body>
