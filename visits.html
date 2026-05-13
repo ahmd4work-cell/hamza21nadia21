@@ -25,13 +25,7 @@
             border-radius: 15px; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        .navbar a { 
-            color: white; 
-            text-decoration: none; 
-            padding: 6px 15px; 
-            font-weight: 700; 
-            font-size: 13px; 
-        }
+        .navbar a { color: white; text-decoration: none; padding: 6px 15px; font-weight: 700; font-size: 13px; }
         .navbar a.active { background-color: rgba(255,255,255,0.1); border-radius: 10px; }
 
         .container { padding: 5px 10px; max-width: 100%; }
@@ -56,7 +50,7 @@
         }
         .btn-save.active { background-color: var(--accent-green-active); pointer-events: auto; }
         
-        .updated-at { font-size: 9px; color: #64748b; font-weight: bold; }
+        .updated-at { font-size: 10px; color: #475569; font-weight: bold; }
     </style>
 </head>
 <body onload="loadSavedData()">
@@ -97,6 +91,7 @@
 <script>
     let isDirty = false;
 
+    // حماية البيانات عند إعادة التحميل
     window.addEventListener('beforeunload', (e) => {
         if (isDirty) { e.preventDefault(); e.returnValue = ''; }
     });
@@ -142,21 +137,29 @@
         if(isNew) isDirty = true;
     }
 
+    // وظيفة رصد التعديل في أي "مربع"
     function markAsChanged(el) {
         isDirty = true;
-        el.closest('tr').querySelector('.btn-save').classList.add('active');
+        const row = el.closest('tr');
+        row.querySelector('.btn-save').classList.add('active');
+        
+        // تجهيز تاريخ اليوم تلقائياً عند أول تعديل
+        const today = new Date().toLocaleDateString('en-GB'); 
+        row.setAttribute('data-pending-update', today); 
     }
 
     function saveAllData(btn) {
-        const now = new Date();
-        const timestamp = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        
-        // تحديث خلية "تاريخ التعديل" في الصف الحالي فقط قبل الحفظ الشامل
         const currentRow = btn.closest('tr');
-        currentRow.querySelector('.updated-at').innerText = timestamp;
+        
+        // وضع تاريخ التعديل التلقائي في الخلية عند الحفظ
+        const pendingDate = currentRow.getAttribute('data-pending-update');
+        if (pendingDate) {
+            currentRow.querySelector('.updated-at').innerText = pendingDate;
+        }
 
         const rows = document.querySelectorAll('#tableBody tr');
         const allVisits = [];
+        
         rows.forEach(row => {
             const ins = row.querySelectorAll('.excel-input');
             allVisits.push({
@@ -170,6 +173,7 @@
         localStorage.setItem('asgate_visits', JSON.stringify(allVisits));
         isDirty = false;
         btn.classList.remove('active');
+        currentRow.removeAttribute('data-pending-update');
     }
 </script>
 </body>
