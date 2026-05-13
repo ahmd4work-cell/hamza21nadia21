@@ -3,67 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASGate - سجل الزيارات</title>
+    <title>ASGate - إدارة الزيارات</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --nav-navy: #001f3f;
-            --bg-color: #f4f7f6;
-            --accent-green: #28a745;
-            --accent-red: #dc3545;
-            --accent-blue: #007bff;
-            --accent-orange: #fd7e14;
+            --bg-color: #f8fafc;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --accent-blue: #3b82f6;
+            --text-main: #334155;
         }
 
-        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; padding-bottom: 60px; }
+        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; color: var(--text-main); }
 
-        /* شريط التنقل */
-        .navbar { background-color: var(--nav-navy); display: flex; padding: 6px 20px; position: sticky; top: 0; z-index: 1000; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
-        .navbar a { color: white; text-decoration: none; padding: 5px 15px; margin-left: 10px; font-weight: 700; font-size: 11px; border-radius: 6px; }
-        .navbar a.active { background-color: #003366; }
+        /* شريط التنقل العلوي */
+        .navbar { background-color: var(--nav-navy); display: flex; padding: 10px 20px; position: sticky; top: 0; z-index: 1000; border-bottom-left-radius: 15px; border-bottom-right-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .navbar a { color: white; text-decoration: none; padding: 8px 16px; margin-left: 10px; font-weight: 700; font-size: 13px; border-radius: 8px; transition: 0.3s; }
+        .navbar a:hover, .navbar a.active { background-color: rgba(255,255,255,0.1); }
 
-        .container { padding: 20px; max-width: 98%; margin: auto; }
+        .container { padding: 25px; max-width: 98%; margin: auto; }
 
-        /* شريط الإجراءات */
-        .action-bar { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .btn-add { background-color: var(--nav-navy); color: white; border: none; padding: 8px 20px; border-radius: 6px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; }
-        .search-input { flex-grow: 1; padding: 8px 15px; border: 1px solid #ddd; border-radius: 6px; font-family: 'Cairo'; outline: none; }
+        /* شريط الإجراءات المطور */
+        .action-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; gap: 20px; }
+        .btn-add { background-color: var(--accent-blue); color: white; border: none; padding: 10px 24px; border-radius: 10px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2); }
+        .search-container { display: flex; align-items: center; background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0 15px; width: 250px; /* تصغير المربع كما طلبت */ }
+        .search-input { border: none; padding: 10px; font-family: 'Cairo'; outline: none; width: 100%; font-size: 13px; }
 
-        /* الجدول والتلميح */
-        .table-container { background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
-        table { width: 100%; border-collapse: collapse; font-size: 11px; table-layout: fixed; }
-        th { background-color: #f8f9fa; padding: 12px 5px; border-bottom: 2px solid #eee; color: var(--nav-navy); text-align: center; }
-        td { padding: 8px 5px; border-bottom: 1px solid #eee; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; font-weight: bold; }
-        
-        /* Tooltip style */
+        /* تنسيق الجدول الاحترافي */
+        .table-card { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid #e2e8f0; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th { background-color: #f1f5f9; padding: 15px 10px; color: var(--nav-navy); font-size: 12px; font-weight: 800; text-align: center; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 14px 10px; border-bottom: 1px solid #f1f5f9; text-align: center; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; }
+        tr:hover { background-color: #f8fafc; }
+
+        /* Tooltip */
         td:hover::after {
-            content: attr(data-tooltip);
-            position: absolute; z-index: 100; bottom: 100%; right: 50%; transform: translateX(50%);
-            background: #333; color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 10px; white-space: normal; width: 150px;
+            content: attr(data-tooltip); position: absolute; z-index: 100; bottom: 100%; left: 50%; transform: translateX(-50%);
+            background: #1e293b; color: white; padding: 6px 12px; border-radius: 6px; font-size: 11px; white-space: normal; width: max-content; max-width: 200px;
         }
 
-        /* مدخلات الجدول */
-        .editable-input, .editable-select { width: 95%; padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-family: 'Cairo'; font-size: 11px; text-align: center; }
-        .row-display input { border: none; background: transparent; pointer-events: none; }
+        /* شارات الحالة */
+        .status-pill { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; display: inline-block; }
+        .status-50 { background: #dcfce7; color: #15803d; }
+        .status-20 { background: #fef9c3; color: #a16207; }
+        .status-interested { background: #dbeafe; color: #1d4ed8; }
+        .status-lost { background: #fee2e2; color: #b91c1c; }
 
-        /* الأزرار */
-        .btn-row { border: none; padding: 4px 8px; border-radius: 4px; color: white; cursor: pointer; font-family: 'Cairo'; font-size: 10px; font-weight: bold; margin: 0 2px; }
-        .btn-edit { background-color: var(--accent-blue); }
-        .btn-transfer { background-color: var(--accent-orange); }
-        .btn-save { background-color: var(--accent-green); display: none; }
+        /* أزرار الإجراءات */
+        .btn-icon { background: none; border: none; cursor: pointer; padding: 5px; margin: 0 3px; border-radius: 6px; transition: 0.2s; font-size: 11px; font-family: 'Cairo'; font-weight: bold; }
+        .btn-edit { color: var(--accent-blue); background: #eff6ff; }
+        .btn-transfer { color: #f59e0b; background: #fffbeb; }
 
-        .whatsapp-link { color: #25D366; text-decoration: none; }
+        /* النافذة المنبثقة (Modal) */
+        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); }
+        .modal-content { background: white; width: 550px; margin: 5% auto; border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); overflow: hidden; animation: slideDown 0.3s ease; }
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .modal-header { background: var(--nav-navy); color: white; padding: 15px 25px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 25px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        .input-group label { font-size: 12px; font-weight: bold; color: #64748b; }
+        .modal-input { padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: 'Cairo'; font-size: 13px; }
+        .full-width { grid-column: span 2; }
+        .modal-footer { padding: 15px 25px; background: #f8fafc; display: flex; justify-content: flex-end; gap: 10px; }
 
-        /* نافذة النقل */
-        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
-        .modal-content { background: white; width: 300px; margin: 15% auto; padding: 20px; border-radius: 15px; text-align: center; }
-        .modal-btns { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
-        .btn-yes { background: var(--accent-green); color: white; border: none; padding: 8px 25px; border-radius: 20px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
-        .btn-no { background: var(--accent-red); color: white; border: none; padding: 8px 25px; border-radius: 20px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
-
-        /* الخط الزمني */
-        .timeline-bar { position: fixed; bottom: 0; width: 100%; background: white; border-top: 1px solid #ddd; padding: 8px 20px; font-size: 11px; display: flex; align-items: center; gap: 20px; }
-        .timeline-item { border-right: 2px solid var(--nav-navy); padding-right: 10px; }
+        .btn-save-modal { background: var(--accent-green); color: white; border: none; padding: 10px 30px; border-radius: 12px; font-weight: bold; cursor: pointer; font-family: 'Cairo'; }
+        .btn-close-modal { background: #e2e8f0; color: #64748b; border: none; padding: 10px 30px; border-radius: 12px; font-weight: bold; cursor: pointer; font-family: 'Cairo'; }
     </style>
 </head>
 <body>
@@ -79,162 +85,143 @@
 
 <div class="container">
     <div class="action-bar">
-        <button class="btn-add" onclick="addNewVisit()">+ إضافة زيارة</button>
-        <input type="text" class="search-input" placeholder="بحث باسم الشركة أو العميل...">
+        <button class="btn-add" onclick="toggleModal('visitModal', true)">+ إضافة زيارة جديدة</button>
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="بحث سريع...">
+        </div>
     </div>
 
-    <div class="table-container">
+    <div class="table-card">
         <table id="visitsTable">
             <thead>
                 <tr>
-                    <th style="width: 100px;">الشركة</th>
-                    <th>العنوان</th>
+                    <th style="width: 12%;">الشركة</th>
                     <th>المسؤول</th>
                     <th>الموبايل</th>
-                    <th>الايميل</th>
                     <th>السجل</th>
                     <th>الخدمة الحالية</th>
                     <th>الخدمة المقترحة</th>
-                    <th style="width: 80px;">الحالة</th>
-                    <th>ملاحظات</th>
-                    <th style="width: 90px;">التاريخ</th>
-                    <th style="width: 110px;">إجراء</th>
+                    <th style="width: 100px;">الحالة</th>
+                    <th style="width: 100px;">التاريخ</th>
+                    <th style="width: 130px;">إجراء</th>
                 </tr>
             </thead>
-            <tbody id="tableBody"></tbody>
+            <tbody id="tableBody">
+                <!-- بيانات تجريبية بالشكل الجديد -->
+                <tr data-time="1715616000000">
+                    <td data-tooltip="شركة الرياض للتقنية">شركة الرياض للتقنية</td>
+                    <td data-tooltip="أحمد محمد">أحمد محمد</td>
+                    <td><a href="https://wa.me/966500000000" target="_blank" style="color:var(--accent-green); text-decoration:none;">0500000000</a></td>
+                    <td data-tooltip="1010203040">1010203040</td>
+                    <td data-tooltip="برنامج محاسبي قديم">برنامج محاسبي قديم</td>
+                    <td data-tooltip="ASGate CRM">ASGate CRM</td>
+                    <td><span class="status-pill status-50">50%</span></td>
+                    <td>2026-05-13</td>
+                    <td>
+                        <button class="btn-icon btn-edit">تعديل</button>
+                        <button class="btn-icon btn-transfer" onclick="openTransferConfirm()">نقل</button>
+                    </td>
+                </tr>
+            </tbody>
         </table>
     </div>
 </div>
 
-<!-- نافذة النقل -->
-<div id="transferModal" class="modal">
+<!-- نافذة إضافة زيارة -->
+<div id="visitModal" class="modal">
     <div class="modal-content">
-        <p style="font-weight: bold;">هل ترغب بنقل الزيارة؟</p>
-        <div class="modal-btns">
-            <button class="btn-yes" onclick="confirmTransfer()">نعم</button>
-            <button class="btn-no" onclick="closeModal()">لا</button>
+        <div class="modal-header">
+            <span>تسجيل زيارة جديدة</span>
+            <span style="cursor:pointer" onclick="toggleModal('visitModal', false)">×</span>
         </div>
-    </div>
-</div>
-
-<div class="timeline-bar">
-    <div class="timeline-item"><strong>المستخدم:</strong> حمزة</div>
-    <div id="lastAction" class="timeline-item"><strong>آخر نشاط:</strong> جاهز للعمل</div>
-</div>
-
-<script>
-    let currentRowForTransfer = null;
-
-    function addNewVisit() {
-        const tbody = document.getElementById('tableBody');
-        const row = tbody.insertRow(0);
-        row.className = 'editing';
-        row.setAttribute('data-time', Date.now());
-        const today = new Date().toISOString().split('T')[0];
-
-        row.innerHTML = `
-            <td data-tooltip="اسم الشركة"><input type="text" class="editable-input" oninput="updateTooltip(this)"></td>
-            <td data-tooltip="العنوان"><input type="text" class="editable-input" oninput="updateTooltip(this)"></td>
-            <td data-tooltip="المسؤول"><input type="text" class="editable-input" oninput="updateTooltip(this)"></td>
-            <td data-tooltip="الموبايل"><input type="text" class="editable-input" placeholder="05xxx"></td>
-            <td data-tooltip="الايميل"><input type="text" class="editable-input" oninput="updateTooltip(this)"></td>
-            <td data-tooltip="السجل"><input type="text" class="editable-input" oninput="updateTooltip(this)"></td>
-            <td data-tooltip="الخدمة الحالية"><input type="text" class="editable-input" oninput="updateTooltip(this)"></td>
-            <td data-tooltip="الخدمة المقترحة"><input type="text" class="editable-input" oninput="updateTooltip(this)"></td>
-            <td>
-                <select class="editable-select">
+        <div class="modal-body">
+            <div class="input-group"><label>اسم الشركة</label><input type="text" id="m_comp" class="modal-input"></div>
+            <div class="input-group"><label>المسؤول</label><input type="text" id="m_mgr" class="modal-input"></div>
+            <div class="input-group"><label>الموبايل</label><input type="text" id="m_phone" class="modal-input"></div>
+            <div class="input-group"><label>الإيميل</label><input type="text" id="m_email" class="modal-input"></div>
+            <div class="input-group"><label>السجل التجاري</label><input type="text" id="m_cr" class="modal-input"></div>
+            <div class="input-group"><label>تاريخ الزيارة</label><input type="date" id="m_date" class="modal-input"></div>
+            <div class="input-group"><label>الخدمة الحالية</label><input type="text" id="m_curr" class="modal-input"></div>
+            <div class="input-group"><label>الخدمة المقترحة</label><input type="text" id="m_prop" class="modal-input"></div>
+            <div class="input-group"><label>الحالة</label>
+                <select id="m_status" class="modal-input">
                     <option value="50%">50%</option>
                     <option value="20%">20%</option>
                     <option value="مهتم">مهتم</option>
                     <option value="فقدان">فقدان</option>
                 </select>
-            </td>
-            <td data-tooltip="ملاحظات"><input type="text" class="editable-input" oninput="updateTooltip(this)"></td>
-            <td><input type="date" class="editable-input" value="${today}"></td>
-            <td>
-                <button class="btn-row btn-save" onclick="saveRow(this)">حفظ</button>
-                <button class="btn-row btn-edit" onclick="editRow(this)" style="display:none">تعديل</button>
-                <button class="btn-row btn-transfer" onclick="openModal(this)">نقل</button>
-            </td>
-        `;
-        updateTimeline("إضافة زيارة جديدة");
+            </div>
+            <div class="input-group full-width"><label>ملاحظات</label><textarea id="m_notes" class="modal-input" rows="2"></textarea></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-close-modal" onclick="toggleModal('visitModal', false)">إلغاء</button>
+            <button class="btn-save-modal" onclick="saveNewVisit()">حفظ الزيارة</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // تعيين تاريخ اليوم تلقائياً عند فتح الصفحة
+    document.getElementById('m_date').value = new Date().toISOString().split('T')[0];
+
+    function toggleModal(id, show) {
+        document.getElementById(id).style.display = show ? 'block' : 'none';
     }
 
-    function saveRow(btn) {
-        const row = btn.closest('tr');
-        const phoneInput = row.cells[3].querySelector('input');
-        let phone = phoneInput.value.trim();
-        
-        // معالجة رابط الواتساب
-        if(phone) {
-            let cleanPhone = phone.startsWith('0') ? '966' + phone.substring(1) : phone;
-            row.cells[3].innerHTML = `<a href="https://wa.me/${cleanPhone}" target="_blank" class="whatsapp-link">${phone}</a>`;
-            row.cells[3].setAttribute('data-tooltip', 'واتساب: ' + phone);
-        }
-
-        row.classList.remove('editing');
-        row.querySelectorAll('input, select').forEach(el => {
-            if(!el.closest('td').classList.contains('whatsapp-link')) {
-                 // تحويل المدخلات لنص عرض فقط
-            }
-        });
-
-        btn.style.display = 'none';
-        row.querySelector('.btn-edit').style.display = 'inline-block';
-        sortAndStyleTable();
-        updateTimeline("تم حفظ البيانات");
-    }
-
-    function editRow(btn) {
-        const row = btn.closest('tr');
-        row.classList.add('editing');
-        btn.style.display = 'none';
-        row.querySelector('.btn-save').style.display = 'inline-block';
-    }
-
-    function openModal(btn) {
-        currentRowForTransfer = btn.closest('tr');
-        document.getElementById('transferModal').style.display = 'block';
-    }
-
-    function closeModal() {
-        document.getElementById('transferModal').style.display = 'none';
-    }
-
-    function confirmTransfer() {
-        currentRowForTransfer.remove();
-        closeModal();
-        updateTimeline("تم نقل الزيارة إلى الفرص البيعية");
-    }
-
-    function updateTooltip(input) {
-        input.parentElement.setAttribute('data-tooltip', input.value);
-    }
-
-    function sortAndStyleTable() {
+    function saveNewVisit() {
         const tbody = document.getElementById('tableBody');
-        const rows = Array.from(tbody.rows);
+        const phone = document.getElementById('m_phone').value;
+        const cleanPhone = phone.startsWith('0') ? '966' + phone.substring(1) : phone;
+        const status = document.getElementById('m_status').value;
+        
+        let statusClass = '';
+        if(status === '50%') statusClass = 'status-50';
+        else if(status === '20%') statusClass = 'status-20';
+        else if(status === 'مهتم') statusClass = 'status-interested';
+        else statusClass = 'status-lost';
+
+        const row = `
+            <tr data-time="${Date.now()}">
+                <td data-tooltip="${document.getElementById('m_comp').value}">${document.getElementById('m_comp').value}</td>
+                <td data-tooltip="${document.getElementById('m_mgr').value}">${document.getElementById('m_mgr').value}</td>
+                <td><a href="https://wa.me/${cleanPhone}" target="_blank" style="color:var(--accent-green); text-decoration:none;">${phone}</a></td>
+                <td data-tooltip="${document.getElementById('m_cr').value}">${document.getElementById('m_cr').value}</td>
+                <td data-tooltip="${document.getElementById('m_curr').value}">${document.getElementById('m_curr').value}</td>
+                <td data-tooltip="${document.getElementById('m_prop').value}">${document.getElementById('m_prop').value}</td>
+                <td><span class="status-pill ${statusClass}">${status}</span></td>
+                <td>${document.getElementById('m_date').value}</td>
+                <td>
+                    <button class="btn-icon btn-edit">تعديل</button>
+                    <button class="btn-icon btn-transfer">نقل</button>
+                </td>
+            </tr>
+        `;
+        
+        tbody.insertAdjacentHTML('afterbegin', row);
+        sortRows();
+        toggleModal('visitModal', false);
+        // مسح الحقول بعد الحفظ
+        document.querySelectorAll('.modal-input').forEach(i => i.value = '');
+        document.getElementById('m_date').value = new Date().toISOString().split('T')[0];
+    }
+
+    function sortRows() {
+        const tbody = document.getElementById('tableBody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
         const priority = { "50%": 4, "20%": 3, "مهتم": 2, "فقدان": 1 };
 
         rows.sort((a, b) => {
-            let valA = a.querySelector('select')?.value || "";
-            let valB = b.querySelector('select')?.value || "";
-            if (priority[valB] !== priority[valA]) return priority[valB] - priority[valA];
+            let statusA = a.querySelector('.status-pill').innerText;
+            let statusB = b.querySelector('.status-pill').innerText;
+            
+            if (priority[statusB] !== priority[statusA]) {
+                return priority[statusB] - priority[statusA];
+            }
             return b.getAttribute('data-time') - a.getAttribute('data-time');
         });
 
         rows.forEach(row => tbody.appendChild(row));
     }
-
-    function updateTimeline(msg) {
-        const now = new Date().toLocaleTimeString('ar-SA');
-        document.getElementById('lastAction').innerHTML = `<strong>آخر نشاط:</strong> ${msg} (${now})`;
-    }
-
-    window.onclick = function(event) {
-        if (event.target == document.getElementById('transferModal')) closeModal();
-    }
 </script>
-
 </body>
 </html>
