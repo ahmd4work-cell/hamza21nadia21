@@ -27,63 +27,37 @@
         .search-container { display: flex; align-items: center; background: white; border: 1px solid var(--border-color); border-radius: 4px; padding: 0 5px; width: 150px; }
         .search-input { border: none; padding: 2px; font-family: 'Cairo'; outline: none; width: 100%; font-size: 11px; }
 
-        /* الجدول - إلغاء الفراغات تماماً */
+        /* الجدول بنمط الإكسل - بدون فراغات */
         .table-card { background: white; border: 1px solid var(--border-color); border-radius: 4px; }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; border-spacing: 0; }
         
-        th { 
-            background-color: #e2e8f0; 
-            padding: 4px 2px; 
-            color: var(--nav-navy); 
-            font-size: 10.5px; 
-            font-weight: 800; 
-            border: 1px solid var(--border-color); /* حدود رفيعة جداً لتمييز الأعمدة دون فراغات */
-        }
+        th { background-color: #e2e8f0; padding: 4px 2px; color: var(--nav-navy); font-size: 10.5px; font-weight: 800; border: 1px solid var(--border-color); }
         
-        td { 
-            padding: 3px 2px; 
-            border: 1px solid #edf2f7; 
-            text-align: center; 
-            font-size: 11px; 
-            white-space: nowrap; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
-            font-weight: bold;
-            color: #1e293b;
-        }
+        td { padding: 0; border: 1px solid var(--border-color); text-align: center; font-size: 11px; height: 28px; }
 
-        tr:hover { background-color: #f1f5f9; }
-
-        /* حقول الإدخال المدمجة */
-        .row-input { 
-            width: 98%; 
-            padding: 2px; 
-            border: 1px solid var(--accent-blue); 
-            border-radius: 2px; 
-            font-family: 'Cairo'; 
-            font-size: 10.5px; 
-            text-align: center; 
+        /* حقول الإدخال لتشبه خلايا الإكسل تماماً */
+        .excel-input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            padding: 0 5px;
+            font-family: 'Cairo';
+            font-size: 11px;
+            text-align: center;
             outline: none;
-            background-color: #fff;
+            box-sizing: border-box;
+            background-color: #fffdec; /* لون خفيف لتمييز وضع التعديل */
+            display: block;
         }
-        
+
+        .excel-input:focus { background-color: #fff; border: 2px solid var(--accent-blue); }
+
         .status-pill { padding: 1px 6px; border-radius: 8px; font-size: 9.5px; font-weight: bold; }
         .status-50 { background: #dcfce7; color: #15803d; }
 
-        .btn-action { 
-            border: none; 
-            padding: 1px 5px; 
-            border-radius: 3px; 
-            font-size: 9.5px; 
-            font-family: 'Cairo'; 
-            font-weight: bold; 
-            cursor: pointer; 
-            margin: 0; 
-            color: white; 
-        }
-        .bg-save { background-color: var(--accent-green); margin-left: 2px; }
+        .btn-action { border: none; padding: 2px 8px; border-radius: 3px; font-size: 10px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; }
+        .bg-save { background-color: var(--accent-green); }
         .bg-edit { background-color: var(--accent-blue); }
-        .bg-transfer { background-color: #f59e0b; margin-right: 2px; }
     </style>
 </head>
 <body>
@@ -111,9 +85,7 @@
                     <th style="width: 110px;">إجراء</th>
                 </tr>
             </thead>
-            <tbody id="tableBody">
-                <!-- الصفوف ستظهر هنا ملتصقة وبدون فراغات -->
-            </tbody>
+            <tbody id="tableBody"></tbody>
         </table>
     </div>
 </div>
@@ -121,57 +93,57 @@
 <script>
     let isEditing = false;
 
-    // تنبيه الخروج إذا لم يتم الحفظ
-    window.onbeforeunload = function() {
-        if (isEditing) return "لم يتم حفظ التغييرات!";
-    };
+    // تنبيه عند محاولة إغلاق الصفحة دون حفظ
+    window.addEventListener('beforeunload', (event) => {
+        if (isEditing) {
+            event.preventDefault();
+            event.returnValue = ''; // يظهر رسالة المتصفح الافتراضية
+        }
+    });
 
     function insertNewRow() {
-        if (isEditing) return alert("احفظ التعديل الحالي أولاً");
+        if (isEditing) return alert("يرجى حفظ البيانات الحالية أولاً");
         
         isEditing = true;
         const tbody = document.getElementById('tableBody');
         const row = tbody.insertRow(0);
-        row.setAttribute('data-new', 'true');
 
         row.innerHTML = `
-            <td><input type="text" class="row-input"></td>
-            <td><input type="text" class="row-input"></td>
-            <td><input type="text" class="row-input"></td>
-            <td><input type="text" class="row-input"></td>
-            <td><input type="text" class="row-input"></td>
-            <td><input type="text" class="row-input"></td>
+            <td><input type="text" class="excel-input"></td>
+            <td><input type="text" class="excel-input"></td>
+            <td><input type="text" class="excel-input"></td>
+            <td><input type="text" class="excel-input"></td>
+            <td><input type="text" class="excel-input"></td>
+            <td><input type="text" class="excel-input"></td>
             <td>
-                <select class="row-input">
+                <select class="excel-input">
                     <option>50%</option><option>20%</option><option>مهتم</option><option>فقدان</option>
                 </select>
             </td>
-            <td><input type="date" class="row-input" value="${new Date().toISOString().split('T')[0]}"></td>
-            <td>
+            <td><input type="date" class="excel-input" value="${new Date().toISOString().split('T')[0]}"></td>
+            <td style="padding: 2px;">
                 <button class="btn-action bg-save" onclick="saveRow(this)">حفظ</button>
-                <button class="btn-action bg-edit" style="opacity:0.3" disabled>تعديل</button>
             </td>
         `;
     }
 
     function saveRow(btn) {
         const row = btn.closest('tr');
-        const inputs = row.querySelectorAll('.row-input');
+        const inputs = row.querySelectorAll('.excel-input');
         const v = Array.from(inputs).map(i => i.value);
         
         isEditing = false;
         row.innerHTML = `
-            <td>${v[0]}</td>
-            <td>${v[1]}</td>
-            <td>${v[2]}</td>
-            <td>${v[3]}</td>
-            <td>${v[4]}</td>
-            <td>${v[5]}</td>
+            <td style="padding: 0 5px;">${v[0]}</td>
+            <td style="padding: 0 5px;">${v[1]}</td>
+            <td style="padding: 0 5px;">${v[2]}</td>
+            <td style="padding: 0 5px;">${v[3]}</td>
+            <td style="padding: 0 5px;">${v[4]}</td>
+            <td style="padding: 0 5px;">${v[5]}</td>
             <td><span class="status-pill status-50">${v[6]}</span></td>
             <td>${v[7]}</td>
-            <td>
+            <td style="padding: 2px;">
                 <button class="btn-action bg-edit" onclick="editRow(this)">تعديل</button>
-                <button class="btn-action bg-transfer" onclick="this.closest('tr').remove()">نقل</button>
             </td>
         `;
     }
