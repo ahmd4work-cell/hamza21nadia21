@@ -1,22 +1,23 @@
+<!DOCTYPE html>
 <html dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRM الاتصالات - الرئيسية</title>
+    <title>ASGate - لوحة التحكم</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --nav-navy: #001f3f;
-            --stat-black: #1a1a1a;
-            --stat-green: #00b050;
-            --stat-yellow: #ffc000;
-            --bg-color: #f4f7f6;
+           --nav-navy: #001f3f;
+           --stat-black: #1a1a1a;
+           --stat-green: #00b050;
+           --stat-yellow: #ffc000;
+           --bg-color: #f4f7f6;
         }
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; }
 
-        .navbar { background-color: var(--nav-navy); display: flex; justify-content: flex-start; padding: 6px 20px; position: sticky; top: 0; z-index: 1000; }
+        .navbar { background-color: var(--nav-navy); display: flex; justify-content: flex-start; padding: 6px 20px; position: sticky; top: 0; z-index: 1000; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
         .navbar a { color: white; text-decoration: none; padding: 5px 15px; margin-left: 10px; font-weight: 700; font-size: 11px; border-radius: 6px; }
         .navbar a.active { background-color: #003366; }
 
@@ -25,95 +26,57 @@
         .container { padding: 15px; max-width: 1400px; margin: auto; }
 
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .small-card { display: flex; align-items: center; padding: 8px 15px; border-radius: 8px; color: white; font-size: 13px; }
+        .small-card { display: flex; align-items: center; padding: 12px 20px; border-radius: 8px; color: white; font-size: 13px; }
 
-        /* التوزيع: الرسوم (يمين)، الجدول (وسط)، الفرز والبحث (يسار) */
-        .dashboard-main { 
-            display: grid; 
-            grid-template-columns: 320px 600px 1fr; 
-            gap: 25px; 
-            margin-bottom: 20px; 
-            align-items: start; 
-        }
-        
+        .dashboard-main { display: grid; grid-template-columns: 320px 600px 1fr; gap: 25px; margin-bottom: 20px; align-items: start; }
         .charts-column { display: flex; flex-direction: column; gap: 20px; }
-        
-        .content-box { background: white; padding: 12px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
+        .content-box { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
 
-        /* ستايل مربع الفرز والبحث الجديد */
-        .search-filter-box {
-            background: white;
-            padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-            border: 1px solid #eee;
-        }
+        .search-filter-box { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #eee; }
         .filter-group { margin-bottom: 15px; }
         .filter-group label { display: block; font-size: 11px; font-weight: bold; margin-bottom: 5px; color: var(--nav-navy); }
-        .filter-input {
-            width: 100%;
-            padding: 8px;
-            font-family: 'Cairo';
-            font-size: 11px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            outline: none;
-        }
-        .filter-input:focus { border-color: var(--stat-green); }
+        .filter-input { width: 100%; padding: 8px; font-family: 'Cairo'; font-size: 11px; border: 1px solid #ddd; border-radius: 6px; outline: none; }
 
-        /* جدول الأهداف */
-        .table-area .content-box { border-right: 4px solid var(--nav-navy); }
-        .yearly-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: center; table-layout: fixed; }
-        .yearly-table th { color: white; padding: 5px 2px; border: 1px solid #eee; font-size: 10px; }
-        .yearly-table td { padding: 4px 2px; border: 1px solid #eee; font-weight: bold; }
+        .yearly-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: center; }
+        .yearly-table th { color: white; padding: 8px 2px; border: 1px solid #eee; font-size: 10px; }
+        .yearly-table td { padding: 6px 2px; border: 1px solid #eee; font-weight: bold; }
 
         .chart-wrapper { position: relative; height: 150px; width: 100%; }
-
-        .timeline-section { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .timeline-item { border-right: 3px solid var(--nav-navy); padding-right: 15px; margin-bottom: 12px; }
-        .timeline-stamp { background: #e9ecef; display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-bottom: 4px; color: var(--nav-navy); }
-        .timeline-content { font-size: 11px; color: #444; }
-
-        h3 { font-size: 12px; margin-bottom: 10px; color: var(--nav-navy); font-weight: 700; }
-
-        @media (max-width: 1300px) { 
-            .dashboard-main { grid-template-columns: 320px 1fr; }
-            .search-filter-box { margin-top: 20px; }
-        }
+        h3 { font-size: 12px; margin-bottom: 15px; color: var(--nav-navy); font-weight: 700; border-bottom: 1px solid #eee; padding-bottom: 5px; }
     </style>
 </head>
 <body>
 
     <nav class="navbar">
-        <a href="#" class="active">الرئيسية</a>
-        <a href="#">الزيارات</a>
-        <a href="#">المتوقعة</a>
+        <a href="index.html" class="active">الرئيسية</a>
+        <a href="visits.html">الزيارات</a>
+        <a href="opportunities.html">الفرص البيعية</a>
         <a href="#">العملاء</a>
         <a href="#">المبيعات</a>
         <a href="#">تذكيرات</a>
     </nav>
 
     <div class="user-info-bar">
-        <div><span style="font-weight:700">الرقم:</span> 12345</div>
-        <div><span style="font-weight:700">الاسم:</span> حمزة</div>
-        <div><span style="font-weight:700">الموبايل:</span> 05XXXXXXX</div>
+        <div><span style="font-weight:700">المستخدم:</span> حمزة</div>
+        <div><span style="font-weight:700">المشروع:</span> ASGate</div>
+        <div><span style="font-weight:700">السوق المستهدف:</span> الرياض</div>
     </div>
 
     <div class="container">
         <div class="stats-grid">
             <div class="small-card" style="background-color: var(--stat-black);">
-                <div style="width:30%">الهدف</div><div style="width:50%; text-align:center; font-weight:bold">180,000</div>
+                <div style="width:40%">الهدف السنوي</div><div style="width:60%; text-align:center; font-weight:bold">180,000</div>
             </div>
             <div class="small-card" style="background-color: var(--stat-green);">
-                <div style="width:30%">مكتمل</div><div style="width:50%; text-align:center; font-weight:bold">14,210</div>
+                <div style="width:40%">المحقق</div><div style="width:60%; text-align:center; font-weight:bold">14,210</div>
             </div>
             <div class="small-card" style="background-color: var(--stat-yellow); color: black;">
-                <div style="width:30%">معلق</div><div style="width:50%; text-align:center; font-weight:bold">790</div>
+                <div style="width:40%">قيد المتابعة</div><div style="width:60%; text-align:center; font-weight:bold">790</div>
             </div>
         </div>
 
         <div class="dashboard-main">
-            <!-- عمود الرسوم (يمين) -->
+            <!-- عمود الرسوم -->
             <div class="charts-column">
                 <div class="content-box">
                     <h3>📈 الأداء الشهري</h3>
@@ -125,19 +88,19 @@
                 </div>
             </div>
 
-            <!-- عمود الجدول (وسط) -->
+            <!-- عمود الجدول -->
             <div class="table-area">
-                <div class="content-box">
-                    <h3>📅 تفاصيل الأهداف</h3>
+                <div class="content-box" style="border-right: 4px solid var(--nav-navy);">
+                    <h3>📅 تفاصيل الأهداف للعام 2026</h3>
                     <table class="yearly-table">
                         <thead>
                             <tr>
-                                <th style="background: #1a1a1a; width: 18%;">الشهر</th>
-                                <th style="background: #1a1a1a;">الهدف</th>
-                                <th style="background: #00b050;">مكتمل</th>
-                                <th style="background: #00b050;">%</th>
-                                <th style="background: #ffc000; color: black;">معلق</th>
-                                <th style="background: #ffc000; color: black;">%</th>
+                                <th style="background: var(--stat-black); width: 18%;">الشهر</th>
+                                <th style="background: var(--stat-black);">الهدف</th>
+                                <th style="background: var(--stat-green);">مكتمل</th>
+                                <th style="background: var(--stat-green);">%</th>
+                                <th style="background: var(--stat-yellow); color: black;">معلق</th>
+                                <th style="background: var(--stat-yellow); color: black;">%</th>
                             </tr>
                         </thead>
                         <tbody id="yearlyDataBody">
@@ -147,37 +110,26 @@
                 </div>
             </div>
 
-            <!-- عمود البحث والفرز (يسار - المساحة الفارغة سابقاً) -->
+            <!-- عمود الفلترة -->
             <div class="search-filter-box">
-                <h3>🔍 فلترة البيانات</h3>
+                <h3>🔍 التحكم بالعرض</h3>
                 <div class="filter-group">
-                    <label>بحث بالاسم / الرقم</label>
-                    <input type="text" class="filter-input" placeholder="اكتب للبحث...">
+                    <label>البحث السريع</label>
+                    <input type="text" class="filter-input" placeholder="اسم الشركة أو المندوب...">
                 </div>
                 <div class="filter-group">
-                    <label>عرض حسب المشرف</label>
+                    <label>تحديد المشرف</label>
                     <select class="filter-input">
                         <option>الكل</option>
-                        <option>أحمد علي</option>
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label>عرض حسب المندوب</label>
+                    <label>تحديد المنطقة</label>
                     <select class="filter-input">
-                        <option>الكل</option>
-                        <option>حمزة</option>
-                        <option>خالد حسن</option>
+                        <option>الرياض</option>
+                        <option>جدة</option>
+                        <option>الدمام</option>
                     </select>
-                </div>
-            </div>
-        </div>
-
-        <div class="timeline-section">
-            <h3>🕒 سجل النشاطات</h3>
-            <div id="timeline-container">
-                <div class="timeline-item">
-                    <div class="timeline-stamp">الأربعاء، 13 مايو 2026 - 01:45 ص</div>
-                    <div class="timeline-content">إضافة واجهة الفرز والبحث في الركن الأيسر للتحكم في عرض التقارير.</div>
                 </div>
             </div>
         </div>
@@ -186,23 +138,24 @@
     <script>
         const months = ["فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
         const tbody = document.getElementById('yearlyDataBody');
-        months.forEach(m => { tbody.innerHTML += `<tr><td>${m}</td><td>15,000</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>`; });
+        months.forEach(m => { 
+            tbody.innerHTML += `<tr><td>${m}</td><td>15,000</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>`;
+        });
 
-        // الرسم البياني (أعمدة)
+        // Chart.js Configuration
         const ctxBar = document.getElementById('performanceChart').getContext('2d');
         new Chart(ctxBar, {
             type: 'bar',
             data: {
                 labels: ['1','2','3','4','5','6','7','8','9','10','11','12'],
                 datasets: [
-                    { label: 'الهدف', data: Array(12).fill(15000), backgroundColor: '#e9ecef', borderRadius: 4, barPercentage: 0.5 },
-                    { label: 'المحقق', data: [14210,0,0,0,0,0,0,0,0,0,0,0], backgroundColor: '#00b050', borderRadius: 4, barPercentage: 0.3 }
+                    { label: 'الهدف', data: Array(12).fill(15000), backgroundColor: '#e9ecef', borderRadius: 4 },
+                    { label: 'المحقق', data: [14210,0,0,0,0,0,0,0,0,0,0,0], backgroundColor: '#00b050', borderRadius: 4 }
                 ]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { stacked: true, grid: { display: false } }, y: { beginAtZero: true, grid: { color: '#f0f0f0' } } } }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
         });
 
-        // الرسم البياني (دائري)
         const ctxPie = document.getElementById('pieChart').getContext('2d');
         new Chart(ctxPie, {
             type: 'doughnut',
@@ -210,7 +163,7 @@
                 labels: ['مكتمل', 'معلق'],
                 datasets: [{ data: [95, 5], backgroundColor: ['#00b050', '#ffc000'], borderWidth: 0 }]
             },
-            options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } }
+            options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom' } } }
         });
     </script>
 </body>
