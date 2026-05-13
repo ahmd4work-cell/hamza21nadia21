@@ -9,80 +9,49 @@
         :root {
             --nav-navy: #001f3f;
             --bg-light: #f4f7f6;
-            --green-btn: #00b050;
-            --red-btn: #d9534f;
+            --green-save: #28a745;
+            --blue-edit: #007bff;
+            --orange-transfer: #fd7e14;
         }
 
         body { background-color: var(--bg-light); font-family: 'Cairo', sans-serif; margin: 0; padding-bottom: 50px; }
 
-        /* شريط التنقل الموحد بحواف دائرية */
+        /* شريط التنقل */
         .navbar { 
             background-color: var(--nav-navy); 
-            display: flex; 
-            padding: 8px 20px; 
-            border-bottom-left-radius: 12px; 
-            border-bottom-right-radius: 12px;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+            display: flex; padding: 8px 20px; 
+            border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;
+            position: sticky; top: 0; z-index: 1000;
         }
         .navbar a { color: white; text-decoration: none; padding: 6px 15px; font-weight: 700; font-size: 11px; border-radius: 6px; margin-left: 5px; }
-        .navbar a:hover { background: rgba(255,255,255,0.1); }
         .active-link { background: #003366 !important; }
 
-        /* شريط الإجراءات (البحث والإضافة يميناً) */
-        .action-bar { 
-            display: flex; 
-            flex-direction: row-reverse; 
-            justify-content: flex-start; 
-            align-items: center; 
-            background: white; 
-            padding: 10px 20px; 
-            gap: 15px; 
-            border-bottom: 1px solid #dee2e6; 
-        }
-        .btn-add { background-color: var(--nav-navy); color: white; border: none; padding: 8px 20px; border-radius: 4px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; }
-        .search-input { width: 250px; padding: 6px 12px; border: 1px solid #ced4da; border-radius: 4px; font-family: 'Cairo'; font-size: 12px; }
+        /* شريط الإجراءات */
+        .action-bar { display: flex; justify-content: flex-start; align-items: center; background: white; padding: 10px 20px; gap: 15px; border-bottom: 1px solid #dee2e6; }
+        .btn-add { background-color: var(--nav-navy); color: white; border: none; padding: 8px 20px; border-radius: 4px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 13px; }
+        .search-input { width: 250px; padding: 7px 12px; border: 1px solid #ced4da; border-radius: 4px; font-family: 'Cairo'; font-size: 12px; }
 
-        /* الجدول والتلميح الذكي */
+        /* الجدول */
         .table-container { padding: 20px; overflow-x: auto; }
         .custom-table { width: 100%; border-collapse: collapse; background: white; table-layout: fixed; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .custom-table thead tr { background-color: var(--nav-navy); color: white; }
         .custom-table th { padding: 10px; font-size: 10px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
-        .custom-table td { 
-            padding: 8px; border: 1px solid #eee; font-size: 11px; text-align: center;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; 
-            font-weight: bold;
-        }
+        .custom-table td { padding: 8px; border: 1px solid #eee; font-size: 11px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; font-weight: bold; }
 
-        /* Tooltip التلميح عند الوقوف بالسهم */
-        .custom-table td:hover::after {
-            content: attr(data-fulltext);
-            position: absolute; z-index: 1000; bottom: 100%; right: 0;
-            background: #333; color: #fff; padding: 5px 10px; border-radius: 4px;
-            white-space: normal; width: 180px; font-size: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
+        /* Tooltip */
+        .custom-table td:hover::after { content: attr(data-fulltext); position: absolute; z-index: 1000; bottom: 100%; right: 0; background: #333; color: #fff; padding: 5px 10px; border-radius: 4px; white-space: normal; width: 180px; font-size: 10px; }
 
-        .editable-input, .editable-select { width: 98%; border: none; font-family: 'Cairo'; font-size: 11px; outline: none; background: transparent; text-align: center; font-weight: bold; }
+        .editable-input, .editable-select { width: 98%; border: 1px solid transparent; font-family: 'Cairo'; font-size: 11px; outline: none; background: transparent; text-align: center; font-weight: bold; }
+        .editing .editable-input, .editing .editable-select { border: 1px solid #ccc; background: #fff; border-radius: 3px; }
+        
+        /* الأزرار داخل الجدول */
+        .btn-action { border: none; padding: 4px 8px; border-radius: 4px; color: white; cursor: pointer; font-family: 'Cairo'; font-size: 10px; font-weight: bold; margin: 0 2px; }
+        .btn-edit { background-color: var(--blue-edit); }
+        .btn-save { background-color: var(--green-save); display: none; }
+        .btn-transfer { background-color: var(--orange-transfer); }
+
         .whatsapp-link { color: #25D366; text-decoration: none; font-weight: bold; }
-
-        /* سجل النشاط يميناً */
-        .activity-log { margin: 20px; background: white; border: 1px solid #b2d7ff; border-radius: 8px; min-height: 80px; position: relative; padding: 15px; }
-        .activity-log-title { position: absolute; top: 10px; right: 15px; font-size: 12px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
-
-        /* التنبيهات */
-        .alert-modal { display: none; position: fixed; z-index: 3000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
-        .alert-content { background: white; width: 320px; margin: 15% auto; padding: 20px; border-radius: 12px; text-align: center; }
-        .btn-group { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
-        .btn-yes { background: var(--green-btn); color: white; border: none; padding: 8px 25px; border-radius: 6px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
-        .btn-no { background: var(--red-btn); color: white; border: none; padding: 8px 25px; border-radius: 6px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
-
-        /* شريط المهام السفلي الموحد */
-        .bottom-taskbar {
-            position: fixed; bottom: 0; width: 100%; background: #eee; 
-            padding: 8px; display: flex; justify-content: center; gap: 30px; 
-            border-top: 1px solid #ccc; font-size: 11px; font-weight: bold; color: #555;
-        }
+        .bottom-taskbar { position: fixed; bottom: 0; width: 100%; background: #eee; padding: 8px; display: flex; justify-content: center; gap: 30px; border-top: 1px solid #ccc; font-size: 11px; font-weight: bold; color: #555; }
     </style>
 </head>
 <body>
@@ -90,7 +59,7 @@
     <nav class="navbar">
         <a href="index.html">الرئيسية</a>
         <a href="visits.html" class="active-link">الزيارات</a>
-        <a href="#">المتوقعة</a>
+        <a href="opportunities.html">فرص بيعية</a>
         <a href="#">العملاء</a>
         <a href="#">المبيعات</a>
         <a href="#">تذكيرات</a>
@@ -98,7 +67,7 @@
 
     <div class="action-bar">
         <button class="btn-add" onclick="addNewRow()">+ إضافة زيارة</button>
-        <input type="text" class="search-input" placeholder="بحث سريع باسم الشركة...">
+        <input type="text" class="search-input" placeholder="بحث باسم الشركة...">
     </div>
 
     <div class="table-container">
@@ -111,40 +80,31 @@
                     <th>الموبايل</th>
                     <th>الايميل</th>
                     <th>السجل</th>
-                    <th>الخدمة الحالية</th>
-                    <th>الخدمة المقترحة</th>
+                    <th>الحالية</th>
+                    <th>المقترحة</th>
                     <th>الحالة</th>
                     <th>ملاحظات</th>
                     <th>التاريخ</th>
-                    <th style="width: 8%;">اجراء</th>
+                    <th style="width: 15%;">إجراء</th>
                 </tr>
             </thead>
-            <tbody id="tableBody">
-                <!-- الصفوف تضاف هنا -->
-            </tbody>
+            <tbody id="tableBody"></tbody>
         </table>
-
-        <div class="activity-log">
-            <div class="activity-log-title"><span>سجل النشاط</span> 🕒</div>
-        </div>
     </div>
 
-    <div id="transferAlert" class="alert-modal">
-        <div class="alert-content">
-            <p style="font-weight: bold;">هل ترغب بنقل الصفحة إلى متوقعة؟</p>
-            <div class="btn-group">
-                <button class="btn-yes" onclick="confirmTransfer()">نعم</button>
-                <button class="btn-no" onclick="cancelTransfer()">لا</button>
+    <!-- نافذة التنبيه -->
+    <div id="transferAlert" class="alert-modal" style="display:none; position: fixed; z-index: 3000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5);">
+        <div style="background: white; width: 320px; margin: 15% auto; padding: 20px; border-radius: 12px; text-align: center; font-family: 'Cairo';">
+            <p style="font-weight: bold;">هل ترغب بنقل الصف إلى فرص بيعية؟</p>
+            <div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px;">
+                <button style="background: #28a745; color: white; border: none; padding: 8px 25px; border-radius: 6px; cursor: pointer; font-family: 'Cairo'; font-weight: bold;" onclick="confirmTransfer()">نعم</button>
+                <button style="background: #dc3545; color: white; border: none; padding: 8px 25px; border-radius: 6px; cursor: pointer; font-family: 'Cairo'; font-weight: bold;" onclick="cancelTransfer()">لا</button>
             </div>
         </div>
     </div>
 
     <div class="bottom-taskbar">
-        <span>المستخدم: حمزة</span>
-        <span>|</span>
-        <span>الحالة: متصل</span>
-        <span>|</span>
-        <span>نظام ASGate v1.0</span>
+        <span>المستخدم: حمزة</span> | <span>الحالة: متصل</span> | <span>نظام ASGate v1.0</span>
     </div>
 
     <script>
@@ -153,13 +113,14 @@
         function addNewRow() {
             const table = document.getElementById("tableBody");
             const row = table.insertRow(0); 
+            row.classList.add('editing');
             const today = new Date().toISOString().split('T')[0];
 
             row.innerHTML = `
                 <td onmouseover="updateTooltip(this)"><input type="text" class="editable-input" placeholder="الشركة" oninput="syncText(this)"></td>
                 <td onmouseover="updateTooltip(this)"><input type="text" class="editable-input" placeholder="العنوان" oninput="syncText(this)"></td>
                 <td onmouseover="updateTooltip(this)"><input type="text" class="editable-input" placeholder="المسؤول" oninput="syncText(this)"></td>
-                <td><input type="text" class="editable-input" placeholder="الموبايل" onblur="formatWhatsapp(this)"></td>
+                <td><input type="text" class="editable-input" placeholder="الموبايل"></td>
                 <td onmouseover="updateTooltip(this)"><input type="text" class="editable-input" placeholder="الايميل" oninput="syncText(this)"></td>
                 <td onmouseover="updateTooltip(this)"><input type="text" class="editable-input" placeholder="السجل" oninput="syncText(this)"></td>
                 <td onmouseover="updateTooltip(this)"><input type="text" class="editable-input" placeholder="الحالية" oninput="syncText(this)"></td>
@@ -176,64 +137,73 @@
                 <td><input type="date" class="editable-input" value="${today}"></td>
                 <td onmouseover="updateTooltip(this)"><input type="text" class="editable-input" placeholder="ملاحظات" oninput="syncText(this)"></td>
                 <td>
-                    <select class="editable-select" onchange="handleAction(this)">
-                        <option value="">- اختر -</option>
-                        <option value="delete">حذف</option>
-                        <option value="excel">تصدير</option>
-                    </select>
+                    <button class="btn-action btn-edit" onclick="editRow(this)" style="display:none">تعديل</button>
+                    <button class="btn-action btn-save" onclick="saveRow(this)">حفظ</button>
+                    <button class="btn-action btn-transfer" onclick="triggerTransfer(this)">نقل</button>
                 </td>
             `;
             row.setAttribute('data-timestamp', Date.now());
         }
 
-        function syncText(input) {
-            input.parentElement.setAttribute('data-fulltext', input.value);
+        function editRow(btn) {
+            const row = btn.closest('tr');
+            row.classList.add('editing');
+            btn.style.display = 'none';
+            row.querySelector('.btn-save').style.display = 'inline-block';
+            
+            const phoneCell = row.cells[3];
+            const currentNum = phoneCell.textContent;
+            phoneCell.innerHTML = `<input type="text" class="editable-input" value="${currentNum}">`;
         }
 
-        function updateTooltip(td) {
-            const input = td.querySelector('input');
-            if (input) td.setAttribute('data-fulltext', input.value || input.placeholder);
-        }
+        function saveRow(btn) {
+            const row = btn.closest('tr');
+            row.classList.remove('editing');
+            btn.style.display = 'none';
+            row.querySelector('.btn-edit').style.display = 'inline-block';
 
-        function formatWhatsapp(input) {
-            let val = input.value.trim();
-            if (val) {
-                let cleanNum = val.startsWith('0') ? '966' + val.substring(1) : val;
-                input.parentElement.innerHTML = `<a href="https://wa.me/${cleanNum}" target="_blank" class="whatsapp-link">${val}</a>`;
+            const phoneInput = row.cells[3].querySelector('input');
+            if (phoneInput) {
+                let val = phoneInput.value.trim();
+                if (val) {
+                    let cleanNum = val.startsWith('0') ? '966' + val.substring(1) : val;
+                    row.cells[3].innerHTML = `<a href="https://wa.me/${cleanNum}" target="_blank" class="whatsapp-link">${val}</a>`;
+                }
             }
+            sortRows();
+        }
+
+        function triggerTransfer(btn) {
+            currentRowForTransfer = btn.closest('tr');
+            document.getElementById('transferAlert').style.display = 'block';
         }
 
         function handleStatusChange(select) {
-            const row = select.closest('tr');
             if (select.value === "مهتم") {
-                currentRowForTransfer = row;
-                document.getElementById('transferAlert').style.display = 'block';
+                triggerTransfer(select);
             }
-            sortRows();
         }
 
         function confirmTransfer() {
             currentRowForTransfer.remove();
             document.getElementById('transferAlert').style.display = 'none';
-            alert("تم إرسال العميل إلى قائمة المتوقعة");
+            alert("تم النقل إلى صفحة فرص بيعية بنجاح");
         }
 
         function cancelTransfer() {
             document.getElementById('transferAlert').style.display = 'none';
         }
 
-        function handleAction(select) {
-            if (select.value === "delete" && confirm("هل تريد حذف هذه الزيارة؟")) {
-                select.closest('tr').remove();
-            }
-            select.value = "";
+        function syncText(input) { input.parentElement.setAttribute('data-fulltext', input.value); }
+        function updateTooltip(td) {
+            const input = td.querySelector('input');
+            if (input) td.setAttribute('data-fulltext', input.value || input.placeholder);
         }
 
         function sortRows() {
             const tbody = document.getElementById('tableBody');
             const rows = Array.from(tbody.rows);
             const priority = { "50%": 1, "20%": 2, "فقدان": 3, "": 4, "مهتم": 0 };
-
             rows.sort((a, b) => {
                 const statA = a.querySelector('select').value;
                 const statB = b.querySelector('select').value;
