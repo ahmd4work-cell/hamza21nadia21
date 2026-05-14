@@ -3,168 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASGate - لوحة التحكم</title>
+    <title>ASGate - الرئيسية</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-           --nav-navy: #001f3f;
-           --stat-black: #1a1a1a;
-           --stat-green: #00b050;
-           --stat-yellow: #ffc000;
-           --bg-color: #f4f7f6;
+            --nav-navy: #001f3f;
+            --bg-color: #f4f7f9;
+            --accent-blue: #3b82f6;
+            --border-color: #cbd5e1;
+            --sidebar-width: 180px; /* تقليل عرض منطقة التحكم هنا */
         }
 
-        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; }
+        body { 
+            background-color: var(--bg-color); 
+            font-family: 'Cairo', sans-serif; 
+            margin: 0; 
+            overflow-x: hidden;
+        }
 
-        .navbar { background-color: var(--nav-navy); display: flex; justify-content: flex-start; padding: 6px 20px; position: sticky; top: 0; z-index: 1000; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
-        .navbar a { color: white; text-decoration: none; padding: 5px 15px; margin-left: 10px; font-weight: 700; font-size: 11px; border-radius: 6px; }
-        .navbar a.active { background-color: #003366; }
+        /* شريط التنقل العلوي */
+        .navbar { 
+            background-color: var(--nav-navy); 
+            display: flex; 
+            padding: 8px 20px; 
+            margin: 5px; 
+            border-radius: 15px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .navbar a { color: white; text-decoration: none; padding: 6px 15px; font-weight: 700; font-size: 13px; }
+        .navbar a.active { background-color: rgba(255,255,255,0.1); border-radius: 10px; }
 
-        .user-info-bar { background: white; display: flex; justify-content: space-around; padding: 8px 15px; border-bottom: 1px solid #ddd; font-size: 11px; color: var(--nav-navy); }
+        /* هيكل الصفحة الرئيسي */
+        .main-layout {
+            display: flex;
+            gap: 15px;
+            padding: 10px;
+            height: calc(100vh - 80px);
+        }
 
-        .container { padding: 15px; max-width: 1400px; margin: auto; }
+        /* منطقة التحكم (Sidebar) - النسخة النحيفة */
+        .control-panel {
+            width: var(--sidebar-width);
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .small-card { display: flex; align-items: center; padding: 12px 20px; border-radius: 8px; color: white; font-size: 13px; }
+        .control-panel h3 {
+            font-size: 14px;
+            color: var(--nav-navy);
+            margin-top: 0;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 8px;
+            text-align: center;
+        }
 
-        .dashboard-main { display: grid; grid-template-columns: 320px 600px 1fr; gap: 25px; margin-bottom: 20px; align-items: start; }
-        .charts-column { display: flex; flex-direction: column; gap: 20px; }
-        .content-box { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
+        .control-btn {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Cairo';
+            font-size: 12px;
+            transition: 0.2s;
+            text-align: center;
+        }
 
-        .search-filter-box { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #eee; }
-        .filter-group { margin-bottom: 15px; }
-        .filter-group label { display: block; font-size: 11px; font-weight: bold; margin-bottom: 5px; color: var(--nav-navy); }
-        .filter-input { width: 100%; padding: 8px; font-family: 'Cairo'; font-size: 11px; border: 1px solid #ddd; border-radius: 6px; outline: none; }
+        .control-btn:hover {
+            background: var(--accent-blue);
+            color: white;
+        }
 
-        .yearly-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: center; }
-        .yearly-table th { color: white; padding: 8px 2px; border: 1px solid #eee; font-size: 10px; }
-        .yearly-table td { padding: 6px 2px; border: 1px solid #eee; font-weight: bold; }
-
-        .chart-wrapper { position: relative; height: 150px; width: 100%; }
-        h3 { font-size: 12px; margin-bottom: 15px; color: var(--nav-navy); font-weight: 700; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        /* منطقة المحتوى الرئيسي */
+        .content-area {
+            flex: 1;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: #64748b;
+        }
     </style>
 </head>
 <body>
 
-    <nav class="navbar">
-        <a href="index.html" class="active">الرئيسية</a>
-        <a href="visits.html">الزيارات</a>
-        <a href="opportunities.html">الفرص البيعية</a>
-        <a href="#">العملاء</a>
-        <a href="#">المبيعات</a>
-        <a href="#">تذكيرات</a>
-    </nav>
+<nav class="navbar">
+    <a href="index.html" class="active">الرئيسية</a>
+    <a href="visits.html">الزيارات</a>
+    <a href="opportunities.html">الفرص البيعية</a>
+    <a href="customers.html">العملاء</a>
+    <a href="sales.html">المبيعات</a>
+    <a href="reminders.html">تذكير</a>
+</nav>
 
-    <div class="user-info-bar">
-        <div><span style="font-weight:700">المستخدم:</span> حمزة</div>
-        <div><span style="font-weight:700">المشروع:</span> ASGate</div>
-        <div><span style="font-weight:700">السوق المستهدف:</span> الرياض</div>
-    </div>
+<div class="main-layout">
+    <!-- منطقة التحكم اقل عرضاً -->
+    <aside class="control-panel">
+        <h3>التحكم بالعرض</h3>
+        <button class="control-btn">عرض يومي</button>
+        <button class="control-btn">عرض أسبوعي</button>
+        <button class="control-btn">عرض شهري</button>
+        <hr style="width:100%; border:0; border-top:1px solid var(--border-color);">
+        <button class="control-btn" style="color: var(--accent-red);">تصدير التقارير</button>
+    </aside>
 
-    <div class="container">
-        <div class="stats-grid">
-            <div class="small-card" style="background-color: var(--stat-black);">
-                <div style="width:40%">الهدف السنوي</div><div style="width:60%; text-align:center; font-weight:bold">180,000</div>
-            </div>
-            <div class="small-card" style="background-color: var(--stat-green);">
-                <div style="width:40%">المحقق</div><div style="width:60%; text-align:center; font-weight:bold">14,210</div>
-            </div>
-            <div class="small-card" style="background-color: var(--stat-yellow); color: black;">
-                <div style="width:40%">قيد المتابعة</div><div style="width:60%; text-align:center; font-weight:bold">790</div>
-            </div>
-        </div>
+    <!-- منطقة المحتوى الرئيسية -->
+    <main class="content-area">
+        مرحباً بك في لوحة تحكم ASGate - سيتم عرض الإحصائيات هنا
+    </main>
+</div>
 
-        <div class="dashboard-main">
-            <!-- عمود الرسوم -->
-            <div class="charts-column">
-                <div class="content-box">
-                    <h3>📈 الأداء الشهري</h3>
-                    <div class="chart-wrapper"><canvas id="performanceChart"></canvas></div>
-                </div>
-                <div class="content-box">
-                    <h3>📊 توزيع الإنجاز</h3>
-                    <div class="chart-wrapper"><canvas id="pieChart"></canvas></div>
-                </div>
-            </div>
-
-            <!-- عمود الجدول -->
-            <div class="table-area">
-                <div class="content-box" style="border-right: 4px solid var(--nav-navy);">
-                    <h3>📅 تفاصيل الأهداف للعام 2026</h3>
-                    <table class="yearly-table">
-                        <thead>
-                            <tr>
-                                <th style="background: var(--stat-black); width: 18%;">الشهر</th>
-                                <th style="background: var(--stat-black);">الهدف</th>
-                                <th style="background: var(--stat-green);">مكتمل</th>
-                                <th style="background: var(--stat-green);">%</th>
-                                <th style="background: var(--stat-yellow); color: black;">معلق</th>
-                                <th style="background: var(--stat-yellow); color: black;">%</th>
-                            </tr>
-                        </thead>
-                        <tbody id="yearlyDataBody">
-                            <tr><td>يناير</td><td>15,000</td><td>14,210</td><td>95%</td><td>790</td><td>5%</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- عمود الفلترة -->
-            <div class="search-filter-box">
-                <h3>🔍 التحكم بالعرض</h3>
-                <div class="filter-group">
-                    <label>البحث السريع</label>
-                    <input type="text" class="filter-input" placeholder="اسم الشركة أو المندوب...">
-                </div>
-                <div class="filter-group">
-                    <label>تحديد المشرف</label>
-                    <select class="filter-input">
-                        <option>الكل</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>تحديد المنطقة</label>
-                    <select class="filter-input">
-                        <option>الرياض</option>
-                        <option>جدة</option>
-                        <option>الدمام</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const months = ["فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
-        const tbody = document.getElementById('yearlyDataBody');
-        months.forEach(m => { 
-            tbody.innerHTML += `<tr><td>${m}</td><td>15,000</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>`;
-        });
-
-        // Chart.js Configuration
-        const ctxBar = document.getElementById('performanceChart').getContext('2d');
-        new Chart(ctxBar, {
-            type: 'bar',
-            data: {
-                labels: ['1','2','3','4','5','6','7','8','9','10','11','12'],
-                datasets: [
-                    { label: 'الهدف', data: Array(12).fill(15000), backgroundColor: '#e9ecef', borderRadius: 4 },
-                    { label: 'المحقق', data: [14210,0,0,0,0,0,0,0,0,0,0,0], backgroundColor: '#00b050', borderRadius: 4 }
-                ]
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-        });
-
-        const ctxPie = document.getElementById('pieChart').getContext('2d');
-        new Chart(ctxPie, {
-            type: 'doughnut',
-            data: {
-                labels: ['مكتمل', 'معلق'],
-                datasets: [{ data: [95, 5], backgroundColor: ['#00b050', '#ffc000'], borderWidth: 0 }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom' } } }
-        });
-    </script>
 </body>
 </html>
