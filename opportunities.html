@@ -2,33 +2,217 @@
 <html dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASGate - الفرص البيعية</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --nav-navy: #001f3f; --bg-light: #f4f7f6; }
-        body { background-color: var(--bg-light); font-family: 'Cairo', sans-serif; margin: 0; }
-        .navbar { background-color: var(--nav-navy); display: flex; padding: 8px 20px; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; position: sticky; top: 0; z-index: 1000; }
-        .navbar a { color: white; text-decoration: none; padding: 6px 15px; font-weight: 700; font-size: 11px; border-radius: 6px; margin-left: 5px; }
-        .active-link { background: #003366 !important; }
-        .content { padding: 20px; }
-        .bottom-taskbar { position: fixed; bottom: 0; width: 100%; background: #eee; padding: 8px; display: flex; justify-content: center; gap: 30px; border-top: 1px solid #ccc; font-size: 11px; font-weight: bold; }
+        :root {
+            --nav-navy: #001f3f;
+            --bg-color: #f4f7f9;
+            --accent-green-active: #22c55e;
+            --accent-green-dim: #d1fae5;
+            --accent-blue: #3b82f6;
+            --accent-red: #ef4444;
+            --border-color: #cbd5e1;
+        }
+
+        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1; }
+
+        /* شريط التنقل بحواف دائرية */
+        .navbar { 
+            background-color: var(--nav-navy); 
+            display: flex; 
+            padding: 8px 20px; 
+            margin: 5px; 
+            border-radius: 15px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .navbar a { color: white; text-decoration: none; padding: 6px 15px; font-weight: 700; font-size: 13px; border-radius: 10px; }
+        .navbar a.active { background-color: rgba(255,255,255,0.1); }
+
+        .container { padding: 5px 10px; max-width: 100%; }
+        
+        .action-bar { 
+            display: flex; 
+            align-items: center; 
+            margin-bottom: 25px; 
+            gap: 10px; 
+            padding: 10px 0; 
+        }
+        
+        .btn-top { border: none; padding: 8px 20px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 13px; transition: 0.3s; color: white; }
+        .btn-add { background-color: var(--accent-blue); }
+        .btn-save-all { background-color: var(--accent-green-dim); color: #065f46; opacity: 0.6; pointer-events: none; }
+        .btn-save-all.active { background-color: var(--accent-green-active); color: white; opacity: 1; pointer-events: auto; box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3); }
+
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; background: white; border: 1px solid var(--border-color); }
+        th { background-color: #e2e8f0; padding: 8px 2px; color: var(--nav-navy); font-size: 11px; font-weight: 800; border: 1px solid var(--border-color); }
+        td { padding: 0; border: 1px solid var(--border-color); text-align: center; height: 38px; font-size: 11px; }
+
+        .excel-input {
+            width: 100%; height: 100%; border: none; padding: 0 5px; font-family: 'Cairo';
+            font-size: 11px; text-align: center; outline: none; box-sizing: border-box; background: transparent;
+        }
+        .excel-input:focus { background-color: #fffdec; box-shadow: inset 0 0 0 1px var(--accent-blue); }
+
+        .btn-delete { border: none; background-color: #fee2e2; color: var(--accent-red); padding: 4px 10px; border-radius: 4px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 10px; }
+        .btn-delete:hover { background-color: var(--accent-red); color: white; }
+
+        .updated-at { font-size: 10px; color: #475569; font-weight: bold; }
     </style>
 </head>
-<body>
-    <nav class="navbar">
-        <a href="index.html">الرئيسية</a>
-        <a href="visits.html">الزيارات</a>
-        <a href="opportunities.html" class="active-link">الفرص البيعية</a>
-        <a href="#">العملاء</a>
-        <a href="#">المبيعات</a>
-        <a href="#">تذكيرات</a>
-    </nav>
+<body onload="loadSavedData()">
 
-    <div class="content">
-        <h2>سجل الفرص البيعية</h2>
-        <p>هنا تظهر جميع الزيارات التي تم تحويلها لفرص بيعية (قيد الإنشاء).</p>
+<nav class="navbar">
+    <a href="index.html">الرئيسية</a>
+    <a href="visits.html">الزيارات</a>
+    <a href="opportunities.html" class="active">الفرص البيعية</a>
+    <a href="customers.html">العملاء</a>
+    <a href="sales.html">المبيعات</a>
+    <a href="reminders.html">تذكير</a>
+</nav>
+
+<div class="container">
+    <div class="action-bar">
+        <button class="btn-top btn-add" title="إضافة فرصة جديدة" onclick="insertNewRow()">+ إضافة فرصة بيعية</button>
+        <button id="saveAllBtn" class="btn-top btn-save-all" title="حفظ التغييرات" onclick="saveAllData()">حفظ التغييرات</button>
     </div>
 
-    <div class="bottom-taskbar"><span>المستخدم: حمزة</span> | <span>نظام ASGate v1.0</span></div>
+    <table id="mainTable">
+        <thead>
+            <tr>
+                <th style="width: 15%;">اسم العميل/الشركة</th>
+                <th style="width: 15%;">المشروع/الخدمة</th>
+                <th style="width: 10%;">القيمة المتوقعة</th>
+                <th style="width: 10%;">المرحلة</th>
+                <th style="width: 10%;">احتمالية الإغلاق</th>
+                <th style="width: 15%;">ملاحظات المتابعة</th>
+                <th style="width: 10%;">التاريخ المتوقع</th>
+                <th style="width: 10%;">تاريخ التعديل</th>
+                <th style="width: 5%;">إجراء</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+</div>
+
+<script>
+    let isDirty = false;
+    
+    // ترتيب الفرص بناءً على الاحتمالية (الأعلى أولاً)
+    const probOrder = { "عالية": 3, "متوسطة": 2, "منخفضة": 1 };
+
+    function loadSavedData() {
+        const saved = localStorage.getItem('asgate_opportunities');
+        if (saved) {
+            let opps = JSON.parse(saved);
+            sortAndRender(opps);
+        }
+    }
+
+    function sortAndRender(opps) {
+        opps.sort((a, b) => {
+            let rankA = probOrder[a.probability] || 0;
+            let rankB = probOrder[b.probability] || 0;
+            if (rankA !== rankB) return rankB - rankA;
+            
+            let dateA = a.updated === '-' ? 0 : new Date(a.updated.split('/').reverse().join('-')).getTime();
+            let dateB = b.updated === '-' ? 0 : new Date(b.updated.split('/').reverse().join('-')).getTime();
+            return dateB - dateA;
+        });
+
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+        opps.forEach(o => renderRow(o));
+        toggleSaveBtn(false);
+    }
+
+    function renderRow(o, isNew = false) {
+        const tbody = document.getElementById('tableBody');
+        const row = tbody.insertRow(isNew ? 0 : -1);
+        row.setAttribute('data-created', o.created || o.date);
+
+        row.innerHTML = `
+            <td><input type="text" class="excel-input" value="${o.client}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${o.service}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${o.value}" oninput="markAsChanged(this)"></td>
+            <td>
+                <select class="excel-input" onchange="markAsChanged(this)">
+                    <option ${o.stage === 'عرض سعر' ? 'selected' : ''}>عرض سعر</option>
+                    <option ${o.stage === 'تفاوض' ? 'selected' : ''}>تفاوض</option>
+                    <option ${o.stage === 'موافقة مبدئية' ? 'selected' : ''}>موافقة مبدئية</option>
+                    <option ${o.stage === 'إغلاق ناجح' ? 'selected' : ''}>إغلاق ناجح</option>
+                </select>
+            </td>
+            <td>
+                <select class="excel-input" onchange="markAsChanged(this)">
+                    <option ${o.probability === 'عالية' ? 'selected' : ''}>عالية</option>
+                    <option ${o.probability === 'متوسطة' ? 'selected' : ''}>متوسطة</option>
+                    <option ${o.probability === 'منخفضة' ? 'selected' : ''}>منخفضة</option>
+                </select>
+            </td>
+            <td><input type="text" class="excel-input" value="${o.notes}" oninput="markAsChanged(this)"></td>
+            <td><input type="date" class="excel-input" value="${o.date}" oninput="markAsChanged(this)"></td>
+            <td class="updated-at">${o.updated}</td>
+            <td><button class="btn-delete" onclick="deleteRow(this)">حذف</button></td>
+        `;
+    }
+
+    function insertNewRow() {
+        const todayStr = new Date().toISOString().split('T')[0];
+        renderRow({ client:'', service:'', value:'', stage:'عرض سعر', probability:'متوسطة', notes:'', date: todayStr, updated: '-', created: todayStr }, true);
+        toggleSaveBtn(true);
+    }
+
+    function markAsChanged(el) {
+        toggleSaveBtn(true);
+        const row = el.closest('tr');
+        const createdDate = row.getAttribute('data-created');
+        const today = new Date().toISOString().split('T')[0];
+        if (today !== createdDate) {
+            row.setAttribute('data-pending-update', new Date().toLocaleDateString('en-GB'));
+        }
+    }
+
+    function toggleSaveBtn(active) {
+        isDirty = active;
+        const btn = document.getElementById('saveAllBtn');
+        if(active) btn.classList.add('active');
+        else btn.classList.remove('active');
+    }
+
+    function saveAllData() {
+        const rows = document.querySelectorAll('#tableBody tr');
+        const allOpps = [];
+        
+        rows.forEach(row => {
+            const ins = row.querySelectorAll('.excel-input');
+            const pendingDate = row.getAttribute('data-pending-update');
+            let updatedAt = row.querySelector('.updated-at').innerText;
+            if (pendingDate) updatedAt = pendingDate;
+
+            allOpps.push({
+                client: ins[0].value, service: ins[1].value, value: ins[2].value,
+                stage: ins[3].value, probability: ins[4].value, notes: ins[5].value,
+                date: ins[6].value, updated: updatedAt,
+                created: row.getAttribute('data-created')
+            });
+        });
+
+        localStorage.setItem('asgate_opportunities', JSON.stringify(allOpps));
+        loadSavedData(); 
+    }
+
+    function deleteRow(btn) {
+        if(confirm("هل أنت متأكد من حذف هذه الفرصة؟")) {
+            btn.closest('tr').remove();
+            saveAllData();
+        }
+    }
+
+    window.onbeforeunload = function() {
+        if (isDirty) return "لديك تغييرات غير محفوظة في الفرص!";
+    };
+</script>
 </body>
 </html>
