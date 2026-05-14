@@ -45,7 +45,6 @@
         .btn-delete { border: none; background-color: #fee2e2; color: var(--accent-red); padding: 4px 10px; border-radius: 4px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 10px; }
         .updated-at { font-size: 10px; color: #475569; font-weight: bold; }
 
-        /* التنبيه المخصص */
         .custom-confirm {
             position: fixed; top: 20%; left: 50%; transform: translate(-50%, -50%);
             background: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
@@ -103,10 +102,14 @@
 <script>
     let isDirty = false;
 
+    // ترتيب العرض حسب الحالة
+    const statusOrder = { "مهتم": 4, "50%": 3, "20%": 2, "فقدان": 1 };
+
     function loadSavedData() {
         const saved = localStorage.getItem('asgate_visits_data');
         if (saved) {
             let data = JSON.parse(saved);
+            data.sort((a, b) => (statusOrder[b.status] || 0) - (statusOrder[a.status] || 0));
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
             data.forEach(item => renderRow(item));
@@ -128,10 +131,11 @@
             <td><input type="text" class="excel-input" value="${v.prop}" oninput="markAsChanged(this)"></td>
             <td>
                 <select class="excel-input" onchange="checkStatus(this)">
-                    <option value="">-</option>
+                    <option value="" ${!v.status ? 'selected' : ''}>-</option>
                     <option ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option>
-                    <option ${v.status === 'غير مهتم' ? 'selected' : ''}>غير مهتم</option>
-                    <option ${v.status === 'مؤجل' ? 'selected' : ''}>مؤجل</option>
+                    <option ${v.status === '50%' ? 'selected' : ''}>50%</option>
+                    <option ${v.status === '20%' ? 'selected' : ''}>20%</option>
+                    <option ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option>
                 </select>
             </td>
             <td><input type="date" class="excel-input" value="${v.date}" oninput="markAsChanged(this)"></td>
