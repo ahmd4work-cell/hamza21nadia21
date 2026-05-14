@@ -7,62 +7,59 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --nav-navy: #001f3f;
-            --bg-color: #f4f7f9;
-            --accent-green-active: #22c55e;
-            --accent-green-dim: #d1fae5;
-            --accent-blue: #3b82f6;
-            --accent-red: #ef4444;
-            --border-color: #cbd5e1;
+            --nav-navy: #001f3f; --bg-color: #f4f7f9; --accent-green-active: #22c55e;
+            --accent-green-dim: #d1fae5; --accent-blue: #3b82f6; --accent-red: #ef4444; --border-color: #cbd5e1;
         }
-
-        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1; }
-
-        .navbar { 
-            background-color: var(--nav-navy); 
-            display: flex; 
-            padding: 8px 20px; 
-            margin: 5px; 
-            border-radius: 15px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
+        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; }
+        .navbar { background-color: var(--nav-navy); display: flex; padding: 8px 20px; margin: 5px; border-radius: 15px; }
         .navbar a { color: white; text-decoration: none; padding: 6px 15px; font-weight: 700; font-size: 13px; border-radius: 10px; }
         .navbar a.active { background-color: rgba(255,255,255,0.1); }
-
-        .container { padding: 5px 10px; max-width: 100%; }
+        .container { padding: 5px 10px; }
         .action-bar { display: flex; align-items: center; margin-bottom: 25px; gap: 10px; padding: 10px 0; }
-        
-        .btn-top { border: none; padding: 8px 20px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 13px; transition: 0.3s; color: white; }
+        .btn-top { border: none; padding: 8px 20px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 13px; color: white; }
         .btn-add { background-color: var(--accent-blue); }
         .btn-save-all { background-color: var(--accent-green-dim); color: #065f46; opacity: 0.6; pointer-events: none; }
         .btn-save-all.active { background-color: var(--accent-green-active); color: white; opacity: 1; pointer-events: auto; }
-
+        
         table { width: 100%; border-collapse: collapse; table-layout: fixed; background: white; border: 1px solid var(--border-color); }
-        th { background-color: #e2e8f0; padding: 8px 2px; color: var(--nav-navy); font-size: 11px; font-weight: 800; border: 1px solid var(--border-color); }
-        td { padding: 0; border: 1px solid var(--border-color); text-align: center; height: 38px; font-size: 11px; }
-
+        th { background-color: #e2e8f0; padding: 8px 2px; color: var(--nav-navy); font-size: 10px; font-weight: 800; border: 1px solid var(--border-color); }
+        td { border: 1px solid var(--border-color); text-align: center; height: 38px; font-size: 11px; overflow: hidden; }
+        
         .excel-input { width: 100%; height: 100%; border: none; padding: 0 5px; font-family: 'Cairo'; font-size: 11px; text-align: center; outline: none; background: transparent; }
-        .btn-delete { border: none; background-color: #fee2e2; color: var(--accent-red); padding: 4px 10px; border-radius: 4px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 10px; }
         .updated-at { font-size: 10px; color: #475569; font-weight: bold; }
-
-        .custom-confirm {
-            position: fixed; top: 20%; left: 50%; transform: translate(-50%, -50%);
-            background: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            z-index: 1000; display: none; text-align: center; border: 2px solid var(--nav-navy);
+        
+        /* تنسيق عمود الملاحظات */
+        .notes-cell { cursor: pointer; position: relative; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; padding: 0 5px; font-size: 10px; color: #555; }
+        .notes-cell:hover::after {
+            content: attr(data-full-text); position: absolute; bottom: 100%; right: 0; background: #333; color: #fff;
+            padding: 8px; border-radius: 5px; z-index: 100; white-space: normal; width: 200px; font-size: 11px;
         }
-        .confirm-btns { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
-        .btn-yes { background: var(--accent-green-active); color: white; border: none; padding: 8px 25px; border-radius: 5px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
-        .btn-no { background: var(--accent-red); color: white; border: none; padding: 8px 25px; border-radius: 5px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
+
+        /* نافذة الملاحظات المنبثقة */
+        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; width: 400px; margin: 10% auto; padding: 20px; border-radius: 15px; text-align: right; }
+        .date-chip { display: inline-block; background: #e2e8f0; padding: 2px 10px; border-radius: 15px; font-weight: bold; font-size: 11px; margin-bottom: 5px; color: var(--nav-navy); }
+        
+        .custom-confirm { position: fixed; top: 20%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 1000; display: none; text-align: center; border: 2px solid var(--nav-navy); }
+        .btn-yes { background: var(--accent-green-active); color: white; border: none; padding: 8px 25px; border-radius: 5px; cursor: pointer; margin: 5px; }
+        .btn-no { background: var(--accent-red); color: white; border: none; padding: 8px 25px; border-radius: 5px; cursor: pointer; margin: 5px; }
     </style>
 </head>
 <body onload="loadSavedData()">
 
+<div id="notesModal" class="modal">
+    <div class="modal-content">
+        <h3>إضافة تحديث للملاحظات</h3>
+        <textarea id="noteInput" style="width: 100%; height: 100px; font-family: 'Cairo'; margin-bottom: 10px;"></textarea>
+        <button class="btn-top btn-add" onclick="saveNote()">حفظ التحديث</button>
+        <button class="btn-top" style="background:#666" onclick="closeNotes()">إلغاء</button>
+    </div>
+</div>
+
 <div id="confirmBox" class="custom-confirm">
     <p id="confirmMsg" style="font-weight: bold;"></p>
-    <div class="confirm-btns">
-        <button class="btn-yes" id="confirmBtn">نعم</button>
-        <button class="btn-no" onclick="closeConfirm()">لا</button>
-    </div>
+    <button class="btn-yes" id="confirmBtn">نعم</button>
+    <button class="btn-no" onclick="closeConfirm()">لا</button>
 </div>
 
 <nav class="navbar">
@@ -84,15 +81,16 @@
         <thead>
             <tr>
                 <th style="width: 14%;">الشركة</th>
-                <th>المسؤول</th>
-                <th style="width: 12%;">الموبايل</th>
-                <th>السجل</th>
-                <th>الخدمة الحالية</th>
-                <th>الخدمة المقترحة</th>
-                <th style="width: 80px;">الحالة</th>
-                <th style="width: 100px;">تاريخ الزيارة</th>
-                <th style="width: 100px;">تاريخ التعديل</th>
-                <th style="width: 70px;">إجراء</th>
+                <th style="width: 10%;">المسؤول</th>
+                <th style="width: 10%;">الموبايل</th>
+                <th style="width: 10%;">السجل</th>
+                <th style="width: 12%;">الخدمة الحالية</th>
+                <th style="width: 12%;">الخدمة المقترحة</th>
+                <th style="width: 12%;">الملاحظات</th>
+                <th style="width: 8%;">الحالة</th>
+                <th style="width: 90px;">تاريخ الزيارة</th>
+                <th style="width: 90px;">تاريخ التعديل</th>
+                <th style="width: 60px;">إجراء</th>
             </tr>
         </thead>
         <tbody id="tableBody"></tbody>
@@ -101,15 +99,12 @@
 
 <script>
     let isDirty = false;
-
-    // ترتيب العرض حسب الحالة
-    const statusOrder = { "مهتم": 4, "50%": 3, "20%": 2, "فقدان": 1 };
+    let activeNoteCell = null;
 
     function loadSavedData() {
         const saved = localStorage.getItem('asgate_visits_data');
         if (saved) {
             let data = JSON.parse(saved);
-            data.sort((a, b) => (statusOrder[b.status] || 0) - (statusOrder[a.status] || 0));
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
             data.forEach(item => renderRow(item));
@@ -123,12 +118,13 @@
         row.setAttribute('data-created', v.created || v.date);
 
         row.innerHTML = `
-            <td><input type="text" class="excel-input" value="${v.comp}" oninput="markAsChanged(this)"></td>
-            <td><input type="text" class="excel-input" value="${v.mgr}" oninput="markAsChanged(this)"></td>
-            <td><input type="text" class="excel-input" value="${v.mob}" oninput="markAsChanged(this)"></td>
-            <td><input type="text" class="excel-input" value="${v.cr}" oninput="markAsChanged(this)"></td>
-            <td><input type="text" class="excel-input" value="${v.curr}" oninput="markAsChanged(this)"></td>
-            <td><input type="text" class="excel-input" value="${v.prop}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.comp || ''}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.mgr || ''}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.mob || ''}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.cr || ''}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.curr || ''}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.prop || ''}" oninput="markAsChanged(this)"></td>
+            <td class="notes-cell" data-full-text="${v.notes || ''}" onclick="openNotes(this)">${v.notes || 'إضافة ملاحظة...'}</td>
             <td>
                 <select class="excel-input" onchange="checkStatus(this)">
                     <option value="" ${!v.status ? 'selected' : ''}>-</option>
@@ -139,9 +135,34 @@
                 </select>
             </td>
             <td><input type="date" class="excel-input" value="${v.date}" oninput="markAsChanged(this)"></td>
-            <td class="updated-at">${v.updated}</td>
-            <td><button class="btn-delete" onclick="deleteRow(this)">حذف</button></td>
+            <td class="updated-at">${v.updated || '-'}</td>
+            <td><button style="border:none; background:#fee2e2; color:red; cursor:pointer; font-size:10px; border-radius:4px; padding:4px;" onclick="deleteRow(this)">حذف</button></td>
         `;
+    }
+
+    // دوال الملاحظات
+    function openNotes(cell) {
+        activeNoteCell = cell;
+        document.getElementById('noteInput').value = '';
+        document.getElementById('notesModal').style.display = 'block';
+    }
+
+    function closeNotes() { document.getElementById('notesModal').style.display = 'none'; }
+
+    function saveNote() {
+        const text = document.getElementById('noteInput').value;
+        if (text.trim() !== "") {
+            const now = new Date();
+            const days = ['الأحد', 'الأثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+            const dateStr = `${days[now.getDay()]} ${now.toLocaleDateString('en-GB')}`;
+            const newContent = `<div class="date-chip">${dateStr}</div><br>${text}<br>`;
+            
+            let currentFullText = activeNoteCell.getAttribute('data-full-text');
+            activeNoteCell.setAttribute('data-full-text', currentFullText + newContent);
+            activeNoteCell.innerText = text.substring(0, 15) + "...";
+            markAsChanged(activeNoteCell);
+        }
+        closeNotes();
     }
 
     function checkStatus(el) {
@@ -151,64 +172,45 @@
         }
     }
 
-    function showConfirm(msg, action) {
-        document.getElementById('confirmMsg').innerText = msg;
-        document.getElementById('confirmBox').style.display = 'block';
-        document.getElementById('confirmBtn').onclick = () => { action(); closeConfirm(); };
-    }
-
-    function closeConfirm() { document.getElementById('confirmBox').style.display = 'none'; }
-
     function transferToOpps(row) {
         const ins = row.querySelectorAll('.excel-input');
+        const notes = row.querySelector('.notes-cell').getAttribute('data-full-text');
         const rowData = {
-            comp: ins[0].value, mgr: ins[1].value, mob: ins[2].value,
-            cr: ins[3].value, curr: ins[4].value, prop: ins[5].value,
-            status: 'مهتم', date: ins[7].value,
-            updated: new Date().toLocaleDateString('en-GB'),
+            comp: ins[0].value, mgr: ins[1].value, mob: ins[2].value, cr: ins[3].value,
+            curr: ins[4].value, prop: ins[5].value, notes: notes,
+            status: 'مهتم', 
+            date: ins[6].value, // الاحتفاظ بتاريخ الزيارة
+            updated: '-',      // حذف تاريخ التعديل
             created: row.getAttribute('data-created')
         };
         
         let oppsData = JSON.parse(localStorage.getItem('asgate_opportunities_data') || '[]');
         oppsData.push(rowData);
         localStorage.setItem('asgate_opportunities_data', JSON.stringify(oppsData));
-        
         row.remove();
         saveAllData();
     }
 
-    function insertNewRow() {
-        const todayStr = new Date().toISOString().split('T')[0];
-        renderRow({ comp:'', mgr:'', mob:'', cr:'', curr:'', prop:'', status:'', date: todayStr, updated: '-', created: todayStr }, true);
-        toggleSaveBtn(true);
+    function showConfirm(msg, action) {
+        document.getElementById('confirmMsg').innerText = msg;
+        document.getElementById('confirmBox').style.display = 'block';
+        document.getElementById('confirmBtn').onclick = () => { action(); closeConfirm(); };
     }
-
-    function markAsChanged(el) {
-        toggleSaveBtn(true);
-        const row = el.closest('tr');
-        const createdDate = row.getAttribute('data-created');
-        const today = new Date().toISOString().split('T')[0];
-        if (today !== createdDate) {
-            row.setAttribute('data-pending-update', new Date().toLocaleDateString('en-GB'));
-        }
-    }
-
-    function toggleSaveBtn(active) {
-        isDirty = active;
-        const btn = document.getElementById('saveAllBtn');
-        if(active) btn.classList.add('active'); else btn.classList.remove('active');
-    }
+    function closeConfirm() { document.getElementById('confirmBox').style.display = 'none'; }
+    function markAsChanged(el) { toggleSaveBtn(true); const row = el.closest('tr'); if (row.getAttribute('data-created') !== new Date().toISOString().split('T')[0]) row.setAttribute('data-pending-update', new Date().toLocaleDateString('en-GB')); }
+    function toggleSaveBtn(active) { isDirty = active; const btn = document.getElementById('saveAllBtn'); if(active) btn.classList.add('active'); else btn.classList.remove('active'); }
 
     function saveAllData() {
         const rows = document.querySelectorAll('#tableBody tr');
         const allData = [];
         rows.forEach(row => {
             const ins = row.querySelectorAll('.excel-input');
+            const notes = row.querySelector('.notes-cell').getAttribute('data-full-text');
             let updatedAt = row.querySelector('.updated-at').innerText;
             if (row.getAttribute('data-pending-update')) updatedAt = row.getAttribute('data-pending-update');
             allData.push({
-                comp: ins[0].value, mgr: ins[1].value, mob: ins[2].value,
-                cr: ins[3].value, curr: ins[4].value, prop: ins[5].value,
+                comp: ins[0].value, mgr: ins[1].value, mob: ins[2].value, cr: ins[3].value,
+                curr: ins[4].value, prop: ins[5].value, notes: notes,
                 status: ins[6].value, date: ins[7].value, updated: updatedAt,
                 created: row.getAttribute('data-created')
             });
@@ -217,7 +219,8 @@
         loadSavedData();
     }
 
-    function deleteRow(btn) { if(confirm("هل أنت متأكد من حذف الزيارة؟")) { btn.closest('tr').remove(); saveAllData(); } }
+    function insertNewRow() { renderRow({ date: new Date().toISOString().split('T')[0], updated: '-', created: new Date().toISOString().split('T')[0] }, true); toggleSaveBtn(true); }
+    function deleteRow(btn) { if(confirm("حذف؟")) { btn.closest('tr').remove(); saveAllData(); } }
 </script>
 </body>
 </html>
