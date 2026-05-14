@@ -18,7 +18,7 @@
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; overflow-x: hidden; }
 
-        /* شريط التنقل بحواف دائرية ولون كحلي */
+        /* شريط التنقل بحواف دائرية */
         .navbar { 
             background-color: var(--nav-navy); 
             display: flex; 
@@ -49,23 +49,23 @@
             align-items: start;
         }
 
-        /* عمود الرسوم البيانية (أعرض الآن - flex 3) */
+        /* عمود الرسوم البيانية */
         .charts-column { 
-            flex: 3; 
+            flex: 2; 
             display: flex; 
             flex-direction: column; 
             gap: 20px; 
         }
 
-        /* عمود سجل الأهداف (أقل من النصف - flex 0.8) */
+        /* عمود سجل الأهداف المحدث حسب طلبك */
         .table-area { 
-            flex: 0.8; 
-            min-width: 220px; 
+            flex: 1.2; 
+            min-width: 300px; 
         }
 
-        /* عمود الفلترة (عرض ثابت) */
+        /* عمود الفلترة */
         .search-filter-box { 
-            width: 260px; 
+            width: 250px; 
             background: white; 
             padding: 15px; 
             border-radius: 12px; 
@@ -75,10 +75,10 @@
 
         .content-box { background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         
-        /* تنسيق الجدول المحدث بالأعمدة الخمسة */
-        .yearly-table { width: 100%; border-collapse: collapse; font-size: 9.5px; text-align: center; }
-        .yearly-table th { background: var(--nav-navy); color: white; padding: 8px 1px; font-weight: bold; }
-        .yearly-table td { padding: 7px 1px; border-bottom: 1px solid #f1f5f9; font-weight: bold; color: #475569; }
+        /* تنسيق الجدول بالأعمدة الخمسة */
+        .yearly-table { width: 100%; border-collapse: collapse; font-size: 10px; text-align: center; }
+        .yearly-table th { background: var(--nav-navy); color: white; padding: 10px 2px; font-weight: bold; }
+        .yearly-table td { padding: 8px 2px; border-bottom: 1px solid #f1f5f9; font-weight: bold; color: #475569; }
 
         .chart-wrapper { position: relative; height: 180px; width: 100%; }
         h3 { font-size: 12px; margin-top: 0; margin-bottom: 15px; color: var(--nav-navy); font-weight: 800; border-right: 3px solid var(--stat-green); padding-right: 10px; }
@@ -87,7 +87,7 @@
         .filter-group label { display: block; font-size: 10px; font-weight: bold; margin-bottom: 5px; color: var(--nav-navy); }
         .filter-input { width: 100%; padding: 8px; font-family: 'Cairo'; font-size: 11px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
 
-        @media (max-width: 1100px) {
+        @media (max-width: 1200px) {
             .dashboard-main { flex-direction: column; }
             .charts-column, .table-area, .search-filter-box { width: 100%; flex: none; }
         }
@@ -127,7 +127,7 @@
         </div>
 
         <div class="dashboard-main">
-            <!-- العمود العريض: الرسوم البيانية -->
+            <!-- العمود الأيمن: الرسوم البيانية -->
             <div class="charts-column">
                 <div class="content-box">
                     <h3>📈 الأداء الشهري</h3>
@@ -139,10 +139,10 @@
                 </div>
             </div>
 
-            <!-- العمود النحيف: سجل الأهداف السنوي (نصف العرض تقريباً) -->
+            <!-- العمود الأوسط المحدث (flex: 1.2) -->
             <div class="table-area">
                 <div class="content-box">
-                    <h3>📅 سجل الأهداف</h3>
+                    <h3>📅 سجل الأهداف السنوي</h3>
                     <table class="yearly-table">
                         <thead>
                             <tr>
@@ -154,13 +154,13 @@
                             </tr>
                         </thead>
                         <tbody id="yearlyDataBody">
-                            <!-- البيانات سيتم تعبئتها عبر الـ Script -->
+                            <!-- البيانات تُعبأ برمجياً -->
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- اليسار: الفلترة -->
+            <!-- العمود الأيسر: الفلترة -->
             <div class="search-filter-box">
                 <h3>🔍 الفلترة</h3>
                 <div class="filter-group">
@@ -180,9 +180,10 @@
     </div>
 
     <script>
-        // تعبئة شهور السنة في الجدول بالأعمدة الخمسة
         const months = ["يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
         const tbody = document.getElementById('yearlyDataBody');
+        
+        // تعبئة البيانات الافتراضية
         months.forEach(m => { 
             tbody.innerHTML += `<tr>
                 <td>${m}</td>
@@ -193,7 +194,7 @@
             </tr>`; 
         });
 
-        // رسم الأداء الشهري
+        // الرسوم البيانية
         const ctxBar = document.getElementById('performanceChart').getContext('2d');
         new Chart(ctxBar, {
             type: 'bar',
@@ -207,7 +208,6 @@
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
         });
 
-        // رسم توزيع الإنجاز
         const ctxPie = document.getElementById('pieChart').getContext('2d');
         new Chart(ctxPie, {
             type: 'doughnut',
