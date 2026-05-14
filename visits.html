@@ -29,7 +29,6 @@
         .container { padding: 5px 10px; max-width: 100%; }
         .action-bar { display: flex; align-items: center; margin-bottom: 15px; gap: 10px; padding: 10px 0; }
         
-        /* أزرار التحكم العلوية */
         .btn-top { border: none; padding: 8px 20px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 13px; transition: 0.3s; color: white; }
         .btn-add { background-color: var(--accent-blue); }
         .btn-save-all { background-color: var(--accent-green-dim); color: #065f46; opacity: 0.6; pointer-events: none; }
@@ -65,8 +64,8 @@
 
 <div class="container">
     <div class="action-bar">
-        <button class="btn-top btn-add" title="إضافة زيارة جديدة للجدول" onclick="insertNewRow()">+ إضافة زيارة</button>
-        <button id="saveAllBtn" class="btn-top btn-save-all" title="حفظ كافة التغييرات التي أجريتها" onclick="saveAllData()">حفظ التغييرات</button>
+        <button class="btn-top btn-add" title="إضافة زيارة جديدة" onclick="insertNewRow()">+ إضافة زيارة</button>
+        <button id="saveAllBtn" class="btn-top btn-save-all" title="حفظ التغييرات" onclick="saveAllData()">حفظ التغييرات</button>
     </div>
 
     <table id="mainTable">
@@ -123,32 +122,33 @@
         row.setAttribute('data-created', v.created || v.date);
 
         row.innerHTML = `
-            <td><input type="text" class="excel-input" value="${v.comp}" oninput="markAsChanged(this)" title="اسم الشركة"></td>
-            <td><input type="text" class="excel-input" value="${v.mgr}" oninput="markAsChanged(this)" title="اسم المسؤول"></td>
+            <td><input type="text" class="excel-input" value="${v.comp}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.mgr}" oninput="markAsChanged(this)"></td>
             <td>
-                <input type="text" class="excel-input" value="${v.mob}" oninput="updateWhatsApp(this); markAsChanged(this)" title="الجوال">
+                <input type="text" class="excel-input" value="${v.mob}" oninput="updateWhatsApp(this); markAsChanged(this)">
                 <a href="https://wa.me/${v.mob}" target="_blank" class="whatsapp-link" style="${v.mob ? '' : 'display:none'}">واتساب ↗</a>
             </td>
-            <td><input type="text" class="excel-input" value="${v.cr}" oninput="markAsChanged(this)" title="السجل التجاري"></td>
-            <td><input type="text" class="excel-input" value="${v.curr}" oninput="markAsChanged(this)" title="الخدمة الحالية"></td>
-            <td><input type="text" class="excel-input" value="${v.prop}" oninput="markAsChanged(this)" title="الخدمة المقترحة"></td>
+            <td><input type="text" class="excel-input" value="${v.cr}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.curr}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.prop}" oninput="markAsChanged(this)"></td>
             <td>
-                <select class="excel-input" onchange="markAsChanged(this)" title="الحالة">
-                    <option ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option>
-                    <option ${v.status === '20%' ? 'selected' : ''}>20%</option>
-                    <option ${v.status === '50%' ? 'selected' : ''}>50%</option>
+                <select class="excel-input" onchange="markAsChanged(this)">
                     <option ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option>
+                    <option ${v.status === '50%' ? 'selected' : ''}>50%</option>
+                    <option ${v.status === '20%' ? 'selected' : ''}>20%</option>
+                    <option ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option>
                 </select>
             </td>
-            <td><input type="date" class="excel-input" value="${v.date}" oninput="markAsChanged(this)" title="تاريخ الزيارة"></td>
-            <td class="updated-at" title="آخر تعديل">${v.updated}</td>
-            <td><button class="btn-delete" onclick="deleteRow(this)" title="حذف">حذف</button></td>
+            <td><input type="date" class="excel-input" value="${v.date}" oninput="markAsChanged(this)"></td>
+            <td class="updated-at">${v.updated}</td>
+            <td><button class="btn-delete" onclick="deleteRow(this)">حذف</button></td>
         `;
     }
 
     function insertNewRow() {
         const todayStr = new Date().toISOString().split('T')[0];
-        renderRow({ comp:'', mgr:'', mob:'', cr:'', curr:'', prop:'', status:'فقدان', date: todayStr, updated: '-', created: todayStr }, true);
+        // التلقائي عند الإضافة يكون مهتم ليظهر في القائمة المنسدلة أولاً
+        renderRow({ comp:'', mgr:'', mob:'', cr:'', curr:'', prop:'', status:'مهتم', date: todayStr, updated: '-', created: todayStr }, true);
         toggleSaveBtn(true);
     }
 
@@ -178,9 +178,7 @@
             const pendingDate = row.getAttribute('data-pending-update');
             let updatedAt = row.querySelector('.updated-at').innerText;
             
-            if (pendingDate) {
-                updatedAt = pendingDate;
-            }
+            if (pendingDate) updatedAt = pendingDate;
 
             allVisits.push({
                 comp: ins[0].value, mgr: ins[1].value, mob: ins[2].value,
@@ -192,7 +190,7 @@
         });
 
         localStorage.setItem('asgate_visits', JSON.stringify(allVisits));
-        loadSavedData(); // إعادة الترتيب بعد الحفظ
+        loadSavedData();
     }
 
     function deleteRow(btn) {
