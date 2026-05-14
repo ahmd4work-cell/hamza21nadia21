@@ -25,9 +25,10 @@
         th { background-color: #e2e8f0; padding: 8px 2px; color: var(--nav-navy); font-size: 10px; font-weight: 800; border: 1px solid var(--border-color); }
         td { border: 1px solid var(--border-color); text-align: center; height: 38px; font-size: 11px; }
         .excel-input { width: 100%; height: 100%; border: none; padding: 0 5px; font-family: 'Cairo'; font-size: 11px; text-align: center; outline: none; background: transparent; }
-        .notes-cell { cursor: pointer; color: #3b82f6; text-decoration: underline; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* تنسيق خلية الملاحظات لتظهر كجزء من النص */
+        .notes-cell { cursor: pointer; color: #475569; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 8px; text-align: right; font-style: italic; }
 
-        /* ستايل الاستيكر 7سم × 12سم */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 2000; }
         .sticker-container { 
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -109,6 +110,19 @@
         toggleSaveBtn(false);
     }
 
+    // وظيفة لاستخلاص النص لعرضه في الجدول
+    function getDisplayNote(notesJson) {
+        try {
+            const notes = JSON.parse(notesJson);
+            if (notes.length > 0) {
+                let lastNote = notes[notes.length - 1].text;
+                // إزالة وسوم br و النقاط للعرض النظيف في الجدول
+                return lastNote.replace(/<br>/g, " ").replace(/•/g, "").substring(0, 30) + "...";
+            }
+        } catch(e) {}
+        return "إضافة ملاحظة...";
+    }
+
     function renderRow(v, isNew = false) {
         const tbody = document.getElementById('tableBody');
         const row = tbody.insertRow(isNew ? 0 : -1);
@@ -120,7 +134,7 @@
             <td><input type="text" class="excel-input" value="${v.cr || ''}" oninput="markAsChanged(this)"></td>
             <td><input type="text" class="excel-input" value="${v.curr || ''}" oninput="markAsChanged(this)"></td>
             <td><input type="text" class="excel-input" value="${v.prop || ''}" oninput="markAsChanged(this)"></td>
-            <td class="notes-cell" data-notes='${v.notes || "[]"}' onclick="openSticker(this)">${v.notes && JSON.parse(v.notes).length > 0 ? 'عرض الملاحظات...' : 'إضافة ملاحظة'}</td>
+            <td class="notes-cell" data-notes='${v.notes || "[]"}' onclick="openSticker(this)">${getDisplayNote(v.notes || "[]")}</td>
             <td>
                 <select class="excel-input" onchange="checkStatus(this)">
                     <option value="" ${!v.status ? 'selected' : ''}>-</option>
@@ -171,7 +185,8 @@
                 notes[notes.length - 1].text += `<br>• ${text}`;
             } else { notes.push({ date: todayStr, text: text }); }
             activeCell.setAttribute('data-notes', JSON.stringify(notes));
-            activeCell.innerText = 'عرض الملاحظات...';
+            // تحديث العرض في الخلية بالنص الجديد
+            activeCell.innerText = getDisplayNote(JSON.stringify(notes));
             markAsChanged(activeCell);
         }
         isStickerChanged = false; document.getElementById('notesOverlay').style.display = 'none'; closeConfirm();
