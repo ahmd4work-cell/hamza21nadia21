@@ -9,8 +9,8 @@
         :root {
             --nav-navy: #001f3f;
             --bg-color: #f4f7f9;
-            --accent-green-dim: #d1fae5;
             --accent-green-active: #22c55e;
+            --accent-green-dim: #d1fae5;
             --accent-blue: #3b82f6;
             --accent-red: #ef4444;
             --border-color: #cbd5e1;
@@ -27,12 +27,17 @@
         .navbar a.active { background-color: rgba(255,255,255,0.1); border-radius: 10px; }
 
         .container { padding: 5px 10px; max-width: 100%; }
-        .action-bar { display: flex; align-items: center; margin-bottom: 8px; gap: 8px; }
-        .btn-add { background-color: var(--accent-blue); color: white; border: none; padding: 5px 15px; border-radius: 6px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 11px; }
+        .action-bar { display: flex; align-items: center; margin-bottom: 15px; gap: 10px; padding: 10px 0; }
+        
+        /* أزرار التحكم العلوية */
+        .btn-top { border: none; padding: 8px 20px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 13px; transition: 0.3s; color: white; }
+        .btn-add { background-color: var(--accent-blue); }
+        .btn-save-all { background-color: var(--accent-green-dim); color: #065f46; opacity: 0.6; pointer-events: none; }
+        .btn-save-all.active { background-color: var(--accent-green-active); color: white; opacity: 1; pointer-events: auto; box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3); }
 
         table { width: 100%; border-collapse: collapse; table-layout: fixed; background: white; border: 1px solid var(--border-color); }
-        th { background-color: #e2e8f0; padding: 4px 2px; color: var(--nav-navy); font-size: 10.5px; font-weight: 800; border: 1px solid var(--border-color); }
-        td { padding: 0; border: 1px solid var(--border-color); text-align: center; height: 35px; font-size: 11px; }
+        th { background-color: #e2e8f0; padding: 8px 2px; color: var(--nav-navy); font-size: 11px; font-weight: 800; border: 1px solid var(--border-color); }
+        td { padding: 0; border: 1px solid var(--border-color); text-align: center; height: 38px; font-size: 11px; }
 
         .excel-input {
             width: 100%; height: 100%; border: none; padding: 0 5px; font-family: 'Cairo';
@@ -40,11 +45,8 @@
         }
         .excel-input:focus { background-color: #fffdec; box-shadow: inset 0 0 0 1px var(--accent-blue); }
 
-        .actions-cell { display: flex; gap: 4px; justify-content: center; align-items: center; height: 100%; }
-        .btn-action { border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; }
-        .btn-save { background-color: var(--accent-green-dim); pointer-events: none; }
-        .btn-save.active { background-color: var(--accent-green-active); pointer-events: auto; }
-        .btn-delete { background-color: #fca5a5; }
+        .btn-delete { border: none; background-color: #fee2e2; color: var(--accent-red); padding: 4px 10px; border-radius: 4px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 10px; }
+        .btn-delete:hover { background-color: var(--accent-red); color: white; }
 
         .whatsapp-link { text-decoration: none; color: #128c7e; font-weight: bold; font-size: 10px; display: block; margin-top: -2px; }
         .updated-at { font-size: 10px; color: #475569; font-weight: bold; }
@@ -63,7 +65,8 @@
 
 <div class="container">
     <div class="action-bar">
-        <button class="btn-add" title="إضافة سطر جديد للزيارات" onclick="insertNewRow()">+ إضافة زيارة</button>
+        <button class="btn-top btn-add" title="إضافة زيارة جديدة للجدول" onclick="insertNewRow()">+ إضافة زيارة</button>
+        <button id="saveAllBtn" class="btn-top btn-save-all" title="حفظ كافة التغييرات التي أجريتها" onclick="saveAllData()">حفظ التغييرات</button>
     </div>
 
     <table id="mainTable">
@@ -75,10 +78,10 @@
                 <th>السجل</th>
                 <th>الخدمة الحالية</th>
                 <th>الخدمة المقترحة</th>
-                <th style="width: 70px;">الحالة</th>
-                <th style="width: 90px;">تاريخ الزيارة</th>
+                <th style="width: 75px;">الحالة</th>
+                <th style="width: 95px;">تاريخ الزيارة</th>
                 <th style="width: 100px;">تاريخ التعديل</th>
-                <th style="width: 110px;">إجراء</th>
+                <th style="width: 70px;">إجراء</th>
             </tr>
         </thead>
         <tbody id="tableBody"></tbody>
@@ -87,8 +90,6 @@
 
 <script>
     let isDirty = false;
-
-    // رتبة الحالات (فقدان أقل شيء ثم مهتم أعلى شيء)
     const statusOrder = { "فقدان": 1, "20%": 2, "50%": 3, "مهتم": 4 };
 
     function loadSavedData() {
@@ -100,14 +101,11 @@
     }
 
     function sortAndRender(visits) {
-        // فرز البيانات حسب الحالة ثم تاريخ التعديل
         visits.sort((a, b) => {
-            // أولاً: حسب رتبة الحالة
             let rankA = statusOrder[a.status] || 0;
             let rankB = statusOrder[b.status] || 0;
             if (rankA !== rankB) return rankA - rankB;
 
-            // ثانياً: حسب تاريخ التعديل (الأحدث يظهر أسفل الأقدم ضمن نفس الحالة)
             let dateA = a.updated === '-' ? 0 : new Date(a.updated.split('/').reverse().join('-')).getTime();
             let dateB = b.updated === '-' ? 0 : new Date(b.updated.split('/').reverse().join('-')).getTime();
             return dateA - dateB;
@@ -116,6 +114,7 @@
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = '';
         visits.forEach(v => renderRow(v));
+        toggleSaveBtn(false);
     }
 
     function renderRow(v, isNew = false) {
@@ -143,23 +142,19 @@
             </td>
             <td><input type="date" class="excel-input" value="${v.date}" oninput="markAsChanged(this)" title="تاريخ الزيارة"></td>
             <td class="updated-at" title="آخر تعديل">${v.updated}</td>
-            <td class="actions-cell">
-                <button class="btn-action btn-save ${isNew ? 'active' : ''}" onclick="saveAllData(this)" title="حفظ">حفظ</button>
-                <button class="btn-action btn-delete" onclick="deleteRow(this)" title="حذف">حذف</button>
-            </td>
+            <td><button class="btn-delete" onclick="deleteRow(this)" title="حذف">حذف</button></td>
         `;
     }
 
     function insertNewRow() {
         const todayStr = new Date().toISOString().split('T')[0];
         renderRow({ comp:'', mgr:'', mob:'', cr:'', curr:'', prop:'', status:'فقدان', date: todayStr, updated: '-', created: todayStr }, true);
-        isDirty = true;
+        toggleSaveBtn(true);
     }
 
     function markAsChanged(el) {
-        isDirty = true;
+        toggleSaveBtn(true);
         const row = el.closest('tr');
-        row.querySelector('.btn-save').classList.add('active');
         const createdDate = row.getAttribute('data-created');
         const today = new Date().toISOString().split('T')[0];
         if (today !== createdDate) {
@@ -167,36 +162,43 @@
         }
     }
 
-    function saveAllData(btn) {
-        if(btn) {
-            const row = btn.closest('tr');
-            if(row.getAttribute('data-pending-update')) {
-                row.querySelector('.updated-at').innerText = row.getAttribute('data-pending-update');
-            }
-        }
+    function toggleSaveBtn(active) {
+        isDirty = active;
+        const btn = document.getElementById('saveAllBtn');
+        if(active) btn.classList.add('active');
+        else btn.classList.remove('active');
+    }
 
+    function saveAllData() {
         const rows = document.querySelectorAll('#tableBody tr');
         const allVisits = [];
+        
         rows.forEach(row => {
             const ins = row.querySelectorAll('.excel-input');
+            const pendingDate = row.getAttribute('data-pending-update');
+            let updatedAt = row.querySelector('.updated-at').innerText;
+            
+            if (pendingDate) {
+                updatedAt = pendingDate;
+            }
+
             allVisits.push({
                 comp: ins[0].value, mgr: ins[1].value, mob: ins[2].value,
                 cr: ins[3].value, curr: ins[4].value, prop: ins[5].value,
                 status: ins[6].value, date: ins[7].value,
-                updated: row.querySelector('.updated-at').innerText,
+                updated: updatedAt,
                 created: row.getAttribute('data-created')
             });
         });
 
         localStorage.setItem('asgate_visits', JSON.stringify(allVisits));
-        isDirty = false;
-        loadSavedData(); // إعادة التحميل لترتيب الجدول فوراً بعد الحفظ
+        loadSavedData(); // إعادة الترتيب بعد الحفظ
     }
 
     function deleteRow(btn) {
         if(confirm("هل أنت متأكد من الحذف؟")) {
             btn.closest('tr').remove();
-            saveAllData(null);
+            saveAllData();
         }
     }
 
@@ -205,6 +207,10 @@
         link.href = `https://wa.me/${input.value.trim()}`;
         link.style.display = input.value.trim() ? 'block' : 'none';
     }
+
+    window.onbeforeunload = function() {
+        if (isDirty) return "لديك تغييرات غير محفوظة!";
+    };
 </script>
 </body>
 </html>
