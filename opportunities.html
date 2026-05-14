@@ -6,6 +6,7 @@
     <title>ASGate - الفرص البيعية</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* نفس الستايل الخاص بصفحة الزيارات لضمان التناسق */
         :root {
             --nav-navy: #001f3f;
             --bg-color: #f4f7f9;
@@ -15,53 +16,43 @@
             --accent-red: #ef4444;
             --border-color: #cbd5e1;
         }
-
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1; }
-
-        /* شريط التنقل بحواف دائرية */
-        .navbar { 
-            background-color: var(--nav-navy); 
-            display: flex; 
-            padding: 8px 20px; 
-            margin: 5px; 
-            border-radius: 15px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
+        .navbar { background-color: var(--nav-navy); display: flex; padding: 8px 20px; margin: 5px; border-radius: 15px; }
         .navbar a { color: white; text-decoration: none; padding: 6px 15px; font-weight: 700; font-size: 13px; border-radius: 10px; }
         .navbar a.active { background-color: rgba(255,255,255,0.1); }
-
-        .container { padding: 5px 10px; max-width: 100%; }
-        
-        .action-bar { 
-            display: flex; 
-            align-items: center; 
-            margin-bottom: 25px; 
-            gap: 10px; 
-            padding: 10px 0; 
-        }
-        
-        .btn-top { border: none; padding: 8px 20px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 13px; transition: 0.3s; color: white; }
+        .container { padding: 5px 10px; }
+        .action-bar { display: flex; align-items: center; margin-bottom: 25px; gap: 10px; padding: 10px 0; }
+        .btn-top { border: none; padding: 8px 20px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 13px; color: white; }
         .btn-add { background-color: var(--accent-blue); }
         .btn-save-all { background-color: var(--accent-green-dim); color: #065f46; opacity: 0.6; pointer-events: none; }
-        .btn-save-all.active { background-color: var(--accent-green-active); color: white; opacity: 1; pointer-events: auto; box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3); }
-
+        .btn-save-all.active { background-color: var(--accent-green-active); color: white; opacity: 1; pointer-events: auto; }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; background: white; border: 1px solid var(--border-color); }
         th { background-color: #e2e8f0; padding: 8px 2px; color: var(--nav-navy); font-size: 11px; font-weight: 800; border: 1px solid var(--border-color); }
-        td { padding: 0; border: 1px solid var(--border-color); text-align: center; height: 38px; font-size: 11px; }
-
-        .excel-input {
-            width: 100%; height: 100%; border: none; padding: 0 5px; font-family: 'Cairo';
-            font-size: 11px; text-align: center; outline: none; box-sizing: border-box; background: transparent;
-        }
-        .excel-input:focus { background-color: #fffdec; box-shadow: inset 0 0 0 1px var(--accent-blue); }
-
-        .btn-delete { border: none; background-color: #fee2e2; color: var(--accent-red); padding: 4px 10px; border-radius: 4px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 10px; }
-        .btn-delete:hover { background-color: var(--accent-red); color: white; }
-
+        td { border: 1px solid var(--border-color); text-align: center; height: 38px; font-size: 11px; }
+        .excel-input { width: 100%; height: 100%; border: none; padding: 0 5px; font-family: 'Cairo'; font-size: 11px; text-align: center; outline: none; background: transparent; }
+        .btn-delete { border: none; background-color: #fee2e2; color: var(--accent-red); padding: 4px 10px; border-radius: 4px; font-size: 10px; cursor: pointer; }
         .updated-at { font-size: 10px; color: #475569; font-weight: bold; }
+        
+        /* التنبيه الملون */
+        .custom-confirm {
+            position: fixed; top: 20%; left: 50%; transform: translate(-50%, -50%);
+            background: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            z-index: 1000; display: none; text-align: center; border: 2px solid var(--nav-navy);
+        }
+        .confirm-btns { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
+        .btn-yes { background: var(--accent-green-active); color: white; border: none; padding: 8px 25px; border-radius: 5px; cursor: pointer; }
+        .btn-no { background: var(--accent-red); color: white; border: none; padding: 8px 25px; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body onload="loadSavedData()">
+
+<div id="confirmBox" class="custom-confirm">
+    <p id="confirmMsg"></p>
+    <div class="confirm-btns">
+        <button class="btn-yes" id="confirmBtn">نعم</button>
+        <button class="btn-no" onclick="closeConfirm()">لا</button>
+    </div>
+</div>
 
 <nav class="navbar">
     <a href="index.html">الرئيسية</a>
@@ -74,8 +65,8 @@
 
 <div class="container">
     <div class="action-bar">
-        <button class="btn-top btn-add" title="إضافة فرصة جديدة" onclick="insertNewRow()">+ إضافة فرصة</button>
-        <button id="saveAllBtn" class="btn-top btn-save-all" title="حفظ التغييرات" onclick="saveAllData()">حفظ التغييرات</button>
+        <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة فرصة</button>
+        <button id="saveAllBtn" class="btn-top btn-save-all" onclick="saveAllData()">حفظ التغييرات</button>
     </div>
 
     <table id="mainTable">
@@ -105,23 +96,11 @@
         const saved = localStorage.getItem('asgate_opportunities_data');
         if (saved) {
             let data = JSON.parse(saved);
-            sortAndRender(data);
+            data.sort((a, b) => (statusOrder[b.status] || 0) - (statusOrder[a.status] || 0));
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            data.forEach(item => renderRow(item));
         }
-    }
-
-    function sortAndRender(data) {
-        data.sort((a, b) => {
-            let rankA = statusOrder[a.status] || 0;
-            let rankB = statusOrder[b.status] || 0;
-            if (rankA !== rankB) return rankB - rankA;
-            let dateA = a.updated === '-' ? 0 : new Date(a.updated.split('/').reverse().join('-')).getTime();
-            let dateB = b.updated === '-' ? 0 : new Date(b.updated.split('/').reverse().join('-')).getTime();
-            return dateB - dateA;
-        });
-
-        const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = '';
-        data.forEach(item => renderRow(item));
         toggleSaveBtn(false);
     }
 
@@ -129,7 +108,6 @@
         const tbody = document.getElementById('tableBody');
         const row = tbody.insertRow(isNew ? 0 : -1);
         row.setAttribute('data-created', v.created || v.date);
-
         row.innerHTML = `
             <td><input type="text" class="excel-input" value="${v.comp}" oninput="markAsChanged(this)"></td>
             <td><input type="text" class="excel-input" value="${v.mgr}" oninput="markAsChanged(this)"></td>
@@ -138,7 +116,7 @@
             <td><input type="text" class="excel-input" value="${v.curr}" oninput="markAsChanged(this)"></td>
             <td><input type="text" class="excel-input" value="${v.prop}" oninput="markAsChanged(this)"></td>
             <td>
-                <select class="excel-input" onchange="markAsChanged(this)">
+                <select class="excel-input" onchange="checkStatus(this)">
                     <option ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option>
                     <option ${v.status === '50%' ? 'selected' : ''}>50%</option>
                     <option ${v.status === '20%' ? 'selected' : ''}>20%</option>
@@ -151,6 +129,40 @@
         `;
     }
 
+    function checkStatus(el) {
+        markAsChanged(el);
+        const toVisits = ['50%', '20%', 'فقدان'];
+        if (toVisits.includes(el.value)) {
+            showConfirm("هل ترغب بنقل الفرصة المتوقعة إلى الزيارات؟", () => transferToVisits(el.closest('tr')));
+        }
+    }
+
+    function showConfirm(msg, action) {
+        document.getElementById('confirmMsg').innerText = msg;
+        document.getElementById('confirmBox').style.display = 'block';
+        document.getElementById('confirmBtn').onclick = () => { action(); closeConfirm(); };
+    }
+
+    function closeConfirm() { document.getElementById('confirmBox').style.display = 'none'; }
+
+    function transferToVisits(row) {
+        const ins = row.querySelectorAll('.excel-input');
+        const rowData = {
+            comp: ins[0].value, mgr: ins[1].value, mob: ins[2].value,
+            cr: ins[3].value, curr: ins[4].value, prop: ins[5].value,
+            status: ins[6].value, date: ins[7].value,
+            updated: new Date().toLocaleDateString('en-GB'),
+            created: row.getAttribute('data-created')
+        };
+        
+        let visitsData = JSON.parse(localStorage.getItem('asgate_visits_data') || '[]');
+        visitsData.push(rowData);
+        localStorage.setItem('asgate_visits_data', JSON.stringify(visitsData));
+        
+        row.remove();
+        saveAllData();
+    }
+
     function insertNewRow() {
         const todayStr = new Date().toISOString().split('T')[0];
         renderRow({ comp:'', mgr:'', mob:'', cr:'', curr:'', prop:'', status:'مهتم', date: todayStr, updated: '-', created: todayStr }, true);
@@ -160,9 +172,7 @@
     function markAsChanged(el) {
         toggleSaveBtn(true);
         const row = el.closest('tr');
-        const createdDate = row.getAttribute('data-created');
-        const today = new Date().toISOString().split('T')[0];
-        if (today !== createdDate) {
+        if (row.getAttribute('data-created') !== new Date().toISOString().split('T')[0]) {
             row.setAttribute('data-pending-update', new Date().toLocaleDateString('en-GB'));
         }
     }
@@ -170,43 +180,28 @@
     function toggleSaveBtn(active) {
         isDirty = active;
         const btn = document.getElementById('saveAllBtn');
-        if(active) btn.classList.add('active');
-        else btn.classList.remove('active');
+        if(active) btn.classList.add('active'); else btn.classList.remove('active');
     }
 
     function saveAllData() {
         const rows = document.querySelectorAll('#tableBody tr');
         const allData = [];
-        
         rows.forEach(row => {
             const ins = row.querySelectorAll('.excel-input');
-            const pendingDate = row.getAttribute('data-pending-update');
             let updatedAt = row.querySelector('.updated-at').innerText;
-            if (pendingDate) updatedAt = pendingDate;
-
+            if (row.getAttribute('data-pending-update')) updatedAt = row.getAttribute('data-pending-update');
             allData.push({
                 comp: ins[0].value, mgr: ins[1].value, mob: ins[2].value,
                 cr: ins[3].value, curr: ins[4].value, prop: ins[5].value,
-                status: ins[6].value, date: ins[7].value,
-                updated: updatedAt,
+                status: ins[6].value, date: ins[7].value, updated: updatedAt,
                 created: row.getAttribute('data-created')
             });
         });
-
         localStorage.setItem('asgate_opportunities_data', JSON.stringify(allData));
-        loadSavedData(); 
+        loadSavedData();
     }
 
-    function deleteRow(btn) {
-        if(confirm("هل أنت متأكد من الحذف؟")) {
-            btn.closest('tr').remove();
-            saveAllData();
-        }
-    }
-
-    window.onbeforeunload = function() {
-        if (isDirty) return "لديك تغييرات غير محفوظة!";
-    };
+    function deleteRow(btn) { if(confirm("حذف الفرصة؟")) { btn.closest('tr').remove(); saveAllData(); } }
 </script>
 </body>
 </html>
