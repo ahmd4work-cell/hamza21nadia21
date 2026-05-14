@@ -57,10 +57,10 @@
             gap: 20px; 
         }
 
-        /* عمود سجل الأهداف المحدث حسب طلبك */
+        /* عمود سجل الأهداف المحدث (flex: 1.5) */
         .table-area { 
-            flex: 1.2; 
-            min-width: 300px; 
+            flex: 1.5; 
+            min-width: 350px; 
         }
 
         /* عمود الفلترة */
@@ -76,9 +76,9 @@
         .content-box { background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         
         /* تنسيق الجدول بالأعمدة الخمسة */
-        .yearly-table { width: 100%; border-collapse: collapse; font-size: 10px; text-align: center; }
-        .yearly-table th { background: var(--nav-navy); color: white; padding: 10px 2px; font-weight: bold; }
-        .yearly-table td { padding: 8px 2px; border-bottom: 1px solid #f1f5f9; font-weight: bold; color: #475569; }
+        .yearly-table { width: 100%; border-collapse: collapse; font-size: 10.5px; text-align: center; }
+        .yearly-table th { background: var(--nav-navy); color: white; padding: 10px 4px; font-weight: bold; border-left: 1px solid rgba(255,255,255,0.1); }
+        .yearly-table td { padding: 8px 4px; border-bottom: 1px solid #f1f5f9; font-weight: bold; color: #475569; }
 
         .chart-wrapper { position: relative; height: 180px; width: 100%; }
         h3 { font-size: 12px; margin-top: 0; margin-bottom: 15px; color: var(--nav-navy); font-weight: 800; border-right: 3px solid var(--stat-green); padding-right: 10px; }
@@ -139,7 +139,7 @@
                 </div>
             </div>
 
-            <!-- العمود الأوسط المحدث (flex: 1.2) -->
+            <!-- العمود الأوسط المحدث (flex: 1.5) -->
             <div class="table-area">
                 <div class="content-box">
                     <h3>📅 سجل الأهداف السنوي</h3>
@@ -183,7 +183,6 @@
         const months = ["يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
         const tbody = document.getElementById('yearlyDataBody');
         
-        // تعبئة البيانات الافتراضية
         months.forEach(m => { 
             tbody.innerHTML += `<tr>
                 <td>${m}</td>
