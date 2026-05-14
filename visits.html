@@ -89,7 +89,9 @@
 
 <script>
     let isDirty = false;
-    const statusOrder = { "فقدان": 1, "20%": 2, "50%": 3, "مهتم": 4 };
+    
+    // تم عكس الأرقام ليكون "مهتم" هو الأعلى (4) و"فقدان" هو الأقل (1)
+    const statusOrder = { "مهتم": 4, "50%": 3, "20%": 2, "فقدان": 1 };
 
     function loadSavedData() {
         const saved = localStorage.getItem('asgate_visits');
@@ -101,13 +103,15 @@
 
     function sortAndRender(visits) {
         visits.sort((a, b) => {
+            // أولاً: الترتيب حسب الحالة (الأعلى رقماً يظهر أولاً)
             let rankA = statusOrder[a.status] || 0;
             let rankB = statusOrder[b.status] || 0;
-            if (rankA !== rankB) return rankA - rankB;
+            if (rankA !== rankB) return rankB - rankA;
 
+            // ثانياً: الترتيب حسب تاريخ التعديل (الأحدث يظهر أولاً)
             let dateA = a.updated === '-' ? 0 : new Date(a.updated.split('/').reverse().join('-')).getTime();
             let dateB = b.updated === '-' ? 0 : new Date(b.updated.split('/').reverse().join('-')).getTime();
-            return dateA - dateB;
+            return dateB - dateA;
         });
 
         const tbody = document.getElementById('tableBody');
@@ -147,7 +151,6 @@
 
     function insertNewRow() {
         const todayStr = new Date().toISOString().split('T')[0];
-        // التلقائي عند الإضافة يكون مهتم ليظهر في القائمة المنسدلة أولاً
         renderRow({ comp:'', mgr:'', mob:'', cr:'', curr:'', prop:'', status:'مهتم', date: todayStr, updated: '-', created: todayStr }, true);
         toggleSaveBtn(true);
     }
@@ -190,7 +193,7 @@
         });
 
         localStorage.setItem('asgate_visits', JSON.stringify(allVisits));
-        loadSavedData();
+        loadSavedData(); 
     }
 
     function deleteRow(btn) {
