@@ -74,22 +74,23 @@
 
 <div class="container">
     <div class="action-bar">
-        <button class="btn-top btn-add" title="إضافة فرصة جديدة" onclick="insertNewRow()">+ إضافة فرصة بيعية</button>
+        <button class="btn-top btn-add" title="إضافة فرصة جديدة" onclick="insertNewRow()">+ إضافة فرصة</button>
         <button id="saveAllBtn" class="btn-top btn-save-all" title="حفظ التغييرات" onclick="saveAllData()">حفظ التغييرات</button>
     </div>
 
     <table id="mainTable">
         <thead>
             <tr>
-                <th style="width: 15%;">اسم العميل/الشركة</th>
-                <th style="width: 15%;">المشروع/الخدمة</th>
-                <th style="width: 10%;">القيمة المتوقعة</th>
-                <th style="width: 10%;">المرحلة</th>
-                <th style="width: 10%;">احتمالية الإغلاق</th>
-                <th style="width: 15%;">ملاحظات المتابعة</th>
-                <th style="width: 10%;">التاريخ المتوقع</th>
-                <th style="width: 10%;">تاريخ التعديل</th>
-                <th style="width: 5%;">إجراء</th>
+                <th style="width: 14%;">الشركة</th>
+                <th>المسؤول</th>
+                <th style="width: 12%;">الموبايل</th>
+                <th>السجل</th>
+                <th>الخدمة الحالية</th>
+                <th>الخدمة المقترحة</th>
+                <th style="width: 80px;">الحالة</th>
+                <th style="width: 100px;">تاريخ الزيارة</th>
+                <th style="width: 100px;">تاريخ التعديل</th>
+                <th style="width: 70px;">إجراء</th>
             </tr>
         </thead>
         <tbody id="tableBody"></tbody>
@@ -98,24 +99,21 @@
 
 <script>
     let isDirty = false;
-    
-    // ترتيب الفرص بناءً على الاحتمالية (الأعلى أولاً)
-    const probOrder = { "عالية": 3, "متوسطة": 2, "منخفضة": 1 };
+    const statusOrder = { "مهتم": 4, "50%": 3, "20%": 2, "فقدان": 1 };
 
     function loadSavedData() {
-        const saved = localStorage.getItem('asgate_opportunities');
+        const saved = localStorage.getItem('asgate_opportunities_data');
         if (saved) {
-            let opps = JSON.parse(saved);
-            sortAndRender(opps);
+            let data = JSON.parse(saved);
+            sortAndRender(data);
         }
     }
 
-    function sortAndRender(opps) {
-        opps.sort((a, b) => {
-            let rankA = probOrder[a.probability] || 0;
-            let rankB = probOrder[b.probability] || 0;
+    function sortAndRender(data) {
+        data.sort((a, b) => {
+            let rankA = statusOrder[a.status] || 0;
+            let rankB = statusOrder[b.status] || 0;
             if (rankA !== rankB) return rankB - rankA;
-            
             let dateA = a.updated === '-' ? 0 : new Date(a.updated.split('/').reverse().join('-')).getTime();
             let dateB = b.updated === '-' ? 0 : new Date(b.updated.split('/').reverse().join('-')).getTime();
             return dateB - dateA;
@@ -123,44 +121,39 @@
 
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = '';
-        opps.forEach(o => renderRow(o));
+        data.forEach(item => renderRow(item));
         toggleSaveBtn(false);
     }
 
-    function renderRow(o, isNew = false) {
+    function renderRow(v, isNew = false) {
         const tbody = document.getElementById('tableBody');
         const row = tbody.insertRow(isNew ? 0 : -1);
-        row.setAttribute('data-created', o.created || o.date);
+        row.setAttribute('data-created', v.created || v.date);
 
         row.innerHTML = `
-            <td><input type="text" class="excel-input" value="${o.client}" oninput="markAsChanged(this)"></td>
-            <td><input type="text" class="excel-input" value="${o.service}" oninput="markAsChanged(this)"></td>
-            <td><input type="text" class="excel-input" value="${o.value}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.comp}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.mgr}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.mob}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.cr}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.curr}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.prop}" oninput="markAsChanged(this)"></td>
             <td>
                 <select class="excel-input" onchange="markAsChanged(this)">
-                    <option ${o.stage === 'عرض سعر' ? 'selected' : ''}>عرض سعر</option>
-                    <option ${o.stage === 'تفاوض' ? 'selected' : ''}>تفاوض</option>
-                    <option ${o.stage === 'موافقة مبدئية' ? 'selected' : ''}>موافقة مبدئية</option>
-                    <option ${o.stage === 'إغلاق ناجح' ? 'selected' : ''}>إغلاق ناجح</option>
+                    <option ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option>
+                    <option ${v.status === '50%' ? 'selected' : ''}>50%</option>
+                    <option ${v.status === '20%' ? 'selected' : ''}>20%</option>
+                    <option ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option>
                 </select>
             </td>
-            <td>
-                <select class="excel-input" onchange="markAsChanged(this)">
-                    <option ${o.probability === 'عالية' ? 'selected' : ''}>عالية</option>
-                    <option ${o.probability === 'متوسطة' ? 'selected' : ''}>متوسطة</option>
-                    <option ${o.probability === 'منخفضة' ? 'selected' : ''}>منخفضة</option>
-                </select>
-            </td>
-            <td><input type="text" class="excel-input" value="${o.notes}" oninput="markAsChanged(this)"></td>
-            <td><input type="date" class="excel-input" value="${o.date}" oninput="markAsChanged(this)"></td>
-            <td class="updated-at">${o.updated}</td>
+            <td><input type="date" class="excel-input" value="${v.date}" oninput="markAsChanged(this)"></td>
+            <td class="updated-at">${v.updated}</td>
             <td><button class="btn-delete" onclick="deleteRow(this)">حذف</button></td>
         `;
     }
 
     function insertNewRow() {
         const todayStr = new Date().toISOString().split('T')[0];
-        renderRow({ client:'', service:'', value:'', stage:'عرض سعر', probability:'متوسطة', notes:'', date: todayStr, updated: '-', created: todayStr }, true);
+        renderRow({ comp:'', mgr:'', mob:'', cr:'', curr:'', prop:'', status:'مهتم', date: todayStr, updated: '-', created: todayStr }, true);
         toggleSaveBtn(true);
     }
 
@@ -183,7 +176,7 @@
 
     function saveAllData() {
         const rows = document.querySelectorAll('#tableBody tr');
-        const allOpps = [];
+        const allData = [];
         
         rows.forEach(row => {
             const ins = row.querySelectorAll('.excel-input');
@@ -191,27 +184,28 @@
             let updatedAt = row.querySelector('.updated-at').innerText;
             if (pendingDate) updatedAt = pendingDate;
 
-            allOpps.push({
-                client: ins[0].value, service: ins[1].value, value: ins[2].value,
-                stage: ins[3].value, probability: ins[4].value, notes: ins[5].value,
-                date: ins[6].value, updated: updatedAt,
+            allData.push({
+                comp: ins[0].value, mgr: ins[1].value, mob: ins[2].value,
+                cr: ins[3].value, curr: ins[4].value, prop: ins[5].value,
+                status: ins[6].value, date: ins[7].value,
+                updated: updatedAt,
                 created: row.getAttribute('data-created')
             });
         });
 
-        localStorage.setItem('asgate_opportunities', JSON.stringify(allOpps));
+        localStorage.setItem('asgate_opportunities_data', JSON.stringify(allData));
         loadSavedData(); 
     }
 
     function deleteRow(btn) {
-        if(confirm("هل أنت متأكد من حذف هذه الفرصة؟")) {
+        if(confirm("هل أنت متأكد من الحذف؟")) {
             btn.closest('tr').remove();
             saveAllData();
         }
     }
 
     window.onbeforeunload = function() {
-        if (isDirty) return "لديك تغييرات غير محفوظة في الفرص!";
+        if (isDirty) return "لديك تغييرات غير محفوظة!";
     };
 </script>
 </body>
