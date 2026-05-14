@@ -45,21 +45,21 @@
         .btn-delete { border: none; background-color: #fee2e2; color: var(--accent-red); padding: 4px 10px; border-radius: 4px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 10px; }
         .updated-at { font-size: 10px; color: #475569; font-weight: bold; }
 
-        /* ستايل التنبيه المخصص */
+        /* التنبيه المخصص */
         .custom-confirm {
             position: fixed; top: 20%; left: 50%; transform: translate(-50%, -50%);
             background: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             z-index: 1000; display: none; text-align: center; border: 2px solid var(--nav-navy);
         }
         .confirm-btns { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
-        .btn-yes { background: var(--accent-green-active); color: white; border: none; padding: 8px 25px; border-radius: 5px; cursor: pointer; }
-        .btn-no { background: var(--accent-red); color: white; border: none; padding: 8px 25px; border-radius: 5px; cursor: pointer; }
+        .btn-yes { background: var(--accent-green-active); color: white; border: none; padding: 8px 25px; border-radius: 5px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
+        .btn-no { background: var(--accent-red); color: white; border: none; padding: 8px 25px; border-radius: 5px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
     </style>
 </head>
 <body onload="loadSavedData()">
 
 <div id="confirmBox" class="custom-confirm">
-    <p id="confirmMsg"></p>
+    <p id="confirmMsg" style="font-weight: bold;"></p>
     <div class="confirm-btns">
         <button class="btn-yes" id="confirmBtn">نعم</button>
         <button class="btn-no" onclick="closeConfirm()">لا</button>
@@ -102,7 +102,6 @@
 
 <script>
     let isDirty = false;
-    let pendingTransfer = null;
 
     function loadSavedData() {
         const saved = localStorage.getItem('asgate_visits_data');
@@ -183,7 +182,9 @@
     function markAsChanged(el) {
         toggleSaveBtn(true);
         const row = el.closest('tr');
-        if (row.getAttribute('data-created') !== new Date().toISOString().split('T')[0]) {
+        const createdDate = row.getAttribute('data-created');
+        const today = new Date().toISOString().split('T')[0];
+        if (today !== createdDate) {
             row.setAttribute('data-pending-update', new Date().toLocaleDateString('en-GB'));
         }
     }
@@ -212,7 +213,7 @@
         loadSavedData();
     }
 
-    function deleteRow(btn) { if(confirm("حذف الزيارة؟")) { btn.closest('tr').remove(); saveAllData(); } }
+    function deleteRow(btn) { if(confirm("هل أنت متأكد من حذف الزيارة؟")) { btn.closest('tr').remove(); saveAllData(); } }
 </script>
 </body>
 </html>
