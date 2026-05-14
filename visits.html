@@ -20,11 +20,8 @@
 
         .navbar { 
             background-color: var(--nav-navy); 
-            display: flex; 
-            padding: 8px 20px; 
-            margin: 5px; 
-            border-radius: 15px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex; padding: 8px 20px; margin: 5px; 
+            border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         .navbar a { color: white; text-decoration: none; padding: 6px 15px; font-weight: 700; font-size: 13px; }
         .navbar a.active { background-color: rgba(255,255,255,0.1); border-radius: 10px; }
@@ -34,8 +31,8 @@
         .btn-add { background-color: var(--accent-blue); color: white; border: none; padding: 5px 15px; border-radius: 6px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 11px; }
 
         table { width: 100%; border-collapse: collapse; table-layout: fixed; background: white; border: 1px solid var(--border-color); }
-        th { background-color: #e2e8f0; padding: 6px 2px; color: var(--nav-navy); font-size: 10.5px; font-weight: 800; border: 1px solid var(--border-color); }
-        td { padding: 0; border: 1px solid var(--border-color); text-align: center; height: 35px; font-size: 11px; position: relative; }
+        th { background-color: #e2e8f0; padding: 4px 2px; color: var(--nav-navy); font-size: 10.5px; font-weight: 800; border: 1px solid var(--border-color); }
+        td { padding: 0; border: 1px solid var(--border-color); text-align: center; height: 35px; font-size: 11px; }
 
         .excel-input {
             width: 100%; height: 100%; border: none; padding: 0 5px; font-family: 'Cairo';
@@ -43,24 +40,13 @@
         }
         .excel-input:focus { background-color: #fffdec; box-shadow: inset 0 0 0 1px var(--accent-blue); }
 
-        /* الأزرار والإجراءات */
         .actions-cell { display: flex; gap: 4px; justify-content: center; align-items: center; height: 100%; }
-        
-        .btn-action { 
-            border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-family: 'Cairo'; 
-            font-weight: bold; cursor: pointer; color: white; transition: 0.2s;
-        }
-        
+        .btn-action { border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; }
         .btn-save { background-color: var(--accent-green-dim); pointer-events: none; }
         .btn-save.active { background-color: var(--accent-green-active); pointer-events: auto; }
         .btn-delete { background-color: #fca5a5; }
-        .btn-delete:hover { background-color: var(--accent-red); }
 
-        /* رابط الواتساب */
-        .whatsapp-link {
-            text-decoration: none; color: #128c7e; font-weight: bold; font-size: 10px; display: block; margin-top: -2px;
-        }
-
+        .whatsapp-link { text-decoration: none; color: #128c7e; font-weight: bold; font-size: 10px; display: block; margin-top: -2px; }
         .updated-at { font-size: 10px; color: #475569; font-weight: bold; }
     </style>
 </head>
@@ -80,7 +66,7 @@
         <button class="btn-add" title="إضافة سطر جديد للزيارات" onclick="insertNewRow()">+ إضافة زيارة</button>
     </div>
 
-    <table>
+    <table id="mainTable">
         <thead>
             <tr>
                 <th style="width: 14%;">الشركة</th>
@@ -102,24 +88,34 @@
 <script>
     let isDirty = false;
 
-    window.addEventListener('beforeunload', (e) => {
-        if (isDirty) { e.preventDefault(); e.returnValue = ''; }
-    });
+    // رتبة الحالات (فقدان أقل شيء ثم مهتم أعلى شيء)
+    const statusOrder = { "فقدان": 1, "20%": 2, "50%": 3, "مهتم": 4 };
 
     function loadSavedData() {
         const saved = localStorage.getItem('asgate_visits');
         if (saved) {
-            const visits = JSON.parse(saved);
-            visits.forEach(v => renderRow(v));
+            let visits = JSON.parse(saved);
+            sortAndRender(visits);
         }
     }
 
-    function insertNewRow() {
-        const todayStr = new Date().toISOString().split('T')[0];
-        renderRow({ 
-            comp:'', mgr:'', mob:'', cr:'', curr:'', prop:'', status:'50%', 
-            date: todayStr, updated: '-', created: todayStr 
-        }, true);
+    function sortAndRender(visits) {
+        // فرز البيانات حسب الحالة ثم تاريخ التعديل
+        visits.sort((a, b) => {
+            // أولاً: حسب رتبة الحالة
+            let rankA = statusOrder[a.status] || 0;
+            let rankB = statusOrder[b.status] || 0;
+            if (rankA !== rankB) return rankA - rankB;
+
+            // ثانياً: حسب تاريخ التعديل (الأحدث يظهر أسفل الأقدم ضمن نفس الحالة)
+            let dateA = a.updated === '-' ? 0 : new Date(a.updated.split('/').reverse().join('-')).getTime();
+            let dateB = b.updated === '-' ? 0 : new Date(b.updated.split('/').reverse().join('-')).getTime();
+            return dateA - dateB;
+        });
+
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+        visits.forEach(v => renderRow(v));
     }
 
     function renderRow(v, isNew = false) {
@@ -128,49 +124,36 @@
         row.setAttribute('data-created', v.created || v.date);
 
         row.innerHTML = `
-            <td><input type="text" class="excel-input" value="${v.comp}" oninput="markAsChanged(this)" title="اسم الشركة المستهدفة"></td>
-            <td><input type="text" class="excel-input" value="${v.mgr}" oninput="markAsChanged(this)" title="اسم الشخص المسؤول"></td>
+            <td><input type="text" class="excel-input" value="${v.comp}" oninput="markAsChanged(this)" title="اسم الشركة"></td>
+            <td><input type="text" class="excel-input" value="${v.mgr}" oninput="markAsChanged(this)" title="اسم المسؤول"></td>
             <td>
-                <input type="text" class="excel-input" value="${v.mob}" oninput="updateWhatsApp(this); markAsChanged(this)" title="رقم الجوال (سيظهر رابط واتساب عند الإدخال)">
+                <input type="text" class="excel-input" value="${v.mob}" oninput="updateWhatsApp(this); markAsChanged(this)" title="الجوال">
                 <a href="https://wa.me/${v.mob}" target="_blank" class="whatsapp-link" style="${v.mob ? '' : 'display:none'}">واتساب ↗</a>
             </td>
-            <td><input type="text" class="excel-input" value="${v.cr}" oninput="markAsChanged(this)" title="رقم السجل التجاري"></td>
-            <td><input type="text" class="excel-input" value="${v.curr}" oninput="markAsChanged(this)" title="الخدمة الحالية المستخدمة"></td>
-            <td><input type="text" class="excel-input" value="${v.prop}" oninput="markAsChanged(this)" title="الخدمة التي سنعرضها من ASGate"></td>
+            <td><input type="text" class="excel-input" value="${v.cr}" oninput="markAsChanged(this)" title="السجل التجاري"></td>
+            <td><input type="text" class="excel-input" value="${v.curr}" oninput="markAsChanged(this)" title="الخدمة الحالية"></td>
+            <td><input type="text" class="excel-input" value="${v.prop}" oninput="markAsChanged(this)" title="الخدمة المقترحة"></td>
             <td>
-                <select class="excel-input" onchange="markAsChanged(this)" title="احتمالية إتمام الصفقة">
-                    <option ${v.status === '50%' ? 'selected' : ''}>50%</option>
-                    <option ${v.status === '20%' ? 'selected' : ''}>20%</option>
-                    <option ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option>
+                <select class="excel-input" onchange="markAsChanged(this)" title="الحالة">
                     <option ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option>
+                    <option ${v.status === '20%' ? 'selected' : ''}>20%</option>
+                    <option ${v.status === '50%' ? 'selected' : ''}>50%</option>
+                    <option ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option>
                 </select>
             </td>
-            <td><input type="date" class="excel-input" value="${v.date}" oninput="markAsChanged(this)" title="تاريخ إجراء الزيارة"></td>
-            <td class="updated-at" title="آخر تاريخ تم فيه تعديل البيانات">${v.updated}</td>
+            <td><input type="date" class="excel-input" value="${v.date}" oninput="markAsChanged(this)" title="تاريخ الزيارة"></td>
+            <td class="updated-at" title="آخر تعديل">${v.updated}</td>
             <td class="actions-cell">
-                <button class="btn-action btn-save ${isNew ? 'active' : ''}" onclick="saveAllData(this)" title="حفظ التعديلات الحالية">حفظ</button>
-                <button class="btn-action btn-delete" onclick="deleteRow(this)" title="حذف هذه الزيارة نهائياً">حذف</button>
+                <button class="btn-action btn-save ${isNew ? 'active' : ''}" onclick="saveAllData(this)" title="حفظ">حفظ</button>
+                <button class="btn-action btn-delete" onclick="deleteRow(this)" title="حذف">حذف</button>
             </td>
         `;
-        if(isNew) isDirty = true;
     }
 
-    function updateWhatsApp(input) {
-        const link = input.parentElement.querySelector('.whatsapp-link');
-        const val = input.value.trim();
-        if(val) {
-            link.href = `https://wa.me/${val}`;
-            link.style.display = 'block';
-        } else {
-            link.style.display = 'none';
-        }
-    }
-
-    function deleteRow(btn) {
-        if(confirm("هل أنت متأكد من حذف هذه الزيارة؟")) {
-            btn.closest('tr').remove();
-            saveAllData(null); // تحديث التخزين بعد الحذف
-        }
+    function insertNewRow() {
+        const todayStr = new Date().toISOString().split('T')[0];
+        renderRow({ comp:'', mgr:'', mob:'', cr:'', curr:'', prop:'', status:'فقدان', date: todayStr, updated: '-', created: todayStr }, true);
+        isDirty = true;
     }
 
     function markAsChanged(el) {
@@ -179,18 +162,17 @@
         row.querySelector('.btn-save').classList.add('active');
         const createdDate = row.getAttribute('data-created');
         const today = new Date().toISOString().split('T')[0];
-        const todayDisplay = new Date().toLocaleDateString('en-GB');
         if (today !== createdDate) {
-            row.setAttribute('data-pending-update', todayDisplay);
+            row.setAttribute('data-pending-update', new Date().toLocaleDateString('en-GB'));
         }
     }
 
     function saveAllData(btn) {
         if(btn) {
-            const currentRow = btn.closest('tr');
-            const pendingDate = currentRow.getAttribute('data-pending-update');
-            if (pendingDate) currentRow.querySelector('.updated-at').innerText = pendingDate;
-            btn.classList.remove('active');
+            const row = btn.closest('tr');
+            if(row.getAttribute('data-pending-update')) {
+                row.querySelector('.updated-at').innerText = row.getAttribute('data-pending-update');
+            }
         }
 
         const rows = document.querySelectorAll('#tableBody tr');
@@ -205,8 +187,23 @@
                 created: row.getAttribute('data-created')
             });
         });
+
         localStorage.setItem('asgate_visits', JSON.stringify(allVisits));
         isDirty = false;
+        loadSavedData(); // إعادة التحميل لترتيب الجدول فوراً بعد الحفظ
+    }
+
+    function deleteRow(btn) {
+        if(confirm("هل أنت متأكد من الحذف؟")) {
+            btn.closest('tr').remove();
+            saveAllData(null);
+        }
+    }
+
+    function updateWhatsApp(input) {
+        const link = input.parentElement.querySelector('.whatsapp-link');
+        link.href = `https://wa.me/${input.value.trim()}`;
+        link.style.display = input.value.trim() ? 'block' : 'none';
     }
 </script>
 </body>
