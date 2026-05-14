@@ -18,7 +18,7 @@
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; overflow-x: hidden; }
 
-        /* شريط التنقل بحواف دائرية */
+        /* شريط التنقل بحواف دائرية ولون كحلي */
         .navbar { 
             background-color: var(--nav-navy); 
             display: flex; 
@@ -41,7 +41,7 @@
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .small-card { display: flex; align-items: center; padding: 15px; border-radius: 12px; color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
 
-        /* التوزيع الرئيسي المحدث */
+        /* التوزيع الرئيسي المحدث بنسبة 2:2 */
         .dashboard-main { 
             display: flex; 
             gap: 20px; 
@@ -57,13 +57,13 @@
             gap: 20px; 
         }
 
-        /* عمود سجل الأهداف المحدث (flex: 1.5) */
+        /* عمود سجل الأهداف المحدث (flex: 2) */
         .table-area { 
-            flex: 1.5; 
-            min-width: 350px; 
+            flex: 2; 
+            min-width: 400px; 
         }
 
-        /* عمود الفلترة */
+        /* عمود الفلترة الجانبي */
         .search-filter-box { 
             width: 250px; 
             background: white; 
@@ -76,12 +76,12 @@
         .content-box { background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         
         /* تنسيق الجدول بالأعمدة الخمسة */
-        .yearly-table { width: 100%; border-collapse: collapse; font-size: 10.5px; text-align: center; }
-        .yearly-table th { background: var(--nav-navy); color: white; padding: 10px 4px; font-weight: bold; border-left: 1px solid rgba(255,255,255,0.1); }
-        .yearly-table td { padding: 8px 4px; border-bottom: 1px solid #f1f5f9; font-weight: bold; color: #475569; }
+        .yearly-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: center; }
+        .yearly-table th { background: var(--nav-navy); color: white; padding: 12px 5px; font-weight: bold; }
+        .yearly-table td { padding: 10px 5px; border-bottom: 1px solid #f1f5f9; font-weight: bold; color: #475569; }
 
         .chart-wrapper { position: relative; height: 180px; width: 100%; }
-        h3 { font-size: 12px; margin-top: 0; margin-bottom: 15px; color: var(--nav-navy); font-weight: 800; border-right: 3px solid var(--stat-green); padding-right: 10px; }
+        h3 { font-size: 13px; margin-top: 0; margin-bottom: 15px; color: var(--nav-navy); font-weight: 800; border-right: 3px solid var(--stat-green); padding-right: 10px; }
 
         .filter-group { margin-bottom: 12px; }
         .filter-group label { display: block; font-size: 10px; font-weight: bold; margin-bottom: 5px; color: var(--nav-navy); }
@@ -101,7 +101,7 @@
         <a href="#">المتوقعة</a>
         <a href="#">العملاء</a>
         <a href="#">المبيعات</a>
-        <a href="#">تذكير</a>
+        <a href="reminders.html">تذكير</a>
     </nav>
 
     <div class="user-info-bar">
@@ -127,7 +127,7 @@
         </div>
 
         <div class="dashboard-main">
-            <!-- العمود الأيمن: الرسوم البيانية -->
+            <!-- العمود الأيمن: الرسوم البيانية (الوزن 2) -->
             <div class="charts-column">
                 <div class="content-box">
                     <h3>📈 الأداء الشهري</h3>
@@ -139,7 +139,7 @@
                 </div>
             </div>
 
-            <!-- العمود الأوسط المحدث (flex: 1.5) -->
+            <!-- العمود الأوسط: سجل الأهداف السنوي (الوزن 2) -->
             <div class="table-area">
                 <div class="content-box">
                     <h3>📅 سجل الأهداف السنوي</h3>
@@ -154,7 +154,7 @@
                             </tr>
                         </thead>
                         <tbody id="yearlyDataBody">
-                            <!-- البيانات تُعبأ برمجياً -->
+                            <!-- التعبئة عبر Script -->
                         </tbody>
                     </table>
                 </div>
@@ -193,7 +193,7 @@
             </tr>`; 
         });
 
-        // الرسوم البيانية
+        // رسوم بيانية توضيحية
         const ctxBar = document.getElementById('performanceChart').getContext('2d');
         new Chart(ctxBar, {
             type: 'bar',
