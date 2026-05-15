@@ -3,22 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASGate - لوحة التحكم</title>
+    <title>ASGate - الرئيسية</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --nav-navy: #001f3f;
-            --stat-black: #1a1a1a;
-            --stat-green: #22c55e;
-            --stat-yellow: #ffc000;
             --bg-color: #f4f7f9;
-            --border-color: #e2e8f0;
+            --accent-blue: #3b82f6;
+            --border-color: #cbd5e1;
         }
 
-        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; overflow-x: hidden; }
+        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.6; }
 
-        /* شريط التنقل بحواف دائرية */
+        /* شريط التنقل الموحد بدقة */
         .navbar { 
             background-color: var(--nav-navy); 
             display: flex; 
@@ -30,202 +27,33 @@
             top: 10px;
             z-index: 1000;
         }
-        /* تم تعديل الروابط هنا لتقتصر على الصفحات الأربع المطلوبة */
         .navbar a { color: white; text-decoration: none; padding: 6px 15px; margin-left: 5px; font-weight: 700; font-size: 11px; border-radius: 10px; transition: 0.3s; }
         .navbar a.active { background-color: rgba(255,255,255,0.1); }
         .navbar a:hover { background-color: rgba(255,255,255,0.05); }
 
-        .user-info-bar { background: white; display: flex; justify-content: space-around; padding: 10px; border-bottom: 1px solid #eee; font-size: 11px; color: var(--nav-navy); margin-bottom: 15px; }
-
-        .container { padding: 0 15px 15px 15px; max-width: 1400px; margin: auto; }
-
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .small-card { display: flex; align-items: center; padding: 15px; border-radius: 12px; color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-
-        .dashboard-main { 
-            display: flex; 
-            gap: 20px; 
-            margin-bottom: 20px; 
-            align-items: start;
-        }
-
-        .charts-column { 
-            flex: 2; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 20px; 
-        }
-
-        .table-area { 
-            flex: 2; 
-            min-width: 400px; 
-        }
-
-        .search-filter-box { 
-            width: 250px; 
-            background: white; 
-            padding: 15px; 
-            border-radius: 12px; 
-            border: 1px solid var(--border-color);
-            flex-shrink: 0;
-        }
-
-        .content-box { background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        
-        .yearly-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: center; }
-        .yearly-table th { background: var(--nav-navy); color: white; padding: 12px 5px; font-weight: bold; }
-        .yearly-table td { padding: 10px 5px; border-bottom: 1px solid #f1f5f9; font-weight: bold; color: #475569; }
-
-        .chart-wrapper { position: relative; height: 180px; width: 100%; }
-        h3 { font-size: 13px; margin-top: 0; margin-bottom: 15px; color: var(--nav-navy); font-weight: 800; border-right: 3px solid var(--stat-green); padding-right: 10px; }
-
-        .filter-group { margin-bottom: 12px; }
-        .filter-group label { display: block; font-size: 10px; font-weight: bold; margin-bottom: 5px; color: var(--nav-navy); }
-        .filter-input { width: 100%; padding: 8px; font-family: 'Cairo'; font-size: 11px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-
-        @media (max-width: 1200px) {
-            .dashboard-main { flex-direction: column; }
-            .charts-column, .table-area, .search-filter-box { width: 100%; flex: none; }
-        }
+        .container { padding: 40px 20px; text-align: center; }
+        .welcome-card { background: white; padding: 50px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); max-width: 800px; margin: 0 auto; border: 1px solid var(--border-color); }
+        h1 { color: var(--nav-navy); margin-bottom: 10px; font-weight: 800; }
+        p { color: #64748b; font-size: 18px; }
     </style>
 </head>
 <body>
 
-    <nav class="navbar">
-        <a href="index.html" class="active">الرئيسية</a>
-        <a href="visits.html">الزيارات</a>
-        <a href="opportunities.html">الفرص البيعية</a> <a href="customers.html">العملاء</a>
-    </nav>
+<nav class="navbar">
+    <a href="index.html" class="active">الرئيسية</a>
+    <a href="visits.html">الزيارات</a>
+    <a href="opportunities.html">الفرص البيعية</a>
+    <a href="customers.html">العملاء</a>
+</nav>
 
-    <div class="user-info-bar">
-        <div><span style="font-weight:700">المستخدم:</span> حمزة</div>
-        <div><span style="font-weight:700">الرقم:</span> 12345</div>
-        <div><span style="font-weight:700">التاريخ:</span> 14 مايو 2026</div>
+<div class="container">
+    <div class="welcome-card">
+        <h1>مرحباً بك في ASGate</h1>
+        <p>نظام إدارة علاقات العملاء والزيارات الميدانية</p>
+        <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 30px 0;">
+        <div style="font-size: 14px; color: #94a3b8;">ابدأ بالتنقل عبر الروابط العلوية لإدارة أعمالك</div>
     </div>
+</div>
 
-    <div class="container">
-        <div class="stats-grid">
-            <div class="small-card" style="background: #1e293b;">
-                <div style="flex:1; font-size: 12px;">إجمالي الهدف</div>
-                <div style="font-size: 16px; font-weight: bold;">180,000</div>
-            </div>
-            <div class="small-card" style="background: #22c55e;">
-                <div style="flex:1; font-size: 12px;">المحقق</div>
-                <div style="font-size: 16px; font-weight: bold;">14,210</div>
-            </div>
-            <div class="small-card" style="background: #f59e0b;">
-                <div style="flex:1; font-size: 12px;">المعلق</div>
-                <div style="font-size: 16px; font-weight: bold;">790</div>
-            </div>
-        </div>
-
-        <div class="dashboard-main">
-            <div class="charts-column">
-                <div class="content-box">
-                    <h3>📈 الأداء الشهري</h3>
-                    <div class="chart-wrapper"><canvas id="performanceChart"></canvas></div>
-                </div>
-                <div class="content-box">
-                    <h3>📊 توزيع الإنجاز</h3>
-                    <div class="chart-wrapper"><canvas id="pieChart"></canvas></div>
-                </div>
-            </div>
-
-            <div class="table-area">
-                <div class="content-box">
-                    <h3>📅 سجل الأهداف السنوي</h3>
-                    <table class="yearly-table">
-                        <thead>
-                            <tr>
-                                <th>الشهر</th>
-                                <th>الهدف</th>
-                                <th>مكتمل</th>
-                                <th>%</th>
-                                <th>معلق</th>
-                            </tr>
-                        </thead>
-                        <tbody id="yearlyDataBody">
-                            </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="search-filter-box">
-                <h3>🔍 الفلترة</h3>
-                
-                <div class="filter-group">
-                    <label>بحث سريع</label>
-                    <input type="text" class="filter-input" placeholder="بحث في إدارة المبيعات...">
-                </div>
-
-                <div class="filter-group">
-                    <label>مدير المبيعات</label>
-                    <select class="filter-input">
-                        <option>الكل</option>
-                        <option>المدير العام</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label>مشرف المبيعات</label>
-                    <select class="filter-input">
-                        <option>الكل</option>
-                        <option>المشرف الإقليمي</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label>مندوب المبيعات</label>
-                    <select class="filter-input">
-                        <option>الكل</option>
-                        <option>حمزة</option>
-                        <option>أحمد</option>
-                    </select>
-                </div>
-
-                <button class="filter-input" style="background: var(--nav-navy); color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 10px;">تطبيق الفلترة</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // تعبئة الجدول بالبيانات
-        const months = ["يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
-        const tbody = document.getElementById('yearlyDataBody');
-        
-        months.forEach(m => { 
-            tbody.innerHTML += `<tr>
-                <td>${m}</td>
-                <td>15,000</td>
-                <td>${m === "يناير" ? '14,210' : '-'}</td>
-                <td>${m === "يناير" ? '95%' : '-'}</td>
-                <td>${m === "يناير" ? '790' : '-'}</td>
-            </tr>`; 
-        });
-
-        // إعداد الرسوم البيانية
-        const ctxBar = document.getElementById('performanceChart').getContext('2d');
-        new Chart(ctxBar, {
-            type: 'bar',
-            data: {
-                labels: ['1','2','3','4','5','6','7','8','9','10','11','12'],
-                datasets: [
-                    { label: 'الهدف', data: Array(12).fill(15000), backgroundColor: '#e2e8f0', borderRadius: 5 },
-                    { label: 'المحقق', data: [14210,0,0,0,0,0,0,0,0,0,0,0], backgroundColor: '#22c55e', borderRadius: 5 }
-                ]
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-        });
-
-        const ctxPie = document.getElementById('pieChart').getContext('2d');
-        new Chart(ctxPie, {
-            type: 'doughnut',
-            data: {
-                labels: ['مكتمل', 'معلق'],
-                datasets: [{ data: [95, 5], backgroundColor: ['#22c55e', '#ffc000'], borderWidth: 0 }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom' } } }
-        });
-    </script>
 </body>
 </html>
