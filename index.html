@@ -18,32 +18,32 @@
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; overflow-x: hidden; }
 
-        /* شريط التنقل بحواف دائرية - تم تعديل الارتفاع بدقة إلى 42px */
+        /* شريط التنقل بحواف دائرية - تم ضبط الارتفاع صراحة إلى 40px */
         .navbar { 
             background-color: var(--nav-navy); 
             display: flex; 
-            align-items: center;  /* يضمن توسيط الروابط عمودياً تماماً */
-            padding: 0 20px;      /* إزالة الـ padding العلوي والسفلي والاعتماد على الارتفاع الثابت */
+            align-items: center;  /* توسيط الروابط عمودياً تماماً */
+            padding: 0 20px;      /* الاعتماد الكامل على الارتفاع الثابت لتجنب زيادة الحجم */
             margin: 10px; 
             border-radius: 15px; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             position: sticky;
             top: 10px;
             z-index: 1000;
-            height: 42px;         /* الارتفاع المطلوب بدقة */
+            height: 40px;         /* الارتفاع الجديد المطلوب بدقة */
             box-sizing: border-box;
         }
         
         .navbar a { 
             color: white; 
             text-decoration: none; 
-            padding: 6px 15px;    /* حشوة الروابط الداخلية بقيت ثابتة للتناسق */
+            padding: 5px 15px;    /* تقليل الحشوة الداخلية لتتناسب مع ارتفاع 40px */
             margin-left: 5px; 
             font-weight: 700; 
             font-size: 11px; 
             border-radius: 10px; 
             transition: 0.3s; 
-            line-height: 1;       /* مهمة جداً لمنع امتداد الصندوق برمجياً */
+            line-height: 1;       /* ثبات الحساب البرمجي لمنع تمدد الصندوق */
         }
         .navbar a.active { background-color: rgba(255,255,255,0.1); }
         .navbar a:hover { background-color: rgba(255,255,255,0.05); }
@@ -72,7 +72,7 @@
         .table-area { 
             flex: 2; 
             min-width: 400px; 
-            }
+        }
 
         .search-filter-box { 
             width: 250px; 
@@ -159,7 +159,7 @@
                             </tr>
                         </thead>
                         <tbody id="yearlyDataBody">
-                            </tbody>
+                        </tbody>
                     </table>
                 </div>
             </div>
