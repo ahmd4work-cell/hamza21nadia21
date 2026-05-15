@@ -2,20 +2,20 @@
 <html dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>ASGate - العملاء</title>
+    <title>ASGate - إدارة العملاء</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --nav-navy: #001f3f; --bg-color: #f4f7f9; --accent-blue: #3b82f6; --border-color: #cbd5e1; }
-        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; }
-        .navbar { background-color: var(--nav-navy); display: flex; padding: 8px 20px; margin: 5px; border-radius: 15px; }
-        .navbar a { color: white; text-decoration: none; padding: 6px 15px; font-weight: 700; font-size: 13px; border-radius: 10px; }
-        .navbar a.active { background-color: rgba(255,255,255,0.1); }
+        :root { --nav-navy: #001f3f; --accent-blue: #3b82f6; }
+        body { background-color: #f4f7f9; font-family: 'Cairo', sans-serif; margin: 0; }
+        .navbar { background-color: var(--nav-navy); display: flex; padding: 10px 20px; margin: 5px; border-radius: 15px; }
+        .navbar a { color: white; text-decoration: none; padding: 8px 15px; font-weight: 700; font-size: 13px; border-radius: 10px; }
+        .navbar a.active { background-color: rgba(255,255,255,0.2); }
         .container { padding: 20px; }
-        table { width: 100%; border-collapse: collapse; background: white; border: 1px solid var(--border-color); }
-        th { background: #e2e8f0; padding: 12px; font-size: 12px; }
-        td { border: 1px solid var(--border-color); padding: 10px; text-align: center; }
-        .company-link { color: var(--accent-blue); font-weight: bold; cursor: pointer; text-decoration: none; }
-        .btn-save { background: #22c55e; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-bottom: 10px; font-family: 'Cairo'; }
+        .btn-top { border: none; padding: 10px 20px; border-radius: 8px; font-family: 'Cairo'; cursor: pointer; color: white; background: var(--accent-blue); margin-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th { background-color: #e2e8f0; padding: 12px; border: 1px solid #cbd5e1; font-size: 11px; }
+        td { border: 1px solid #cbd5e1; text-align: center; padding: 10px; font-size: 12px; }
+        .company-link { color: var(--accent-blue); font-weight: bold; text-decoration: none; }
     </style>
 </head>
 <body onload="loadCustomers()">
@@ -26,25 +26,24 @@
         <a href="customers.html" class="active">العملاء</a>
     </nav>
     <div class="container">
-        <button class="btn-save" onclick="addCustomer()">+ عميل جديد</button>
-        <table id="customersTable">
-            <thead>
-                <tr><th>الشركة (الملف الشخصي)</th><th>المسؤول</th><th>الموبايل</th><th>السجل التجاري</th><th>إجراء</th></tr>
-            </thead>
-            <tbody id="customersBody"></tbody>
+        <button class="btn-top" onclick="addCustomer()">+ إضافة عميل جديد</button>
+        <table>
+            <thead><tr><th>اسم الشركة</th><th>المسؤول</th><th>الموبايل</th><th>السجل</th><th>إجراء</th></tr></thead>
+            <tbody id="custBody"></tbody>
         </table>
     </div>
     <script>
         function loadCustomers() {
             const data = JSON.parse(localStorage.getItem('asgate_customers_data') || '[]');
-            const body = document.getElementById('customersBody');
+            const body = document.getElementById('custBody');
             body.innerHTML = '';
             data.forEach((c, idx) => {
-                const row = body.insertRow();
-                row.innerHTML = `
-                    <td><a href="customer-profile.html?name=${encodeURIComponent(c.comp)}" class="company-link">${c.comp}</a></td>
-                    <td>${c.mgr}</td><td>${c.mob}</td><td>${c.cr}</td>
-                    <td><button onclick="deleteCust(${idx})" style="color:red; background:none; border:none; cursor:pointer;">حذف</button></td>
+                body.innerHTML += `
+                    <tr>
+                        <td><a href="customer-profile.html?name=${encodeURIComponent(c.comp)}" class="company-link">${c.comp}</a></td>
+                        <td>${c.mgr}</td><td>${c.mob}</td><td>${c.cr}</td>
+                        <td><button onclick="del(${idx})" style="color:red;border:none;background:none;cursor:pointer">حذف</button></td>
+                    </tr>
                 `;
             });
         }
@@ -52,12 +51,17 @@
             const name = prompt("اسم الشركة:");
             if(name) {
                 let data = JSON.parse(localStorage.getItem('asgate_customers_data') || '[]');
-                data.push({comp: name, mgr: 'غير محدد', mob: 'غير محدد', cr: 'غير محدد', address: 'غير محدد'});
+                data.push({comp: name, mgr: '-', mob: '-', cr: '-', address: '-'});
                 localStorage.setItem('asgate_customers_data', JSON.stringify(data));
                 loadCustomers();
             }
         }
-        function deleteCust(idx) { if(confirm('حذف؟')) { let data = JSON.parse(localStorage.getItem('asgate_customers_data')); data.splice(idx, 1); localStorage.setItem('asgate_customers_data', JSON.stringify(data)); loadCustomers(); } }
+        function del(idx) {
+            let data = JSON.parse(localStorage.getItem('asgate_customers_data'));
+            data.splice(idx, 1);
+            localStorage.setItem('asgate_customers_data', JSON.stringify(data));
+            loadCustomers();
+        }
     </script>
 </body>
 </html>
