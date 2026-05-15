@@ -2,21 +2,28 @@
 <html dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>ASGate - الزيارات</title>
+    <title>ASGate - الزيارات الميدانية</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --nav-navy: #001f3f; --bg-color: #f4f7f9; --accent-blue: #3b82f6; --border-color: #cbd5e1; }
+        :root { --nav-navy: #001f3f; --bg-color: #f4f7f9; --accent-blue: #3b82f6; --sticker-yellow: #fff9c4; }
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; }
-        .navbar { background-color: var(--nav-navy); display: flex; padding: 8px 20px; margin: 5px; border-radius: 15px; }
-        .navbar a { color: white; text-decoration: none; padding: 6px 15px; font-weight: 700; font-size: 13px; border-radius: 10px; }
-        .navbar a:hover { background: rgba(255,255,255,0.1); }
+        .navbar { background-color: var(--nav-navy); display: flex; padding: 10px 20px; margin: 5px; border-radius: 15px; }
+        .navbar a { color: white; text-decoration: none; padding: 8px 15px; font-weight: 700; font-size: 13px; border-radius: 10px; }
         .navbar a.active { background-color: rgba(255,255,255,0.2); }
-        .container { padding: 20px; }
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; }
-        th { background: #e2e8f0; padding: 12px; font-size: 12px; }
-        td { border-bottom: 1px solid var(--border-color); padding: 10px; text-align: center; }
-        .status-select { padding: 5px; border-radius: 5px; font-family: 'Cairo'; }
-        .btn-add { background: var(--accent-blue); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-bottom: 15px; font-family: 'Cairo'; }
+        
+        .container { padding: 15px; }
+        .btn-top { border: none; padding: 10px 20px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; background: var(--accent-blue); margin-bottom: 15px; }
+        
+        table { width: 100%; border-collapse: collapse; background: white; border: 1px solid #cbd5e1; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        th { background-color: #e2e8f0; padding: 12px; color: var(--nav-navy); font-size: 11px; font-weight: 800; border: 1px solid #cbd5e1; }
+        td { border: 1px solid #cbd5e1; text-align: center; height: 45px; font-size: 12px; }
+        .excel-input { width: 100%; height: 100%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; }
+        
+        .notes-cell { cursor: pointer; color: #64748b; font-style: italic; background: #fafafa; }
+        
+        /* Modal Sticker */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 2000; }
+        .sticker { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; background: var(--sticker-yellow); padding: 20px; border-radius: 2px; box-shadow: 5px 5px 15px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body onload="loadVisits()">
@@ -27,56 +34,76 @@
         <a href="customers.html">العملاء</a>
     </nav>
     <div class="container">
-        <button class="btn-add" onclick="addNewRow()">+ إضافة زيارة</button>
-        <table id="visitsTable">
+        <button class="btn-top" onclick="addNewVisit()">+ إضافة زيارة جديدة</button>
+        <table id="mainTable">
             <thead>
                 <tr>
-                    <th>الشركة</th><th>المسؤول</th><th>الموبايل</th><th>الحالة</th><th>التاريخ</th><th>إجراء</th>
+                    <th style="width:15%">الشركة</th><th style="width:10%">المسؤول</th><th style="width:10%">الموبايل</th>
+                    <th style="width:10%">الحالة</th><th style="width:10%">التاريخ</th><th style="width:30%">الملاحظات</th><th style="width:5%">-</th>
                 </tr>
             </thead>
-            <tbody id="visitsBody"></tbody>
+            <tbody id="tableBody"></tbody>
         </table>
     </div>
+
     <script>
         function loadVisits() {
             const data = JSON.parse(localStorage.getItem('asgate_visits_data') || '[]');
-            const body = document.getElementById('visitsBody');
-            body.innerHTML = '';
-            data.forEach((v, idx) => {
-                const row = body.insertRow();
-                row.innerHTML = `
-                    <td>${v.comp}</td><td>${v.mgr}</td><td>${v.mob}</td>
-                    <td>
-                        <select class="status-select" onchange="updateStatus(${idx}, this.value)">
-                            <option ${v.status==='زيارة'?'selected':''}>زيارة</option>
-                            <option ${v.status==='مهتم'?'selected':''}>مهتم</option>
-                        </select>
-                    </td>
-                    <td>${v.date}</td>
-                    <td><button onclick="deleteVisit(${idx})" style="color:red; background:none; border:none; cursor:pointer;">حذف</button></td>
-                `;
-            });
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            data.forEach((v, idx) => renderRow(v, idx));
         }
-        function updateStatus(idx, newStatus) {
-            let data = JSON.parse(localStorage.getItem('asgate_visits_data') || '[]');
-            if (newStatus === 'مهتم') {
+
+        function renderRow(v, idx) {
+            const tbody = document.getElementById('tableBody');
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td><input type="text" class="excel-input" value="${v.comp}" onchange="updateVal(${idx}, 'comp', this.value)"></td>
+                <td><input type="text" class="excel-input" value="${v.mgr}" onchange="updateVal(${idx}, 'mgr', this.value)"></td>
+                <td><input type="text" class="excel-input" value="${v.mob}" onchange="updateVal(${idx}, 'mob', this.value)"></td>
+                <td>
+                    <select class="excel-input" onchange="checkStatus(${idx}, this.value)">
+                        <option ${v.status==='زيارة'?'selected':''}>زيارة</option>
+                        <option ${v.status==='مهتم'?'selected':''}>مهتم</option>
+                    </select>
+                </td>
+                <td><input type="date" class="excel-input" value="${v.date}" onchange="updateVal(${idx}, 'date', this.value)"></td>
+                <td class="notes-cell" onclick="alert('خاصية الاستيكر تعمل عند الحفظ')">${v.notes ? "عرض الملاحظات" : "اضف ملاحظة..."}</td>
+                <td><button onclick="deleteVisit(${idx})" style="color:red; border:none; background:none; cursor:pointer;">X</button></td>
+            `;
+        }
+
+        function checkStatus(idx, val) {
+            let data = JSON.parse(localStorage.getItem('asgate_visits_data'));
+            if(val === 'مهتم') {
                 let opps = JSON.parse(localStorage.getItem('asgate_opportunities_data') || '[]');
                 opps.push(data[idx]);
                 localStorage.setItem('asgate_opportunities_data', JSON.stringify(opps));
                 data.splice(idx, 1);
-            } else { data[idx].status = newStatus; }
+                alert("تم التحويل للفرص البيعية");
+            } else { data[idx].status = val; }
             localStorage.setItem('asgate_visits_data', JSON.stringify(data));
             loadVisits();
         }
-        function deleteVisit(idx) { if(confirm('حذف؟')) { let data = JSON.parse(localStorage.getItem('asgate_visits_data')); data.splice(idx, 1); localStorage.setItem('asgate_visits_data', JSON.stringify(data)); loadVisits(); } }
-        function addNewRow() { 
-            const name = prompt("اسم الشركة:");
-            if(name) {
-                let data = JSON.parse(localStorage.getItem('asgate_visits_data') || '[]');
-                data.push({comp: name, mgr: '-', mob: '-', status: 'زيارة', date: new Date().toLocaleDateString()});
-                localStorage.setItem('asgate_visits_data', JSON.stringify(data));
-                loadVisits();
-            }
+
+        function updateVal(idx, key, val) {
+            let data = JSON.parse(localStorage.getItem('asgate_visits_data'));
+            data[idx][key] = val;
+            localStorage.setItem('asgate_visits_data', JSON.stringify(data));
+        }
+
+        function addNewVisit() {
+            let data = JSON.parse(localStorage.getItem('asgate_visits_data') || '[]');
+            data.push({comp: '', mgr: '', mob: '', status: 'زيارة', date: new Date().toISOString().split('T')[0], notes: ''});
+            localStorage.setItem('asgate_visits_data', JSON.stringify(data));
+            loadVisits();
+        }
+
+        function deleteVisit(idx) {
+            let data = JSON.parse(localStorage.getItem('asgate_visits_data'));
+            data.splice(idx, 1);
+            localStorage.setItem('asgate_visits_data', JSON.stringify(data));
+            loadVisits();
         }
     </script>
 </body>
