@@ -5,13 +5,15 @@
     <title>ASGate - الفرص البيعية</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --nav-navy: #001f3f; --bg-color: #fffbeb; --accent-gold: #f59e0b; }
-        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; }
-        .navbar { background-color: var(--nav-navy); display: flex; padding: 8px 20px; margin: 5px; border-radius: 15px; }
-        .navbar a { color: white; text-decoration: none; padding: 6px 15px; font-weight: 700; font-size: 13px; border-radius: 10px; }
+        :root { --nav-navy: #001f3f; --accent-gold: #f59e0b; }
+        body { background-color: #f8fafc; font-family: 'Cairo', sans-serif; margin: 0; }
+        .navbar { background-color: var(--nav-navy); display: flex; padding: 10px 20px; margin: 5px; border-radius: 15px; }
+        .navbar a { color: white; text-decoration: none; padding: 8px 15px; font-weight: 700; font-size: 13px; border-radius: 10px; }
         .navbar a.active { background-color: var(--accent-gold); }
         .container { padding: 20px; }
-        .opp-card { background: white; border-right: 5px solid var(--accent-gold); padding: 15px; margin-bottom: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .opp-table { width: 100%; border-collapse: collapse; background: white; }
+        .opp-table th { background: var(--nav-navy); color: white; padding: 12px; }
+        .opp-table td { border: 1px solid #e2e8f0; padding: 12px; text-align: center; }
     </style>
 </head>
 <body onload="loadOpps()">
@@ -22,24 +24,27 @@
         <a href="customers.html">العملاء</a>
     </nav>
     <div class="container">
-        <h2>قائمة العملاء المهتمين (الفرص)</h2>
-        <div id="oppsList"></div>
+        <h2 style="color:var(--nav-navy)">الفرص البيعية النشطة</h2>
+        <table class="opp-table">
+            <thead><tr><th>الشركة</th><th>المسؤول</th><th>الموبايل</th><th>الحالة</th><th>إجراء</th></tr></thead>
+            <tbody id="oppsBody"></tbody>
+        </table>
     </div>
     <script>
         function loadOpps() {
             const data = JSON.parse(localStorage.getItem('asgate_opportunities_data') || '[]');
-            const list = document.getElementById('oppsList');
-            list.innerHTML = data.length === 0 ? '<p>لا توجد فرص حالية.</p>' : '';
+            const body = document.getElementById('oppsBody');
+            body.innerHTML = data.length === 0 ? '<tr><td colspan="5">لا توجد فرص حالية</td></tr>' : '';
             data.forEach((o, idx) => {
-                list.innerHTML += `
-                    <div class="opp-card">
-                        <div><strong>${o.comp}</strong><br><small>${o.mgr} | ${o.mob}</small></div>
-                        <button onclick="deleteOpp(${idx})" style="color:red; background:none; border:none; cursor:pointer;">إغلاق الفرصة</button>
-                    </div>
-                `;
+                body.innerHTML += `<tr><td>${o.comp}</td><td>${o.mgr}</td><td>${o.mob}</td><td style="color:green;font-weight:bold">مهتم</td><td><button onclick="del(${idx})">إغلاق</button></td></tr>`;
             });
         }
-        function deleteOpp(idx) { if(confirm('إغلاق الفرصة؟')) { let data = JSON.parse(localStorage.getItem('asgate_opportunities_data')); data.splice(idx, 1); localStorage.setItem('asgate_opportunities_data', JSON.stringify(data)); loadOpps(); } }
+        function del(idx) {
+            let data = JSON.parse(localStorage.getItem('asgate_opportunities_data'));
+            data.splice(idx, 1);
+            localStorage.setItem('asgate_opportunities_data', JSON.stringify(data));
+            loadOpps();
+        }
     </script>
 </body>
 </html>
