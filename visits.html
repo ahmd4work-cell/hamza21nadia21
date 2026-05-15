@@ -2,109 +2,224 @@
 <html dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>ASGate - الزيارات الميدانية</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASGate - الزيارات</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --nav-navy: #001f3f; --bg-color: #f4f7f9; --accent-blue: #3b82f6; --sticker-yellow: #fff9c4; }
-        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; }
-        .navbar { background-color: var(--nav-navy); display: flex; padding: 10px 20px; margin: 5px; border-radius: 15px; }
-        .navbar a { color: white; text-decoration: none; padding: 8px 15px; font-weight: 700; font-size: 13px; border-radius: 10px; }
-        .navbar a.active { background-color: rgba(255,255,255,0.2); }
+        :root {
+            --nav-navy: #001f3f;
+            --bg-color: #f4f7f9;
+            --accent-green-active: #22c55e;
+            --accent-green-dim: #d1fae5;
+            --accent-blue: #3b82f6;
+            --accent-red: #ef4444;
+            --border-color: #cbd5e1;
+        }
+
+        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1; }
+
+        /* شريط التنقل الموحد المطابق للرئيسية */
+        .navbar { 
+            background-color: var(--nav-navy); 
+            display: flex; 
+            padding: 8px 20px; 
+            margin: 10px; 
+            border-radius: 15px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 10px;
+            z-index: 1000;
+        }
+        .navbar a { color: white; text-decoration: none; padding: 6px 15px; margin-left: 5px; font-weight: 700; font-size: 11px; border-radius: 10px; transition: 0.3s; }
+        .navbar a.active { background-color: rgba(255,255,255,0.1); }
+        .navbar a:hover { background-color: rgba(255,255,255,0.05); }
+
+        .container { padding: 5px 10px; max-width: 100%; }
+        .action-bar { display: flex; align-items: center; margin-top: 15px; margin-bottom: 15px; gap: 10px; padding: 10px 0; }
         
-        .container { padding: 15px; }
-        .btn-top { border: none; padding: 10px 20px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; background: var(--accent-blue); margin-bottom: 15px; }
-        
-        table { width: 100%; border-collapse: collapse; background: white; border: 1px solid #cbd5e1; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        th { background-color: #e2e8f0; padding: 12px; color: var(--nav-navy); font-size: 11px; font-weight: 800; border: 1px solid #cbd5e1; }
-        td { border: 1px solid #cbd5e1; text-align: center; height: 45px; font-size: 12px; }
-        .excel-input { width: 100%; height: 100%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; }
-        
-        .notes-cell { cursor: pointer; color: #64748b; font-style: italic; background: #fafafa; }
-        
-        /* Modal Sticker */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 2000; }
-        .sticker { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; background: var(--sticker-yellow); padding: 20px; border-radius: 2px; box-shadow: 5px 5px 15px rgba(0,0,0,0.2); }
+        .btn-top { border: none; padding: 8px 20px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 13px; transition: 0.3s; color: white; }
+        .btn-add { background-color: var(--accent-blue); }
+        .btn-save-all { background-color: var(--accent-green-dim); color: #065f46; opacity: 0.6; pointer-events: none; }
+        .btn-save-all.active { background-color: var(--accent-green-active); color: white; opacity: 1; pointer-events: auto; }
+
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; background: white; border: 1px solid var(--border-color); }
+        th { background-color: #e2e8f0; padding: 8px 2px; color: var(--nav-navy); font-size: 11px; font-weight: 800; border: 1px solid var(--border-color); }
+        td { padding: 0; border: 1px solid var(--border-color); text-align: center; height: 38px; font-size: 11px; }
+
+        .excel-input { width: 100%; height: 100%; border: none; padding: 0 5px; font-family: 'Cairo'; font-size: 11px; text-align: center; outline: none; background: transparent; }
+        .btn-delete { border: none; background-color: #fee2e2; color: var(--accent-red); padding: 4px 10px; border-radius: 4px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 10px; }
+        .updated-at { font-size: 10px; color: #475569; font-weight: bold; }
+
+        /* نافذة التأكيد */
+        .custom-confirm {
+            position: fixed; top: 30%; left: 50%; transform: translate(-50%, -50%);
+            background: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            z-index: 1000; display: none; text-align: center; border: 2px solid var(--nav-navy);
+        }
+        .confirm-btns { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
+        .btn-yes { background: var(--accent-green-active); color: white; border: none; padding: 8px 25px; border-radius: 5px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
+        .btn-no { background: var(--accent-red); color: white; border: none; padding: 8px 25px; border-radius: 5px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
     </style>
 </head>
-<body onload="loadVisits()">
-    <nav class="navbar">
-        <a href="index.html">الرئيسية</a>
-        <a href="visits.html" class="active">الزيارات</a>
-        <a href="opportunities.html">الفرص البيعية</a>
-        <a href="customers.html">العملاء</a>
-    </nav>
-    <div class="container">
-        <button class="btn-top" onclick="addNewVisit()">+ إضافة زيارة جديدة</button>
-        <table id="mainTable">
-            <thead>
-                <tr>
-                    <th style="width:15%">الشركة</th><th style="width:10%">المسؤول</th><th style="width:10%">الموبايل</th>
-                    <th style="width:10%">الحالة</th><th style="width:10%">التاريخ</th><th style="width:30%">الملاحظات</th><th style="width:5%">-</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-        </table>
+<body onload="loadSavedData()">
+
+<div id="confirmBox" class="custom-confirm">
+    <p id="confirmMsg" style="font-weight: bold;"></p>
+    <div class="confirm-btns">
+        <button class="btn-yes" id="confirmBtn">نعم</button>
+        <button class="btn-no" onclick="closeConfirm()">لا</button>
+    </div>
+</div>
+
+<nav class="navbar">
+    <a href="index.html">الرئيسية</a>
+    <a href="visits.html" class="active">الزيارات</a>
+    <a href="opportunities.html">الفرص البيعية</a>
+    <a href="customers.html">العملاء</a>
+</nav>
+
+<div class="container">
+    <div class="action-bar">
+        <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة زيارة</button>
+        <button id="saveAllBtn" class="btn-top btn-save-all" onclick="saveAllData()">حفظ التغييرات</button>
     </div>
 
-    <script>
-        function loadVisits() {
-            const data = JSON.parse(localStorage.getItem('asgate_visits_data') || '[]');
+    <table id="mainTable">
+        <thead>
+            <tr>
+                <th style="width: 14%;">الشركة</th>
+                <th>المسؤول</th>
+                <th style="width: 12%;">الموبايل</th>
+                <th>السجل</th>
+                <th>الخدمة الحالية</th>
+                <th>الخدمة المقترحة</th>
+                <th style="width: 80px;">الحالة</th>
+                <th style="width: 100px;">تاريخ الزيارة</th>
+                <th style="width: 100px;">تاريخ التعديل</th>
+                <th style="width: 70px;">إجراء</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+</div>
+
+<script>
+    let isDirty = false;
+    const statusOrder = { "مهتم": 4, "50%": 3, "20%": 2, "فقدان": 1 };
+
+    function loadSavedData() {
+        const saved = localStorage.getItem('asgate_visits_data');
+        if (saved) {
+            let data = JSON.parse(saved);
+            data.sort((a, b) => (statusOrder[b.status] || 0) - (statusOrder[a.status] || 0));
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
-            data.forEach((v, idx) => renderRow(v, idx));
+            data.forEach(item => renderRow(item));
         }
+        toggleSaveBtn(false);
+    }
 
-        function renderRow(v, idx) {
-            const tbody = document.getElementById('tableBody');
-            const row = tbody.insertRow();
-            row.innerHTML = `
-                <td><input type="text" class="excel-input" value="${v.comp}" onchange="updateVal(${idx}, 'comp', this.value)"></td>
-                <td><input type="text" class="excel-input" value="${v.mgr}" onchange="updateVal(${idx}, 'mgr', this.value)"></td>
-                <td><input type="text" class="excel-input" value="${v.mob}" onchange="updateVal(${idx}, 'mob', this.value)"></td>
-                <td>
-                    <select class="excel-input" onchange="checkStatus(${idx}, this.value)">
-                        <option ${v.status==='زيارة'?'selected':''}>زيارة</option>
-                        <option ${v.status==='مهتم'?'selected':''}>مهتم</option>
-                    </select>
-                </td>
-                <td><input type="date" class="excel-input" value="${v.date}" onchange="updateVal(${idx}, 'date', this.value)"></td>
-                <td class="notes-cell" onclick="alert('خاصية الاستيكر تعمل عند الحفظ')">${v.notes ? "عرض الملاحظات" : "اضف ملاحظة..."}</td>
-                <td><button onclick="deleteVisit(${idx})" style="color:red; border:none; background:none; cursor:pointer;">X</button></td>
-            `;
-        }
+    function renderRow(v, isNew = false) {
+        const tbody = document.getElementById('tableBody');
+        const row = tbody.insertRow(isNew ? 0 : -1);
+        row.setAttribute('data-created', v.created || v.date);
 
-        function checkStatus(idx, val) {
-            let data = JSON.parse(localStorage.getItem('asgate_visits_data'));
-            if(val === 'مهتم') {
-                let opps = JSON.parse(localStorage.getItem('asgate_opportunities_data') || '[]');
-                opps.push(data[idx]);
-                localStorage.setItem('asgate_opportunities_data', JSON.stringify(opps));
-                data.splice(idx, 1);
-                alert("تم التحويل للفرص البيعية");
-            } else { data[idx].status = val; }
-            localStorage.setItem('asgate_visits_data', JSON.stringify(data));
-            loadVisits();
-        }
+        row.innerHTML = `
+            <td><input type="text" class="excel-input" value="${v.comp}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.mgr}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.mob}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.cr}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.curr}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.prop}" oninput="markAsChanged(this)"></td>
+            <td>
+                <select class="excel-input" onchange="checkStatus(this)">
+                    <option value="" ${!v.status ? 'selected' : ''}>-</option>
+                    <option ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option>
+                    <option ${v.status === '50%' ? 'selected' : ''}>50%</option>
+                    <option ${v.status === '20%' ? 'selected' : ''}>20%</option>
+                    <option ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option>
+                </select>
+            </td>
+            <td><input type="date" class="excel-input" value="${v.date}" oninput="markAsChanged(this)"></td>
+            <td class="updated-at">${v.updated}</td>
+            <td><button class="btn-delete" onclick="deleteRow(this)">حذف</button></td>
+        `;
+    }
 
-        function updateVal(idx, key, val) {
-            let data = JSON.parse(localStorage.getItem('asgate_visits_data'));
-            data[idx][key] = val;
-            localStorage.setItem('asgate_visits_data', JSON.stringify(data));
+    function checkStatus(el) {
+        markAsChanged(el);
+        if (el.value === 'مهتم') {
+            showConfirm("هل تريد نقل الزيارة إلى الفرص البيعية؟", () => transferToOpps(el.closest('tr')));
         }
+    }
 
-        function addNewVisit() {
-            let data = JSON.parse(localStorage.getItem('asgate_visits_data') || '[]');
-            data.push({comp: '', mgr: '', mob: '', status: 'زيارة', date: new Date().toISOString().split('T')[0], notes: ''});
-            localStorage.setItem('asgate_visits_data', JSON.stringify(data));
-            loadVisits();
-        }
+    function showConfirm(msg, action) {
+        document.getElementById('confirmMsg').innerText = msg;
+        document.getElementById('confirmBox').style.display = 'block';
+        document.getElementById('confirmBtn').onclick = () => { action(); closeConfirm(); };
+    }
 
-        function deleteVisit(idx) {
-            let data = JSON.parse(localStorage.getItem('asgate_visits_data'));
-            data.splice(idx, 1);
-            localStorage.setItem('asgate_visits_data', JSON.stringify(data));
-            loadVisits();
+    function closeConfirm() { document.getElementById('confirmBox').style.display = 'none'; }
+
+    function transferToOpps(row) {
+        const ins = row.querySelectorAll('.excel-input');
+        const rowData = {
+            comp: ins[0].value, mgr: ins[1].value, mob: ins[2].value,
+            cr: ins[3].value, curr: ins[4].value, prop: ins[5].value,
+            status: 'مهتم', date: ins[7].value,
+            updated: new Date().toLocaleDateString('en-GB'),
+            created: row.getAttribute('data-created')
+        };
+        
+        let oppsData = JSON.parse(localStorage.getItem('asgate_opportunities_data') || '[]');
+        oppsData.push(rowData);
+        localStorage.setItem('asgate_opportunities_data', JSON.stringify(oppsData));
+        
+        row.remove();
+        saveAllData(); // حفظ التغييرات فوراً بعد النقل
+    }
+
+    function insertNewRow() {
+        const todayStr = new Date().toISOString().split('T')[0];
+        renderRow({ comp:'', mgr:'', mob:'', cr:'', curr:'', prop:'', status:'', date: todayStr, updated: '-', created: todayStr }, true);
+        toggleSaveBtn(true);
+    }
+
+    function markAsChanged(el) {
+        toggleSaveBtn(true);
+        const row = el.closest('tr');
+        const createdDate = row.getAttribute('data-created');
+        const today = new Date().toISOString().split('T')[0];
+        if (today !== createdDate) {
+            row.setAttribute('data-pending-update', new Date().toLocaleDateString('en-GB'));
         }
-    </script>
+    }
+
+    function toggleSaveBtn(active) {
+        isDirty = active;
+        const btn = document.getElementById('saveAllBtn');
+        if(active) btn.classList.add('active'); else btn.classList.remove('active');
+    }
+
+    function saveAllData() {
+        const rows = document.querySelectorAll('#tableBody tr');
+        const allData = [];
+        rows.forEach(row => {
+            const ins = row.querySelectorAll('.excel-input');
+            let updatedAt = row.querySelector('.updated-at').innerText;
+            if (row.getAttribute('data-pending-update')) updatedAt = row.getAttribute('data-pending-update');
+            allData.push({
+                comp: ins[0].value, mgr: ins[1].value, mob: ins[2].value,
+                cr: ins[3].value, curr: ins[4].value, prop: ins[5].value,
+                status: ins[6].value, date: ins[7].value, updated: updatedAt,
+                created: row.getAttribute('data-created')
+            });
+        });
+        localStorage.setItem('asgate_visits_data', JSON.stringify(allData));
+        loadSavedData();
+    }
+
+    function deleteRow(btn) { if(confirm("هل أنت متأكد من حذف الزيارة؟")) { btn.closest('tr').remove(); saveAllData(); } }
+</script>
 </body>
 </html>
