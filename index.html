@@ -18,20 +18,33 @@
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; overflow-x: hidden; }
 
-        /* شريط التنقل بحواف دائرية */
+        /* شريط التنقل بحواف دائرية - تم تعديل الارتفاع بدقة إلى 42px */
         .navbar { 
             background-color: var(--nav-navy); 
             display: flex; 
-            padding: 8px 20px; 
+            align-items: center;  /* يضمن توسيط الروابط عمودياً تماماً */
+            padding: 0 20px;      /* إزالة الـ padding العلوي والسفلي والاعتماد على الارتفاع الثابت */
             margin: 10px; 
             border-radius: 15px; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             position: sticky;
             top: 10px;
             z-index: 1000;
+            height: 42px;         /* الارتفاع المطلوب بدقة */
+            box-sizing: border-box;
         }
-        /* تم تعديل الروابط هنا لتقتصر على الصفحات الأربع المطلوبة */
-        .navbar a { color: white; text-decoration: none; padding: 6px 15px; margin-left: 5px; font-weight: 700; font-size: 11px; border-radius: 10px; transition: 0.3s; }
+        
+        .navbar a { 
+            color: white; 
+            text-decoration: none; 
+            padding: 6px 15px;    /* حشوة الروابط الداخلية بقيت ثابتة للتناسق */
+            margin-left: 5px; 
+            font-weight: 700; 
+            font-size: 11px; 
+            border-radius: 10px; 
+            transition: 0.3s; 
+            line-height: 1;       /* مهمة جداً لمنع امتداد الصندوق برمجياً */
+        }
         .navbar a.active { background-color: rgba(255,255,255,0.1); }
         .navbar a:hover { background-color: rgba(255,255,255,0.05); }
 
@@ -59,7 +72,7 @@
         .table-area { 
             flex: 2; 
             min-width: 400px; 
-        }
+            }
 
         .search-filter-box { 
             width: 250px; 
@@ -94,7 +107,8 @@
     <nav class="navbar">
         <a href="index.html" class="active">الرئيسية</a>
         <a href="visits.html">الزيارات</a>
-        <a href="opportunities.html">الفرص البيعية</a> <a href="customers.html">العملاء</a>
+        <a href="opportunities.html">الفرص البيعية</a> 
+        <a href="customers.html">العملاء</a>
     </nav>
 
     <div class="user-info-bar">
