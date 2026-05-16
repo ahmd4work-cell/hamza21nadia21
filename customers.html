@@ -6,8 +6,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --nav-dark-green: #064e3b; /* لون أخضر داكن للشريط */
-            --active-light-green: #4ade80; /* لون أخضر فاتح للرابط النشط */
+            --nav-ultra-purple: #2e1065; /* اللون البنفسجي الداكن جداً الموحد */
+            --active-light-purple: #a78bfa; /* اللون البنفسجي الفاتح للرابط النشط */
             --bg-color: #f4f7f9;
             --accent-blue: #3b82f6;
             --border-color: #cbd5e1;
@@ -16,9 +16,9 @@
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; }
 
-        /* شريط التنقل - الارتفاع 37 بكسل */
+        /* شريط التنقل الموحد - الارتفاع 37 بكسل */
         .navbar { 
-            background-color: var(--nav-dark-green); 
+            background-color: var(--nav-ultra-purple); 
             display: flex; 
             align-items: center; 
             padding: 0 20px; 
@@ -28,7 +28,7 @@
             position: sticky;
             top: 10px;
             z-index: 1000;
-            height: 37px; /* الارتفاع المطلوب بدقة */
+            height: 37px; 
             box-sizing: border-box;
         }
 
@@ -44,28 +44,27 @@
             line-height: 1;
         }
 
-        /* تمييز كلمة العملاء بمربع أخضر فاتح دائري الحواف */
+        /* تمييز كلمة العملاء بمربع بنفسجي فاتح */
         .navbar a.active { 
-            background-color: var(--active-light-green); 
-            color: var(--nav-dark-green); /* نص داكن داخل المربع الفاتح */
+            background-color: var(--active-light-purple); 
+            color: white; 
             border-radius: 8px;
         }
         
         .navbar a:hover:not(.active) { background-color: rgba(255,255,255,0.1); }
 
-        /* باقي التنسيقات للجداول والأزرار */
         .container { padding: 5px 10px; }
         .action-bar { display: flex; align-items: center; margin-top: 15px; margin-bottom: 20px; gap: 10px; padding: 10px 0; }
         .btn-top { border: none; padding: 8px 20px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 13px; color: white; transition: 0.3s; }
         
         table { width: 100%; border-collapse: collapse; table-layout: fixed; background: white; border: 1px solid var(--border-color); }
-        th { background-color: #e2e8f0; padding: 8px 2px; color: var(--nav-dark-green); font-size: 10px; font-weight: 800; border: 1px solid var(--border-color); }
+        th { background-color: #f5f3ff; padding: 8px 2px; color: var(--nav-ultra-purple); font-size: 10px; font-weight: 800; border: 1px solid var(--border-color); }
         td { border: 1px solid var(--border-color); text-align: center; height: 38px; font-size: 11px; }
 
         .excel-input { width: 100%; height: 100%; border: none; padding: 0 5px; font-family: 'Cairo'; font-size: 11px; text-align: center; outline: none; background: transparent; }
         .notes-cell { cursor: pointer; color: #475569; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 8px; text-align: right; font-style: italic; }
 
-        /* نظام الاستيكر */
+        /* نظام الملاحظات (الاستيكر) */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 2000; }
         .sticker-container {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -80,7 +79,7 @@
         .sticker-save-btn { width: 100%; border: none; padding: 7px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; font-size: 11px; background-color: #81c784; }
         .sticker-save-btn.active { background-color: #22c55e; }
 
-        .custom-confirm { position: fixed; top: 20%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: none; text-align: center; border: 2px solid var(--nav-dark-green); z-index: 3000; min-width: 250px; }
+        .custom-confirm { position: fixed; top: 20%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: none; text-align: center; border: 2px solid var(--nav-ultra-purple); z-index: 3000; min-width: 250px; }
     </style>
 </head>
 <body onload="loadSavedData()">
@@ -132,7 +131,6 @@
 </div>
 
 <script>
-    // الدوال البرمجية (Logic) كما هي لضمان استمرار عمل قاعدة البيانات المحلية
     let isDirty = false; 
     let activeCell = null; 
     let isStickerChanged = false;
@@ -183,17 +181,14 @@
     }
 
     function closeConfirm() { document.getElementById('confirmBox').style.display = 'none'; }
-    function markAsChanged(el) { toggleSaveBtn(true); }
     
-    function toggleSaveBtn(active) { 
-        isDirty = active; 
+    function markAsChanged() { 
+        isDirty = true; 
         const btn = document.getElementById('saveAllBtn');
-        if(active) {
-            btn.style.backgroundColor = "#22c55e";
-            btn.style.color = "white";
-            btn.style.opacity = "1";
-            btn.style.pointerEvents = "auto";
-        }
+        btn.style.backgroundColor = "#22c55e";
+        btn.style.color = "white";
+        btn.style.opacity = "1";
+        btn.style.pointerEvents = "auto";
     }
 
     function loadSavedData() {
@@ -204,19 +199,18 @@
             tbody.innerHTML = '';
             data.forEach(item => renderRow(item));
         }
-        toggleSaveBtn(false);
     }
 
     function renderRow(v, isNew = false) {
         const tbody = document.getElementById('tableBody');
         const row = tbody.insertRow(isNew ? 0 : -1);
         row.innerHTML = `
-            <td><input type="text" class="excel-input" value="${v.comp || ''}" oninput="markAsChanged(this)"></td>
-            <td><input type="text" class="excel-input" value="${v.address || ''}" oninput="markAsChanged(this)"></td>
-            <td><input type="text" class="excel-input" value="${v.mgr || ''}" oninput="markAsChanged(this)"></td>
-            <td><input type="text" class="excel-input" value="${v.mob || ''}" oninput="markAsChanged(this)"></td>
-            <td><input type="text" class="excel-input" value="${v.cr || ''}" oninput="markAsChanged(this)"></td>
-            <td><input type="text" class="excel-input" value="${v.salesman || ''}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.comp || ''}" oninput="markAsChanged()"></td>
+            <td><input type="text" class="excel-input" value="${v.address || ''}" oninput="markAsChanged()"></td>
+            <td><input type="text" class="excel-input" value="${v.mgr || ''}" oninput="markAsChanged()"></td>
+            <td><input type="text" class="excel-input" value="${v.mob || ''}" oninput="markAsChanged()"></td>
+            <td><input type="text" class="excel-input" value="${v.cr || ''}" oninput="markAsChanged()"></td>
+            <td><input type="text" class="excel-input" value="${v.salesman || ''}" oninput="markAsChanged()"></td>
             <td class="notes-cell" data-notes='${v.notes || "[]"}' onclick="openSticker(this)">${getDisplayNote(v.notes || "[]")}</td>
             <td><button style="border:none; background:#fee2e2; color:red; cursor:pointer; font-size:10px; border-radius:4px; padding:4px;" onclick="deleteRow(this)">حذف</button></td>
         `;
@@ -232,7 +226,7 @@
             } else { notes.push({ date: todayStr, text: text }); }
             activeCell.setAttribute('data-notes', JSON.stringify(notes));
             activeCell.innerText = getDisplayNote(JSON.stringify(notes));
-            toggleSaveBtn(true);
+            markAsChanged();
         }
         isStickerChanged = false; 
         document.getElementById('notesOverlay').style.display = 'none'; 
@@ -257,7 +251,7 @@
         location.reload();
     }
 
-    function insertNewRow() { renderRow({}, true); toggleSaveBtn(true); }
+    function insertNewRow() { renderRow({}, true); markAsChanged(); }
     function deleteRow(btn) { if(confirm("حذف العميل؟")) { btn.closest('tr').remove(); saveAllData(); } }
 </script>
 </body>
