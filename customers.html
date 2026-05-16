@@ -6,19 +6,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --nav-ultra-purple: #2e1065; /* اللون البنفسجي الداكن جداً الموحد */
-            --active-light-purple: #a78bfa; /* اللون البنفسجي الفاتح للرابط النشط */
+            /* درجات البنفسجي المطلوبة */
+            --nav-bg: #2e1065;          /* بنفسجي داكن جداً */
+            --nav-active: #a78bfa;      /* بنفسجي فاتح للمربع */
             --bg-color: #f4f7f9;
             --accent-blue: #3b82f6;
             --border-color: #cbd5e1;
             --sticker-yellow: #fff9c4;
+            --accent-green-active: #22c55e;
+            --accent-green-dim: #d1fae5;
         }
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; }
 
-        /* شريط التنقل الموحد - الارتفاع 37 بكسل */
+        /* شريط التنقل - ارتفاع 37px */
         .navbar { 
-            background-color: var(--nav-ultra-purple); 
+            background-color: var(--nav-bg); 
             display: flex; 
             align-items: center; 
             padding: 0 20px; 
@@ -33,32 +36,36 @@
         }
 
         .navbar a { 
-            color: white; 
+            color: white;               /* لون الخط أبيض */
             text-decoration: none; 
-            padding: 4px 15px; 
+            padding: 0 15px; 
             margin-left: 5px; 
             font-weight: 700; 
-            font-size: 11px; 
-            border-radius: 10px; 
+            font-size: 12px;            /* حجم الخط 12 بكسل */
+            border-radius: 8px;         /* مربع دائري الحواف */
             transition: 0.3s; 
-            line-height: 1;
+            line-height: 26px;          /* لتوسيط النص داخل المربع */
+            height: 26px;
+            display: inline-block;
         }
 
-        /* تمييز كلمة العملاء بمربع بنفسجي فاتح */
+        /* الصفحة النشطة: مربع بنفسجي فاتح */
         .navbar a.active { 
-            background-color: var(--active-light-purple); 
+            background-color: var(--nav-active); 
             color: white; 
-            border-radius: 8px;
         }
-        
+
         .navbar a:hover:not(.active) { background-color: rgba(255,255,255,0.1); }
 
         .container { padding: 5px 10px; }
         .action-bar { display: flex; align-items: center; margin-top: 15px; margin-bottom: 20px; gap: 10px; padding: 10px 0; }
-        .btn-top { border: none; padding: 8px 20px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 13px; color: white; transition: 0.3s; }
         
+        .btn-top { border: none; padding: 8px 20px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 13px; color: white; transition: 0.3s; }
+        .btn-save-all { background-color: var(--accent-green-dim); color: #065f46; opacity: 0.6; pointer-events: none; }
+        .btn-save-all.active { background-color: var(--accent-green-active); color: white; opacity: 1; pointer-events: auto; }
+
         table { width: 100%; border-collapse: collapse; table-layout: fixed; background: white; border: 1px solid var(--border-color); }
-        th { background-color: #f5f3ff; padding: 8px 2px; color: var(--nav-ultra-purple); font-size: 10px; font-weight: 800; border: 1px solid var(--border-color); }
+        th { background-color: #f5f3ff; padding: 8px 2px; color: var(--nav-bg); font-size: 10px; font-weight: 800; border: 1px solid var(--border-color); }
         td { border: 1px solid var(--border-color); text-align: center; height: 38px; font-size: 11px; }
 
         .excel-input { width: 100%; height: 100%; border: none; padding: 0 5px; font-family: 'Cairo'; font-size: 11px; text-align: center; outline: none; background: transparent; }
@@ -79,7 +86,7 @@
         .sticker-save-btn { width: 100%; border: none; padding: 7px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; font-size: 11px; background-color: #81c784; }
         .sticker-save-btn.active { background-color: #22c55e; }
 
-        .custom-confirm { position: fixed; top: 20%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: none; text-align: center; border: 2px solid var(--nav-ultra-purple); z-index: 3000; min-width: 250px; }
+        .custom-confirm { position: fixed; top: 20%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: none; text-align: center; border: 2px solid var(--nav-bg); z-index: 3000; min-width: 250px; }
     </style>
 </head>
 <body onload="loadSavedData()">
@@ -94,7 +101,7 @@
 <div class="container">
     <div class="action-bar">
         <button class="btn-top" style="background:var(--accent-blue)" onclick="insertNewRow()">+ إضافة عميل جديد</button>
-        <button id="saveAllBtn" class="btn-top" style="background:#d1fae5; color:#065f46; opacity:0.6; pointer-events:none;" onclick="saveAllData()">حفظ التغييرات</button>
+        <button id="saveAllBtn" class="btn-top btn-save-all" onclick="saveAllData()">حفظ التغييرات</button>
     </div>
     <table id="mainTable">
         <thead>
@@ -181,15 +188,8 @@
     }
 
     function closeConfirm() { document.getElementById('confirmBox').style.display = 'none'; }
-    
-    function markAsChanged() { 
-        isDirty = true; 
-        const btn = document.getElementById('saveAllBtn');
-        btn.style.backgroundColor = "#22c55e";
-        btn.style.color = "white";
-        btn.style.opacity = "1";
-        btn.style.pointerEvents = "auto";
-    }
+    function markAsChanged() { toggleSaveBtn(true); }
+    function toggleSaveBtn(active) { isDirty = active; document.getElementById('saveAllBtn').classList.toggle('active', active); }
 
     function loadSavedData() {
         const saved = localStorage.getItem('asgate_customers_data');
@@ -199,6 +199,7 @@
             tbody.innerHTML = '';
             data.forEach(item => renderRow(item));
         }
+        toggleSaveBtn(false);
     }
 
     function renderRow(v, isNew = false) {
@@ -226,7 +227,7 @@
             } else { notes.push({ date: todayStr, text: text }); }
             activeCell.setAttribute('data-notes', JSON.stringify(notes));
             activeCell.innerText = getDisplayNote(JSON.stringify(notes));
-            markAsChanged();
+            toggleSaveBtn(true);
         }
         isStickerChanged = false; 
         document.getElementById('notesOverlay').style.display = 'none'; 
@@ -238,20 +239,16 @@
         document.querySelectorAll('#tableBody tr').forEach(row => {
             const ins = row.querySelectorAll('.excel-input');
             allData.push({ 
-                comp: ins[0].value, 
-                address: ins[1].value, 
-                mgr: ins[2].value, 
-                mob: ins[3].value, 
-                cr: ins[4].value, 
-                salesman: ins[5].value, 
+                comp: ins[0].value, address: ins[1].value, mgr: ins[2].value, 
+                mob: ins[3].value, cr: ins[4].value, salesman: ins[5].value, 
                 notes: row.querySelector('.notes-cell').getAttribute('data-notes') 
             });
         });
         localStorage.setItem('asgate_customers_data', JSON.stringify(allData)); 
-        location.reload();
+        loadSavedData();
     }
 
-    function insertNewRow() { renderRow({}, true); markAsChanged(); }
+    function insertNewRow() { renderRow({}, true); toggleSaveBtn(true); }
     function deleteRow(btn) { if(confirm("حذف العميل؟")) { btn.closest('tr').remove(); saveAllData(); } }
 </script>
 </body>
