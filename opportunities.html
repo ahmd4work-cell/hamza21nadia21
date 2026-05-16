@@ -6,7 +6,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --nav-dark-purple: #4c1d95; /* لون بنفسجي داكن للشريط */
+            --nav-ultra-purple: #2e1065; /* لون بنفسجي داكن جداً (مطابق لصفحة الزيارات) */
             --active-light-purple: #a78bfa; /* لون بنفسجي فاتح للرابط النشط */
             --bg-color: #f4f7f9;
             --accent-blue: #3b82f6;
@@ -15,9 +15,9 @@
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; }
 
-        /* شريط التنقل الموحد - ارتفاع 37 بكسل */
+        /* شريط التنقل الموحد - الارتفاع 37 بكسل */
         .navbar { 
-            background-color: var(--nav-dark-purple); 
+            background-color: var(--nav-ultra-purple); 
             display: flex; 
             align-items: center; 
             padding: 0 20px; 
@@ -43,7 +43,7 @@
             line-height: 1;
         }
 
-        /* تمييز الفرص البيعية بمربع بنفسجي فاتح */
+        /* تمييز كلمة الفرص البيعية بمربع بنفسجي فاتح */
         .navbar a.active { 
             background-color: var(--active-light-purple); 
             color: white; 
@@ -52,13 +52,13 @@
         
         .navbar a:hover:not(.active) { background-color: rgba(255,255,255,0.1); }
 
+        /* تنسيقات الجدول والمحتوى */
         .container { padding: 5px 10px; }
         .action-bar { display: flex; align-items: center; margin-top: 15px; margin-bottom: 20px; gap: 10px; padding: 10px 0; }
-        
         .btn-top { border: none; padding: 8px 20px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 13px; color: white; transition: 0.3s; }
-
+        
         table { width: 100%; border-collapse: collapse; table-layout: fixed; background: white; border: 1px solid var(--border-color); }
-        th { background-color: #f5f3ff; padding: 8px 2px; color: var(--nav-dark-purple); font-size: 10px; font-weight: 800; border: 1px solid var(--border-color); }
+        th { background-color: #f5f3ff; padding: 8px 2px; color: var(--nav-ultra-purple); font-size: 10px; font-weight: 800; border: 1px solid var(--border-color); }
         td { border: 1px solid var(--border-color); text-align: center; height: 38px; font-size: 11px; }
 
         .excel-input { width: 100%; height: 100%; border: none; padding: 0 5px; font-family: 'Cairo'; font-size: 11px; text-align: center; outline: none; background: transparent; }
