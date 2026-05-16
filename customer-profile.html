@@ -18,48 +18,69 @@
         .navbar { background-color: var(--nav-purple); display: flex; align-items: center; padding: 0 20px; margin: 5px 10px; border-radius: 10px; height: 32px; }
         .navbar a { color: white; text-decoration: none; padding: 0 12px; font-weight: 700; font-size: 11px; }
 
-        .container { padding: 5px 15px; max-width: 1300px; margin: auto; }
+        .container { padding: 5px 15px; max-width: 100%; margin: auto; }
 
-        /* الأقسام المدمجة جداً */
+        /* الأقسام المدمجة مع توزيع المسافات */
         .compact-section { 
-            background: var(--white); border-radius: 8px; padding: 6px 15px; 
+            background: var(--white); border-radius: 8px; padding: 8px 20px; 
             box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 6px;
             border-right: 4px solid var(--nav-purple);
-            display: flex; align-items: center; gap: 20px;
+            display: flex; flex-direction: column; /* للسماح بوجود أسطر داخل القسم */
         }
 
-        .section-label { font-size: 12px; color: var(--nav-purple); font-weight: 800; min-width: 100px; white-space: nowrap; }
+        .row-wrapper { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; /* هذا يوزع العناصر على كامل العرض */
+            width: 100%; 
+        }
 
-        /* توزيع البيانات في سطر واحد */
-        .data-row-inline { display: flex; flex-grow: 1; gap: 25px; align-items: center; }
+        .section-label { font-size: 12px; color: var(--nav-purple); font-weight: 800; min-width: 120px; }
+
+        /* توزيع البيانات بالتساوي */
+        .data-row-inline { 
+            display: flex; 
+            flex-grow: 1; 
+            justify-content: space-between; /* توزيع المسافات بين المعلومات */
+            align-items: center;
+            margin-right: 20px; /* مسافة بسيطة بعد العنوان الرئيسي */
+        }
         
         .info-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
         .info-item label { color: #94a3b8; font-weight: bold; white-space: nowrap; }
         .info-item span { color: #1e293b; font-weight: 700; }
 
+        /* زر جديد في سطر منفصل */
+        .add-mgr-row {
+            margin-top: 5px;
+            padding-top: 5px;
+            border-top: 1px dashed #f1f5f9;
+        }
         .add-mgr-btn {
             background: #f1f5f9; color: var(--nav-purple); font-size: 10px; font-weight: bold; 
-            padding: 2px 8px; border-radius: 4px; cursor: pointer; border: 1px solid #e2e8f0;
+            padding: 2px 12px; border-radius: 4px; cursor: pointer; border: 1px solid #e2e8f0;
+            display: inline-block; transition: 0.2s;
         }
+        .add-mgr-btn:hover { background: var(--nav-purple); color: white; }
 
-        /* شريط التحكم المدمج */
+        /* شريط التحكم */
         .control-strip { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 
         .action-btn {
-            border: none; border-radius: 6px; padding: 0 12px; 
+            border: none; border-radius: 6px; padding: 0 15px; 
             color: white; font-family: 'Cairo'; font-weight: bold; font-size: 11px; 
-            cursor: pointer; height: 28px; display: flex; align-items: center; gap: 5px;
+            cursor: pointer; height: 30px; display: flex; align-items: center; gap: 5px;
         }
         .btn-green { background-color: var(--order-green); }
         .btn-yellow { background-color: var(--visit-yellow); }
 
         .tabs-wrapper { 
             display: flex; background: var(--nav-purple); padding: 2px; 
-            border-radius: 8px; gap: 2px; flex-grow: 1; height: 28px; align-items: center;
+            border-radius: 8px; gap: 2px; flex-grow: 1; height: 30px; align-items: center;
         }
         .tab-btn { 
             flex: 1; border: none; background: transparent; color: rgba(255,255,255,0.6); 
-            height: 24px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; 
+            height: 26px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; 
             font-size: 11px; border-radius: 6px;
         }
         .tab-btn.active { background: var(--nav-active); color: white; }
@@ -67,15 +88,15 @@
         /* منطقة المحتوى */
         .content-area { 
             background: white; border-radius: 10px; padding: 12px; 
-            min-height: 180px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            min-height: 200px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             border: 2px solid transparent;
         }
         .content-area.mode-visit { border-color: var(--visit-yellow); background-color: #fffef9; }
         .content-area.mode-order { border-color: var(--order-green); background-color: #fafffb; }
 
         table { width: 100%; border-collapse: collapse; font-size: 11px; }
-        th { text-align: right; color: #64748b; padding: 6px; border-bottom: 2px solid #eee; }
-        td { padding: 6px; border-bottom: 1px solid #eee; }
+        th { text-align: right; color: #64748b; padding: 8px; border-bottom: 2px solid #eee; }
+        td { padding: 8px; border-bottom: 1px solid #eee; }
     </style>
 </head>
 <body onload="loadClientData()">
@@ -89,23 +110,29 @@
 
 <div class="container">
     <div class="compact-section">
-        <div class="section-label">🏢 بيانات المنشأة:</div>
-        <div class="data-row-inline">
-            <div class="info-item"><label>الشركة:</label><span id="c-name">-</span></div>
-            <div class="info-item"><label>السجل:</label><span id="c-cr">-</span></div>
-            <div class="info-item"><label>العنوان:</label><span id="c-addr">-</span></div>
+        <div class="row-wrapper">
+            <div class="section-label">🏢 بيانات المنشأة:</div>
+            <div class="data-row-inline">
+                <div class="info-item"><label>الشركة:</label><span id="c-name">-</span></div>
+                <div class="info-item"><label>السجل:</label><span id="c-cr">-</span></div>
+                <div class="info-item"><label>العنوان:</label><span id="c-addr">-</span></div>
+            </div>
         </div>
     </div>
 
     <div class="compact-section">
-        <div class="section-label">👤 المسؤول المباشر:</div>
-        <div class="data-row-inline">
-            <div class="info-item"><label>الاسم:</label><span id="m-name">-</span></div>
-            <div class="info-item"><label>الموبايل:</label><span id="m-mob">-</span></div>
-            <div class="info-item"><label>الايميل:</label><span id="m-email">info@asgate.sa</span></div>
-            <div class="info-item"><label>رقم آخر:</label><span>-</span></div>
-            <div class="info-item"><label>أضيف في:</label><span>16/05/2026</span></div>
-            <div class="add-mgr-btn" onclick="alert('إضافة مسؤول')">✚ جديد</div>
+        <div class="row-wrapper">
+            <div class="section-label">👤 المسؤول المباشر:</div>
+            <div class="data-row-inline">
+                <div class="info-item"><label>الاسم:</label><span id="m-name">-</span></div>
+                <div class="info-item"><label>الموبايل:</label><span id="m-mob">-</span></div>
+                <div class="info-item"><label>الايميل:</label><span id="m-email">info@asgate.sa</span></div>
+                <div class="info-item"><label>رقم آخر:</label><span>-</span></div>
+                <div class="info-item"><label>أضيف في:</label><span>16/05/2026</span></div>
+            </div>
+        </div>
+        <div class="add-mgr-row">
+            <div class="add-mgr-btn" onclick="alert('إضافة مسؤول جديد')">✚ إضافة مسؤول آخر</div>
         </div>
     </div>
 
