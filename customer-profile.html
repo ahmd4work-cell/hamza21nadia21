@@ -2,118 +2,146 @@
 <html dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>ملف العميل | ASGate</title>
+    <title>ASGate - ملف العميل</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --nav-purple: #2e1065; --nav-active: #a78bfa; --bg: #f4f7f9; --white: #ffffff; }
-        body { background-color: var(--bg); font-family: 'Cairo', sans-serif; margin: 0; }
-        
-        .navbar { background-color: var(--nav-purple); display: flex; align-items: center; padding: 0 20px; margin: 10px; border-radius: 15px; height: 37px; }
-        .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; }
-
-        .container { padding: 15px; max-width: 1200px; margin: auto; }
-
-        /* القسم العلوي: بيانات الشركة */
-        .header-card { 
-            background: var(--white); border-radius: 15px; padding: 20px; 
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 15px;
-            border-right: 6px solid var(--nav-purple);
+        :root {
+            --nav-bg: #2e1065;
+            --accent-green: #22c55e;
+            --bg-color: #f4f7f9;
         }
-        .header-card div label { display: block; font-size: 11px; color: #64748b; font-weight: bold; }
-        .header-card div span { font-size: 16px; font-weight: 800; color: var(--nav-purple); }
+        body { font-family: 'Cairo', sans-serif; background-color: var(--bg-color); margin: 0; padding: 20px; }
+        
+        .header-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .comp-name { color: var(--nav-bg); margin: 0; font-size: 24px; }
+        
+        .action-bar { margin-bottom: 20px; display: flex; gap: 10px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; color: white; transition: 0.3s; }
+        .btn-visit { background-color: #3b82f6; }
+        .btn-back { background-color: #64748b; text-decoration: none; display: inline-block; font-size: 14px; }
 
-        /* شريط المسؤولين */
-        .managers-strip { background: white; border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .manager-row { display: grid; grid-template-columns: 2fr 1.5fr 2fr 1fr; background: #f8fafc; padding: 8px 12px; border-radius: 10px; margin-top: 8px; font-size: 12px; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; }
+        th { background: #f8fafc; padding: 12px; border: 1px solid #e2e8f0; font-size: 13px; }
+        td { padding: 12px; border: 1px solid #e2e8f0; text-align: center; font-size: 13px; }
 
-        /* شريط الأدوات الوظيفي */
-        .tools-bar { display: flex; background: var(--nav-purple); padding: 5px; border-radius: 12px; gap: 5px; margin-bottom: 15px; }
-        .tool-btn { flex: 1; border: none; background: transparent; color: white; padding: 10px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; font-size: 12px; border-radius: 8px; }
-        .tool-btn:hover, .tool-btn.active { background: var(--nav-active); }
-
-        .content-area { background: white; border-radius: 15px; padding: 20px; min-height: 300px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        /* نافذة المودال */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal-content { background: white; width: 400px; margin: 10% auto; padding: 20px; border-radius: 12px; position: relative; }
+        .modal-content h3 { margin-top: 0; color: var(--nav-bg); }
+        .form-group { margin-bottom: 15px; text-align: right; }
+        .form-group label { display: block; font-size: 12px; margin-bottom: 5px; font-weight: bold; }
+        .form-group input, .form-group textarea { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: 'Cairo'; box-sizing: border-box; }
     </style>
 </head>
-<body onload="loadClientData()">
+<body>
 
-<nav class="navbar">
-    <a href="index.html">الرئيسية</a>
-    <a href="visits.html">الزيارات</a>
-    <a href="opportunities.html">الفرص البيعية</a>
-    <a href="customers.html">العملاء</a>
-</nav>
+    <a href="customers.html" class="btn btn-back">← العودة للعملاء</a>
 
-<div class="container">
     <div class="header-card">
-        <div><label>اسم الشركة</label><span id="c-name">-</span></div>
-        <div><label>السجل التجاري</label><span id="c-cr">-</span></div>
-        <div><label>العنوان</label><span id="c-addr">-</span></div>
+        <h1 id="displayCompanyName" class="comp-name">اسم الشركة</h1>
+        <p id="displayAddress" style="color: #64748b;"></p>
     </div>
 
-    <div class="managers-strip">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <b style="font-size:14px;">👥 المسؤولين</b>
-            <button onclick="alert('إضافة مسؤول جديد')" style="border:none; background:var(--nav-purple); color:white; padding:4px 12px; border-radius:6px; cursor:pointer; font-family:'Cairo'; font-size:11px;">+ إضافة مسؤول</button>
-        </div>
-        <div id="mgr-list">
+    <div class="action-bar">
+        <button class="btn btn-visit" onclick="openVisitModal()">+ إنشاء زيارة جديدة</button>
+    </div>
+
+    <h3>سجل زيارات العميل</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>التاريخ</th>
+                <th>نوع الزيارة</th>
+                <th>النتائج / الملاحظات</th>
+            </tr>
+        </thead>
+        <tbody id="clientVisitsBody">
+            </tbody>
+    </table>
+
+    <div id="visitModal" class="modal">
+        <div class="modal-content">
+            <h3>تسجيل زيارة جديدة</h3>
+            <div class="form-group">
+                <label>التاريخ</label>
+                <input type="date" id="visitDate">
             </div>
+            <div class="form-group">
+                <label>نوع الزيارة (مثلاً: ميدانية، اتصال، زووم)</label>
+                <input type="text" id="visitType" placeholder="ادخل نوع الزيارة">
+            </div>
+            <div class="form-group">
+                <label>التفاصيل / الملاحظات</label>
+                <textarea id="visitNotes" rows="3"></textarea>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn" style="background: var(--accent-green); flex: 1;" onclick="saveNewVisit()">حفظ الزيارة</button>
+                <button class="btn" style="background: #ef4444;" onclick="closeVisitModal()">إلغاء</button>
+            </div>
+        </div>
     </div>
-
-    <div class="tools-bar">
-        <button class="tool-btn" onclick="openTab('new-order')">انشاء طلب</button>
-        <button class="tool-btn" onclick="openTab('new-visit')">انشاء زيارة</button>
-        <button class="tool-btn active" onclick="openTab('v-history')">سجل الزيارات</button>
-        <button class="tool-btn" onclick="openTab('o-history')">سجل الطلبات</button>
-        <button class="tool-btn" onclick="openTab('attachments')">المرفقات</button>
-    </div>
-
-    <div class="content-area" id="display-frame">
-        <p style="text-align:center; color:#94a3b8; margin-top:100px;">اختر عملية من الشريط أعلاه لعرض البيانات</p>
-    </div>
-</div>
 
 <script>
     const urlParams = new URLSearchParams(window.location.search);
-    const clientName = urlParams.get('name');
+    const companyName = urlParams.get('name');
 
-    function loadClientData() {
-        if(!clientName) return;
-        const data = JSON.parse(localStorage.getItem('asgate_customers_data') || '[]');
-        const client = data.find(c => c.comp === clientName);
+    document.getElementById('displayCompanyName').innerText = companyName || "عميل غير معروف";
 
-        if(client) {
-            document.getElementById('c-name').innerText = client.comp;
-            document.getElementById('c-cr').innerText = client.cr || 'غير مسجل';
-            document.getElementById('c-addr').innerText = client.address || 'غير محدد';
-            
-            // محاكاة عرض المسؤولين
-            const list = document.getElementById('mgr-list');
-            list.innerHTML = `
-                <div class="manager-row">
-                    <div><b>الاسم:</b> ${client.mgr}</div>
-                    <div><b>الموبايل:</b> ${client.mob}</div>
-                    <div><b>الإيميل:</b> info@company.com</div>
-                    <div style="color:#94a3b8; font-size:10px;">أُضيف في: 16/05/2026</div>
-                </div>
-            `;
-        }
+    // 1. فتح وإغلاق النافذة
+    function openVisitModal() {
+        document.getElementById('visitDate').valueAsDate = new Date();
+        document.getElementById('visitModal').style.display = 'block';
+    }
+    function closeVisitModal() {
+        document.getElementById('visitModal').style.display = 'none';
     }
 
-    function openTab(tab) {
-        const frame = document.getElementById('display-frame');
-        document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-        event.target.classList.add('active');
-
-        if(tab === 'v-history') {
-            const visits = JSON.parse(localStorage.getItem('asgate_visits_data') || '[]').filter(v => v.comp === clientName);
-            frame.innerHTML = `<h4>سجل الزيارات الميدانية</h4>` + (visits.length > 0 ? 
-                visits.map(v => `<div style="border-bottom:1px solid #eee; padding:10px;">📅 ${v.date} - ${v.status}</div>`).join('') : 
-                `<p>لا توجد زيارات مسجلة لهذا العميل.</p>`);
-        } else {
-            frame.innerHTML = `<h3 style="text-align:center; color:var(--nav-purple); margin-top:80px;">قسم ${tab} تحت البرمجة</h3>`;
-        }
+    // 2. تحميل زيارات هذا العميل فقط
+    function loadClientVisits() {
+        const allVisits = JSON.parse(localStorage.getItem('asgate_visits_data') || "[]");
+        const clientVisits = allVisits.filter(v => v.comp === companyName);
+        
+        const tbody = document.getElementById('clientVisitsBody');
+        tbody.innerHTML = clientVisits.map(v => `
+            <tr>
+                <td>${v.date}</td>
+                <td>${v.type || 'غير محدد'}</td>
+                <td>${v.notes || '-'}</td>
+            </tr>
+        `).join('');
     }
+
+    // 3. حفظ الزيارة في مكانين (سجل العميل والزيارات العامة)
+    function saveNewVisit() {
+        const date = document.getElementById('visitDate').value;
+        const type = document.getElementById('visitType').value;
+        const notes = document.getElementById('visitNotes').value;
+
+        if(!date) { alert("يرجى تحديد التاريخ"); return; }
+
+        // جلب البيانات الحالية
+        const allVisits = JSON.parse(localStorage.getItem('asgate_visits_data') || "[]");
+
+        // إنشاء كائن الزيارة الجديد
+        const newVisit = {
+            comp: companyName,
+            date: date,
+            type: type,
+            notes: notes,
+            timestamp: new Date().getTime() // للترتيب
+        };
+
+        // إضافة الزيارة للقائمة وحفظها
+        allVisits.push(newVisit);
+        localStorage.setItem('asgate_visits_data', JSON.stringify(allVisits));
+
+        alert("تم تسجيل الزيارة بنجاح ومزامنتها مع جدول الزيارات العام");
+        closeVisitModal();
+        loadClientVisits(); // تحديث الجدول في الصفحة
+    }
+
+    // التشغيل عند الفتح
+    window.onload = loadClientVisits;
 </script>
 </body>
 </html>
