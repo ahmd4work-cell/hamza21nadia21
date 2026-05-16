@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>المبيعات | ASGate</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-
     <style>
         :root { 
             --nav-purple: #2e1065; 
@@ -18,8 +17,8 @@
         }
         
         body { background-color: var(--bg); font-family: 'Cairo', sans-serif; margin: 0; }
-
-        /* شريط التنقل بعد التعديل */
+        
+        /* شريط التنقل الموحد - ارتفاع 37 بكسل */
         .navbar { 
             background-color: var(--nav-purple); 
             display: flex; 
@@ -34,7 +33,6 @@
             z-index: 1000;
             box-sizing: border-box;
         }
-
         .navbar a { 
             color: white; 
             text-decoration: none; 
@@ -46,22 +44,13 @@
             line-height: 26px; 
             height: 26px; 
             display: inline-block;
-            font-family: 'Cairo', sans-serif;
         }
-
-        .navbar a.active { 
-            background-color: var(--nav-active); 
-            color: white; 
-            border-radius: 8px;
-        }
-
-        .navbar a:hover:not(.active) { 
-            background-color: rgba(255,255,255,0.1); 
-        }
+        .navbar a.active { background-color: var(--nav-active); color: white; }
+        .navbar a:hover:not(.active) { background-color: rgba(255,255,255,0.1); }
 
         .container { padding: 5px 15px; max-width: 100%; margin: auto; }
 
-        /* كروت الإحصائيات */
+        /* كروت الإحصائيات السريعة */
         .stats-grid { 
             display: flex; 
             justify-content: space-between; 
@@ -82,7 +71,7 @@
         .stat-label { font-size: 11px; color: #64748b; font-weight: bold; margin-bottom: 2px; }
         .stat-value { font-size: 18px; color: var(--nav-purple); font-weight: 800; }
 
-        /* منطقة التحكم */
+        /* منطقة التحكم والبحث */
         .actions-bar { 
             display: flex; 
             justify-content: space-between; 
@@ -92,4 +81,154 @@
         }
         .search-box { 
             padding: 8px 15px; 
-            border: 1px solid
+            border: 1px solid var(--border); 
+            border-radius: 10px; 
+            flex-grow: 0;
+            width: 320px; 
+            font-family: 'Cairo'; 
+            font-size: 12px; 
+            outline: none;
+            transition: 0.2s;
+        }
+        .search-box:focus { border-color: var(--nav-active); box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.1); }
+
+        .add-sale-btn { 
+            background: var(--nav-purple); 
+            color: white; 
+            border: none; 
+            padding: 0 20px; 
+            border-radius: 10px; 
+            font-family: 'Cairo'; 
+            font-weight: bold; 
+            cursor: pointer;
+            font-size: 12px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+        }
+        .add-sale-btn:hover { background: #3b1680; transform: translateY(-1px); }
+
+        /* جدول المبيعات */
+        .sales-table-container { 
+            background: var(--white); 
+            border-radius: 12px; 
+            padding: 5px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+            border: 1px solid var(--border);
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        th { 
+            text-align: right; 
+            color: var(--nav-purple); 
+            padding: 12px 10px; 
+            border-bottom: 2px solid #f1f5f9; 
+            background-color: #f8fafc;
+            font-weight: 800;
+        }
+        td { padding: 12px 10px; border-bottom: 1px solid #f1f5f9; color: #1e293b; font-weight: 600; }
+        tr:hover { background-color: #fcfcfd; }
+        
+        .status-badge { 
+            padding: 3px 10px; 
+            border-radius: 6px; 
+            font-size: 10px; 
+            font-weight: bold; 
+            display: inline-block;
+        }
+        .status-paid { background: #dcfce7; color: #166534; }
+        .status-pending { background: #fef9c3; color: #854d0e; }
+        
+        .details-btn {
+            border: 1px solid var(--nav-purple);
+            background: transparent;
+            color: var(--nav-purple);
+            padding: 3px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Cairo';
+            font-size: 10px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .details-btn:hover { background: var(--nav-purple); color: white; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="index.html">الرئيسية</a>
+    <a href="visits.html">الزيارات</a>
+    <a href="opportunities.html">الفرص البيعية</a>
+    <a href="customers.html">العملاء</a>
+    <a href="sales.html" class="active">المبيعات</a>
+</nav>
+
+<div class="container">
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-label">إجمالي المبيعات (مايو 2026)</span>
+            <span class="stat-value">124,500.00 ر.س</span>
+        </div>
+        <div class="stat-card" style="border-right-color: var(--accent-blue);">
+            <span class="stat-label">الفواتير المستحقة</span>
+            <span class="stat-value">12 فاتورة</span>
+        </div>
+        <div class="stat-card" style="border-right-color: var(--accent-yellow);">
+            <span class="stat-label">مبالغ تحت المراجعة</span>
+            <span class="stat-value">45,000.00 ر.س</span>
+        </div>
+    </div>
+
+    <div class="actions-bar">
+        <input type="text" class="search-box" placeholder="🔍 ابحث برقم الفاتورة أو اسم العميل...">
+        <button class="add-sale-btn" onclick="alert('فتح نموذج إنشاء فاتورة مبيعات جديدة')">
+            <span>+ إنشاء فاتورة مبيعات</span>
+        </button>
+    </div>
+
+    <div class="sales-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 15%;">رقم الفاتورة</th>
+                    <th style="width: 25%;">العميل</th>
+                    <th style="width: 15%;">التاريخ</th>
+                    <th style="width: 15%;">المبلغ الإجمالي</th>
+                    <th style="width: 15%;">الحالة</th>
+                    <th style="width: 15%;">الإجراء</th>
+                </tr>
+            </thead>
+            <tbody id="sales-data">
+                <tr>
+                    <td>#INV-9901</td>
+                    <td>شركة الحلول الذكية</td>
+                    <td>2026/05/16</td>
+                    <td>15,000.00 ر.س</td>
+                    <td><span class="status-badge status-paid">تم التحصيل</span></td>
+                    <td><button class="details-btn">التفاصيل</button></td>
+                </tr>
+                <tr>
+                    <td>#INV-9902</td>
+                    <td>مؤسسة الأفق للنقل</td>
+                    <td>2026/05/15</td>
+                    <td>8,450.00 ر.س</td>
+                    <td><span class="status-badge status-pending">انتظار الدفع</span></td>
+                    <td><button class="details-btn">التفاصيل</button></td>
+                </tr>
+                <tr>
+                    <td>#INV-9903</td>
+                    <td>مصنع الرياض للتغليف</td>
+                    <td>2026/05/14</td>
+                    <td>22,100.00 ر.س</td>
+                    <td><span class="status-badge status-paid">تم التحصيل</span></td>
+                    <td><button class="details-btn">التفاصيل</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>
