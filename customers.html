@@ -37,31 +37,31 @@
 
         table { width: 100%; border-collapse: collapse; background: white; border: 1px solid var(--border-color); table-layout: fixed; }
         th { background-color: #f5f3ff; padding: 8px; color: var(--nav-bg); font-size: 11px; font-weight: 800; border: 1px solid var(--border-color); }
-        td { border: 1px solid var(--border-color); text-align: center; height: 38px; font-size: 11px; position: relative; }
+        td { border: 1px solid var(--border-color); text-align: center; height: 42px; font-size: 11px; position: relative; }
 
-        /* خلية الشركة المحدثة */
-        .company-cell { cursor: cell; background-color: #ffffff; transition: 0.2s; }
-        .company-cell:hover { background-color: #f8fafc; }
-        
+        /* خلية الشركة الذكية */
+        .company-wrapper { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; gap: 5px; }
         .company-link { 
-            color: var(--nav-bg); 
-            text-decoration: underline; 
-            font-weight: 700; 
-            padding: 2px 8px;
-            display: inline-block;
-            z-index: 2;
-            position: relative;
+            color: var(--nav-bg); text-decoration: underline; font-weight: 700; 
+            padding: 2px 5px; transition: 0.2s;
         }
         .company-link:hover { color: var(--accent-blue); background: #f0f7ff; border-radius: 4px; }
 
+        /* زر التعديل يظهر فقط عند الحوم بالماوس */
+        .edit-trigger { 
+            cursor: pointer; font-size: 12px; color: #94a3b8; visibility: hidden; 
+            background: #f1f5f9; padding: 2px 6px; border-radius: 4px;
+        }
+        td:hover .edit-trigger { visibility: visible; }
+        .edit-trigger:hover { color: var(--accent-blue); background: #e2e8f0; }
+
         .edit-input {
-            width: 90%; height: 80%; border: 1px solid var(--accent-blue);
+            width: 85%; height: 28px; border: 1px solid var(--accent-blue);
             border-radius: 4px; text-align: center; font-family: 'Cairo';
             font-size: 11px; display: none; outline: none; margin: auto;
         }
 
         .excel-input-standard { width: 100%; height: 100%; border: none; text-align: center; font-family: 'Cairo'; font-size: 11px; background: transparent; outline: none; }
-
         .notes-cell { cursor: pointer; color: #475569; font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 8px; }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 2000; }
@@ -85,12 +85,12 @@
     <table id="mainTable">
         <thead>
             <tr>
-                <th style="width: 20%;">الشركة (نقرة: ملف / نقرتين: تعديل)</th>
+                <th style="width: 25%;">الشركة (الاسم رابط | ✎ للتعديل)</th>
                 <th style="width: 15%;">العنوان</th>
                 <th style="width: 10%;">المسؤول</th>
                 <th style="width: 10%;">الموبايل</th>
                 <th style="width: 10%;">السجل</th>
-                <th style="width: 25%;">ملاحظات</th>
+                <th style="width: 20%;">ملاحظات</th>
                 <th style="width: 10%;">إجراء</th>
             </tr>
         </thead>
@@ -126,23 +126,16 @@
         const tbody = document.getElementById('tableBody');
         const row = tbody.insertRow(isNew ? 0 : -1);
         
-        // 1. خلية الشركة
+        // خلية الشركة المحدثة
         const compCell = row.insertCell(0);
-        compCell.className = "company-cell";
-        
-        // عند النقر المزدوج في أي مكان في الخلية يتم التعديل
-        compCell.ondblclick = function() { startEdit(this); };
-
         compCell.innerHTML = `
-            <a href="customer-profile.html?name=${encodeURIComponent(v.comp || '')}" class="company-link">
-                ${v.comp || 'اسم الشركة...'}
-            </a>
-            <input type="text" class="edit-input" value="${v.comp || ''}" 
-                   onblur="finalizeEdit(this)" 
-                   onkeydown="if(event.key==='Enter') this.blur()">
+            <div class="company-wrapper">
+                <a href="customer-profile.html?name=${encodeURIComponent(v.comp || '')}" class="company-link">${v.comp || 'اسم الشركة...'}</a>
+                <span class="edit-trigger" onclick="startEdit(this.parentElement)">✎</span>
+            </div>
+            <input type="text" class="edit-input" value="${v.comp || ''}" onblur="finalizeEdit(this)" onkeydown="if(event.key==='Enter') this.blur()">
         `;
 
-        // 2. بقية الخلايا
         row.innerHTML += `
             <td><input type="text" class="excel-input-standard" value="${v.address || ''}" oninput="markAsChanged()"></td>
             <td><input type="text" class="excel-input-standard" value="${v.mgr || ''}" oninput="markAsChanged()"></td>
@@ -153,27 +146,24 @@
         `;
     }
 
-    function startEdit(td) {
-        const link = td.querySelector('.company-link');
+    function startEdit(wrapper) {
+        const td = wrapper.parentElement;
         const input = td.querySelector('.edit-input');
-        link.style.display = 'none';
+        wrapper.style.display = 'none';
         input.style.display = 'block';
         input.focus();
-        // وضع المؤشر في نهاية النص
-        const val = input.value;
-        input.value = '';
-        input.value = val;
     }
 
     function finalizeEdit(input) {
         const td = input.parentElement;
-        const link = td.querySelector('.company-link');
-        if (link.innerText !== input.value) {
-            markAsChanged();
-        }
+        const wrapper = td.querySelector('.company-wrapper');
+        const link = wrapper.querySelector('.company-link');
+        
+        if (link.innerText !== input.value) markAsChanged();
+        
         link.innerText = input.value || 'اسم الشركة...';
         link.href = "customer-profile.html?name=" + encodeURIComponent(input.value);
-        link.style.display = 'inline-block';
+        wrapper.style.display = 'flex';
         input.style.display = 'none';
     }
 
@@ -219,21 +209,18 @@
             const compVal = row.cells[0].querySelector('.edit-input').value;
             const otherInputs = row.querySelectorAll('input.excel-input-standard');
             allData.push({
-                comp: compVal, 
-                address: otherInputs[0].value, 
-                mgr: otherInputs[1].value,
-                mob: otherInputs[2].value, 
-                cr: otherInputs[3].value,
+                comp: compVal, address: otherInputs[0].value, mgr: otherInputs[1].value,
+                mob: otherInputs[2].value, cr: otherInputs[3].value,
                 notes: row.querySelector('.notes-cell').getAttribute('data-notes')
             });
         });
         localStorage.setItem('asgate_customers_data', JSON.stringify(allData));
-        alert("تم حفظ التعديلات بنجاح");
+        alert("تم الحفظ");
         toggleSaveBtn(false);
     }
 
     function insertNewRow() { renderRow({}, true); markAsChanged(); }
-    function deleteRow(btn) { if(confirm("حذف العميل؟")) { btn.closest('tr').remove(); saveAllData(); } }
+    function deleteRow(btn) { if(confirm("حذف؟")) { btn.closest('tr').remove(); saveAllData(); } }
 </script>
 </body>
 </html>
