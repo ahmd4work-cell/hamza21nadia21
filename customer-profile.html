@@ -20,51 +20,62 @@
 
         .container { padding: 10px 15px; max-width: 1200px; margin: auto; }
 
-        /* المربع الموحد */
-        .unified-card { 
-            background: var(--white); border-radius: 15px; padding: 12px 20px; 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 12px;
-            border-right: 5px solid var(--nav-purple);
-        }
-        .data-column h3 { font-size: 13px; color: var(--nav-purple); margin: 0 0 8px 0; border-bottom: 1px solid #f1f5f9; padding-bottom: 4px; }
-        .info-row { display: flex; margin-bottom: 4px; font-size: 12px; }
-        .info-row label { width: 90px; color: #94a3b8; font-weight: bold; }
-        .info-row span { font-weight: 700; color: #1e293b; }
+        /* هيكل البيانات الجديد: سطرين فوق بعض */
+        .info-container { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
 
-        /* شريط الأدوات المدمج في سطر واحد */
-        .control-strip { 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            margin-bottom: 12px;
-            background: transparent;
+        .section-card { 
+            background: var(--white); border-radius: 12px; padding: 12px 18px; 
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03); border-right: 5px solid var(--nav-purple);
         }
 
-        /* تصغير أزرار الإضافة */
+        .section-title { 
+            font-size: 13px; color: var(--nav-purple); font-weight: 800; 
+            margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+        }
+
+        /* توزيع بيانات المنشأة في سطر واحد */
+        .company-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        
+        /* توزيع بيانات المسؤول في سطر واحد عريض */
+        .manager-row { 
+            display: grid; 
+            grid-template-columns: 1.5fr 1fr 1.5fr 1fr 1fr; 
+            gap: 10px; background: #f8fafc; padding: 8px 12px; 
+            border-radius: 8px; border: 1px solid #eef2f6; margin-bottom: 5px;
+        }
+
+        .info-block label { display: block; font-size: 10px; color: #94a3b8; font-weight: bold; }
+        .info-block span { font-size: 12px; font-weight: 700; color: #1e293b; }
+
+        .add-mgr-link {
+            color: var(--nav-purple); font-size: 11px; font-weight: bold; 
+            text-decoration: none; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; margin-top: 5px;
+        }
+        .add-mgr-link:hover { text-decoration: underline; }
+
+        /* الشريط المدمج (الأزرار + التبديل) */
+        .control-strip { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+
         .add-btn {
             border: none; border-radius: 8px; padding: 0 15px; 
             color: white; font-family: 'Cairo'; font-weight: bold; font-size: 11px; 
-            cursor: pointer; height: 36px; display: flex; align-items: center; gap: 5px;
-            white-space: nowrap; transition: 0.2s;
+            cursor: pointer; height: 32px; display: flex; align-items: center; gap: 5px;
+            white-space: nowrap;
         }
         .btn-green { background-color: var(--order-green); }
         .btn-yellow { background-color: var(--visit-yellow); }
-        .add-btn:hover { opacity: 0.9; transform: scale(0.98); }
 
-        /* شريط التبديل البنفسجي بجانب الأزرار */
         .tabs-wrapper { 
             display: flex; background: var(--nav-purple); padding: 3px; 
-            border-radius: 10px; gap: 2px; flex-grow: 1; height: 30px; align-items: center;
+            border-radius: 10px; gap: 2px; flex-grow: 1; height: 32px; align-items: center;
         }
         .tab-btn { 
             flex: 1; border: none; background: transparent; color: rgba(255,255,255,0.7); 
-            height: 28px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; 
-            font-size: 11px; border-radius: 7px; transition: 0.3s;
+            height: 26px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; 
+            font-size: 11px; border-radius: 7px;
         }
         .tab-btn.active { background: var(--nav-active); color: white; }
 
-        /* منطقة المحتوى */
         .content-area { 
             background: white; border-radius: 15px; padding: 15px; 
             min-height: 200px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
@@ -88,18 +99,28 @@
 </nav>
 
 <div class="container">
-    <div class="unified-card">
-        <div class="data-column">
-            <h3>🏢 بيانات المنشأة</h3>
-            <div class="info-row"><label>الشركة:</label><span id="c-name">-</span></div>
-            <div class="info-row"><label>السجل:</label><span id="c-cr">-</span></div>
-            <div class="info-row"><label>العنوان:</label><span id="c-addr">-</span></div>
+    <div class="info-container">
+        <div class="section-card">
+            <div class="section-title">🏢 بيانات المنشأة</div>
+            <div class="company-grid">
+                <div class="info-block"><label>اسم الشركة</label><span id="c-name">-</span></div>
+                <div class="info-block"><label>السجل التجاري</label><span id="c-cr">-</span></div>
+                <div class="info-block"><label>العنوان</label><span id="c-addr">-</span></div>
+            </div>
         </div>
-        <div class="data-column" style="border-right: 1px solid #f1f5f9; padding-right: 25px;">
-            <h3>👤 المسؤول المباشر</h3>
-            <div class="info-row"><label>الاسم:</label><span id="m-name">-</span></div>
-            <div class="info-row"><label>الموبايل:</label><span id="m-mob">-</span></div>
-            <div class="info-row"><label>تاريخ الإضافة:</label><span>16/05/2026</span></div>
+
+        <div class="section-card">
+            <div class="section-title">👤 المسؤول المباشر</div>
+            <div id="managers-container">
+                <div class="manager-row">
+                    <div class="info-block"><label>الاسم</label><span id="m-name">-</span></div>
+                    <div class="info-block"><label>الموبايل</label><span id="m-mob">-</span></div>
+                    <div class="info-block"><label>الايميل</label><span id="m-email">info@example.com</span></div>
+                    <div class="info-block"><label>رقم آخر</label><span>-</span></div>
+                    <div class="info-block"><label>تاريخ الإضافة</label><span>16/05/2026</span></div>
+                </div>
+            </div>
+            <a class="add-mgr-link" onclick="alert('إضافة مسؤول جديد')">✚ إضافة مسؤول آخر</a>
         </div>
     </div>
 
