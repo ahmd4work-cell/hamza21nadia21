@@ -11,54 +11,64 @@
             --bg: #f4f7f9; 
             --white: #ffffff;
             --accent-green: #22c55e;
+            --accent-blue: #3b82f6;
+            --accent-yellow: #eab308;
+            --border: #e2e8f0;
         }
+        
         body { background-color: var(--bg); font-family: 'Cairo', sans-serif; margin: 0; }
         
-        /* شريط التنقل حسب المواصفات المطلوبة */
+        /* شريط التنقل الموحد - ارتفاع 37 بكسل */
         .navbar { 
             background-color: var(--nav-purple); 
             display: flex; 
             align-items: center; 
             padding: 0 20px; 
-            margin: 5px 10px; 
-            border-radius: 10px; 
-            height: 37px; /* الارتفاع المطلوب */
+            margin: 10px; 
+            border-radius: 15px; 
+            height: 37px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 10px;
+            z-index: 1000;
+            box-sizing: border-box;
         }
         .navbar a { 
             color: white; 
             text-decoration: none; 
-            padding: 5px 15px; 
+            padding: 0 15px; 
             font-weight: 700; 
-            font-size: 12px; /* حجم الخط المطلوب */
-            transition: 0.3s;
+            font-size: 12px; 
+            border-radius: 8px; 
+            transition: 0.3s; 
+            line-height: 26px; 
+            height: 26px; 
+            display: inline-block;
         }
-        /* تمييز الصفحة النشطة */
-        .navbar a.active { 
-            background-color: var(--nav-active); 
-            border-radius: 8px; /* زوايا دائرية */
-            color: white;
-        }
+        .navbar a.active { background-color: var(--nav-active); color: white; }
+        .navbar a:hover:not(.active) { background-color: rgba(255,255,255,0.1); }
 
-        .container { padding: 10px 20px; max-width: 100%; margin: auto; }
+        .container { padding: 5px 15px; max-width: 100%; margin: auto; }
 
-        /* كروت الإحصائيات السريعة (توزيع أفقي) */
+        /* كروت الإحصائيات السريعة */
         .stats-grid { 
             display: flex; 
             justify-content: space-between; 
-            gap: 15px; 
+            gap: 12px; 
+            margin-top: 10px;
             margin-bottom: 15px; 
         }
         .stat-card { 
             flex: 1; 
             background: var(--white); 
-            padding: 10px 20px; 
+            padding: 12px 18px; 
             border-radius: 12px; 
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             border-right: 4px solid var(--accent-green);
             display: flex;
             flex-direction: column;
         }
-        .stat-label { font-size: 11px; color: #64748b; font-weight: bold; }
+        .stat-label { font-size: 11px; color: #64748b; font-weight: bold; margin-bottom: 2px; }
         .stat-value { font-size: 18px; color: var(--nav-purple); font-weight: 800; }
 
         /* منطقة التحكم والبحث */
@@ -66,47 +76,83 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            gap: 15px;
         }
         .search-box { 
-            padding: 6px 15px; 
-            border: 1px solid #e2e8f0; 
-            border-radius: 8px; 
-            width: 300px; 
+            padding: 8px 15px; 
+            border: 1px solid var(--border); 
+            border-radius: 10px; 
+            flex-grow: 0;
+            width: 320px; 
             font-family: 'Cairo'; 
             font-size: 12px; 
+            outline: none;
+            transition: 0.2s;
         }
+        .search-box:focus { border-color: var(--nav-active); box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.1); }
+
         .add-sale-btn { 
             background: var(--nav-purple); 
             color: white; 
             border: none; 
-            padding: 6px 20px; 
-            border-radius: 8px; 
+            padding: 0 20px; 
+            border-radius: 10px; 
             font-family: 'Cairo'; 
             font-weight: bold; 
             cursor: pointer;
             font-size: 12px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
         }
+        .add-sale-btn:hover { background: #3b1680; transform: translateY(-1px); }
 
-        /* جدول المبيعات المدمج */
+        /* جدول المبيعات */
         .sales-table-container { 
             background: var(--white); 
             border-radius: 12px; 
-            padding: 15px; 
+            padding: 5px; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+            border: 1px solid var(--border);
         }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th { text-align: right; color: #64748b; padding: 10px; border-bottom: 2px solid #f1f5f9; }
-        td { padding: 10px; border-bottom: 1px solid #f1f5f9; color: #1e293b; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        th { 
+            text-align: right; 
+            color: var(--nav-purple); 
+            padding: 12px 10px; 
+            border-bottom: 2px solid #f1f5f9; 
+            background-color: #f8fafc;
+            font-weight: 800;
+        }
+        td { padding: 12px 10px; border-bottom: 1px solid #f1f5f9; color: #1e293b; font-weight: 600; }
+        tr:hover { background-color: #fcfcfd; }
         
         .status-badge { 
-            padding: 2px 8px; 
-            border-radius: 5px; 
+            padding: 3px 10px; 
+            border-radius: 6px; 
             font-size: 10px; 
             font-weight: bold; 
+            display: inline-block;
         }
         .status-paid { background: #dcfce7; color: #166534; }
         .status-pending { background: #fef9c3; color: #854d0e; }
+        
+        .details-btn {
+            border: 1px solid var(--nav-purple);
+            background: transparent;
+            color: var(--nav-purple);
+            padding: 3px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Cairo';
+            font-size: 10px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .details-btn:hover { background: var(--nav-purple); color: white; }
     </style>
 </head>
 <body>
@@ -122,34 +168,36 @@
 <div class="container">
     <div class="stats-grid">
         <div class="stat-card">
-            <span class="stat-label">إجمالي المبيعات (الشهر)</span>
+            <span class="stat-label">إجمالي المبيعات (مايو 2026)</span>
             <span class="stat-value">124,500.00 ر.س</span>
         </div>
-        <div class="stat-card" style="border-right-color: #3b82f6;">
+        <div class="stat-card" style="border-right-color: var(--accent-blue);">
             <span class="stat-label">الفواتير المستحقة</span>
-            <span class="stat-value">12</span>
+            <span class="stat-value">12 فاتورة</span>
         </div>
-        <div class="stat-card" style="border-right-color: #eab308;">
-            <span class="stat-label">تحت المراجعة</span>
+        <div class="stat-card" style="border-right-color: var(--accent-yellow);">
+            <span class="stat-label">مبالغ تحت المراجعة</span>
             <span class="stat-value">45,000.00 ر.س</span>
         </div>
     </div>
 
     <div class="actions-bar">
-        <input type="text" class="search-box" placeholder="🔍 بحث برقم الفاتورة أو اسم العميل...">
-        <button class="add-sale-btn" onclick="alert('فتح نموذج فاتورة جديدة')">+ إنشاء فاتورة مبيعات</button>
+        <input type="text" class="search-box" placeholder="🔍 ابحث برقم الفاتورة أو اسم العميل...">
+        <button class="add-sale-btn" onclick="alert('فتح نموذج إنشاء فاتورة مبيعات جديدة')">
+            <span>+ إنشاء فاتورة مبيعات</span>
+        </button>
     </div>
 
     <div class="sales-table-container">
         <table>
             <thead>
                 <tr>
-                    <th>رقم الفاتورة</th>
-                    <th>العميل</th>
-                    <th>التاريخ</th>
-                    <th>المبلغ الإجمالي</th>
-                    <th>الحالة</th>
-                    <th>الإجراء</th>
+                    <th style="width: 15%;">رقم الفاتورة</th>
+                    <th style="width: 25%;">العميل</th>
+                    <th style="width: 15%;">التاريخ</th>
+                    <th style="width: 15%;">المبلغ الإجمالي</th>
+                    <th style="width: 15%;">الحالة</th>
+                    <th style="width: 15%;">الإجراء</th>
                 </tr>
             </thead>
             <tbody id="sales-data">
@@ -157,17 +205,25 @@
                     <td>#INV-9901</td>
                     <td>شركة الحلول الذكية</td>
                     <td>2026/05/16</td>
-                    <td>15,000 ر.س</td>
+                    <td>15,000.00 ر.س</td>
                     <td><span class="status-badge status-paid">تم التحصيل</span></td>
-                    <td><button style="border:none; background:none; cursor:pointer; color:var(--nav-purple); font-weight:bold;">تفاصيل</button></td>
+                    <td><button class="details-btn">التفاصيل</button></td>
                 </tr>
                 <tr>
                     <td>#INV-9902</td>
                     <td>مؤسسة الأفق للنقل</td>
                     <td>2026/05/15</td>
-                    <td>8,450 ر.س</td>
+                    <td>8,450.00 ر.س</td>
                     <td><span class="status-badge status-pending">انتظار الدفع</span></td>
-                    <td><button style="border:none; background:none; cursor:pointer; color:var(--nav-purple); font-weight:bold;">تفاصيل</button></td>
+                    <td><button class="details-btn">التفاصيل</button></td>
+                </tr>
+                <tr>
+                    <td>#INV-9903</td>
+                    <td>مصنع الرياض للتغليف</td>
+                    <td>2026/05/14</td>
+                    <td>22,100.00 ر.س</td>
+                    <td><span class="status-badge status-paid">تم التحصيل</span></td>
+                    <td><button class="details-btn">التفاصيل</button></td>
                 </tr>
             </tbody>
         </table>
