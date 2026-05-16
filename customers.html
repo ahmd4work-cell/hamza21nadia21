@@ -12,6 +12,7 @@
             --border-color: #cbd5e1;
             --sticker-yellow: #fff9c4;
             --accent-green-active: #22c55e;
+            --accent-blue: #3b82f6;
         }
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; }
@@ -30,30 +31,36 @@
         .container { padding: 5px 10px; }
         .action-bar { display: flex; align-items: center; margin-top: 15px; margin-bottom: 20px; gap: 10px; }
         
-        .btn-top { border: none; padding: 8px 20px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 13px; color: white; }
+        .btn-top { border: none; padding: 8px 20px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 13px; color: white; transition: 0.3s; }
         .btn-save-all { background-color: #d1fae5; color: #065f46; opacity: 0.6; pointer-events: none; }
         .btn-save-all.active { background-color: var(--accent-green-active); color: white; opacity: 1; pointer-events: auto; }
 
-        table { width: 100%; border-collapse: collapse; background: white; border: 1px solid var(--border-color); }
+        table { width: 100%; border-collapse: collapse; background: white; border: 1px solid var(--border-color); table-layout: fixed; }
         th { background-color: #f5f3ff; padding: 8px; color: var(--nav-bg); font-size: 11px; font-weight: 800; border: 1px solid var(--border-color); }
-        td { border: 1px solid var(--border-color); text-align: center; height: 38px; font-size: 11px; }
+        td { border: 1px solid var(--border-color); text-align: center; height: 38px; font-size: 11px; position: relative; }
 
-        /* خلية الشركة الذكية */
-        .company-cell { cursor: text; position: relative; }
+        /* خلية الشركة المحدثة */
+        .company-cell { cursor: cell; background-color: #ffffff; transition: 0.2s; }
+        .company-cell:hover { background-color: #f8fafc; }
+        
         .company-link { 
             color: var(--nav-bg); 
             text-decoration: underline; 
             font-weight: 700; 
-            padding: 2px 5px;
-            display: inline-block; /* ليكون الرابط على قدر النص فقط */
+            padding: 2px 8px;
+            display: inline-block;
+            z-index: 2;
+            position: relative;
         }
-        .company-link:hover { color: #3b82f6; background: #eff6ff; border-radius: 4px; }
+        .company-link:hover { color: var(--accent-blue); background: #f0f7ff; border-radius: 4px; }
 
-        .excel-input { 
-            width: 95%; height: 80%; border: 1px solid #3b82f6; border-radius: 4px;
-            padding: 0 5px; font-family: 'Cairo'; font-size: 11px; text-align: center; 
-            outline: none; background: white; display: none; margin: auto;
+        .edit-input {
+            width: 90%; height: 80%; border: 1px solid var(--accent-blue);
+            border-radius: 4px; text-align: center; font-family: 'Cairo';
+            font-size: 11px; display: none; outline: none; margin: auto;
         }
+
+        .excel-input-standard { width: 100%; height: 100%; border: none; text-align: center; font-family: 'Cairo'; font-size: 11px; background: transparent; outline: none; }
 
         .notes-cell { cursor: pointer; color: #475569; font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 8px; }
 
@@ -72,13 +79,13 @@
 
 <div class="container">
     <div class="action-bar">
-        <button class="btn-top" style="background:#3b82f6" onclick="insertNewRow()">+ إضافة عميل جديد</button>
+        <button class="btn-top" style="background:var(--accent-blue)" onclick="insertNewRow()">+ إضافة عميل جديد</button>
         <button id="saveAllBtn" class="btn-top btn-save-all" onclick="saveAllData()">حفظ التغييرات</button>
     </div>
     <table id="mainTable">
         <thead>
             <tr>
-                <th style="width: 20%;">الشركة (النص رابط / الخلية تعديل)</th>
+                <th style="width: 20%;">الشركة (نقرة: ملف / نقرتين: تعديل)</th>
                 <th style="width: 15%;">العنوان</th>
                 <th style="width: 10%;">المسؤول</th>
                 <th style="width: 10%;">الموبايل</th>
@@ -119,23 +126,23 @@
         const tbody = document.getElementById('tableBody');
         const row = tbody.insertRow(isNew ? 0 : -1);
         
-        // خلية الشركة الذكية
+        // 1. خلية الشركة
         const compCell = row.insertCell(0);
         compCell.className = "company-cell";
-        // النقر على الخلية يبدأ التعديل، لكن النقر على الرابط يفتح الصفحة
-        compCell.onclick = function(e) {
-            if (e.target.tagName !== 'A') startEdit(this);
-        };
+        
+        // عند النقر المزدوج في أي مكان في الخلية يتم التعديل
+        compCell.ondblclick = function() { startEdit(this); };
 
         compCell.innerHTML = `
             <a href="customer-profile.html?name=${encodeURIComponent(v.comp || '')}" class="company-link">
                 ${v.comp || 'اسم الشركة...'}
             </a>
-            <input type="text" class="excel-input" value="${v.comp || ''}" 
+            <input type="text" class="edit-input" value="${v.comp || ''}" 
                    onblur="finalizeEdit(this)" 
-                   oninput="markAsChanged()">
+                   onkeydown="if(event.key==='Enter') this.blur()">
         `;
 
+        // 2. بقية الخلايا
         row.innerHTML += `
             <td><input type="text" class="excel-input-standard" value="${v.address || ''}" oninput="markAsChanged()"></td>
             <td><input type="text" class="excel-input-standard" value="${v.mgr || ''}" oninput="markAsChanged()"></td>
@@ -144,31 +151,26 @@
             <td class="notes-cell" data-notes='${v.notes || "[]"}' onclick="openSticker(this)">${getDisplayNote(v.notes || "[]")}</td>
             <td><button style="border:none; background:#fee2e2; color:red; cursor:pointer; padding:3px 8px; border-radius:4px;" onclick="deleteRow(this)">حذف</button></td>
         `;
-
-        // تنسيق المدخلات الأخرى لتشبه الإكسيل
-        row.querySelectorAll('.excel-input-standard').forEach(input => {
-            input.style.width = "100%";
-            input.style.height = "100%";
-            input.style.border = "none";
-            input.style.textAlign = "center";
-            input.style.fontFamily = "Cairo";
-            input.style.fontSize = "11px";
-            input.style.background = "transparent";
-            input.style.outline = "none";
-        });
     }
 
     function startEdit(td) {
         const link = td.querySelector('.company-link');
-        const input = td.querySelector('.excel-input');
+        const input = td.querySelector('.edit-input');
         link.style.display = 'none';
         input.style.display = 'block';
         input.focus();
+        // وضع المؤشر في نهاية النص
+        const val = input.value;
+        input.value = '';
+        input.value = val;
     }
 
     function finalizeEdit(input) {
         const td = input.parentElement;
         const link = td.querySelector('.company-link');
+        if (link.innerText !== input.value) {
+            markAsChanged();
+        }
         link.innerText = input.value || 'اسم الشركة...';
         link.href = "customer-profile.html?name=" + encodeURIComponent(input.value);
         link.style.display = 'inline-block';
@@ -182,8 +184,15 @@
         } catch(e) { return 'إضافة ملاحظة...'; }
     }
 
-    function markAsChanged() { toggleSaveBtn(true); }
-    function toggleSaveBtn(active) { isDirty = active; document.getElementById('saveAllBtn').classList.toggle('active', active); }
+    function markAsChanged() { 
+        isDirty = true; 
+        document.getElementById('saveAllBtn').classList.add('active'); 
+    }
+
+    function toggleSaveBtn(active) { 
+        isDirty = active; 
+        document.getElementById('saveAllBtn').classList.toggle('active', active); 
+    }
 
     function openSticker(cell) {
         activeCell = cell;
@@ -207,8 +216,7 @@
     function saveAllData() {
         const allData = [];
         document.querySelectorAll('#tableBody tr').forEach(row => {
-            // جلب قيمة الشركة من الإدخال المخفي أو الرابط
-            const compVal = row.cells[0].querySelector('.excel-input').value;
+            const compVal = row.cells[0].querySelector('.edit-input').value;
             const otherInputs = row.querySelectorAll('input.excel-input-standard');
             allData.push({
                 comp: compVal, 
@@ -220,7 +228,7 @@
             });
         });
         localStorage.setItem('asgate_customers_data', JSON.stringify(allData));
-        alert("تم حفظ البيانات بنجاح");
+        alert("تم حفظ التعديلات بنجاح");
         toggleSaveBtn(false);
     }
 
