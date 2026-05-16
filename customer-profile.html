@@ -15,78 +15,67 @@
         }
         body { background-color: var(--bg); font-family: 'Cairo', sans-serif; margin: 0; }
         
-        .navbar { background-color: var(--nav-purple); display: flex; align-items: center; padding: 0 20px; margin: 10px; border-radius: 15px; height: 37px; }
-        .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 11px; }
+        .navbar { background-color: var(--nav-purple); display: flex; align-items: center; padding: 0 20px; margin: 5px 10px; border-radius: 10px; height: 32px; }
+        .navbar a { color: white; text-decoration: none; padding: 0 12px; font-weight: 700; font-size: 11px; }
 
-        .container { padding: 10px 15px; max-width: 1200px; margin: auto; }
+        .container { padding: 5px 15px; max-width: 1300px; margin: auto; }
 
-        /* هيكل البيانات الجديد: سطرين فوق بعض */
-        .info-container { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
-
-        .section-card { 
-            background: var(--white); border-radius: 12px; padding: 12px 18px; 
-            box-shadow: 0 2px 6px rgba(0,0,0,0.03); border-right: 5px solid var(--nav-purple);
+        /* الأقسام المدمجة جداً */
+        .compact-section { 
+            background: var(--white); border-radius: 8px; padding: 6px 15px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 6px;
+            border-right: 4px solid var(--nav-purple);
+            display: flex; align-items: center; gap: 20px;
         }
 
-        .section-title { 
-            font-size: 13px; color: var(--nav-purple); font-weight: 800; 
-            margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
-        }
+        .section-label { font-size: 12px; color: var(--nav-purple); font-weight: 800; min-width: 100px; white-space: nowrap; }
 
-        /* توزيع بيانات المنشأة في سطر واحد */
-        .company-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        /* توزيع البيانات في سطر واحد */
+        .data-row-inline { display: flex; flex-grow: 1; gap: 25px; align-items: center; }
         
-        /* توزيع بيانات المسؤول في سطر واحد عريض */
-        .manager-row { 
-            display: grid; 
-            grid-template-columns: 1.5fr 1fr 1.5fr 1fr 1fr; 
-            gap: 10px; background: #f8fafc; padding: 8px 12px; 
-            border-radius: 8px; border: 1px solid #eef2f6; margin-bottom: 5px;
+        .info-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+        .info-item label { color: #94a3b8; font-weight: bold; white-space: nowrap; }
+        .info-item span { color: #1e293b; font-weight: 700; }
+
+        .add-mgr-btn {
+            background: #f1f5f9; color: var(--nav-purple); font-size: 10px; font-weight: bold; 
+            padding: 2px 8px; border-radius: 4px; cursor: pointer; border: 1px solid #e2e8f0;
         }
 
-        .info-block label { display: block; font-size: 10px; color: #94a3b8; font-weight: bold; }
-        .info-block span { font-size: 12px; font-weight: 700; color: #1e293b; }
+        /* شريط التحكم المدمج */
+        .control-strip { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 
-        .add-mgr-link {
-            color: var(--nav-purple); font-size: 11px; font-weight: bold; 
-            text-decoration: none; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; margin-top: 5px;
-        }
-        .add-mgr-link:hover { text-decoration: underline; }
-
-        /* الشريط المدمج (الأزرار + التبديل) */
-        .control-strip { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-
-        .add-btn {
-            border: none; border-radius: 8px; padding: 0 15px; 
+        .action-btn {
+            border: none; border-radius: 6px; padding: 0 12px; 
             color: white; font-family: 'Cairo'; font-weight: bold; font-size: 11px; 
-            cursor: pointer; height: 32px; display: flex; align-items: center; gap: 5px;
-            white-space: nowrap;
+            cursor: pointer; height: 28px; display: flex; align-items: center; gap: 5px;
         }
         .btn-green { background-color: var(--order-green); }
         .btn-yellow { background-color: var(--visit-yellow); }
 
         .tabs-wrapper { 
-            display: flex; background: var(--nav-purple); padding: 3px; 
-            border-radius: 10px; gap: 2px; flex-grow: 1; height: 32px; align-items: center;
+            display: flex; background: var(--nav-purple); padding: 2px; 
+            border-radius: 8px; gap: 2px; flex-grow: 1; height: 28px; align-items: center;
         }
         .tab-btn { 
-            flex: 1; border: none; background: transparent; color: rgba(255,255,255,0.7); 
-            height: 26px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; 
-            font-size: 11px; border-radius: 7px;
+            flex: 1; border: none; background: transparent; color: rgba(255,255,255,0.6); 
+            height: 24px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; 
+            font-size: 11px; border-radius: 6px;
         }
         .tab-btn.active { background: var(--nav-active); color: white; }
 
+        /* منطقة المحتوى */
         .content-area { 
-            background: white; border-radius: 15px; padding: 15px; 
-            min-height: 200px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            background: white; border-radius: 10px; padding: 12px; 
+            min-height: 180px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             border: 2px solid transparent;
         }
-        .content-area.mode-visit { border-color: var(--visit-yellow); background-color: #fffdf5; }
-        .content-area.mode-order { border-color: var(--order-green); background-color: #f6fff9; }
+        .content-area.mode-visit { border-color: var(--visit-yellow); background-color: #fffef9; }
+        .content-area.mode-order { border-color: var(--order-green); background-color: #fafffb; }
 
         table { width: 100%; border-collapse: collapse; font-size: 11px; }
-        th { text-align: right; color: #64748b; padding: 8px; border-bottom: 2px solid #eee; }
-        td { padding: 8px; border-bottom: 1px solid #eee; }
+        th { text-align: right; color: #64748b; padding: 6px; border-bottom: 2px solid #eee; }
+        td { padding: 6px; border-bottom: 1px solid #eee; }
     </style>
 </head>
 <body onload="loadClientData()">
@@ -99,34 +88,30 @@
 </nav>
 
 <div class="container">
-    <div class="info-container">
-        <div class="section-card">
-            <div class="section-title">🏢 بيانات المنشأة</div>
-            <div class="company-grid">
-                <div class="info-block"><label>اسم الشركة</label><span id="c-name">-</span></div>
-                <div class="info-block"><label>السجل التجاري</label><span id="c-cr">-</span></div>
-                <div class="info-block"><label>العنوان</label><span id="c-addr">-</span></div>
-            </div>
+    <div class="compact-section">
+        <div class="section-label">🏢 بيانات المنشأة:</div>
+        <div class="data-row-inline">
+            <div class="info-item"><label>الشركة:</label><span id="c-name">-</span></div>
+            <div class="info-item"><label>السجل:</label><span id="c-cr">-</span></div>
+            <div class="info-item"><label>العنوان:</label><span id="c-addr">-</span></div>
         </div>
+    </div>
 
-        <div class="section-card">
-            <div class="section-title">👤 المسؤول المباشر</div>
-            <div id="managers-container">
-                <div class="manager-row">
-                    <div class="info-block"><label>الاسم</label><span id="m-name">-</span></div>
-                    <div class="info-block"><label>الموبايل</label><span id="m-mob">-</span></div>
-                    <div class="info-block"><label>الايميل</label><span id="m-email">info@example.com</span></div>
-                    <div class="info-block"><label>رقم آخر</label><span>-</span></div>
-                    <div class="info-block"><label>تاريخ الإضافة</label><span>16/05/2026</span></div>
-                </div>
-            </div>
-            <a class="add-mgr-link" onclick="alert('إضافة مسؤول جديد')">✚ إضافة مسؤول آخر</a>
+    <div class="compact-section">
+        <div class="section-label">👤 المسؤول المباشر:</div>
+        <div class="data-row-inline">
+            <div class="info-item"><label>الاسم:</label><span id="m-name">-</span></div>
+            <div class="info-item"><label>الموبايل:</label><span id="m-mob">-</span></div>
+            <div class="info-item"><label>الايميل:</label><span id="m-email">info@asgate.sa</span></div>
+            <div class="info-item"><label>رقم آخر:</label><span>-</span></div>
+            <div class="info-item"><label>أضيف في:</label><span>16/05/2026</span></div>
+            <div class="add-mgr-btn" onclick="alert('إضافة مسؤول')">✚ جديد</div>
         </div>
     </div>
 
     <div class="control-strip">
-        <button class="add-btn btn-green" onclick="alert('إضافة طلب')">🛒 طلب جديد</button>
-        <button class="add-btn btn-yellow" onclick="alert('إضافة زيارة')">🚗 زيارة جديدة</button>
+        <button class="action-btn btn-green" onclick="alert('طلب جديد')">🛒 طلب جديد</button>
+        <button class="action-btn btn-yellow" onclick="alert('زيارة جديدة')">🚗 زيارة جديدة</button>
         
         <div class="tabs-wrapper">
             <button class="tab-btn active" id="btn-v" onclick="openTab('v-history')">سجل الزيارات</button>
@@ -136,7 +121,9 @@
     </div>
 
     <div class="content-area mode-visit" id="display-frame">
-        <h4 id="frame-title" style="margin:0 0 10px 0; font-size:13px;">📅 سجل الزيارات</h4>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <b id="frame-title" style="font-size:12px; color:var(--nav-purple);">📅 سجل الزيارات الميدانية</b>
+        </div>
         <div id="table-content"></div>
     </div>
 </div>
@@ -152,8 +139,8 @@
 
         if(client) {
             document.getElementById('c-name').innerText = client.comp;
-            document.getElementById('c-cr').innerText = client.cr || 'غير مسجل';
-            document.getElementById('c-addr').innerText = client.address || 'غير محدد';
+            document.getElementById('c-cr').innerText = client.cr || '0000000';
+            document.getElementById('c-addr').innerText = client.address || 'الرياض';
             document.getElementById('m-name').innerText = client.mgr || '-';
             document.getElementById('m-mob').innerText = client.mob || '-';
             openTab('v-history');
@@ -170,22 +157,22 @@
         if(tab === 'v-history') {
             document.getElementById('btn-v').classList.add('active');
             frame.className = "content-area mode-visit";
-            title.innerText = "📅 سجل الزيارات";
+            title.innerText = "📅 سجل الزيارات الميدانية";
             const visits = JSON.parse(localStorage.getItem('asgate_visits_data') || '[]').filter(v => v.comp === clientName);
             content.innerHTML = visits.length > 0 ? `
                 <table>
                     <thead><tr><th>التاريخ</th><th>النوع</th><th>الملاحظات</th></tr></thead>
                     <tbody>${visits.map(v => `<tr><td>${v.date}</td><td>${v.type || 'ميدانية'}</td><td>${v.notes || '-'}</td></tr>`).join('')}</tbody>
-                </table>` : `<p style="text-align:center; color:#94a3b8; font-size:11px;">لا توجد زيارات.</p>`;
+                </table>` : `<p style="text-align:center; color:#94a3b8; font-size:11px;">لا توجد سجلات حالياً.</p>`;
         } else if(tab === 'o-history') {
             document.getElementById('btn-o').classList.add('active');
             frame.className = "content-area mode-order";
-            title.innerText = "🛒 سجل الطلبات";
-            content.innerHTML = `<p style="text-align:center; color:#94a3b8; font-size:11px; margin-top:30px;">لا توجد طلبات مسجلة.</p>`;
+            title.innerText = "🛒 سجل طلبات العميل";
+            content.innerHTML = `<p style="text-align:center; color:#94a3b8; font-size:11px; margin-top:20px;">لا توجد طلبات سابقة.</p>`;
         } else {
             frame.className = "content-area";
-            title.innerText = "📁 المرفقات";
-            content.innerHTML = `<p style="text-align:center; color:#94a3b8; font-size:11px; margin-top:30px;">لا توجد ملفات.</p>`;
+            title.innerText = "📁 الملفات والمرفقات";
+            content.innerHTML = `<p style="text-align:center; color:#94a3b8; font-size:11px; margin-top:20px;">لا توجد مرفقات حالياً.</p>`;
         }
     }
 </script>
