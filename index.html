@@ -31,7 +31,7 @@
             position: sticky;
             top: 10px;
             z-index: 1000;
-            height: 37px;
+            height: 37px; /* الارتفاع المطلوب */
             box-sizing: border-box;
         }
 
@@ -41,16 +41,16 @@
             padding: 0 15px; 
             margin-left: 5px; 
             font-weight: 700; 
-            font-size: 12px; 
+            font-size: 12px; /* حجم الخط المطلوب */
             border-radius: 8px; 
             transition: 0.3s; 
-            line-height: 26px; /* لتوسيط النص داخل المربع الملون */
+            line-height: 26px; 
             height: 26px;
             display: inline-block;
         }
 
         .navbar a.active { 
-            background-color: var(--nav-active); 
+            background-color: var(--nav-active); /* التمييز المطلوب */
             color: white;
         }
 
@@ -60,37 +60,14 @@
 
         .container { padding: 0 15px 15px 15px; max-width: 1400px; margin: auto; }
 
+        /* تنسيقات الكروت والجداول */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .small-card { display: flex; align-items: center; padding: 15px; border-radius: 12px; color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
 
-        .dashboard-main { 
-            display: flex; 
-            gap: 20px; 
-            margin-bottom: 20px; 
-            align-items: start;
-        }
-
-        .charts-column { 
-            flex: 2; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 20px; 
-        }
-
-        .table-area { 
-            flex: 2; 
-            min-width: 400px; 
-        }
-
-        .search-filter-box { 
-            width: 250px; 
-            background: white; 
-            padding: 15px; 
-            border-radius: 12px; 
-            border: 1px solid var(--border-color);
-            flex-shrink: 0;
-        }
-
+        .dashboard-main { display: flex; gap: 20px; margin-bottom: 20px; align-items: start; }
+        .charts-column { flex: 2; display: flex; flex-direction: column; gap: 20px; }
+        .table-area { flex: 2; min-width: 400px; }
+        .search-filter-box { width: 250px; background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); flex-shrink: 0; }
         .content-box { background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         
         .yearly-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: center; }
@@ -117,6 +94,7 @@
         <a href="visits.html">الزيارات</a>
         <a href="opportunities.html">الفرص البيعية</a>
         <a href="customers.html">العملاء</a>
+        <a href="sales.html">المبيعات</a>
     </nav>
 
     <div class="user-info-bar">
@@ -166,20 +144,17 @@
                                 <th>معلق</th>
                             </tr>
                         </thead>
-                        <tbody id="yearlyDataBody">
-                            </tbody>
+                        <tbody id="yearlyDataBody"></tbody>
                     </table>
                 </div>
             </div>
 
             <div class="search-filter-box">
                 <h3>🔍 الفلترة</h3>
-                
                 <div class="filter-group">
                     <label>بحث سريع</label>
                     <input type="text" class="filter-input" placeholder="بحث في إدارة المبيعات...">
                 </div>
-
                 <div class="filter-group">
                     <label>مدير المبيعات</label>
                     <select class="filter-input">
@@ -187,31 +162,12 @@
                         <option>المدير العام</option>
                     </select>
                 </div>
-
-                <div class="filter-group">
-                    <label>مشرف المبيعات</label>
-                    <select class="filter-input">
-                        <option>الكل</option>
-                        <option>المشرف الإقليمي</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label>مندوب المبيعات</label>
-                    <select class="filter-input">
-                        <option>الكل</option>
-                        <option>حمزة</option>
-                        <option>أحمد</option>
-                    </select>
-                </div>
-
                 <button class="filter-input" style="background: var(--nav-purple); color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 10px;">تطبيق الفلترة</button>
             </div>
         </div>
     </div>
 
     <script>
-        // تعبئة الجدول بالبيانات
         const months = ["يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
         const tbody = document.getElementById('yearlyDataBody');
         
@@ -225,7 +181,6 @@
             </tr>`; 
         });
 
-        // إعداد الرسوم البيانية
         const ctxBar = document.getElementById('performanceChart').getContext('2d');
         new Chart(ctxBar, {
             type: 'bar',
