@@ -1,1 +1,119 @@
+<!DOCTYPE html>
+<html dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>ملف العميل | ASGate</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --nav-purple: #2e1065; --nav-active: #a78bfa; --bg: #f4f7f9; --white: #ffffff; }
+        body { background-color: var(--bg); font-family: 'Cairo', sans-serif; margin: 0; }
+        
+        .navbar { background-color: var(--nav-purple); display: flex; align-items: center; padding: 0 20px; margin: 10px; border-radius: 15px; height: 37px; }
+        .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; }
 
+        .container { padding: 15px; max-width: 1200px; margin: auto; }
+
+        /* القسم العلوي: بيانات الشركة */
+        .header-card { 
+            background: var(--white); border-radius: 15px; padding: 20px; 
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 15px;
+            border-right: 6px solid var(--nav-purple);
+        }
+        .header-card div label { display: block; font-size: 11px; color: #64748b; font-weight: bold; }
+        .header-card div span { font-size: 16px; font-weight: 800; color: var(--nav-purple); }
+
+        /* شريط المسؤولين */
+        .managers-strip { background: white; border-radius: 15px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .manager-row { display: grid; grid-template-columns: 2fr 1.5fr 2fr 1fr; background: #f8fafc; padding: 8px 12px; border-radius: 10px; margin-top: 8px; font-size: 12px; border: 1px solid #e2e8f0; }
+
+        /* شريط الأدوات الوظيفي */
+        .tools-bar { display: flex; background: var(--nav-purple); padding: 5px; border-radius: 12px; gap: 5px; margin-bottom: 15px; }
+        .tool-btn { flex: 1; border: none; background: transparent; color: white; padding: 10px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; font-size: 12px; border-radius: 8px; }
+        .tool-btn:hover, .tool-btn.active { background: var(--nav-active); }
+
+        .content-area { background: white; border-radius: 15px; padding: 20px; min-height: 300px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body onload="loadClientData()">
+
+<nav class="navbar">
+    <a href="index.html">الرئيسية</a>
+    <a href="visits.html">الزيارات</a>
+    <a href="opportunities.html">الفرص البيعية</a>
+    <a href="customers.html">العملاء</a>
+</nav>
+
+<div class="container">
+    <div class="header-card">
+        <div><label>اسم الشركة</label><span id="c-name">-</span></div>
+        <div><label>السجل التجاري</label><span id="c-cr">-</span></div>
+        <div><label>العنوان</label><span id="c-addr">-</span></div>
+    </div>
+
+    <div class="managers-strip">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <b style="font-size:14px;">👥 المسؤولين</b>
+            <button onclick="alert('إضافة مسؤول جديد')" style="border:none; background:var(--nav-purple); color:white; padding:4px 12px; border-radius:6px; cursor:pointer; font-family:'Cairo'; font-size:11px;">+ إضافة مسؤول</button>
+        </div>
+        <div id="mgr-list">
+            </div>
+    </div>
+
+    <div class="tools-bar">
+        <button class="tool-btn" onclick="openTab('new-order')">انشاء طلب</button>
+        <button class="tool-btn" onclick="openTab('new-visit')">انشاء زيارة</button>
+        <button class="tool-btn active" onclick="openTab('v-history')">سجل الزيارات</button>
+        <button class="tool-btn" onclick="openTab('o-history')">سجل الطلبات</button>
+        <button class="tool-btn" onclick="openTab('attachments')">المرفقات</button>
+    </div>
+
+    <div class="content-area" id="display-frame">
+        <p style="text-align:center; color:#94a3b8; margin-top:100px;">اختر عملية من الشريط أعلاه لعرض البيانات</p>
+    </div>
+</div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const clientName = urlParams.get('name');
+
+    function loadClientData() {
+        if(!clientName) return;
+        const data = JSON.parse(localStorage.getItem('asgate_customers_data') || '[]');
+        const client = data.find(c => c.comp === clientName);
+
+        if(client) {
+            document.getElementById('c-name').innerText = client.comp;
+            document.getElementById('c-cr').innerText = client.cr || 'غير مسجل';
+            document.getElementById('c-addr').innerText = client.address || 'غير محدد';
+            
+            // محاكاة عرض المسؤولين
+            const list = document.getElementById('mgr-list');
+            list.innerHTML = `
+                <div class="manager-row">
+                    <div><b>الاسم:</b> ${client.mgr}</div>
+                    <div><b>الموبايل:</b> ${client.mob}</div>
+                    <div><b>الإيميل:</b> info@company.com</div>
+                    <div style="color:#94a3b8; font-size:10px;">أُضيف في: 16/05/2026</div>
+                </div>
+            `;
+        }
+    }
+
+    function openTab(tab) {
+        const frame = document.getElementById('display-frame');
+        document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+        event.target.classList.add('active');
+
+        if(tab === 'v-history') {
+            const visits = JSON.parse(localStorage.getItem('asgate_visits_data') || '[]').filter(v => v.comp === clientName);
+            frame.innerHTML = `<h4>سجل الزيارات الميدانية</h4>` + (visits.length > 0 ? 
+                visits.map(v => `<div style="border-bottom:1px solid #eee; padding:10px;">📅 ${v.date} - ${v.status}</div>`).join('') : 
+                `<p>لا توجد زيارات مسجلة لهذا العميل.</p>`);
+        } else {
+            frame.innerHTML = `<h3 style="text-align:center; color:var(--nav-purple); margin-top:80px;">قسم ${tab} تحت البرمجة</h3>`;
+        }
+    }
+</script>
+</body>
+</html>
