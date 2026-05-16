@@ -15,8 +15,34 @@
         }
         body { background-color: var(--bg); font-family: 'Cairo', sans-serif; margin: 0; }
         
-        .navbar { background-color: var(--nav-purple); display: flex; align-items: center; padding: 0 20px; margin: 5px 10px; border-radius: 10px; height: 32px; }
-        .navbar a { color: white; text-decoration: none; padding: 0 12px; font-weight: 700; font-size: 11px; }
+        /* شريط التنقل الموحد - ارتفاع 37 بكسل */
+        .navbar { 
+            background-color: var(--nav-purple); 
+            display: flex; 
+            align-items: center; 
+            padding: 0 20px; 
+            margin: 10px; 
+            border-radius: 15px; 
+            height: 37px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 10px;
+            z-index: 1000;
+            box-sizing: border-box;
+        }
+        .navbar a { 
+            color: white; 
+            text-decoration: none; 
+            padding: 0 15px; 
+            font-weight: 700; 
+            font-size: 12px; 
+            border-radius: 8px; 
+            transition: 0.3s; 
+            line-height: 26px; 
+            height: 26px; 
+            display: inline-block;
+        }
+        .navbar a:hover { background-color: rgba(255,255,255,0.1); }
 
         .container { padding: 5px 15px; max-width: 100%; margin: auto; }
 
@@ -25,13 +51,13 @@
             background: var(--white); border-radius: 8px; padding: 8px 20px; 
             box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 6px;
             border-right: 4px solid var(--nav-purple);
-            display: flex; flex-direction: column; /* للسماح بوجود أسطر داخل القسم */
+            display: flex; flex-direction: column;
         }
 
         .row-wrapper { 
             display: flex; 
             align-items: center; 
-            justify-content: space-between; /* هذا يوزع العناصر على كامل العرض */
+            justify-content: space-between; 
             width: 100%; 
         }
 
@@ -41,9 +67,9 @@
         .data-row-inline { 
             display: flex; 
             flex-grow: 1; 
-            justify-content: space-between; /* توزيع المسافات بين المعلومات */
+            justify-content: space-between; 
             align-items: center;
-            margin-right: 20px; /* مسافة بسيطة بعد العنوان الرئيسي */
+            margin-right: 20px;
         }
         
         .info-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
@@ -63,7 +89,7 @@
         }
         .add-mgr-btn:hover { background: var(--nav-purple); color: white; }
 
-        /* شريط التحكم */
+        /* شريط التحكم المدمج */
         .control-strip { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 
         .action-btn {
@@ -106,6 +132,7 @@
     <a href="visits.html">الزيارات</a>
     <a href="opportunities.html">الفرص البيعية</a>
     <a href="customers.html">العملاء</a>
+    <a href="sales.html">المبيعات</a>
 </nav>
 
 <div class="container">
@@ -137,8 +164,8 @@
     </div>
 
     <div class="control-strip">
-        <button class="action-btn btn-green" onclick="alert('طلب جديد')">🛒 طلب جديد</button>
-        <button class="action-btn btn-yellow" onclick="alert('زيارة جديدة')">🚗 زيارة جديدة</button>
+        <button class="action-btn btn-green" onclick="alert('فتح نموذج طلب جديد')">🛒 طلب جديد</button>
+        <button class="action-btn btn-yellow" onclick="alert('فتح نموذج زيارة جديدة')">🚗 زيارة جديدة</button>
         
         <div class="tabs-wrapper">
             <button class="tab-btn active" id="btn-v" onclick="openTab('v-history')">سجل الزيارات</button>
@@ -156,11 +183,14 @@
 </div>
 
 <script>
+    // الحصول على اسم العميل من الرابط
     const urlParams = new URLSearchParams(window.location.search);
     const clientName = urlParams.get('name');
 
     function loadClientData() {
         if(!clientName) return;
+        
+        // البحث عن بيانات العميل في التخزين المحلي
         const data = JSON.parse(localStorage.getItem('asgate_customers_data') || '[]');
         const client = data.find(c => c.comp === clientName);
 
@@ -170,6 +200,8 @@
             document.getElementById('c-addr').innerText = client.address || 'الرياض';
             document.getElementById('m-name').innerText = client.mgr || '-';
             document.getElementById('m-mob').innerText = client.mob || '-';
+            
+            // تحميل سجل الزيارات تلقائياً
             openTab('v-history');
         }
     }
@@ -179,27 +211,34 @@
         const title = document.getElementById('frame-title');
         const content = document.getElementById('table-content');
         
+        // تحديث مظهر الأزرار
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         
         if(tab === 'v-history') {
             document.getElementById('btn-v').classList.add('active');
             frame.className = "content-area mode-visit";
             title.innerText = "📅 سجل الزيارات الميدانية";
-            const visits = JSON.parse(localStorage.getItem('asgate_visits_data') || '[]').filter(v => v.comp === clientName);
+            
+            // جلب الزيارات المرتبطة بهذا العميل فقط
+            const visits = JSON.parse(localStorage.getItem('asgate_visits_data') || '[]')
+                               .filter(v => v.comp === clientName);
+                               
             content.innerHTML = visits.length > 0 ? `
                 <table>
                     <thead><tr><th>التاريخ</th><th>النوع</th><th>الملاحظات</th></tr></thead>
                     <tbody>${visits.map(v => `<tr><td>${v.date}</td><td>${v.type || 'ميدانية'}</td><td>${v.notes || '-'}</td></tr>`).join('')}</tbody>
                 </table>` : `<p style="text-align:center; color:#94a3b8; font-size:11px;">لا توجد سجلات حالياً.</p>`;
-        } else if(tab === 'o-history') {
+        } 
+        else if(tab === 'o-history') {
             document.getElementById('btn-o').classList.add('active');
             frame.className = "content-area mode-order";
             title.innerText = "🛒 سجل طلبات العميل";
-            content.innerHTML = `<p style="text-align:center; color:#94a3b8; font-size:11px; margin-top:20px;">لا توجد طلبات سابقة.</p>`;
-        } else {
+            content.innerHTML = `<p style="text-align:center; color:#94a3b8; font-size:11px; margin-top:20px;">لا توجد طلبات سابقة مسجلة.</p>`;
+        } 
+        else {
             frame.className = "content-area";
             title.innerText = "📁 الملفات والمرفقات";
-            content.innerHTML = `<p style="text-align:center; color:#94a3b8; font-size:11px; margin-top:20px;">لا توجد مرفقات حالياً.</p>`;
+            content.innerHTML = `<p style="text-align:center; color:#94a3b8; font-size:11px; margin-top:20px;">لا توجد مرفقات مرتبطة بهذا الملف.</p>`;
         }
     }
 </script>
