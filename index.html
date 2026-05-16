@@ -8,7 +8,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --nav-navy: #001f3f;
+            --nav-ultra-purple: #2e1065; /* اللون الموحد لجميع الصفحات */
+            --active-light-purple: #a78bfa; /* لون التمييز للرابط النشط */
             --stat-black: #1a1a1a;
             --stat-green: #22c55e;
             --stat-yellow: #ffc000;
@@ -18,82 +19,66 @@
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; overflow-x: hidden; }
 
-        /* شريط التنقل بحواف دائرية - تم ضبط الارتفاع صراحة إلى 40px */
+        /* شريط التنقل الموحد - الارتفاع 37 بكسل */
         .navbar { 
-            background-color: var(--nav-navy); 
+            background-color: var(--nav-ultra-purple); 
             display: flex; 
-            align-items: center;  /* توسيط الروابط عمودياً تماماً */
-            padding: 0 20px;      /* الاعتماد الكامل على الارتفاع الثابت لتجنب زيادة الحجم */
+            align-items: center; 
+            padding: 0 20px; 
             margin: 10px; 
             border-radius: 15px; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             position: sticky;
             top: 10px;
             z-index: 1000;
-            height: 40px;         /* الارتفاع الجديد المطلوب بدقة */
+            height: 37px; 
             box-sizing: border-box;
         }
         
         .navbar a { 
             color: white; 
             text-decoration: none; 
-            padding: 5px 15px;    /* تقليل الحشوة الداخلية لتتناسب مع ارتفاع 40px */
+            padding: 4px 15px; 
             margin-left: 5px; 
             font-weight: 700; 
             font-size: 11px; 
             border-radius: 10px; 
             transition: 0.3s; 
-            line-height: 1;       /* ثبات الحساب البرمجي لمنع تمدد الصندوق */
+            line-height: 1;
         }
-        .navbar a.active { background-color: rgba(255,255,255,0.1); }
-        .navbar a:hover { background-color: rgba(255,255,255,0.05); }
+        
+        /* تمييز كلمة الرئيسية بمربع بنفسجي فاتح */
+        .navbar a.active { 
+            background-color: var(--active-light-purple); 
+            color: white;
+            border-radius: 8px;
+        }
+        
+        .navbar a:hover:not(.active) { background-color: rgba(255,255,255,0.1); }
 
-        .user-info-bar { background: white; display: flex; justify-content: space-around; padding: 10px; border-bottom: 1px solid #eee; font-size: 11px; color: var(--nav-navy); margin-bottom: 15px; }
+        .user-info-bar { background: white; display: flex; justify-content: space-around; padding: 10px; border-bottom: 1px solid #eee; font-size: 11px; color: var(--nav-ultra-purple); margin-bottom: 15px; }
 
         .container { padding: 0 15px 15px 15px; max-width: 1400px; margin: auto; }
 
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .small-card { display: flex; align-items: center; padding: 15px; border-radius: 12px; color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
 
-        .dashboard-main { 
-            display: flex; 
-            gap: 20px; 
-            margin-bottom: 20px; 
-            align-items: start;
-        }
-
-        .charts-column { 
-            flex: 2; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 20px; 
-        }
-
-        .table-area { 
-            flex: 2; 
-            min-width: 400px; 
-        }
-
-        .search-filter-box { 
-            width: 250px; 
-            background: white; 
-            padding: 15px; 
-            border-radius: 12px; 
-            border: 1px solid var(--border-color);
-            flex-shrink: 0;
-        }
+        .dashboard-main { display: flex; gap: 20px; margin-bottom: 20px; align-items: start; }
+        .charts-column { flex: 2; display: flex; flex-direction: column; gap: 20px; }
+        .table-area { flex: 2; min-width: 400px; }
+        .search-filter-box { width: 250px; background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); flex-shrink: 0; }
 
         .content-box { background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         
         .yearly-table { width: 100%; border-collapse: collapse; font-size: 11px; text-align: center; }
-        .yearly-table th { background: var(--nav-navy); color: white; padding: 12px 5px; font-weight: bold; }
+        .yearly-table th { background: var(--nav-ultra-purple); color: white; padding: 12px 5px; font-weight: bold; }
         .yearly-table td { padding: 10px 5px; border-bottom: 1px solid #f1f5f9; font-weight: bold; color: #475569; }
 
         .chart-wrapper { position: relative; height: 180px; width: 100%; }
-        h3 { font-size: 13px; margin-top: 0; margin-bottom: 15px; color: var(--nav-navy); font-weight: 800; border-right: 3px solid var(--stat-green); padding-right: 10px; }
+        h3 { font-size: 13px; margin-top: 0; margin-bottom: 15px; color: var(--nav-ultra-purple); font-weight: 800; border-right: 3px solid var(--stat-green); padding-right: 10px; }
 
         .filter-group { margin-bottom: 12px; }
-        .filter-group label { display: block; font-size: 10px; font-weight: bold; margin-bottom: 5px; color: var(--nav-navy); }
+        .filter-group label { display: block; font-size: 10px; font-weight: bold; margin-bottom: 5px; color: var(--nav-ultra-purple); }
         .filter-input { width: 100%; padding: 8px; font-family: 'Cairo'; font-size: 11px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
 
         @media (max-width: 1200px) {
@@ -114,7 +99,7 @@
     <div class="user-info-bar">
         <div><span style="font-weight:700">المستخدم:</span> حمزة</div>
         <div><span style="font-weight:700">الرقم:</span> 12345</div>
-        <div><span style="font-weight:700">التاريخ:</span> 14 مايو 2026</div>
+        <div><span style="font-weight:700">التاريخ:</span> 16 مايو 2026</div>
     </div>
 
     <div class="container">
@@ -158,8 +143,7 @@
                                 <th>معلق</th>
                             </tr>
                         </thead>
-                        <tbody id="yearlyDataBody">
-                        </tbody>
+                        <tbody id="yearlyDataBody"></tbody>
                     </table>
                 </div>
             </div>
@@ -197,13 +181,12 @@
                     </select>
                 </div>
 
-                <button class="filter-input" style="background: var(--nav-navy); color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 10px;">تطبيق الفلترة</button>
+                <button class="filter-input" style="background: var(--nav-ultra-purple); color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 10px;">تطبيق الفلترة</button>
             </div>
         </div>
     </div>
 
     <script>
-        // تعبئة الجدول بالبيانات
         const months = ["يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
         const tbody = document.getElementById('yearlyDataBody');
         
@@ -217,7 +200,6 @@
             </tr>`; 
         });
 
-        // إعداد الرسوم البيانية
         const ctxBar = document.getElementById('performanceChart').getContext('2d');
         new Chart(ctxBar, {
             type: 'bar',
