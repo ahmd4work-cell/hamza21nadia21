@@ -12,50 +12,55 @@
             --border-color: #cbd5e1;
             --sticker-yellow: #fff9c4;
             --accent-green-active: #22c55e;
+            --accent-green-dim: #d1fae5;
         }
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; }
 
-        /* شريط التنقل الموحد - 37px */
+        /* شريط التنقل - 37px */
         .navbar { 
-            background-color: var(--nav-bg); display: flex; align-items: center; 
-            padding: 0 20px; margin: 10px; border-radius: 15px; height: 37px; 
+            background-color: var(--nav-bg); 
+            display: flex; align-items: center; padding: 0 20px; 
+            margin: 10px; border-radius: 15px; height: 37px;
             position: sticky; top: 10px; z-index: 1000; box-sizing: border-box;
         }
-
         .navbar a { 
-            color: white; text-decoration: none; padding: 0 15px; margin-left: 5px; 
-            font-weight: 700; font-size: 12px; border-radius: 8px; transition: 0.3s; 
-            line-height: 26px; height: 26px; display: inline-block;
+            color: white; text-decoration: none; padding: 0 15px; font-weight: 700; 
+            font-size: 12px; border-radius: 8px; transition: 0.3s; line-height: 26px; height: 26px; display: inline-block;
         }
-
         .navbar a.active { background-color: var(--nav-active); }
 
         .container { padding: 5px 10px; }
         .action-bar { display: flex; align-items: center; margin-top: 15px; margin-bottom: 20px; gap: 10px; }
         
-        .btn-top { border: none; padding: 8px 20px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 13px; color: white; }
-        .btn-save-all { background-color: #d1fae5; color: #065f46; opacity: 0.6; pointer-events: none; }
+        .btn-top { border: none; padding: 8px 20px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 13px; color: white; transition: 0.3s; }
+        .btn-save-all { background-color: var(--accent-green-dim); color: #065f46; opacity: 0.6; pointer-events: none; }
         .btn-save-all.active { background-color: var(--accent-green-active); color: white; opacity: 1; pointer-events: auto; }
 
         table { width: 100%; border-collapse: collapse; background: white; border: 1px solid var(--border-color); }
         th { background-color: #f5f3ff; padding: 8px; color: var(--nav-bg); font-size: 11px; font-weight: 800; border: 1px solid var(--border-color); }
-        td { border: 1px solid var(--border-color); text-align: center; height: 38px; font-size: 11px; position: relative; }
+        td { border: 1px solid var(--border-color); text-align: center; height: 38px; font-size: 11px; }
 
+        /* تنسيق مدخلات الإكسيل */
         .excel-input { width: 100%; height: 100%; border: none; padding: 0 5px; font-family: 'Cairo'; font-size: 11px; text-align: center; outline: none; background: transparent; }
         
-        /* تنسيق رابط ملف العميل */
-        .profile-link {
-            position: absolute; left: 5px; top: 50%; transform: translateY(-50%);
-            text-decoration: none; font-size: 14px; color: var(--nav-bg); opacity: 0.5;
+        /* جعل اسم الشركة يظهر كرابط جذاب */
+        .company-link-input {
+            color: var(--nav-bg);
+            font-weight: 700;
+            text-decoration: underline;
+            text-decoration-style: dotted;
+            cursor: pointer;
         }
-        .profile-link:hover { opacity: 1; }
+        .company-link-input:hover {
+            color: var(--accent-green-active);
+        }
 
-        .notes-cell { cursor: pointer; color: #475569; font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 5px; }
+        .notes-cell { cursor: pointer; color: #475569; font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 8px; }
 
-        /* Modal Styles */
+        /* نظام الاستيكر */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 2000; }
-        .sticker-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 7cm; background: var(--sticker-yellow); border-radius: 2px; box-shadow: 5px 5px 15px rgba(0,0,0,0.2); }
+        .sticker-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 7cm; background-color: var(--sticker-yellow); border-radius: 2px; box-shadow: 5px 5px 15px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body onload="loadSavedData()">
@@ -75,7 +80,7 @@
     <table id="mainTable">
         <thead>
             <tr>
-                <th style="width: 20%;">الشركة (تعديل/ملف)</th>
+                <th style="width: 20%;">الشركة (رابط الملف)</th>
                 <th style="width: 15%;">العنوان</th>
                 <th style="width: 10%;">المسؤول</th>
                 <th style="width: 10%;">الموبايل</th>
@@ -88,12 +93,12 @@
     </table>
 </div>
 
-<div id="notesOverlay" class="modal-overlay" onclick="closeSticker()">
+<div id="notesOverlay" class="modal-overlay" onclick="this.style.display='none'">
     <div class="sticker-container" onclick="event.stopPropagation()">
-        <div id="historyArea" style="padding:15px; max-height:300px; overflow-y:auto; font-size:11px;"></div>
+        <div id="historyArea" style="padding:15px; font-size:11px; max-height:250px; overflow-y:auto;"></div>
         <div style="padding:15px; background:#fff59d">
-            <textarea id="stickerInput" style="width:100%; height:60px; border:none; background:transparent; font-family:'Cairo'; outline:none;" placeholder="تحديث جديد..."></textarea>
-            <button onclick="confirmAndSaveNote()" style="width:100%; border:none; padding:8px; background:#22c55e; color:white; font-family:'Cairo'; font-weight:bold; cursor:pointer;">حفظ التحديث</button>
+            <textarea id="stickerInput" style="width:100%; height:50px; border:none; background:transparent; font-family:'Cairo'; outline:none;" placeholder="تحديث الملاحظة..."></textarea>
+            <button onclick="confirmAndSaveNote()" style="width:100%; background:#22c55e; color:white; border:none; padding:8px; cursor:pointer; font-family:'Cairo'; font-weight:bold;">حفظ</button>
         </div>
     </div>
 </div>
@@ -116,18 +121,30 @@
         const tbody = document.getElementById('tableBody');
         const row = tbody.insertRow(isNew ? 0 : -1);
         row.innerHTML = `
-            <td style="display:flex; align-items:center;">
-                <input type="text" class="excel-input" value="${v.comp || ''}" oninput="markAsChanged()">
-                <a href="customer-profile.html?name=${encodeURIComponent(v.comp || '')}" class="profile-link" title="فتح الملف الشخصي">📂</a>
+            <td style="position:relative;">
+                <input type="text" class="excel-input company-link-input" 
+                       value="${v.comp || ''}" 
+                       oninput="markAsChanged()" 
+                       onclick="if(event.ctrlKey || event.metaKey) window.location.href='customer-profile.html?name='+encodeURIComponent(this.value)"
+                       title="اضغط مع Ctrl لفتح الملف، أو عدل الاسم مباشرة">
+                <a href="customer-profile.html?name=${encodeURIComponent(v.comp || '')}" 
+                   style="position:absolute; left:2px; top:2px; font-size:9px; text-decoration:none; color:#aaa;">🔗</a>
             </td>
             <td><input type="text" class="excel-input" value="${v.address || ''}" oninput="markAsChanged()"></td>
             <td><input type="text" class="excel-input" value="${v.mgr || ''}" oninput="markAsChanged()"></td>
             <td><input type="text" class="excel-input" value="${v.mob || ''}" oninput="markAsChanged()"></td>
             <td><input type="text" class="excel-input" value="${v.cr || ''}" oninput="markAsChanged()"></td>
             <td class="notes-cell" data-notes='${v.notes || "[]"}' onclick="openSticker(this)">${getDisplayNote(v.notes || "[]")}</td>
-            <td><button style="border:none; background:#fee2e2; color:red; cursor:pointer; padding:4px 8px; border-radius:4px;" onclick="deleteRow(this)">حذف</button></td>
+            <td><button style="border:none; background:#fee2e2; color:red; cursor:pointer; padding:3px 8px; border-radius:4px;" onclick="deleteRow(this)">حذف</button></td>
         `;
     }
+
+    // لتسهيل الأمر على المستخدم: الضغط المزدوج يفتح الملف
+    document.addEventListener('dblclick', function(e) {
+        if(e.target.classList.contains('company-link-input') && e.target.value) {
+            window.location.href = 'customer-profile.html?name=' + encodeURIComponent(e.target.value);
+        }
+    });
 
     function getDisplayNote(json) {
         try {
@@ -146,8 +163,6 @@
         document.getElementById('notesOverlay').style.display = 'block';
     }
 
-    function closeSticker() { document.getElementById('notesOverlay').style.display = 'none'; }
-
     function confirmAndSaveNote() {
         const text = document.getElementById('stickerInput').value.trim();
         if(text) {
@@ -157,7 +172,7 @@
             activeCell.innerText = getDisplayNote(JSON.stringify(notes));
             markAsChanged();
         }
-        closeSticker();
+        document.getElementById('notesOverlay').style.display = 'none';
     }
 
     function saveAllData() {
@@ -172,10 +187,11 @@
         });
         localStorage.setItem('asgate_customers_data', JSON.stringify(allData));
         loadSavedData();
+        alert("تم حفظ التعديلات");
     }
 
     function insertNewRow() { renderRow({}, true); markAsChanged(); }
-    function deleteRow(btn) { if(confirm("حذف العميل؟")) { btn.closest('tr').remove(); saveAllData(); } }
+    function deleteRow(btn) { if(confirm("حذف؟")) { btn.closest('tr').remove(); saveAllData(); } }
 </script>
 </body>
 </html>
