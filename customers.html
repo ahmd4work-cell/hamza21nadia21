@@ -12,16 +12,15 @@
             --border-color: #cbd5e1;
             --sticker-yellow: #fff9c4;
             --accent-green-active: #22c55e;
-            --accent-green-dim: #d1fae5;
+            --accent-blue: #3b82f6;
         }
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; }
 
         /* شريط التنقل - 37px */
         .navbar { 
-            background-color: var(--nav-bg); 
-            display: flex; align-items: center; padding: 0 20px; 
-            margin: 10px; border-radius: 15px; height: 37px;
+            background-color: var(--nav-bg); display: flex; align-items: center; 
+            padding: 0 20px; margin: 10px; border-radius: 15px; height: 37px;
             position: sticky; top: 10px; z-index: 1000; box-sizing: border-box;
         }
         .navbar a { 
@@ -34,31 +33,28 @@
         .action-bar { display: flex; align-items: center; margin-top: 15px; margin-bottom: 20px; gap: 10px; }
         
         .btn-top { border: none; padding: 8px 20px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 13px; color: white; transition: 0.3s; }
-        .btn-save-all { background-color: var(--accent-green-dim); color: #065f46; opacity: 0.6; pointer-events: none; }
+        .btn-save-all { background-color: #d1fae5; color: #065f46; opacity: 0.6; pointer-events: none; }
         .btn-save-all.active { background-color: var(--accent-green-active); color: white; opacity: 1; pointer-events: auto; }
 
         table { width: 100%; border-collapse: collapse; background: white; border: 1px solid var(--border-color); }
         th { background-color: #f5f3ff; padding: 8px; color: var(--nav-bg); font-size: 11px; font-weight: 800; border: 1px solid var(--border-color); }
         td { border: 1px solid var(--border-color); text-align: center; height: 38px; font-size: 11px; }
 
-        /* تنسيق مدخلات الإكسيل */
+        /* خلية اسم الشركة - الرابط */
+        .company-cell { position: relative; padding: 0 !important; }
+        .company-link {
+            display: block; width: 100%; height: 100%; line-height: 38px;
+            color: var(--nav-bg); text-decoration: none; font-weight: 700;
+            transition: 0.2s; cursor: pointer;
+        }
+        .company-link:hover { background-color: #f0fdf4; color: var(--accent-blue); text-decoration: underline; }
+
+        /* مدخل إكسيل مخفي يظهر فقط عند التعديل */
         .excel-input { width: 100%; height: 100%; border: none; padding: 0 5px; font-family: 'Cairo'; font-size: 11px; text-align: center; outline: none; background: transparent; }
-        
-        /* جعل اسم الشركة يظهر كرابط جذاب */
-        .company-link-input {
-            color: var(--nav-bg);
-            font-weight: 700;
-            text-decoration: underline;
-            text-decoration-style: dotted;
-            cursor: pointer;
-        }
-        .company-link-input:hover {
-            color: var(--accent-green-active);
-        }
 
         .notes-cell { cursor: pointer; color: #475569; font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 8px; }
 
-        /* نظام الاستيكر */
+        /* نظام الملاحظات الاستيكر */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 2000; }
         .sticker-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 7cm; background-color: var(--sticker-yellow); border-radius: 2px; box-shadow: 5px 5px 15px rgba(0,0,0,0.2); }
     </style>
@@ -74,7 +70,7 @@
 
 <div class="container">
     <div class="action-bar">
-        <button class="btn-top" style="background:#3b82f6" onclick="insertNewRow()">+ إضافة عميل جديد</button>
+        <button class="btn-top" style="background:var(--accent-blue)" onclick="insertNewRow()">+ إضافة عميل جديد</button>
         <button id="saveAllBtn" class="btn-top btn-save-all" onclick="saveAllData()">حفظ التغييرات</button>
     </div>
     <table id="mainTable">
@@ -97,7 +93,7 @@
     <div class="sticker-container" onclick="event.stopPropagation()">
         <div id="historyArea" style="padding:15px; font-size:11px; max-height:250px; overflow-y:auto;"></div>
         <div style="padding:15px; background:#fff59d">
-            <textarea id="stickerInput" style="width:100%; height:50px; border:none; background:transparent; font-family:'Cairo'; outline:none;" placeholder="تحديث الملاحظة..."></textarea>
+            <textarea id="stickerInput" style="width:100%; height:50px; border:none; background:transparent; font-family:'Cairo'; outline:none;" placeholder="تحديث جديد..."></textarea>
             <button onclick="confirmAndSaveNote()" style="width:100%; background:#22c55e; color:white; border:none; padding:8px; cursor:pointer; font-family:'Cairo'; font-weight:bold;">حفظ</button>
         </div>
     </div>
@@ -120,16 +116,23 @@
     function renderRow(v, isNew = false) {
         const tbody = document.getElementById('tableBody');
         const row = tbody.insertRow(isNew ? 0 : -1);
-        row.innerHTML = `
-            <td style="position:relative;">
-                <input type="text" class="excel-input company-link-input" 
-                       value="${v.comp || ''}" 
-                       oninput="markAsChanged()" 
-                       onclick="if(event.ctrlKey || event.metaKey) window.location.href='customer-profile.html?name='+encodeURIComponent(this.value)"
-                       title="اضغط مع Ctrl لفتح الملف، أو عدل الاسم مباشرة">
-                <a href="customer-profile.html?name=${encodeURIComponent(v.comp || '')}" 
-                   style="position:absolute; left:2px; top:2px; font-size:9px; text-decoration:none; color:#aaa;">🔗</a>
-            </td>
+        
+        // خلية الشركة - رابط مباشر
+        const companyCell = row.insertCell(0);
+        companyCell.className = "company-cell";
+        companyCell.innerHTML = `
+            <a href="customer-profile.html?name=${encodeURIComponent(v.comp || '')}" class="company-link" id="link-${row.rowIndex}">
+                ${v.comp || 'اسم الشركة...'}
+            </a>
+            <input type="text" class="excel-input" value="${v.comp || ''}" 
+                   style="display:none;" 
+                   onblur="finalizeEdit(this, ${row.rowIndex})" 
+                   oninput="markAsChanged()">
+        `;
+        // إضافة خاصية التعديل عند الضغط المطول أو الزر الأيمن (اختياري) أو النقر المزدوج
+        companyCell.ondblclick = function() { startEdit(this); };
+
+        row.innerHTML += `
             <td><input type="text" class="excel-input" value="${v.address || ''}" oninput="markAsChanged()"></td>
             <td><input type="text" class="excel-input" value="${v.mgr || ''}" oninput="markAsChanged()"></td>
             <td><input type="text" class="excel-input" value="${v.mob || ''}" oninput="markAsChanged()"></td>
@@ -139,12 +142,22 @@
         `;
     }
 
-    // لتسهيل الأمر على المستخدم: الضغط المزدوج يفتح الملف
-    document.addEventListener('dblclick', function(e) {
-        if(e.target.classList.contains('company-link-input') && e.target.value) {
-            window.location.href = 'customer-profile.html?name=' + encodeURIComponent(e.target.value);
-        }
-    });
+    function startEdit(td) {
+        const link = td.querySelector('.company-link');
+        const input = td.querySelector('.excel-input');
+        link.style.display = 'none';
+        input.style.display = 'block';
+        input.focus();
+    }
+
+    function finalizeEdit(input, rowIndex) {
+        const td = input.parentElement;
+        const link = td.querySelector('.company-link');
+        link.innerText = input.value || 'اسم الشركة...';
+        link.href = "customer-profile.html?name=" + encodeURIComponent(input.value);
+        link.style.display = 'block';
+        input.style.display = 'none';
+    }
 
     function getDisplayNote(json) {
         try {
@@ -178,20 +191,24 @@
     function saveAllData() {
         const allData = [];
         document.querySelectorAll('#tableBody tr').forEach(row => {
-            const ins = row.querySelectorAll('.excel-input');
+            const companyInput = row.cells[0].querySelector('.excel-input');
+            const otherInputs = row.querySelectorAll('td:not(.company-cell) .excel-input');
             allData.push({
-                comp: ins[0].value, address: ins[1].value, mgr: ins[2].value,
-                mob: ins[3].value, cr: ins[4].value,
+                comp: companyInput.value, 
+                address: otherInputs[0].value, 
+                mgr: otherInputs[1].value,
+                mob: otherInputs[2].value, 
+                cr: otherInputs[3].value,
                 notes: row.querySelector('.notes-cell').getAttribute('data-notes')
             });
         });
         localStorage.setItem('asgate_customers_data', JSON.stringify(allData));
-        loadSavedData();
         alert("تم حفظ التعديلات");
+        loadSavedData();
     }
 
     function insertNewRow() { renderRow({}, true); markAsChanged(); }
-    function deleteRow(btn) { if(confirm("حذف؟")) { btn.closest('tr').remove(); saveAllData(); } }
+    function deleteRow(btn) { if(confirm("حذف العميل؟")) { btn.closest('tr').remove(); saveAllData(); } }
 </script>
 </body>
 </html>
