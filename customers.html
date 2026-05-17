@@ -27,7 +27,7 @@
             display: flex; 
             align-items: center; 
             padding: 0 20px; 
-            margin: 10px; 
+            margin: 10px;           /* مسافة 10 بكسل للمظهر العائم */
             border-radius: 15px; 
             height: 37px;
             position: sticky; 
@@ -39,61 +39,57 @@
         .navbar a { 
             color: #ffffff; 
             text-decoration: none; 
-            padding: 0 15px; 
-            font-weight: 700; 
-            font-size: 12px; 
+            padding: 0 15px;        /* مسافة 15 بكسل يمين ويسار */
+            font-weight: 700;       /* وزن عريض */
+            font-size: 12px;        /* حجم الخط */
             border-radius: 6px; 
             transition: 0.3s; 
-            line-height: 26px; 
+            line-height: 26px;      /* ارتفاع المربع الداخلي */
             height: 26px; 
             display: inline-block;
         }
-        .navbar a.active { background-color: var(--nav-active); color: var(--nav-bg); }
-        .navbar a:hover:not(.active) { background-color: rgba(255,255,255,0.1); }
+        /* وصف المربع عند التنشيط والضغط */
+        .navbar a.active { 
+            background-color: var(--nav-active); 
+            color: var(--nav-bg);   /* نص داكن على خلفية فاتحة لزيادة التباين */
+        }
+        .navbar a:hover:not(.active) { 
+            background-color: rgba(255,255,255,0.1); 
+        }
 
-        /* --- تحديث شريط الأزرار (Action Bar) --- */
         .container { padding: 5px 15px; max-width: 100%; }
         
-        .action-bar { 
-            display: flex; 
-            align-items: center; 
-            margin: 10px 0;         /* تقليل المسافات لتتناسق مع النظام الموحد */
-            gap: 10px; 
-            padding: 5px 0;
-        }
-        
-        .btn-top { 
-            border: none; 
-            padding: 8px 20px;      /* الحجم القياسي الموحد */
-            border-radius: 8px; 
-            font-family: 'Cairo'; 
-            font-weight: 700;       /* خط عريض وواضح */
-            cursor: pointer; 
-            font-size: 12px;        /* حجم متناسق مع شريط التنقل */
-            color: white; 
-            transition: 0.3s; 
-        }
-        
+        /* شريط الأزرار */
+        .action-bar { display: flex; align-items: center; margin: 10px 0; gap: 10px; padding: 5px 0; }
+        .btn-top { border: none; padding: 8px 20px; border-radius: 8px; font-family: 'Cairo'; font-weight: 700; cursor: pointer; font-size: 12px; color: white; transition: 0.3s; }
         .btn-save-all { background-color: #d1fae5; color: #065f46; opacity: 0.6; pointer-events: none; }
         .btn-save-all.active { background-color: var(--accent-green-active); color: white; opacity: 1; pointer-events: auto; }
-        /* --------------------------------------- */
 
-        /* 2. جدول العملاء */
-        .table-wrapper { background: white; border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        /* 2. جدول العملاء المطور */
+        .table-wrapper { 
+            background: white; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            border: 1px solid var(--border-color); 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+        }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         
+        /* شريط العناوين حسب الوصف */
         th { 
             background-color: var(--header-purple); 
-            padding: 10px 5px; 
+            padding: 10px 5px;      /* ارتفاع صافي 40px تقريباً */
             color: #ffffff; 
             font-size: 11px; 
-            font-weight: 800; 
-            border-left: 1px solid rgba(255,255,255,0.1); 
+            font-weight: 800;       /* عريض جداً */
+            border-left: 1px solid rgba(255,255,255,0.1); /* فواصل بيضاء شفافة */
             text-align: center;
         }
+        th:last-child { border-left: none; }
 
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 38px; font-size: 11px; color: #1e293b; font-weight: 600; }
 
+        /* السلوك البصري (Zebra Stripes) */
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
         tbody tr:nth-child(odd) { background-color: #ffffff; }
 
@@ -137,7 +133,7 @@
         <table id="mainTable">
             <thead>
                 <tr>
-                    <th style="width: 20%;">الشركة (✎)</th>
+                    <th style="width: 14%;">الشركة (✎)</th>
                     <th style="width: 15%;">العنوان</th>
                     <th style="width: 10%;">المسؤول</th>
                     <th style="width: 12%;">الموبايل</th>
@@ -163,6 +159,7 @@
 </div>
 
 <script>
+    /* كود الـ JavaScript الخاص بالوظائف كما هو لضمان بقاء عمل الصفحة */
     let isDirty = false;
     let activeCell = null;
 
@@ -179,7 +176,6 @@
     function renderRow(v, isNew = false) {
         const tbody = document.getElementById('tableBody');
         const row = tbody.insertRow(isNew ? 0 : -1);
-        
         const today = new Date().toLocaleDateString('en-GB'); 
         const creationDate = v.created || today;
 
