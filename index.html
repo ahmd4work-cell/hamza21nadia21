@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASGate - لوحة التحكم</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
+            /* الألوان الموحدة للنظام */
             --nav-purple: #2e1065;
             --nav-active: #a78bfa;
             --stat-black: #1a1a1a;
@@ -19,20 +20,20 @@
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; overflow-x: hidden; }
 
-        /* شريط التنقل الموحد - ارتفاع 37 بكسل */
+        /* --- تحديث شريط التنقل العلوي (الارتفاع الصافي 37 بكسل) --- */
         .navbar { 
             background-color: var(--nav-purple); 
             display: flex; 
             align-items: center;
             padding: 0 20px; 
-            margin: 10px; 
-            border-radius: 15px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin: 10px;           /* المظهر العائم */
+            border-radius: 12px;    /* حواف منحنية عصرية */
+            height: 37px;           /* الارتفاع المطلوب */
             position: sticky;
             top: 10px;
             z-index: 1000;
-            height: 37px; /* الارتفاع المطلوب */
             box-sizing: border-box;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         .navbar a { 
@@ -41,23 +42,23 @@
             padding: 0 15px; 
             margin-left: 5px; 
             font-weight: 700; 
-            font-size: 12px; /* حجم الخط المطلوب */
-            border-radius: 8px; 
+            font-size: 12px;        /* حجم الخط المطلوب */
+            border-radius: 6px; 
             transition: 0.3s; 
-            line-height: 26px; 
+            line-height: 26px;      /* ارتفاع مربع التأثير الداخلي */
             height: 26px;
             display: inline-block;
         }
 
         .navbar a.active { 
-            background-color: var(--nav-active); /* التمييز المطلوب */
-            color: white;
+            background-color: var(--nav-active); 
+            color: var(--nav-purple); /* نص داكن على خلفية فاتحة للوضوح */
         }
 
         .navbar a:hover:not(.active) { background-color: rgba(255,255,255,0.1); }
+        /* ---------------------------------------------------- */
 
         .user-info-bar { background: white; display: flex; justify-content: space-around; padding: 10px; border-bottom: 1px solid #eee; font-size: 11px; color: var(--nav-purple); margin-bottom: 15px; }
-
         .container { padding: 0 15px 15px 15px; max-width: 1400px; margin: auto; }
 
         /* تنسيقات الكروت والجداول */
