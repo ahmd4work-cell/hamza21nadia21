@@ -7,29 +7,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* الألوان الجديدة والمحدثة */
-            --nav-navy-light: #334155;  /* كحلي فاتح احترافي */
-            --nav-active: #a78bfa; 
+            /* تعديل اللون إلى أزرق داكن احترافي */
+            --nav-blue-dark: #1e3a8a;  
+            --nav-active: #60a5fa; 
             --bg-color: #f1f5f9;
-            --table-blue-alt: #f8fafc; /* لون الصف المتبادل */
+            --table-blue-alt: #f8fafc; 
             --accent-green-active: #22c55e;
             --accent-blue: #3b82f6;
             --accent-red: #ef4444;
-            --border-soft: #e2e8f0;    /* حدود ناعمة */
+            --border-soft: #e2e8f0;    
             --sticker-yellow: #fff9c4;
         }
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.5; }
 
-        /* شريط التنقل الموحد - كحلي فاتح */
+        /* شريط التنقل الموحد - أزرق داكن */
         .navbar { 
-            background-color: var(--nav-navy-light); 
+            background-color: var(--nav-blue-dark); 
             display: flex; 
             align-items: center; 
             padding: 0 20px; 
             margin: 10px; 
             border-radius: 12px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
             position: sticky;
             top: 10px;
             z-index: 1000;
@@ -56,21 +56,19 @@
 
         .container { padding: 10px 20px; max-width: 100%; }
         
-        /* أزرار التحكم */
         .action-bar { display: flex; align-items: center; margin-bottom: 15px; gap: 10px; }
         .btn-top { border: none; padding: 10px 24px; border-radius: 10px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 13px; color: white; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .btn-add { background-color: var(--accent-blue); }
         .btn-save-all { background-color: #cbd5e1; color: #64748b; pointer-events: none; }
         .btn-save-all.active { background-color: var(--accent-green-active); color: white; pointer-events: auto; }
 
-        /* تنسيق الجدول الاحترافي */
         .table-wrapper { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid var(--border-soft); }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         
         th { 
             background-color: #f8fafc; 
             padding: 14px 8px; 
-            color: var(--nav-navy-light); 
+            color: var(--nav-blue-dark); 
             font-size: 11px; 
             font-weight: 800; 
             border-bottom: 2px solid var(--border-soft);
@@ -85,10 +83,10 @@
             font-size: 11px; 
         }
 
-        /* صف أبيض وصف أزرق فاتح جداً */
+        /* صف أبيض وصف أزرق فاتح */
         tr:nth-child(even) { background-color: var(--table-blue-alt); }
         tr:nth-child(odd) { background-color: #ffffff; }
-        tr:hover { background-color: #f1f5f9; } /* تأثير عند مرور الماوس */
+        tr:hover { background-color: #f1f5f9; }
 
         .excel-input { width: 100%; height: 100%; border: none; padding: 0 5px; font-family: 'Cairo'; font-size: 12px; text-align: center; outline: none; background: transparent; color: #334155; }
         .excel-input:focus { background-color: rgba(59, 130, 246, 0.05); }
@@ -96,7 +94,7 @@
         .notes-cell { cursor: pointer; color: #64748b; font-size: 10px; padding: 0 10px; text-align: right; font-style: italic; }
         .btn-delete { border: none; background: #fee2e2; color: var(--accent-red); padding: 5px 12px; border-radius: 6px; font-size: 10px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
         
-        /* ستايل الاستيكر والمربعات الحوارية لم يتغير لضمان الوظيفية */
+        /* نظام الملاحظات والتأكيد */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 2000; }
         .sticker-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 7cm; height: 12cm; background-color: var(--sticker-yellow); border-radius: 2px; box-shadow: 5px 5px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column; border-top: 20px solid #fff59d; }
         .sticker-history { flex-grow: 1; overflow-y: auto; padding: 12px; font-size: 11px; border-bottom: 1px dashed #decb00; text-align: right; }
@@ -106,7 +104,7 @@
         .sticker-save-btn { width: 100%; border: none; padding: 7px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; background-color: #81c784; }
         .sticker-save-btn.active { background-color: #22c55e; }
 
-        .custom-confirm { position: fixed; top: 30%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 3000; display: none; text-align: center; border: 2px solid var(--nav-navy-light); min-width: 250px; }
+        .custom-confirm { position: fixed; top: 30%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 3000; display: none; text-align: center; border: 2px solid var(--nav-blue-dark); min-width: 250px; }
         .confirm-btns { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
         .btn-yes { background: var(--accent-green-active); color: white; border: none; padding: 8px 25px; border-radius: 5px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
         .btn-no { background: var(--accent-red); color: white; border: none; padding: 8px 25px; border-radius: 5px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
