@@ -38,16 +38,24 @@
 
         .container { padding: 0 15px; }
         
-        .action-bar { display: flex; align-items: center; margin: 10px 0; gap: 15px; }
+        /* شريط الأدوات مع الأزرار بجانب بعضها */
+        .action-bar { 
+            display: flex; 
+            align-items: center; 
+            margin: 8px 0; 
+            gap: 10px; /* مسافة بسيطة بين الأزرار */
+        }
 
+        /* مربع البحث في المنتصف */
         .search-wrapper { flex-grow: 1; display: flex; justify-content: center; }
         .search-input {
             width: 350px; padding: 6px 15px; border-radius: 20px;
             border: 1px solid var(--border-soft); font-family: 'Cairo';
             font-size: 13px; outline: none;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
         }
 
-        .btn-top { border: none; padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; color: white; transition: 0.3s; }
+        .btn-top { border: none; padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; color: white; transition: 0.3s; white-space: nowrap; }
         .btn-add { background-color: var(--accent-blue); }
         .btn-save-all { background-color: #cbd5e1; color: #64748b; pointer-events: none; }
         .btn-save-all.active { background-color: var(--accent-green-active); color: white; pointer-events: auto; }
@@ -71,7 +79,7 @@
         .notes-cell { cursor: pointer; color: #64748b; font-size: 10px; padding: 0 8px; text-align: right; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .btn-delete { border: none; background: #fee2e2; color: var(--accent-red); padding: 3px 8px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold; }
         
-        /* Modals */
+        /* Modals and Confirms */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 2000; }
         .sticker-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 7cm; height: 12cm; background-color: var(--sticker-yellow); border-radius: 2px; box-shadow: 5px 5px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column; border-top: 20px solid #fff59d; }
         .sticker-history { flex-grow: 1; overflow-y: auto; padding: 12px; font-size: 11px; border-bottom: 1px dashed #decb00; text-align: right; }
@@ -108,10 +116,11 @@
 <div class="container">
     <div class="action-bar">
         <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة فرصة</button>
-        <div class="search-wrapper">
-            <input type="text" id="searchInput" class="search-input" placeholder="بحث باسم الشركة أو المسؤول..." onkeyup="filterTable()">
-        </div>
         <button id="saveAllBtn" class="btn-top btn-save-all" onclick="saveAllData()">حفظ التغييرات</button>
+        
+        <div class="search-wrapper">
+            <input type="text" id="searchInput" class="search-input" placeholder="بحث (الشركة، المسؤول، الموبايل، السجل)..." onkeyup="filterTable()">
+        </div>
     </div>
 
     <div class="table-wrapper">
@@ -153,13 +162,28 @@
     let isStickerChanged = false;
     const statusOrder = { "مهتم": 4, "50%": 3, "20%": 2, "فقدان": 1 };
 
+    // نظام البحث المطور ليشمل عدة أعمدة
     function filterTable() {
         const query = document.getElementById('searchInput').value.toLowerCase();
         const rows = document.querySelectorAll('#tableBody tr');
+        
         rows.forEach(row => {
-            const comp = row.cells[0].querySelector('input').value.toLowerCase();
-            const mgr = row.cells[1].querySelector('input').value.toLowerCase();
-            row.style.display = (comp.includes(query) || mgr.includes(query)) ? '' : 'none';
+            const cells = row.querySelectorAll('.excel-input');
+            if (cells.length >= 5) {
+                const comp = cells[0].value.toLowerCase(); // الشركة
+                const mgr  = cells[1].value.toLowerCase(); // المسؤول
+                const mob  = cells[2].value.toLowerCase(); // الموبايل
+                const cr   = cells[3].value.toLowerCase(); // السجل
+                const curr = cells[4].value.toLowerCase(); // الخدمة الحالية (العنوان)
+                
+                const isMatch = comp.includes(query) || 
+                                mgr.includes(query)  || 
+                                mob.includes(query)  || 
+                                cr.includes(query)   || 
+                                curr.includes(query);
+                
+                row.style.display = isMatch ? '' : 'none';
+            }
         });
     }
 
@@ -239,7 +263,6 @@
         const allData = [];
         rows.forEach(row => {
             const ins = row.querySelectorAll('.excel-input');
-            const selects = row.querySelectorAll('select');
             let updatedAt = row.querySelector('.updated-at').innerText;
             if (row.getAttribute('data-pending-update')) updatedAt = row.getAttribute('data-pending-update');
             allData.push({
