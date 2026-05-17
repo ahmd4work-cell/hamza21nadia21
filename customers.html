@@ -27,7 +27,7 @@
             display: flex; 
             align-items: center; 
             padding: 0 20px; 
-            margin: 10px;           /* مسافة 10 بكسل للمظهر العائم */
+            margin: 10px; 
             border-radius: 15px; 
             height: 37px;
             position: sticky; 
@@ -39,48 +39,61 @@
         .navbar a { 
             color: #ffffff; 
             text-decoration: none; 
-            padding: 0 15px;        /* المسافة بين أسماء الصفحات */
-            font-weight: 700;       /* وزن عريض للوضوح */
-            font-size: 12px;        /* حجم الخط */
+            padding: 0 15px; 
+            font-weight: 700; 
+            font-size: 12px; 
             border-radius: 6px; 
             transition: 0.3s; 
-            line-height: 26px;      /* ارتفاع المربع الداخلي */
+            line-height: 26px; 
             height: 26px; 
             display: inline-block;
         }
-        .navbar a.active { 
-            background-color: var(--nav-active); 
-            color: var(--nav-bg);   /* زيادة التباين */
-        }
-        .navbar a:hover:not(.active) { 
-            background-color: rgba(255,255,255,0.1); 
-        }
+        .navbar a.active { background-color: var(--nav-active); color: var(--nav-bg); }
+        .navbar a:hover:not(.active) { background-color: rgba(255,255,255,0.1); }
 
+        /* --- تحديث شريط الأزرار (Action Bar) --- */
         .container { padding: 5px 15px; max-width: 100%; }
-        .action-bar { display: flex; align-items: center; margin-top: 15px; margin-bottom: 20px; gap: 10px; }
         
-        .btn-top { border: none; padding: 8px 20px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 13px; color: white; transition: 0.3s; }
+        .action-bar { 
+            display: flex; 
+            align-items: center; 
+            margin: 10px 0;         /* تقليل المسافات لتتناسق مع النظام الموحد */
+            gap: 10px; 
+            padding: 5px 0;
+        }
+        
+        .btn-top { 
+            border: none; 
+            padding: 8px 20px;      /* الحجم القياسي الموحد */
+            border-radius: 8px; 
+            font-family: 'Cairo'; 
+            font-weight: 700;       /* خط عريض وواضح */
+            cursor: pointer; 
+            font-size: 12px;        /* حجم متناسق مع شريط التنقل */
+            color: white; 
+            transition: 0.3s; 
+        }
+        
         .btn-save-all { background-color: #d1fae5; color: #065f46; opacity: 0.6; pointer-events: none; }
         .btn-save-all.active { background-color: var(--accent-green-active); color: white; opacity: 1; pointer-events: auto; }
+        /* --------------------------------------- */
 
-        /* 2. جدول العملاء (نظام الألوان والمساحات) */
+        /* 2. جدول العملاء */
         .table-wrapper { background: white; border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         
-        /* شريط العناوين المطور */
         th { 
             background-color: var(--header-purple); 
-            padding: 10px 5px;      /* الارتفاع الصافي 40px تقريباً */
+            padding: 10px 5px; 
             color: #ffffff; 
             font-size: 11px; 
-            font-weight: 800;       /* عريض جداً ليبرز كعنوان */
-            border-left: 1px solid rgba(255,255,255,0.1); /* فواصل بيضاء شفافة */
+            font-weight: 800; 
+            border-left: 1px solid rgba(255,255,255,0.1); 
             text-align: center;
         }
 
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 38px; font-size: 11px; color: #1e293b; font-weight: 600; }
 
-        /* 3. السلوك البصري (Zebra Stripes) */
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
         tbody tr:nth-child(odd) { background-color: #ffffff; }
 
