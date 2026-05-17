@@ -18,7 +18,7 @@
         
         body { background-color: var(--bg); font-family: 'Cairo', sans-serif; margin: 0; }
         
-        /* شريط التنقل الموحد - ارتفاع 37 بكسل */
+        /* شريط التنقل الموحد - ارتفاع 37 بكسل مع المسافات المطلوبة */
         .navbar { 
             background-color: var(--nav-purple); 
             display: flex; 
@@ -36,7 +36,8 @@
         .navbar a { 
             color: white; 
             text-decoration: none; 
-            padding: 0 15px; 
+            padding: 0 15px;      /* المسافة الداخلية 15 بكسل */
+            margin-left: 5px;      /* المسافة بين الكلمات 5 بكسل */
             font-weight: 700; 
             font-size: 12px; 
             border-radius: 8px; 
@@ -83,14 +84,11 @@
             padding: 8px 15px; 
             border: 1px solid var(--border); 
             border-radius: 10px; 
-            flex-grow: 0;
             width: 320px; 
             font-family: 'Cairo'; 
             font-size: 12px; 
             outline: none;
-            transition: 0.2s;
         }
-        .search-box:focus { border-color: var(--nav-active); box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.1); }
 
         .add-sale-btn { 
             background: var(--nav-purple); 
@@ -106,9 +104,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: 0.3s;
         }
-        .add-sale-btn:hover { background: #3b1680; transform: translateY(-1px); }
 
         /* جدول المبيعات */
         .sales-table-container { 
@@ -128,7 +124,6 @@
             font-weight: 800;
         }
         td { padding: 12px 10px; border-bottom: 1px solid #f1f5f9; color: #1e293b; font-weight: 600; }
-        tr:hover { background-color: #fcfcfd; }
         
         .status-badge { 
             padding: 3px 10px; 
@@ -150,9 +145,7 @@
             font-family: 'Cairo';
             font-size: 10px;
             font-weight: bold;
-            transition: 0.2s;
         }
-        .details-btn:hover { background: var(--nav-purple); color: white; }
     </style>
 </head>
 <body>
@@ -204,7 +197,7 @@
                 <tr>
                     <td>#INV-9901</td>
                     <td>شركة الحلول الذكية</td>
-                    <td>2026/05/16</td>
+                    <td>2026-05-16</td>
                     <td>15,000.00 ر.س</td>
                     <td><span class="status-badge status-paid">تم التحصيل</span></td>
                     <td><button class="details-btn">التفاصيل</button></td>
@@ -212,7 +205,7 @@
                 <tr>
                     <td>#INV-9902</td>
                     <td>مؤسسة الأفق للنقل</td>
-                    <td>2026/05/15</td>
+                    <td>2026-05-15</td>
                     <td>8,450.00 ر.س</td>
                     <td><span class="status-badge status-pending">انتظار الدفع</span></td>
                     <td><button class="details-btn">التفاصيل</button></td>
@@ -220,7 +213,7 @@
                 <tr>
                     <td>#INV-9903</td>
                     <td>مصنع الرياض للتغليف</td>
-                    <td>2026/05/14</td>
+                    <td>2026-05-14</td>
                     <td>22,100.00 ر.س</td>
                     <td><span class="status-badge status-paid">تم التحصيل</span></td>
                     <td><button class="details-btn">التفاصيل</button></td>
