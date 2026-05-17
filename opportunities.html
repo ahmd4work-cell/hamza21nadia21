@@ -7,29 +7,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* الألوان المعتمدة */
-            --nav-purple: #2e1065;      /* بنفسجي داكن */
-            --nav-active: #a78bfa;      /* بنفسجي فاتح للمربع */
-            --bg-color: #f4f7f9;
+            /* الألوان الجديدة والمحدثة */
+            --nav-navy-light: #334155;  /* كحلي فاتح احترافي */
+            --nav-active: #a78bfa; 
+            --bg-color: #f1f5f9;
+            --table-blue-alt: #f8fafc; /* لون الصف المتبادل */
             --accent-green-active: #22c55e;
-            --accent-green-dim: #d1fae5;
             --accent-blue: #3b82f6;
             --accent-red: #ef4444;
-            --border-color: #cbd5e1;
+            --border-soft: #e2e8f0;    /* حدود ناعمة */
             --sticker-yellow: #fff9c4;
         }
 
-        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1; }
+        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.5; }
 
-        /* شريط التنقل الموحد - ارتفاع 37 بكسل */
+        /* شريط التنقل الموحد - كحلي فاتح */
         .navbar { 
-            background-color: var(--nav-purple); 
+            background-color: var(--nav-navy-light); 
             display: flex; 
             align-items: center; 
             padding: 0 20px; 
             margin: 10px; 
-            border-radius: 15px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 12px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             position: sticky;
             top: 10px;
             z-index: 1000;
@@ -43,59 +43,70 @@
             padding: 0 15px; 
             margin-left: 5px; 
             font-weight: 700; 
-            font-size: 12px;            /* حجم الخط 12 بكسل */
-            border-radius: 8px;         /* مربع دائري الحواف */
+            font-size: 12px; 
+            border-radius: 6px; 
             transition: 0.3s; 
-            line-height: 26px;          /* لتوسيط النص داخل المربع */
+            line-height: 26px; 
             height: 26px;
             display: inline-block;
         }
 
-        /* الصفحة النشطة: مربع بنفسجي فاتح */
-        .navbar a.active { 
-            background-color: var(--nav-active); 
-            color: white; 
-        }
-
+        .navbar a.active { background-color: var(--nav-active); color: white; }
         .navbar a:hover:not(.active) { background-color: rgba(255,255,255,0.1); }
 
-        .container { padding: 5px 10px; max-width: 100%; }
-        .action-bar { display: flex; align-items: center; margin-top: 15px; margin-bottom: 20px; gap: 10px; padding: 10px 0; }
+        .container { padding: 10px 20px; max-width: 100%; }
         
-        .btn-top { border: none; padding: 8px 20px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 13px; color: white; transition: 0.3s; }
+        /* أزرار التحكم */
+        .action-bar { display: flex; align-items: center; margin-bottom: 15px; gap: 10px; }
+        .btn-top { border: none; padding: 10px 24px; border-radius: 10px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 13px; color: white; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .btn-add { background-color: var(--accent-blue); }
-        .btn-save-all { background-color: var(--accent-green-dim); color: #065f46; opacity: 0.6; pointer-events: none; }
-        .btn-save-all.active { background-color: var(--accent-green-active); color: white; opacity: 1; pointer-events: auto; }
+        .btn-save-all { background-color: #cbd5e1; color: #64748b; pointer-events: none; }
+        .btn-save-all.active { background-color: var(--accent-green-active); color: white; pointer-events: auto; }
 
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; background: white; border: 1px solid var(--border-color); }
-        th { background-color: #f5f3ff; padding: 8px 2px; color: var(--nav-purple); font-size: 11px; font-weight: 800; border: 1px solid var(--border-color); }
-        td { border: 1px solid var(--border-color); text-align: center; height: 38px; font-size: 11px; }
-
-        .excel-input { width: 100%; height: 100%; border: none; padding: 0 5px; font-family: 'Cairo'; font-size: 11px; text-align: center; outline: none; background: transparent; }
-        .notes-cell { cursor: pointer; color: #475569; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 8px; text-align: right; font-style: italic; }
-        .btn-delete { border: none; background-color: #fee2e2; color: var(--accent-red); padding: 4px 10px; border-radius: 4px; font-size: 10px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
-        .updated-at { font-size: 10px; color: #475569; font-weight: bold; }
-
-        /* نظام الملاحظات (الاستيكر) */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 2000; }
-        .sticker-container {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 7cm; height: 12cm; background-color: var(--sticker-yellow); border-radius: 2px;
-            box-shadow: 5px 5px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column;
-            border-top: 20px solid #fff59d;
+        /* تنسيق الجدول الاحترافي */
+        .table-wrapper { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid var(--border-soft); }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        
+        th { 
+            background-color: #f8fafc; 
+            padding: 14px 8px; 
+            color: var(--nav-navy-light); 
+            font-size: 11px; 
+            font-weight: 800; 
+            border-bottom: 2px solid var(--border-soft);
+            text-align: center;
         }
+
+        td { 
+            padding: 0; 
+            border-bottom: 1px solid var(--border-soft); 
+            text-align: center; 
+            height: 45px; 
+            font-size: 11px; 
+        }
+
+        /* صف أبيض وصف أزرق فاتح جداً */
+        tr:nth-child(even) { background-color: var(--table-blue-alt); }
+        tr:nth-child(odd) { background-color: #ffffff; }
+        tr:hover { background-color: #f1f5f9; } /* تأثير عند مرور الماوس */
+
+        .excel-input { width: 100%; height: 100%; border: none; padding: 0 5px; font-family: 'Cairo'; font-size: 12px; text-align: center; outline: none; background: transparent; color: #334155; }
+        .excel-input:focus { background-color: rgba(59, 130, 246, 0.05); }
+
+        .notes-cell { cursor: pointer; color: #64748b; font-size: 10px; padding: 0 10px; text-align: right; font-style: italic; }
+        .btn-delete { border: none; background: #fee2e2; color: var(--accent-red); padding: 5px 12px; border-radius: 6px; font-size: 10px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
+        
+        /* ستايل الاستيكر والمربعات الحوارية لم يتغير لضمان الوظيفية */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 2000; }
+        .sticker-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 7cm; height: 12cm; background-color: var(--sticker-yellow); border-radius: 2px; box-shadow: 5px 5px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column; border-top: 20px solid #fff59d; }
         .sticker-history { flex-grow: 1; overflow-y: auto; padding: 12px; font-size: 11px; border-bottom: 1px dashed #decb00; text-align: right; }
         .sticker-editor { padding: 12px; height: 100px; text-align: right; }
         .date-chip { display: inline-block; background: #fbc02d; color: #000; padding: 1px 7px; border-radius: 10px; font-weight: bold; font-size: 9px; margin-bottom: 5px; }
         .sticker-textarea { width: 100%; border: none; background: transparent; font-family: 'Cairo'; font-size: 11px; resize: none; outline: none; height: 60px; text-align: right; }
-        .sticker-save-btn { width: 100%; border: none; padding: 7px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; font-size: 11px; background-color: #81c784; }
+        .sticker-save-btn { width: 100%; border: none; padding: 7px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; background-color: #81c784; }
         .sticker-save-btn.active { background-color: #22c55e; }
 
-        .custom-confirm {
-            position: fixed; top: 30%; left: 50%; transform: translate(-50%, -50%);
-            background: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            z-index: 3000; display: none; text-align: center; border: 2px solid var(--nav-purple); min-width: 250px;
-        }
+        .custom-confirm { position: fixed; top: 30%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 3000; display: none; text-align: center; border: 2px solid var(--nav-navy-light); min-width: 250px; }
         .confirm-btns { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
         .btn-yes { background: var(--accent-green-active); color: white; border: none; padding: 8px 25px; border-radius: 5px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
         .btn-no { background: var(--accent-red); color: white; border: none; padding: 8px 25px; border-radius: 5px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
@@ -125,24 +136,26 @@
         <button id="saveAllBtn" class="btn-top btn-save-all" onclick="saveAllData()">حفظ التغييرات</button>
     </div>
 
-    <table id="mainTable">
-        <thead>
-            <tr>
-                <th style="width: 14%;">الشركة</th>
-                <th>المسؤول</th>
-                <th style="width: 12%;">الموبايل</th>
-                <th>السجل</th>
-                <th>الخدمة الحالية</th>
-                <th>الخدمة المقترحة</th>
-                <th style="width: 80px;">الحالة</th>
-                <th style="width: 100px;">تاريخ الزيارة</th>
-                <th style="width: 18%;">ملاحظات</th>
-                <th style="width: 100px;">تاريخ التعديل</th>
-                <th style="width: 70px;">إجراء</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-    </table>
+    <div class="table-wrapper">
+        <table id="mainTable">
+            <thead>
+                <tr>
+                    <th style="width: 14%;">الشركة</th>
+                    <th>المسؤول</th>
+                    <th style="width: 12%;">الموبايل</th>
+                    <th>السجل</th>
+                    <th>الخدمة الحالية</th>
+                    <th>الخدمة المقترحة</th>
+                    <th style="width: 90px;">الحالة</th>
+                    <th style="width: 110px;">تاريخ الزيارة</th>
+                    <th style="width: 18%;">ملاحظات</th>
+                    <th style="width: 100px;">تاريخ التعديل</th>
+                    <th style="width: 80px;">إجراء</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
 </div>
 
 <div id="notesOverlay" class="modal-overlay" onclick="handleOutsideClick(event)">
@@ -161,6 +174,8 @@
     let activeCell = null;
     let isStickerChanged = false;
     const statusOrder = { "مهتم": 4, "50%": 3, "20%": 2, "فقدان": 1 };
+
+    function getTodayFormatted() { return new Date().toISOString().split('T')[0]; }
 
     function getDisplayNote(notesJson) {
         try {
@@ -185,7 +200,7 @@
         document.getElementById('historyArea').innerHTML = hHtml;
         const now = new Date(); 
         const days = ['الأحد', 'الأثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-        document.getElementById('currentDateChip').innerText = `${days[now.getDay()]} ${now.toLocaleDateString('en-GB')}`;
+        document.getElementById('currentDateChip').innerText = `${days[now.getDay()]} ${getTodayFormatted()}`;
         document.getElementById('stickerInput').value = '';
         document.getElementById('saveStickerBtn').classList.remove('active');
         document.getElementById('notesOverlay').style.display = 'block';
@@ -234,7 +249,7 @@
             </td>
             <td><input type="date" class="excel-input" value="${v.date}" oninput="markAsChanged(this)"></td>
             <td class="notes-cell" data-notes='${v.notes || "[]"}' onclick="openSticker(this)">${getDisplayNote(v.notes || "[]")}</td>
-            <td class="updated-at">${v.updated}</td>
+            <td class="updated-at" style="color:#64748b; font-weight:bold;">${v.updated}</td>
             <td><button class="btn-delete" onclick="deleteRow(this)">حذف</button></td>
         `;
     }
@@ -262,14 +277,12 @@
             cr: ins[3].value, curr: ins[4].value, prop: ins[5].value,
             status: ins[6].value, date: ins[7].value,
             notes: row.querySelector('.notes-cell').getAttribute('data-notes') || "[]",
-            updated: new Date().toLocaleDateString('en-GB'),
+            updated: getTodayFormatted(),
             created: row.getAttribute('data-created')
         };
-        
         let visitsData = JSON.parse(localStorage.getItem('asgate_visits_data') || '[]');
         visitsData.push(rowData);
         localStorage.setItem('asgate_visits_data', JSON.stringify(visitsData));
-        
         row.remove();
         saveAllData();
     }
@@ -292,7 +305,7 @@
     }
 
     function insertNewRow() {
-        const todayStr = new Date().toISOString().split('T')[0];
+        const todayStr = getTodayFormatted();
         renderRow({ comp:'', mgr:'', mob:'', cr:'', curr:'', prop:'', status:'مهتم', date: todayStr, notes: '[]', updated: '-', created: todayStr }, true);
         toggleSaveBtn(true);
     }
@@ -300,8 +313,8 @@
     function markAsChanged(el) {
         toggleSaveBtn(true);
         const row = el.closest('tr');
-        if (row.getAttribute('data-created') !== new Date().toISOString().split('T')[0]) {
-            row.setAttribute('data-pending-update', new Date().toLocaleDateString('en-GB'));
+        if (row.getAttribute('data-created') !== getTodayFormatted()) {
+            row.setAttribute('data-pending-update', getTodayFormatted());
         }
     }
 
