@@ -7,14 +7,15 @@
     <style>
         :root { 
             --nav-purple-dark: #2e1065; 
-            --purple-mid: #8b5cf6; /* البنفسجي المتوسط المطلوب */
+            --purple-mid: #8b5cf6; /* البنفسجي المتوسط */
             --nav-active: #a78bfa; 
             --bg: #f4f7f9; 
             --white: #ffffff;
             --order-green: #22c55e;
             --visit-yellow: #eab308;
+            --danger-red: #ef4444; /* اللون الأحمر للرجوع */
         }
-        body { background-color: var(--bg); font-family: 'Cairo', sans-serif; margin: 0; }
+        body { background-color: var(--bg); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
         
         /* شريط التنقل العلوي - بنفسج وسط */
         .navbar { 
@@ -73,7 +74,7 @@
             display: inline-block; transition: 0.2s; margin-top: 5px;
         }
 
-        /* شريط التحكم والتبويبات - شريط ثاني بنفسج وسط */
+        /* شريط التحكم والتبويبات */
         .control-strip { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 
         .tabs-wrapper { 
@@ -87,14 +88,27 @@
         }
         .tab-btn.active { background: white; color: var(--purple-mid); }
 
-        /* زر الرجوع الاحترافي */
+        /* زر الرجوع المطور بحواف حمراء */
         .back-btn {
-            background: white; color: var(--purple-mid); border: 1.5px solid var(--purple-mid);
-            height: 32px; padding: 0 15px; border-radius: 8px; cursor: pointer;
-            font-family: 'Cairo'; font-weight: 800; font-size: 11px;
-            display: flex; align-items: center; gap: 6px; transition: 0.3s;
+            background: white; 
+            color: var(--danger-red); 
+            border: 1.5px solid var(--danger-red);
+            height: 32px; 
+            padding: 0 15px; 
+            border-radius: 8px; 
+            cursor: pointer;
+            font-family: 'Cairo'; 
+            font-weight: 800; 
+            font-size: 11px;
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            transition: 0.3s;
         }
-        .back-btn:hover { background: var(--purple-mid); color: white; }
+        .back-btn:hover { 
+            background: var(--danger-red); 
+            color: white; 
+        }
 
         .action-btn {
             border: none; border-radius: 8px; padding: 0 15px; 
@@ -154,8 +168,8 @@
             <span>→</span> رجوع للعملاء
         </button>
 
-        <button class="action-btn btn-green" onclick="alert('طلب جديد')">🛒 طلب جديد</button>
-        <button class="action-btn btn-yellow" onclick="alert('زيارة جديدة')">🚗 زيارة جديدة</button>
+        <button class="action-btn btn-green" onclick="alert('فتح نموذج طلب جديد')">🛒 طلب جديد</button>
+        <button class="action-btn btn-yellow" onclick="alert('فتح نموذج زيارة جديدة')">🚗 زيارة جديدة</button>
         
         <div class="tabs-wrapper">
             <button class="tab-btn active" id="btn-v" onclick="openTab('v-history')">سجل الزيارات</button>
@@ -174,10 +188,9 @@
     const urlParams = new URLSearchParams(window.location.search);
     const clientName = urlParams.get('name');
 
-    // وظيفة الرجوع الاحترافية
+    // وظيفة الرجوع مع حفظ الموقع
     function goBackAndFocus() {
         if(clientName) {
-            // تخزين اسم العميل للبحث عنه عند العودة لصفحة العملاء
             sessionStorage.setItem('last_viewed_client', clientName);
         }
         window.location.href = 'customers.html';
@@ -191,7 +204,7 @@
         if(client) {
             document.getElementById('c-name').innerText = client.comp;
             document.getElementById('c-cr').innerText = client.cr || '0000000';
-            document.getElementById('c-addr').innerText = client.address || 'الرياض';
+            document.getElementById('c-addr').innerText = client.address || 'غير محدد';
             document.getElementById('m-name').innerText = client.mgr || '-';
             document.getElementById('m-mob').innerText = client.mob || '-';
             openTab('v-history');
@@ -211,11 +224,14 @@
                 <table>
                     <thead><tr><th>التاريخ</th><th>النوع</th><th>الملاحظات</th></tr></thead>
                     <tbody>${visits.map(v => `<tr><td>${v.date}</td><td>ميدانية</td><td>${v.notes || '-'}</td></tr>`).join('')}</tbody>
-                </table>` : `<p style="text-align:center; color:#94a3b8; font-size:11px;">لا توجد سجلات.</p>`;
+                </table>` : `<p style="text-align:center; color:#94a3b8; font-size:11px; margin-top:20px;">لا توجد سجلات حالياً.</p>`;
         } else if(tab === 'o-history') {
             document.getElementById('btn-o').classList.add('active');
             title.innerText = "🛒 سجل طلبات العميل";
-            content.innerHTML = `<p style="text-align:center; color:#94a3b8; font-size:11px;">لا توجد طلبات سابقة.</p>`;
+            content.innerHTML = `<p style="text-align:center; color:#94a3b8; font-size:11px; margin-top:20px;">لا توجد طلبات سابقة مسجلة.</p>`;
+        } else {
+            title.innerText = "📁 المرفقات";
+            content.innerHTML = `<p style="text-align:center; color:#94a3b8; font-size:11px; margin-top:20px;">لا توجد ملفات مرفقة.</p>`;
         }
     }
 </script>
