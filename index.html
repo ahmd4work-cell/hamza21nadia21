@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASGate - لوحة التحكم الشاملة</title>
+    <title>ASGate - لوحة التحكم المحدثة</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --nav-dark: #1e293b;
-            --blue-bright: #0ea5e9; /* أزرق لامع خفيف */
-            --blue-glow: rgba(14, 165, 233, 0.4); 
+            /* درجات الكحلي اللامع */
+            --navy-deep: #0f172a;
+            --navy-bright: #1e293b;
+            --navy-shiny: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            --navy-glow: rgba(15, 23, 42, 0.3);
+            --accent-blue: #38bdf8; /* لون التمييز */
             --bg-color: #f4f7f9;
             --border-color: #e2e8f0;
             --white: #ffffff;
@@ -18,25 +21,25 @@
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; overflow-x: hidden; }
 
-        /* --- شريط التنقل باللون الأزرق اللامع الخفيف --- */
+        /* --- شريط التنقل باللون الكحلي اللامع --- */
         .navbar { 
-            background-color: var(--blue-bright); 
+            background: var(--navy-shiny); 
             display: flex; align-items: center; padding: 0 20px; 
             margin: 10px; border-radius: 12px; height: 37px; 
             position: sticky; top: 10px; z-index: 1000;
-            /* تأثير اللمعان والتوهج */
-            box-shadow: 0 4px 15px var(--blue-glow); 
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            /* تأثير اللمعان والعمق */
+            box-shadow: 0 4px 10px var(--navy-glow), inset 0 1px 1px rgba(255,255,255,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
         .navbar a { 
-            color: white; text-decoration: none; padding: 0 15px; 
+            color: #cbd5e1; text-decoration: none; padding: 0 15px; 
             font-weight: 700; font-size: 12px; border-radius: 6px; 
             height: 26px; line-height: 26px; display: inline-block;
             transition: 0.3s;
         }
-        /* الزر النشط بخلفية بيضاء شفافة لإبراز اللون الأزرق */
-        .navbar a.active { background-color: rgba(255, 255, 255, 0.9); color: var(--blue-bright); }
-        .navbar a:hover:not(.active) { background-color: rgba(255, 255, 255, 0.2); }
+        /* الزر النشط بلمسة زرقة فاتحة ليبرز على الكحلي */
+        .navbar a.active { background-color: rgba(255, 255, 255, 0.15); color: white; box-shadow: 0 0 10px rgba(255,255,255,0.1); }
+        .navbar a:hover:not(.active) { color: white; background-color: rgba(255,255,255,0.05); }
 
         .container { padding: 0 15px 15px 15px; max-width: 100%; margin: auto; }
 
@@ -57,27 +60,28 @@
             border: 1px solid var(--border-color); display: flex; gap: 10px; align-items: flex-end;
         }
         .filter-item { flex: 1; display: flex; flex-direction: column; gap: 4px; }
-        .filter-item label { font-size: 10px; font-weight: 800; color: var(--blue-bright); }
+        .filter-item label { font-size: 10px; font-weight: 800; color: var(--navy-deep); }
         .filter-input { 
             width: 100%; padding: 6px; font-family: 'Cairo'; 
             font-size: 11px; border: 1px solid #e2e8f0; border-radius: 6px; background: #f8fafc;
         }
 
-        /* زر التصفية بالأزرق اللامع */
+        /* زر التصفية بالكحلي اللامع */
         .filter-btn {
-            background: var(--blue-bright); color: white; border: none; 
+            background: var(--navy-deep); color: white; border: none; 
             padding: 7px 15px; border-radius: 6px; font-family: 'Cairo'; 
             font-size: 11px; cursor: pointer; font-weight: bold;
-            box-shadow: 0 2px 8px var(--blue-glow);
+            transition: 0.3s;
         }
+        .filter-btn:hover { background: #1e293b; }
 
         /* --- الشبكة الرئيسية --- */
         .main-dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .content-box { background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); box-sizing: border-box; }
-        h3 { font-size: 12px; margin: 0 0 15px 0; color: var(--nav-dark); font-weight: 800; border-right: 3px solid var(--blue-bright); padding-right: 8px; }
+        h3 { font-size: 12px; margin: 0 0 15px 0; color: var(--navy-deep); font-weight: 800; border-right: 3px solid var(--accent-blue); padding-right: 8px; }
 
         .yearly-table { width: 100%; border-collapse: collapse; font-size: 11px; }
-        .yearly-table th { background: var(--blue-bright); color: white; padding: 10px 5px; text-align: center; }
+        .yearly-table th { background: var(--navy-deep); color: white; padding: 10px 5px; text-align: center; }
         .yearly-table td { padding: 8px 5px; border-bottom: 1px solid #f1f5f9; text-align: center; font-weight: bold; color: #475569; }
 
         .charts-column { display: flex; flex-direction: column; gap: 20px; }
@@ -103,11 +107,11 @@
         
         <div class="top-dashboard-row">
             <div class="stats-mini-grid">
-                <div class="small-card-mini" style="background: #1e293b;">
+                <div class="small-card-mini" style="background: var(--navy-deep);">
                     <div class="label">إجمالي الهدف</div>
                     <div class="value">180,000</div>
                 </div>
-                <div class="small-card-mini" style="background: var(--blue-bright); box-shadow: 0 4px 12px var(--blue-glow);">
+                <div class="small-card-mini" style="background: #22c55e;">
                     <div class="label">المحقق</div>
                     <div class="value">14,210</div>
                 </div>
@@ -189,7 +193,7 @@
                 labels: months,
                 datasets: [
                     { label: 'الهدف', data: Array(12).fill(15000), backgroundColor: '#e2e8f0', borderRadius: 4 },
-                    { label: 'المحقق', data: [14210,0,0,0,0,0,0,0,0,0,0,0], backgroundColor: '#0ea5e9', borderRadius: 4 }
+                    { label: 'المحقق', data: [14210,0,0,0,0,0,0,0,0,0,0,0], backgroundColor: '#0f172a', borderRadius: 4 }
                 ]
             },
             options: commonOptions
@@ -199,7 +203,7 @@
             type: 'doughnut',
             data: {
                 labels: ['مكتمل', 'معلق'],
-                datasets: [{ data: [95, 5], backgroundColor: ['#0ea5e9', '#f59e0b'], borderWidth: 0 }]
+                datasets: [{ data: [95, 5], backgroundColor: ['#0f172a', '#f59e0b'], borderWidth: 0 }]
             },
             options: { ...commonOptions, cutout: '75%', plugins: { legend: { display: true, position: 'bottom' } } }
         });
