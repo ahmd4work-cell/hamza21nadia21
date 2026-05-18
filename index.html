@@ -1,48 +1,818 @@
-<!-- TOP SECTION -->
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 
-<div class="top-layout">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- RIGHT SIDE -->
+    <title>ASGate Dashboard</title>
 
-    <div class="top-right-section">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-        <!-- MINI STATS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-        <div class="mini-stats-grid">
+    <style>
+        :root {
 
-            <div class="mini-card dark-card">
+            --nav-purple: #2e1065;
+            --nav-active: #a78bfa;
 
-                <div class="mini-title">
-                    إجمالي الهدف
+            --stat-black: #0f172a;
+            --stat-green: #22c55e;
+            --stat-yellow: #f59e0b;
+
+            --bg-color: #f4f7fb;
+            --white: #ffffff;
+            --border-color: #e2e8f0;
+
+            --shadow:
+                0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+
+            margin: 0;
+
+            background: var(--bg-color);
+
+            font-family: 'Cairo', sans-serif;
+
+            overflow-x: hidden;
+
+            color: #1e293b;
+        }
+
+        /* ================= NAVBAR ================= */
+
+        .navbar {
+
+            background: var(--nav-purple);
+
+            margin: 10px;
+
+            border-radius: 16px;
+
+            height: 55px;
+
+            display: flex;
+
+            align-items: center;
+
+            padding: 0 15px;
+
+            position: sticky;
+
+            top: 10px;
+
+            z-index: 1000;
+
+            box-shadow: var(--shadow);
+        }
+
+        .navbar a {
+
+            text-decoration: none;
+
+            color: white;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            padding: 10px 16px;
+
+            border-radius: 10px;
+
+            transition: 0.3s;
+        }
+
+        .navbar a:hover {
+
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .navbar a.active {
+
+            background: linear-gradient(135deg, #a78bfa, #c4b5fd);
+
+            color: var(--nav-purple);
+
+            box-shadow: 0 5px 15px rgba(167, 139, 250, .4);
+        }
+
+        /* ================= USER INFO ================= */
+
+        .user-info-bar {
+
+            background: white;
+
+            margin: 0 10px 20px;
+
+            border-radius: 14px;
+
+            display: flex;
+
+            justify-content: space-around;
+
+            align-items: center;
+
+            padding: 15px;
+
+            box-shadow: var(--shadow);
+
+            font-size: 12px;
+
+            font-weight: 700;
+        }
+
+        /* ================= CONTAINER ================= */
+
+        .container {
+
+            padding: 0 15px 20px;
+
+            max-width: 1450px;
+
+            margin: auto;
+        }
+
+        /* ================= TOP LAYOUT ================= */
+
+        .top-layout {
+
+            display: grid;
+
+            grid-template-columns: 240px 1fr 280px;
+
+            gap: 20px;
+
+            margin-bottom: 20px;
+
+            align-items: start;
+        }
+
+        /* ================= MINI STATS ================= */
+
+        .mini-stats-grid {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 12px;
+        }
+
+        .mini-card {
+
+            border-radius: 14px;
+
+            padding: 12px 15px;
+
+            color: white;
+
+            box-shadow: var(--shadow);
+
+            transition: .3s ease;
+
+            min-height: 75px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: center;
+        }
+
+        .mini-card:hover {
+
+            transform: translateY(-3px);
+        }
+
+        .dark-card {
+            background: var(--stat-black);
+        }
+
+        .green-card {
+            background: var(--stat-green);
+        }
+
+        .yellow-card {
+            background: var(--stat-yellow);
+        }
+
+        .mini-title {
+
+            font-size: 11px;
+
+            opacity: .9;
+
+            margin-bottom: 5px;
+        }
+
+        .mini-number {
+
+            font-size: 20px;
+
+            font-weight: 800;
+
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ================= CENTER INFO ================= */
+
+        .middle-stats-grid {
+
+            display: grid;
+
+            grid-template-columns: repeat(3, 1fr);
+
+            gap: 15px;
+        }
+
+        .info-card {
+
+            background: white;
+
+            border-radius: 16px;
+
+            padding: 18px;
+
+            min-height: 95px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: center;
+
+            box-shadow: var(--shadow);
+
+            transition: .3s;
+        }
+
+        .info-card:hover {
+
+            transform: translateY(-3px);
+        }
+
+        .info-title {
+
+            font-size: 12px;
+
+            color: #64748b;
+
+            margin-bottom: 10px;
+
+            font-weight: 700;
+        }
+
+        .info-number {
+
+            font-size: 28px;
+
+            font-weight: 800;
+
+            color: var(--nav-purple);
+
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ================= FILTER ================= */
+
+        .compact-filter {
+
+            background: white;
+
+            padding: 14px;
+
+            border-radius: 16px;
+
+            box-shadow: var(--shadow);
+        }
+
+        h3 {
+
+            margin-top: 0;
+
+            font-size: 14px;
+
+            font-weight: 800;
+
+            color: var(--nav-purple);
+
+            border-right: 4px solid var(--nav-active);
+
+            padding-right: 10px;
+
+            margin-bottom: 14px;
+        }
+
+        .filter-group {
+
+            margin-bottom: 10px;
+        }
+
+        .filter-group label {
+
+            display: block;
+
+            margin-bottom: 6px;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            color: var(--nav-purple);
+        }
+
+        .filter-input {
+
+            width: 100%;
+
+            height: 38px;
+
+            border-radius: 10px;
+
+            border: 1px solid #dbe2ea;
+
+            padding: 0 12px;
+
+            font-family: 'Cairo';
+
+            font-size: 11px;
+
+            transition: .3s;
+        }
+
+        .filter-input:focus {
+
+            outline: none;
+
+            border-color: var(--nav-active);
+
+            box-shadow: 0 0 0 4px rgba(167,139,250,.15);
+        }
+
+        .filter-btn {
+
+            width: 100%;
+
+            margin-top: 10px;
+
+            height: 38px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            background: var(--nav-purple);
+
+            color: white;
+
+            font-family: 'Cairo';
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            transition: .3s;
+        }
+
+        .filter-btn:hover {
+
+            opacity: .95;
+        }
+
+        /* ================= MAIN GRID ================= */
+
+        .dashboard-main {
+
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 20px;
+        }
+
+        /* ================= BOXES ================= */
+
+        .content-box {
+
+            background: white;
+
+            border-radius: 18px;
+
+            padding: 18px;
+
+            box-shadow: var(--shadow);
+        }
+
+        /* ================= TABLE ================= */
+
+        .table-area {
+
+            overflow-x: auto;
+        }
+
+        .yearly-table {
+
+            width: 100%;
+
+            min-width: 650px;
+
+            border-collapse: collapse;
+
+            font-size: 12px;
+
+            text-align: center;
+        }
+
+        .yearly-table th {
+
+            background: var(--nav-purple);
+
+            color: white;
+
+            padding: 14px 8px;
+        }
+
+        .yearly-table td {
+
+            padding: 12px 8px;
+
+            border-bottom: 1px solid #f1f5f9;
+
+            font-weight: 700;
+
+            color: #475569;
+
+            font-variant-numeric: tabular-nums;
+        }
+
+        .yearly-table tr:hover {
+
+            background: #f8fafc;
+        }
+
+        /* ================= CHARTS ================= */
+
+        .charts-column {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 20px;
+        }
+
+        .chart-wrapper {
+
+            position: relative;
+
+            width: 100%;
+
+            height: 250px;
+        }
+
+        /* ================= MOBILE ================= */
+
+        @media (max-width: 1200px) {
+
+            .top-layout {
+
+                grid-template-columns: 1fr;
+            }
+
+            .middle-stats-grid {
+
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .dashboard-main {
+
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media (max-width: 768px) {
+
+            .navbar {
+
+                overflow-x: auto;
+
+                white-space: nowrap;
+            }
+
+            .user-info-bar {
+
+                flex-direction: column;
+
+                gap: 10px;
+            }
+
+            .middle-stats-grid {
+
+                grid-template-columns: 1fr;
+            }
+
+            .chart-wrapper {
+
+                height: 220px;
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+
+    <nav class="navbar">
+
+        <a href="#" class="active">الرئيسية</a>
+
+        <a href="#">الزيارات</a>
+
+        <a href="#">الفرص البيعية</a>
+
+        <a href="#">العملاء</a>
+
+        <a href="#">المبيعات</a>
+
+    </nav>
+
+    <!-- USER INFO -->
+
+    <div class="user-info-bar">
+
+        <div>
+            المستخدم:
+            <strong>حمزة</strong>
+        </div>
+
+        <div>
+            الرقم الوظيفي:
+            <strong>12345</strong>
+        </div>
+
+        <div>
+            التاريخ:
+            <strong>18 مايو 2026</strong>
+        </div>
+
+    </div>
+
+    <!-- CONTAINER -->
+
+    <div class="container">
+
+        <!-- TOP SECTION -->
+
+        <div class="top-layout">
+
+            <!-- MINI STATS -->
+
+            <div class="mini-stats-grid">
+
+                <div class="mini-card dark-card">
+
+                    <div class="mini-title">
+                        إجمالي الهدف
+                    </div>
+
+                    <div class="mini-number">
+                        180,000
+                    </div>
+
                 </div>
 
-                <div class="mini-number">
-                    180,000
+                <div class="mini-card green-card">
+
+                    <div class="mini-title">
+                        المحقق
+                    </div>
+
+                    <div class="mini-number">
+                        14,210
+                    </div>
+
+                </div>
+
+                <div class="mini-card yellow-card">
+
+                    <div class="mini-title">
+                        المعلق
+                    </div>
+
+                    <div class="mini-number">
+                        790
+                    </div>
+
                 </div>
 
             </div>
 
-            <div class="mini-card green-card">
+            <!-- CENTER STATS -->
 
-                <div class="mini-title">
-                    المحقق
+            <div class="middle-stats-grid">
+
+                <div class="info-card">
+
+                    <div class="info-title">
+                        عدد الزيارات
+                    </div>
+
+                    <div class="info-number">
+                        125
+                    </div>
+
                 </div>
 
-                <div class="mini-number">
-                    14,210
+                <div class="info-card">
+
+                    <div class="info-title">
+                        إجمالي الناجح
+                    </div>
+
+                    <div class="info-number">
+                        88
+                    </div>
+
+                </div>
+
+                <div class="info-card">
+
+                    <div class="info-title">
+                        إجمالي الفرصة البيعية
+                    </div>
+
+                    <div class="info-number">
+                        47
+                    </div>
+
                 </div>
 
             </div>
 
-            <div class="mini-card yellow-card">
+            <!-- FILTER -->
 
-                <div class="mini-title">
-                    المعلق
+            <div class="compact-filter">
+
+                <h3>
+                    🔍 الفلترة
+                </h3>
+
+                <div class="filter-group">
+
+                    <label>
+                        بحث سريع
+                    </label>
+
+                    <input type="text"
+                        class="filter-input"
+                        placeholder="ابحث...">
+
                 </div>
 
-                <div class="mini-number">
-                    790
+                <div class="filter-group">
+
+                    <label>
+                        مدير المبيعات
+                    </label>
+
+                    <select class="filter-input">
+
+                        <option>الكل</option>
+
+                        <option>المدير العام</option>
+
+                        <option>مدير المنطقة</option>
+
+                    </select>
+
                 </div>
+
+                <div class="filter-group">
+
+                    <label>
+                        مشرف المبيعات
+                    </label>
+
+                    <select class="filter-input">
+
+                        <option>الكل</option>
+
+                        <option>مشرف 1</option>
+
+                        <option>مشرف 2</option>
+
+                    </select>
+
+                </div>
+
+                <div class="filter-group">
+
+                    <label>
+                        الحالة
+                    </label>
+
+                    <select class="filter-input">
+
+                        <option>الكل</option>
+
+                        <option>مكتمل</option>
+
+                        <option>معلق</option>
+
+                    </select>
+
+                </div>
+
+                <button class="filter-btn">
+
+                    تطبيق
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- MAIN -->
+
+        <div class="dashboard-main">
+
+            <!-- CHARTS -->
+
+            <div class="charts-column">
+
+                <div class="content-box">
+
+                    <h3>
+                        📈 الأداء الشهري
+                    </h3>
+
+                    <div class="chart-wrapper">
+
+                        <canvas id="performanceChart"></canvas>
+
+                    </div>
+
+                </div>
+
+                <div class="content-box">
+
+                    <h3>
+                        📊 توزيع الإنجاز
+                    </h3>
+
+                    <div class="chart-wrapper">
+
+                        <canvas id="pieChart"></canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- TABLE -->
+
+            <div class="content-box table-area">
+
+                <h3>
+                    📅 سجل الأهداف السنوي
+                </h3>
+
+                <table class="yearly-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>الشهر</th>
+
+                            <th>الهدف</th>
+
+                            <th>المحقق</th>
+
+                            <th>النسبة</th>
+
+                            <th>المعلق</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="yearlyDataBody"></tbody>
+
+                </table>
 
             </div>
 
@@ -50,128 +820,195 @@
 
     </div>
 
-    <!-- CENTER STATS -->
+    <script>
 
-    <div class="middle-stats-grid">
+        const salesData = {
 
-        <div class="info-card">
+            target: 15000,
 
-            <div class="info-title">
-                عدد الزيارات
-            </div>
+            achieved: 14210,
 
-            <div class="info-number">
-                125
-            </div>
+            pending: 790
+        };
 
-        </div>
+        const months = [
 
-        <div class="info-card">
+            "يناير",
+            "فبراير",
+            "مارس",
+            "ابريل",
+            "مايو",
+            "يونيو",
+            "يوليو",
+            "أغسطس",
+            "سبتمبر",
+            "أكتوبر",
+            "نوفمبر",
+            "ديسمبر"
+        ];
 
-            <div class="info-title">
-                إجمالي الناجح
-            </div>
+        /* TABLE */
 
-            <div class="info-number">
-                88
-            </div>
+        const tbody =
+            document.getElementById("yearlyDataBody");
 
-        </div>
+        let rows = "";
 
-        <div class="info-card">
+        months.forEach((month, index) => {
 
-            <div class="info-title">
-                إجمالي الفرصة البيعية
-            </div>
+            rows += `
 
-            <div class="info-number">
-                47
-            </div>
+            <tr>
 
-        </div>
+                <td>${month}</td>
 
-    </div>
+                <td>
+                    ${salesData.target.toLocaleString()}
+                </td>
 
-    <!-- FILTER -->
+                <td>
+                    ${index === 0
+                    ? salesData.achieved.toLocaleString()
+                    : '-'}
+                </td>
 
-    <div class="search-filter-box compact-filter">
+                <td>
+                    ${index === 0
+                    ? '95%'
+                    : '-'}
+                </td>
 
-        <h3>
-            🔍 الفلترة
-        </h3>
+                <td>
+                    ${index === 0
+                    ? salesData.pending.toLocaleString()
+                    : '-'}
+                </td>
 
-        <div class="filter-group">
+            </tr>
 
-            <label>
-                بحث سريع
-            </label>
+            `;
+        });
 
-            <input type="text"
-                class="filter-input"
-                placeholder="ابحث...">
+        tbody.innerHTML = rows;
 
-        </div>
+        /* BAR CHART */
 
-        <div class="filter-group">
+        const ctxBar =
+            document
+                .getElementById('performanceChart')
+                .getContext('2d');
 
-            <label>
-                مدير المبيعات
-            </label>
+        new Chart(ctxBar, {
 
-            <select class="filter-input">
+            type: 'bar',
 
-                <option>الكل</option>
+            data: {
 
-                <option>المدير العام</option>
+                labels: months,
 
-                <option>مدير المنطقة</option>
+                datasets: [
 
-            </select>
+                    {
 
-        </div>
+                        label: 'الهدف',
 
-        <div class="filter-group">
+                        data: Array(12).fill(15000),
 
-            <label>
-                مشرف المبيعات
-            </label>
+                        backgroundColor: '#dbeafe',
 
-            <select class="filter-input">
+                        borderRadius: 8
+                    },
 
-                <option>الكل</option>
+                    {
 
-                <option>مشرف 1</option>
+                        label: 'المحقق',
 
-                <option>مشرف 2</option>
+                        data: [14210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 
-            </select>
+                        backgroundColor: '#22c55e',
 
-        </div>
+                        borderRadius: 8
+                    }
 
-        <div class="filter-group">
+                ]
+            },
 
-            <label>
-                الحالة
-            </label>
+            options: {
 
-            <select class="filter-input">
+                responsive: true,
 
-                <option>الكل</option>
+                maintainAspectRatio: false,
 
-                <option>مكتمل</option>
+                plugins: {
 
-                <option>معلق</option>
+                    legend: {
 
-            </select>
+                        display: true,
 
-        </div>
+                        position: 'bottom'
+                    }
 
-        <button class="filter-btn">
+                }
 
-            تطبيق
+            }
 
-        </button>
+        });
 
-    </div>
+        /* PIE CHART */
 
-</div>
+        const ctxPie =
+            document
+                .getElementById('pieChart')
+                .getContext('2d');
+
+        new Chart(ctxPie, {
+
+            type: 'doughnut',
+
+            data: {
+
+                labels: ['مكتمل', 'معلق'],
+
+                datasets: [
+
+                    {
+
+                        data: [95, 5],
+
+                        backgroundColor: [
+                            '#22c55e',
+                            '#f59e0b'
+                        ],
+
+                        borderWidth: 0
+                    }
+
+                ]
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                cutout: '72%',
+
+                plugins: {
+
+                    legend: {
+
+                        position: 'bottom'
+                    }
+
+                }
+
+            }
+
+        });
+
+    </script>
+
+</body>
+
+</html>
