@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تفاصيل الطلب | ASGate</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --nav-bg: #2e1065;
+            --header-purple: #8b5cf6;
+            --bg-color: #f4f7f9;
+            --white: #ffffff;
+            --border-color: #cbd5e1;
+            --accent-blue: #3b82f6;
+            --zebra-blue: #eff6ff;
+        }
+
+        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
+
+        /* شريط علوي بسيط للعودة */
+        .top-nav { 
+            background: var(--nav-bg); padding: 10px 20px; 
+            display: flex; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .back-btn { 
+            color: white; text-decoration: none; font-size: 13px; font-weight: bold; 
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .container { padding: 20px; }
+
+        /* منطقة البيانات الأساسية (الصف العلوي) */
+        .order-header-info { 
+            background: white; padding: 15px 25px; border-radius: 12px; 
+            border: 1px solid var(--border-color); display: flex; 
+            flex-wrap: wrap; gap: 20px; justify-content: space-between; 
+            margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .info-item { display: flex; flex-direction: column; gap: 4px; min-width: 120px; }
+        .info-label { font-size: 10px; color: #64748b; font-weight: 800; }
+        .info-value { font-size: 13px; color: var(--nav-bg); font-weight: 800; }
+
+        /* منطقة الأزرار */
+        .action-bar { margin-bottom: 12px; }
+        .btn-add-product { 
+            background: var(--accent-blue); color: white; border: none; 
+            padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; 
+            font-weight: bold; cursor: pointer; font-size: 12px; transition: 0.3s;
+        }
+        .btn-add-product:hover { background: #1d4ed8; }
+
+        /* جدول المنتجات */
+        .table-wrapper { 
+            background: white; border-radius: 10px; overflow: hidden; 
+            border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th { 
+            background-color: var(--header-purple); padding: 10px 5px; 
+            color: white; font-size: 11px; font-weight: 800; 
+            border-left: 1px solid rgba(255,255,255,0.1); text-align: center;
+        }
+        td { 
+            border-bottom: 1px solid #f1f5f9; text-align: center; 
+            height: 38px; font-size: 11px; font-weight: 600; color: #1e293b;
+        }
+        tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
+
+        .badge-active { background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 4px; font-size: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="top-nav">
+        <a href="sales.html" class="back-btn"><span>🔙</span> العودة لصفحة المبيعات</a>
+    </div>
+
+    <div class="container">
+        <div class="order-header-info">
+            <div class="info-item"><span class="info-label">رقم الطلب</span><span class="info-value" id="orderId">#ORD-7701</span></div>
+            <div class="info-item"><span class="info-label">الشركة</span><span class="info-value">شركة الحلول الذكية</span></div>
+            <div class="info-item"><span class="info-label">السجل</span><span class="info-value">1010203040</span></div>
+            <div class="info-item"><span class="info-label">نوع الطلب</span><span class="info-value">توريد أجهزة</span></div>
+            <div class="info-item"><span class="info-label">حالة الطلب</span><span class="info-value">مكتمل</span></div>
+            <div class="info-item"><span class="info-label">قيمة الطلب</span><span class="info-value">25,400.00 ر.س</span></div>
+        </div>
+
+        <div class="action-bar">
+            <button class="btn-add-product" onclick="alert('فتح نافذة إضافة منتج')">+ إضافة منتج</button>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">نوع الطلب</th>
+                        <th style="width: 25%;">اسم الطلب</th>
+                        <th style="width: 10%;">العدد</th>
+                        <th style="width: 12%;">الاشتراك</th>
+                        <th style="width: 12%;">الحالة</th>
+                        <th style="width: 16%;">ملاحظة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>خدمة سحابية</td>
+                        <td>نظام CRM برو</td>
+                        <td>5</td>
+                        <td>سنوي</td>
+                        <td><span class="badge-active">نشط</span></td>
+                        <td style="color:#64748b; font-style:italic;">لا يوجد</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // كود بسيط لاستخراج رقم الطلب من الرابط وعرضه
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+        if(id) document.getElementById('orderId').innerText = '#ORD-' + id;
+    </script>
+
+</body>
+</html>
