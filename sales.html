@@ -5,22 +5,22 @@
     <title>المبيعات | ASGate</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { 
+        :root {
             /* درجات الكحلي اللامع الموحدة */
             --navy-deep: #0f172a;
             --navy-bright: #1e293b;
             --navy-shiny: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
             --navy-glow: rgba(15, 23, 42, 0.3);
-            --accent-blue: #38bdf8;
+            --accent-blue: #3b82f6; /* لون الأزرار الموحد */
             --bg: #f4f7f9; 
             --white: #ffffff;
-            --border: #e2e8f0;
-            --zebra-blue: #f8fafc;
+            --border: #cbd5e1;
+            --zebra-blue: #eff6ff;
         }
         
-        body { background-color: var(--bg); font-family: 'Cairo', sans-serif; margin: 0; }
+        body { background-color: var(--bg); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
         
-        /* شريط الصفحات العلوي (الكحلي اللامع) */
+        /* شريط الصفحات العلوي (تصميم الكحلي اللامع العائم) */
         .navbar { 
             background: var(--navy-shiny); 
             display: flex; 
@@ -34,6 +34,7 @@
             top: 10px;
             z-index: 1000;
             border: 1px solid rgba(255, 255, 255, 0.05);
+            box-sizing: border-box;
         }
         .navbar a { 
             color: #cbd5e1; 
@@ -50,80 +51,78 @@
         .navbar a.active { background-color: rgba(255, 255, 255, 0.15); color: white; }
         .navbar a:hover:not(.active) { color: white; background-color: rgba(255,255,255,0.05); }
 
-        .container { padding: 15px; max-width: 100%; margin: auto; }
+        .container { padding: 0 15px; }
 
-        /* منطقة التحكم (زر الإنشاء والبحث على اليمين) */
-        .top-actions { 
+        /* شريط التحكم العلوي (نفس هيكل كود العملاء) */
+        .action-bar { 
             display: flex; 
-            justify-content: flex-start; /* التموضع جهة اليمين */
             align-items: center; 
-            gap: 15px; 
-            margin-bottom: 20px; 
+            margin: 8px 0; /* مسافات صغيرة ومضغوطة كما في العملاء */
+            gap: 10px; 
         }
 
-        .add-sale-btn { 
-            background: var(--navy-deep); 
-            color: white; 
+        /* حجم الأزرار المحدث والموحد */
+        .btn-top { 
             border: none; 
-            padding: 0 20px; 
-            border-radius: 10px; 
+            padding: 7px 18px; 
+            border-radius: 8px; 
             font-family: 'Cairo'; 
-            font-weight: 800; 
+            font-weight: bold; 
             cursor: pointer; 
             font-size: 12px; 
-            height: 40px; 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            box-shadow: 0 4px 6px var(--navy-glow);
-            transition: 0.3s;
+            color: white; 
+            transition: 0.3s; 
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
-        .add-sale-btn:hover { background: var(--navy-bright); transform: translateY(-1px); }
+        .btn-add { background-color: var(--accent-blue); }
+        .btn-add:hover { background-color: #1d4ed8; }
 
-        .search-container { position: relative; }
+        /* صندوق البحث بتصميم أنيق */
         .search-box { 
             padding: 0 15px; 
             border: 1px solid var(--border); 
-            border-radius: 10px; 
-            width: 350px; 
-            height: 40px;
+            border-radius: 8px; 
+            width: 300px; 
+            height: 32px; /* ارتفاع متناسق مع الأزرار */
             font-family: 'Cairo'; 
-            font-size: 12px; 
+            font-size: 11px; 
             outline: none; 
             background: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
 
-        /* جدول المبيعات */
-        .sales-table-container { 
-            background: var(--white); 
-            border-radius: 12px; 
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
-            border: 1px solid var(--border);
+        /* الجدول (تنسيق العملاء + ألوان الكحلي) */
+        .table-wrapper { 
+            background: white; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            border: 1px solid var(--border); 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
         }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         
-        /* شريط عناوين الأعمدة (الكحلي) */
+        /* شريط عناوين الأعمدة بالكحلي الداكن الرفيع */
         th { 
-            text-align: center; 
-            color: #ffffff; 
-            padding: 12px 8px; 
             background-color: var(--navy-deep); 
+            padding: 10px 5px; 
+            color: #ffffff; 
+            font-size: 11px; 
             font-weight: 800; 
-            border-left: 1px solid rgba(255,255,255,0.05);
+            border-left: 1px solid rgba(255,255,255,0.1); 
+            text-align: center;
         }
-
-        td { padding: 14px 10px; border-bottom: 1px solid #f1f5f9; color: #334155; font-weight: 600; text-align: center; }
-
+        
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 38px; font-size: 11px; font-weight: 600; color: #334155; }
+        
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
         tbody tr:hover { background-color: #f1f5f9; }
-        
-        .status-badge { padding: 4px 12px; border-radius: 6px; font-size: 10px; font-weight: 800; }
+
+        .status-badge { padding: 3px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; display: inline-block; }
         .status-done { background: #dcfce7; color: #166534; }
         .status-process { background: #e0f2fe; color: #0369a1; }
-        
-        .notes-text { color: #94a3b8; font-size: 11px; font-style: italic; }
+        .notes-text { color: #64748b; font-size: 10px; font-style: italic; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 5px; }
+
     </style>
 </head>
 <body>
@@ -137,17 +136,12 @@
 </nav>
 
 <div class="container">
-    
-    <div class="top-actions">
-        <button class="add-sale-btn" onclick="alert('فتح نافذة إنشاء طلب مبيعات جديد')">
-            <span>+ إنشاء طلب مبيعات</span>
-        </button>
-        <div class="search-container">
-            <input type="text" class="search-box" placeholder="🔍 ابحث باسم الشركة، رقم الطلب أو السجل...">
-        </div>
+    <div class="action-bar">
+        <button class="btn-top btn-add" onclick="alert('إنشاء طلب جديد')">+ إنشاء طلب مبيعات</button>
+        <input type="text" class="search-box" placeholder="🔍 ابحث بالشركة، الطلب أو السجل...">
     </div>
-
-    <div class="sales-table-container">
+    
+    <div class="table-wrapper">
         <table>
             <thead>
                 <tr>
@@ -160,7 +154,7 @@
                     <th style="width: 20%;">ملاحظات</th>
                 </tr>
             </thead>
-            <tbody id="sales-data">
+            <tbody>
                 <tr>
                     <td>#ORD-7701</td>
                     <td>شركة الحلول الذكية</td>
@@ -168,7 +162,7 @@
                     <td>توريد أجهزة</td>
                     <td><span class="status-badge status-done">مكتمل</span></td>
                     <td>25,400.00 ر.س</td>
-                    <td class="notes-text">تم التسليم في الموقع الرئيسي</td>
+                    <td class="notes-text">تم التسليم للموقع</td>
                 </tr>
                 <tr>
                     <td>#ORD-7702</td>
@@ -177,7 +171,7 @@
                     <td>عقد صيانة</td>
                     <td><span class="status-badge status-process">قيد المعالجة</span></td>
                     <td>12,000.00 ر.س</td>
-                    <td class="notes-text">انتظار توقيع العقد النهائي</td>
+                    <td class="notes-text">في مرحلة التوقيع</td>
                 </tr>
                 <tr>
                     <td>#ORD-7703</td>
