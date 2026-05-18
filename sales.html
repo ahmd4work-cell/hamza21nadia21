@@ -6,147 +6,51 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* 1. لوحة الألوان البنفسجية الملكية */
-            --nav-bg: #2e1065;          /* بنفسجي داكن ملكي */
-            --header-purple: #8b5cf6;   /* بنفسجي متوسط للعناوين */
-            --nav-active: #a78bfa;      /* بنفسجي فاتح (Lavender) */
+            --nav-bg: #2e1065;
+            --header-purple: #8b5cf6;
+            --nav-active: #a78bfa;
             --bg-color: #f4f7f9;
             --white: #ffffff;
-            --zebra-blue: #eff6ff;      /* أزرق سماوي خفيف جداً */
+            --zebra-blue: #eff6ff;
             --border-color: #cbd5e1;
-            --accent-blue: #3b82f6;     /* لون زر الإضافة */
+            --accent-blue: #3b82f6;
+            --accent-green: #22c55e;
         }
 
-        body { 
-            background-color: var(--bg-color); 
-            font-family: 'Cairo', sans-serif; 
-            margin: 0; 
-            line-height: 1.2; 
-        }
+        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
 
-        /* --- 1. شريط الصفحات العلوي (Navbar) --- */
         .navbar { 
-            background-color: var(--nav-bg); 
-            display: flex; 
-            align-items: center; 
-            padding: 0 20px; 
-            margin: 10px; 
-            border-radius: 12px; 
-            height: 37px;
-            position: sticky; 
-            top: 10px; 
-            z-index: 1000; 
-            box-sizing: border-box;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background-color: var(--nav-bg); display: flex; align-items: center; padding: 0 20px; 
+            margin: 10px; border-radius: 12px; height: 37px; position: sticky; top: 10px; z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); box-sizing: border-box;
         }
-
         .navbar a { 
-            color: var(--white); 
-            text-decoration: none; 
-            padding: 0 15px; /* مسافة 30px بين كل نصين */
-            font-weight: 700; 
-            font-size: 12px; 
-            border-radius: 6px; 
-            transition: 0.3s; 
-            line-height: 26px; 
-            height: 26px; 
-            display: inline-block;
+            color: var(--white); text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; 
+            border-radius: 6px; transition: 0.3s; line-height: 26px; height: 26px; display: inline-block;
         }
-
-        /* حالة التنشيط والمربع الداخلي */
-        .navbar a.active { 
-            background-color: var(--nav-active); 
-            color: var(--nav-bg); 
-        }
-
-        /* حالة تمرير الماوس */
-        .navbar a:hover:not(.active) { 
-            background-color: rgba(255,255,255,0.1); 
-        }
+        .navbar a.active { background-color: var(--nav-active); color: var(--nav-bg); }
 
         .container { padding: 0 15px; }
 
-        /* --- 2. شريط الأزرار والبحث --- */
-        .action-bar { 
-            display: flex; 
-            align-items: center; 
-            margin: 12px 0; 
-            gap: 12px; 
-        }
+        .action-bar { display: flex; align-items: center; margin: 12px 0; gap: 10px; }
 
-        .btn-add { 
-            background-color: var(--accent-blue); 
-            color: white; 
-            border: none; 
-            padding: 7px 18px; 
-            border-radius: 8px; 
-            font-family: 'Cairo'; 
-            font-weight: bold; 
-            cursor: pointer; 
-            font-size: 12px; 
-            transition: 0.3s;
-        }
+        .btn-top { border: none; padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; color: white; transition: 0.3s; }
+        .btn-add { background-color: var(--accent-blue); }
+        /* زر الحفظ الرمادي الذي يتحول للأخضر */
+        .btn-save { background-color: #cbd5e1; color: #64748b; }
+        .btn-save.dirty { background-color: var(--accent-green); color: white; }
 
-        .search-box { 
-            padding: 0 15px; 
-            border: 1px solid var(--border-color); 
-            border-radius: 8px; 
-            width: 320px; 
-            height: 32px; 
-            font-family: 'Cairo'; 
-            font-size: 11px; 
-            outline: none; 
-        }
+        .search-box { padding: 0 15px; border: 1px solid var(--border-color); border-radius: 8px; width: 300px; height: 32px; font-family: 'Cairo'; font-size: 11px; outline: none; }
 
-        /* --- 3. جدول المبيعات المطور --- */
-        .table-wrapper { 
-            background: var(--white); 
-            border-radius: 10px; 
-            overflow: hidden; 
-            border: 1px solid var(--border-color); 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
-        }
-
+        .table-wrapper { background: var(--white); border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-
-        /* شريط أعمدة الجدول (البنفسجي المتوسط) */
-        th { 
-            background-color: var(--header-purple); 
-            padding: 10px 5px; /* ارتفاع 40px تقريباً */
-            color: var(--white); 
-            font-size: 11px; 
-            font-weight: 800; 
-            border-left: 1px solid rgba(255,255,255,0.1); /* فواصل شفافة */
-            text-align: center;
-        }
-
-        td { 
-            border-bottom: 1px solid #f1f5f9; 
-            text-align: center; 
-            height: 38px; 
-            font-size: 11px; 
-            font-weight: 600; 
-            color: #1e293b;
-        }
-
-        /* السلوك البصري (Zebra Stripes) */
+        th { background-color: var(--header-purple); padding: 10px 5px; color: var(--white); font-size: 11px; font-weight: 800; border-left: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 38px; font-size: 11px; font-weight: 600; }
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
-        tbody tr:nth-child(odd) { background-color: var(--white); }
-        tbody tr:hover { background-color: #f1f5f9; }
-
+        
+        .order-link { color: var(--accent-blue); text-decoration: none; font-weight: 800; }
         .status-badge { padding: 3px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; }
         .status-done { background: #dcfce7; color: #166534; }
-        .status-process { background: #fef9c3; color: #854d0e; }
-        
-        .notes-cell { 
-            font-size: 10px; 
-            color: #64748b; 
-            font-style: italic; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
-            white-space: nowrap; 
-            padding: 0 10px;
-        }
     </style>
 </head>
 <body>
@@ -161,49 +65,44 @@
 
 <div class="container">
     <div class="action-bar">
-        <button class="btn-add" onclick="alert('إنشاء طلب جديد')">+ إنشاء طلب مبيعات</button>
-        <input type="text" class="search-box" placeholder="🔍 ابحث بالشركة، رقم الطلب أو السجل...">
+        <button class="btn-top btn-add">+ إنشاء طلب مبيعات</button>
+        <button id="saveBtn" class="btn-top btn-save">حفظ التغييرات</button>
+        <input type="text" class="search-box" placeholder="🔍 ابحث بالشركة، رقم الطلب...">
     </div>
     
     <div class="table-wrapper">
         <table>
             <thead>
                 <tr>
-                    <th style="width: 10%;">رقم الطلب</th>
-                    <th style="width: 14%;">الشركة</th>
+                    <th style="width: 12%;">رقم الطلب</th>
+                    <th style="width: 18%;">الشركة</th>
                     <th style="width: 12%;">السجل</th>
                     <th style="width: 13%;">نوع الطلب</th>
                     <th style="width: 12%;">حالة الطلب</th>
                     <th style="width: 13%;">قيمة الطلب</th>
-                    <th style="width: 18%;">ملاحظات</th>
-                    <th style="width: 80px;">إجراء</th>
+                    <th style="width: 20%;">ملاحظات</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>#ORD-7701</td>
+                    <td><a href="order-details.html?id=7701" class="order-link">#ORD-7701</a></td>
                     <td>شركة الحلول الذكية</td>
                     <td>1010203040</td>
                     <td>توريد أجهزة</td>
                     <td><span class="status-badge status-done">مكتمل</span></td>
                     <td>25,400.00 ر.س</td>
-                    <td class="notes-cell">تم التسليم النهائي</td>
-                    <td><button style="border:none; background:#fee2e2; color:red; cursor:pointer; padding:3px 8px; border-radius:4px; font-family:'Cairo'; font-size:10px; font-weight:bold;">حذف</button></td>
-                </tr>
-                <tr>
-                    <td>#ORD-7702</td>
-                    <td>مؤسسة الأفق للنقل</td>
-                    <td>2050607080</td>
-                    <td>عقد صيانة</td>
-                    <td><span class="status-badge status-process">قيد المعالجة</span></td>
-                    <td>12,000.00 ر.س</td>
-                    <td class="notes-cell">انتظار المراجعة</td>
-                    <td><button style="border:none; background:#fee2e2; color:red; cursor:pointer; padding:3px 8px; border-radius:4px; font-family:'Cairo'; font-size:10px; font-weight:bold;">حذف</button></td>
+                    <td style="font-size:10px; color:#64748b; font-style:italic;">تم التسليم</td>
                 </tr>
             </tbody>
         </table>
     </div>
 </div>
 
+<script>
+    // تغيير لون زر الحفظ عند التعديل (محاكاة)
+    document.querySelector('.search-box').addEventListener('input', function() {
+        document.getElementById('saveBtn').classList.add('dirty');
+    });
+</script>
 </body>
 </html>
