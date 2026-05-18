@@ -18,7 +18,7 @@
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; overflow-x: hidden; }
 
-        /* --- شريط التنقل --- */
+        /* --- شريط التنقل العلوي بالروابط الصحيحة --- */
         .navbar { 
             background-color: var(--purple-mid); 
             display: flex; align-items: center; padding: 0 20px; 
@@ -30,12 +30,14 @@
             color: white; text-decoration: none; padding: 0 15px; 
             font-weight: 700; font-size: 12px; border-radius: 6px; 
             height: 26px; line-height: 26px; display: inline-block;
+            transition: 0.3s;
         }
         .navbar a.active { background-color: var(--nav-active); color: var(--nav-purple); }
+        .navbar a:hover:not(.active) { background-color: rgba(255,255,255,0.2); }
 
         .container { padding: 0 15px 15px 15px; max-width: 100%; margin: auto; }
 
-        /* --- الصف العلوي (الإحصائيات والفلترة) --- */
+        /* --- الصف العلوي: الإحصائيات والفلاتر --- */
         .top-dashboard-row {
             display: flex; gap: 15px; margin-bottom: 20px; align-items: flex-end;
         }
@@ -60,26 +62,26 @@
             font-size: 11px; border: 1px solid #e2e8f0; border-radius: 6px; background: #f8fafc;
         }
 
-        /* --- التخطيط الجديد (50% يمين / 50% يسار) --- */
+        /* --- تقسيم الشاشة: 50% يمين / 50% يسار --- */
         .main-dashboard-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr; /* تقسيم متساوي للنصفين */
+            grid-template-columns: 1fr 1fr;
             gap: 20px;
         }
 
-        .content-box { background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); height: 100%; box-sizing: border-box; }
+        .content-box { background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); box-sizing: border-box; }
         h3 { font-size: 12px; margin: 0 0 15px 0; color: var(--nav-purple); font-weight: 800; border-right: 3px solid var(--nav-active); padding-right: 8px; }
 
-        /* جدول الأهداف السنوي */
+        /* سجل الأهداف السنوي (يمين) */
         .yearly-table { width: 100%; border-collapse: collapse; font-size: 11px; }
         .yearly-table th { background: var(--nav-purple); color: white; padding: 10px 5px; text-align: center; }
-        .yearly-table td { padding: 7px 5px; border-bottom: 1px solid #f1f5f9; text-align: center; font-weight: bold; color: #475569; }
+        .yearly-table td { padding: 8px 5px; border-bottom: 1px solid #f1f5f9; text-align: center; font-weight: bold; color: #475569; }
 
-        /* الرسوم البيانية */
+        /* الرسوم البيانية (يسار) */
         .charts-column { display: flex; flex-direction: column; gap: 20px; }
-        .chart-container { height: 200px; position: relative; }
+        .chart-container { height: 210px; position: relative; }
 
-        @media (max-width: 1000px) {
+        @media (max-width: 1100px) {
             .main-dashboard-grid { grid-template-columns: 1fr; }
             .top-dashboard-row { flex-direction: column; align-items: stretch; }
         }
@@ -88,11 +90,11 @@
 <body>
 
     <nav class="navbar">
-        <a href="#" class="active">الرئيسية</a>
-        <a href="#">الزيارات</a>
-        <a href="#">الفرص البيعية</a>
-        <a href="#">العملاء</a>
-        <a href="#">المبيعات</a>
+        <a href="index.html" class="active">الرئيسية</a>
+        <a href="visits.html">الزيارات</a>
+        <a href="opportunities.html">الفرص البيعية</a>
+        <a href="customers.html">العملاء</a>
+        <a href="sales.html">المبيعات</a>
     </nav>
 
     <div class="container">
@@ -166,48 +168,45 @@
     </div>
 
     <script>
-        // إكمال الشهور حتى ديسمبر
-        const months = [
-            "يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو", 
-            "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"
-        ];
+        // إعداد بيانات الشهور كاملة
+        const months = ["يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
         const tbody = document.getElementById('yearlyDataBody');
         
         months.forEach((m, index) => { 
-            // بيانات تجريبية ليناير فقط
-            const isJanuary = index === 0;
+            const isJan = index === 0;
             tbody.innerHTML += `<tr>
                 <td>${m}</td>
                 <td>15,000</td>
-                <td>${isJanuary ? '14,210' : '-'}</td>
-                <td>${isJanuary ? '95%' : '-'}</td>
-                <td>${isJanuary ? '790' : '-'}</td>
+                <td>${isJan ? '14,210' : '-'}</td>
+                <td>${isJan ? '95%' : '-'}</td>
+                <td>${isJan ? '790' : '-'}</td>
             </tr>`; 
         });
 
+        // الرسوم البيانية
         const commonOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
         
-        // رسم الأداء الشهري
+        // الأداء الشهري
         new Chart(document.getElementById('performanceChart'), {
             type: 'bar',
             data: {
                 labels: months,
                 datasets: [
                     { label: 'الهدف', data: Array(12).fill(15000), backgroundColor: '#e2e8f0', borderRadius: 4 },
-                    { label: 'المحقق', data: [14210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], backgroundColor: '#22c55e', borderRadius: 4 }
+                    { label: 'المحقق', data: [14210,0,0,0,0,0,0,0,0,0,0,0], backgroundColor: '#22c55e', borderRadius: 4 }
                 ]
             },
             options: commonOptions
         });
 
-        // رسم توزيع الإنجاز
+        // توزيع الإنجاز
         new Chart(document.getElementById('pieChart'), {
             type: 'doughnut',
             data: {
                 labels: ['مكتمل', 'معلق'],
                 datasets: [{ data: [95, 5], backgroundColor: ['#22c55e', '#f59e0b'], borderWidth: 0 }]
             },
-            options: { ...commonOptions, cutout: '75%', plugins: { legend: { display: true, position: 'right', labels: { font: { family: 'Cairo', size: 11 } } } } }
+            options: { ...commonOptions, cutout: '75%', plugins: { legend: { display: true, position: 'bottom' } } }
         });
     </script>
 </body>
