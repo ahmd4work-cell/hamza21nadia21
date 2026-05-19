@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASGate - ملف الموظف</title>
+    <title>ASGate - ملف الموظف الذكي</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -33,24 +33,42 @@
         }
         .navbar a.active { background-color: var(--nav-active); color: white; }
 
-        /* شريط معلومات الموظف الجديد */
+        /* شريط معلومات الموظف المحدث */
         .employee-info-bar {
-            margin: 0 10%; /* يبدأ بعد 10% وينتهي قبل 10% */
+            margin: 10px 10%; 
             height: 35px;
             background-color: var(--white);
             border: 1px solid var(--border-color);
-            border-bottom: none; /* لإبراز الاتصال بالخلفية */
-            border-radius: 15px 15px 0 0; /* حواف دائرية من الأعلى فقط */
+            border-radius: 20px; /* حواف دائرية بالكامل */
             display: flex;
             align-items: center;
-            justify-content: space-around;
-            padding: 0 20px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.02);
+            justify-content: space-between;
+            padding: 0 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            position: relative;
         }
-        .info-item { font-size: 11px; color: var(--nav-purple); font-weight: 700; }
+
+        .info-content { display: flex; gap: 30px; align-items: center; transition: 0.3s; }
+        .info-item { font-size: 11px; color: var(--nav-purple); font-weight: 700; white-space: nowrap; }
         .info-item span { color: #64748b; font-weight: 400; margin-right: 5px; }
 
-        .container { padding: 20px; }
+        /* أيقونة العين (طمس البيانات) */
+        .eye-toggle {
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+            color: var(--nav-purple);
+        }
+        .eye-toggle:hover { opacity: 0.7; }
+
+        /* حالة الطمس */
+        .blurred { filter: blur(5px); pointer-events: none; user-select: none; }
+
+        .container { padding: 5px 20px 20px 20px; }
 
         .dashboard-grid {
             display: grid;
@@ -66,13 +84,12 @@
 
         h3 { font-size: 13px; margin: 0 0 15px 0; color: var(--nav-purple); font-weight: 800; border-right: 4px solid var(--accent-blue); padding-right: 8px; }
 
-        /* أدوات التصفية */
+        /* الفلاتر والمربعات */
         .filters-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
         .filter-card { background: white; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 4px; }
         .filter-card label { font-size: 9px; font-weight: 800; color: var(--nav-purple); }
         .filter-input { width: 100%; border: none; background: var(--input-bg); font-family: 'Cairo'; font-size: 11px; padding: 5px; border-radius: 6px; outline: none; }
 
-        /* المربعات الإحصائية */
         .stats-cards { display: flex; gap: 10px; margin-bottom: 15px; width: 100%; }
         .stat-card { flex: 1; padding: 12px; border-radius: 12px; text-align: center; color: white; }
         .bg-blue { background-color: var(--accent-blue); }
@@ -85,7 +102,8 @@
         
         @media (max-width: 1100px) {
             .dashboard-grid { grid-template-columns: 1fr; }
-            .employee-info-bar { margin: 0 10px; flex-wrap: wrap; height: auto; padding: 10px; }
+            .employee-info-bar { margin: 10px; flex-direction: column; height: auto; padding: 15px; }
+            .info-content { flex-direction: column; gap: 10px; }
             .spacer { display: none; }
         }
     </style>
@@ -101,11 +119,20 @@
 </nav>
 
 <div class="employee-info-bar">
-    <div class="info-item">اسم الموظف: <span>محمد المنصور</span></div>
-    <div class="info-item">الرقم الوظيفي: <span>ASG-2026</span></div>
-    <div class="info-item">تاريخ التعيين: <span>01/01/2026</span></div>
-    <div class="info-item">الموبايل: <span>05XXXXXXXX</span></div>
-    <div class="info-item">الايميل: <span>m.mansour@asgate.sa</span></div>
+    <div class="info-content" id="employeeData">
+        <div class="info-item">اسم الموظف: <span>محمد المنصور</span></div>
+        <div class="info-item">الرقم الوظيفي: <span>ASG-2026</span></div>
+        <div class="info-item">تاريخ التعيين: <span>01/01/2026</span></div>
+        <div class="info-item">الموبايل: <span>05XXXXXXXX</span></div>
+        <div class="info-item">الايميل: <span>m.mansour@asgate.sa</span></div>
+    </div>
+    
+    <div class="eye-toggle" onclick="togglePrivacy()">
+        <svg id="eyeIcon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+    </div>
 </div>
 
 <div class="container">
@@ -114,12 +141,7 @@
             <h3>📅 سجل الأهداف السنوي (2026)</h3>
             <table class="yearly-table">
                 <thead>
-                    <tr>
-                        <th style="width: 25%;">الشهر</th>
-                        <th style="width: 25%;">الهدف</th>
-                        <th style="width: 25%;">المكتمل</th>
-                        <th style="width: 25%;">معلق</th>
-                    </tr>
+                    <tr><th>الشهر</th><th>الهدف</th><th>المكتمل</th><th>معلق</th></tr>
                 </thead>
                 <tbody id="monthsBody"></tbody>
             </table>
@@ -150,6 +172,21 @@
 </div>
 
 <script>
+    // وظيفة طمس البيانات
+    function togglePrivacy() {
+        const dataBox = document.getElementById('employeeData');
+        const eyeIcon = document.getElementById('eyeIcon');
+        dataBox.classList.toggle('blurred');
+        
+        // تغيير شكل الأيقونة عند الضغط (اختياري)
+        if(dataBox.classList.contains('blurred')) {
+            eyeIcon.style.color = '#ef4444'; // أحمر عند الطمس
+        } else {
+            eyeIcon.style.color = 'var(--nav-purple)';
+        }
+    }
+
+    // تعبئة الجدول
     const months = ["يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
     const tbody = document.getElementById('monthsBody');
     months.forEach((m, i) => {
@@ -157,6 +194,7 @@
         row.innerHTML = `<td>${m}</td><td>15,000</td><td>${i===0?'14,210':'-'}</td><td>${i===0?'790':'-'}</td>`;
     });
 
+    // رسم البياني
     const ctx = document.getElementById('performanceChart').getContext('2d');
     new Chart(ctx, {
         type: 'line',
