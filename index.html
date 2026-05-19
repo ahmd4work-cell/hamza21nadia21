@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASGate - نظام إدارة المبيعات</title>
+    <title>ASGate - ملف الموظف</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -21,7 +21,7 @@
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
 
-        /* شريط التنقل - التعديل هنا */
+        /* شريط التنقل */
         .navbar { 
             background-color: var(--nav-purple); display: flex; align-items: center; padding: 0 20px; 
             margin: 10px; border-radius: 15px; height: 37px; position: sticky; top: 10px; z-index: 1000;
@@ -31,10 +31,24 @@
             color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; 
             border-radius: 8px; transition: 0.3s; line-height: 26px; height: 26px; display: inline-block;
         }
-        
-        /* اللون البنفسجي الفاتح للرابط النشط */
         .navbar a.active { background-color: var(--nav-active); color: white; }
-        .navbar a:hover:not(.active) { background-color: rgba(255,255,255,0.1); }
+
+        /* شريط معلومات الموظف الجديد */
+        .employee-info-bar {
+            margin: 0 10%; /* يبدأ بعد 10% وينتهي قبل 10% */
+            height: 35px;
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-bottom: none; /* لإبراز الاتصال بالخلفية */
+            border-radius: 15px 15px 0 0; /* حواف دائرية من الأعلى فقط */
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 20px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.02);
+        }
+        .info-item { font-size: 11px; color: var(--nav-purple); font-weight: 700; }
+        .info-item span { color: #64748b; font-weight: 400; margin-right: 5px; }
 
         .container { padding: 20px; }
 
@@ -52,36 +66,26 @@
 
         h3 { font-size: 13px; margin: 0 0 15px 0; color: var(--nav-purple); font-weight: 800; border-right: 4px solid var(--accent-blue); padding-right: 8px; }
 
-        /* أدوات التصفية العلوية (الفلاتر) */
+        /* أدوات التصفية */
         .filters-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
         .filter-card { background: white; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 4px; }
         .filter-card label { font-size: 9px; font-weight: 800; color: var(--nav-purple); }
-        .filter-input { 
-            width: 100%; border: none; background: var(--input-bg); font-family: 'Cairo'; 
-            font-size: 11px; padding: 5px; border-radius: 6px; outline: none; color: #334155;
-        }
-        select.filter-input { cursor: pointer; border: 1px solid transparent; }
-        select.filter-input:focus { border-color: var(--accent-blue); }
+        .filter-input { width: 100%; border: none; background: var(--input-bg); font-family: 'Cairo'; font-size: 11px; padding: 5px; border-radius: 6px; outline: none; }
 
-        /* المربعات الثلاثة الإحصائية */
+        /* المربعات الإحصائية */
         .stats-cards { display: flex; gap: 10px; margin-bottom: 15px; width: 100%; }
-        .stat-card { flex: 1; padding: 12px; border-radius: 12px; text-align: center; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .stat-card .label { font-size: 9px; font-weight: bold; opacity: 0.9; }
-        .stat-card .value { font-size: 14px; font-weight: 800; }
-
+        .stat-card { flex: 1; padding: 12px; border-radius: 12px; text-align: center; color: white; }
         .bg-blue { background-color: var(--accent-blue); }
         .bg-green { background-color: var(--accent-green); }
         .bg-yellow { background-color: var(--accent-yellow-dim); color: #854d0e; }
 
-        /* الجداول والرسوم */
         .yearly-table { width: 100%; border-collapse: collapse; font-size: 11px; }
         .yearly-table th { background: #f5f3ff; color: var(--nav-purple); padding: 10px 5px; border: 1px solid var(--border-color); }
         .yearly-table td { border: 1px solid var(--border-color); padding: 8px 5px; text-align: center; font-weight: bold; color: #475569; }
-        .chart-wrapper { height: 260px; position: relative; }
-
+        
         @media (max-width: 1100px) {
-            .dashboard-grid { grid-template-columns: 1fr; gap: 20px; }
-            .filters-grid { grid-template-columns: 1fr 1fr; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .employee-info-bar { margin: 0 10px; flex-wrap: wrap; height: auto; padding: 10px; }
             .spacer { display: none; }
         }
     </style>
@@ -96,9 +100,16 @@
     <a href="sales.html">المبيعات</a>
 </nav>
 
+<div class="employee-info-bar">
+    <div class="info-item">اسم الموظف: <span>محمد المنصور</span></div>
+    <div class="info-item">الرقم الوظيفي: <span>ASG-2026</span></div>
+    <div class="info-item">تاريخ التعيين: <span>01/01/2026</span></div>
+    <div class="info-item">الموبايل: <span>05XXXXXXXX</span></div>
+    <div class="info-item">الايميل: <span>m.mansour@asgate.sa</span></div>
+</div>
+
 <div class="container">
     <div class="dashboard-grid">
-        
         <div class="content-box">
             <h3>📅 سجل الأهداف السنوي (2026)</h3>
             <table class="yearly-table">
@@ -117,63 +128,28 @@
         <div class="spacer"></div>
 
         <div class="left-section">
-            
             <div class="filters-grid">
-                <div class="filter-card">
-                    <label>بحث</label>
-                    <input type="text" class="filter-input" placeholder="اسم العميل...">
-                </div>
-                <div class="filter-card">
-                    <label>مدير المبيعات</label>
-                    <select class="filter-input">
-                        <option>الكل</option>
-                        <option>أحمد الخالد</option>
-                    </select>
-                </div>
-                <div class="filter-card">
-                    <label>مشرف المبيعات</label>
-                    <select class="filter-input">
-                        <option>الكل</option>
-                        <option>سلطان العتيبي</option>
-                    </select>
-                </div>
-                <div class="filter-card">
-                    <label>مندوب المبيعات</label>
-                    <select class="filter-input">
-                        <option>الكل</option>
-                        <option>محمد المنصور</option>
-                    </select>
-                </div>
+                <div class="filter-card"><label>بحث</label><input type="text" class="filter-input" placeholder="..."></div>
+                <div class="filter-card"><label>المدير</label><select class="filter-input"><option>الكل</option></select></div>
+                <div class="filter-card"><label>المشرف</label><select class="filter-input"><option>الكل</option></select></div>
+                <div class="filter-card"><label>المندوب</label><select class="filter-input"><option>الكل</option></select></div>
             </div>
             
             <div class="stats-cards">
-                <div class="stat-card bg-blue">
-                    <div class="label">إجمالي الهدف السنوي</div>
-                    <div class="value">180,000</div>
-                </div>
-                <div class="stat-card bg-green">
-                    <div class="label">إجمالي المبيعات السنوية</div>
-                    <div class="value">14,210</div>
-                </div>
-                <div class="stat-card bg-yellow">
-                    <div class="label">إجمالي المعلق</div>
-                    <div class="value">790</div>
-                </div>
+                <div class="stat-card bg-blue"><div style="font-size: 9px;">إجمالي الهدف السنوي</div><div style="font-size: 14px; font-weight: 800;">180,000</div></div>
+                <div class="stat-card bg-green"><div style="font-size: 9px;">إجمالي المبيعات السنوية</div><div style="font-size: 14px; font-weight: 800;">14,210</div></div>
+                <div class="stat-card bg-yellow"><div style="font-size: 9px;">إجمالي المعلق</div><div style="font-size: 14px; font-weight: 800;">790</div></div>
             </div>
 
             <div class="content-box">
                 <h3>📈 تحليل الأداء الشهري</h3>
-                <div class="chart-wrapper">
-                    <canvas id="performanceChart"></canvas>
-                </div>
+                <div style="height: 260px; position: relative;"><canvas id="performanceChart"></canvas></div>
             </div>
         </div>
-
     </div>
 </div>
 
 <script>
-    // تعبئة الجدول
     const months = ["يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
     const tbody = document.getElementById('monthsBody');
     months.forEach((m, i) => {
@@ -181,33 +157,21 @@
         row.innerHTML = `<td>${m}</td><td>15,000</td><td>${i===0?'14,210':'-'}</td><td>${i===0?'790':'-'}</td>`;
     });
 
-    // رسم البياني
     const ctx = document.getElementById('performanceChart').getContext('2d');
     new Chart(ctx, {
         type: 'line',
         data: {
             labels: months,
             datasets: [{
-                label: 'الإنجاز',
                 data: [14210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 borderColor: '#3b82f6',
                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
                 borderWidth: 3,
                 fill: true,
-                tension: 0.4,
-                pointRadius: 4,
-                pointBackgroundColor: '#3b82f6'
+                tension: 0.4
             }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
-                x: { grid: { display: false } }
-            }
-        }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
 </script>
 
