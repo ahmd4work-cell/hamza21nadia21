@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASGate - التقرير السنوي</title>
+    <title>ASGate - نظام إدارة المبيعات</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -16,6 +16,7 @@
             --accent-blue: #3b82f6;
             --accent-green: #22c55e;
             --accent-yellow-dim: #facc15;
+            --input-bg: #f8fafc;
         }
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
@@ -47,24 +48,36 @@
 
         h3 { font-size: 13px; margin: 0 0 15px 0; color: var(--nav-purple); font-weight: 800; border-right: 4px solid var(--accent-blue); padding-right: 8px; }
 
-        .yearly-table { width: 100%; border-collapse: collapse; font-size: 11px; }
-        .yearly-table th { background: #f5f3ff; color: var(--nav-purple); padding: 10px 5px; border: 1px solid var(--border-color); }
-        .yearly-table td { border: 1px solid var(--border-color); padding: 8px 5px; text-align: center; font-weight: bold; color: #475569; }
+        /* أدوات التصفية العلوية (الفلاتر) */
+        .filters-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
+        .filter-card { background: white; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 4px; }
+        .filter-card label { font-size: 9px; font-weight: 800; color: var(--nav-purple); }
+        .filter-input { 
+            width: 100%; border: none; background: var(--input-bg); font-family: 'Cairo'; 
+            font-size: 11px; padding: 5px; border-radius: 6px; outline: none; color: #334155;
+        }
+        select.filter-input { cursor: pointer; border: 1px solid transparent; }
+        select.filter-input:focus { border-color: var(--accent-blue); }
 
+        /* المربعات الثلاثة */
         .stats-cards { display: flex; gap: 10px; margin-bottom: 15px; width: 100%; }
         .stat-card { flex: 1; padding: 12px; border-radius: 12px; text-align: center; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .stat-card .label { font-size: 9px; font-weight: bold; opacity: 0.9; margin-bottom: 4px; }
+        .stat-card .label { font-size: 9px; font-weight: bold; opacity: 0.9; }
         .stat-card .value { font-size: 14px; font-weight: 800; }
 
         .bg-blue { background-color: var(--accent-blue); }
         .bg-green { background-color: var(--accent-green); }
-        .bg-yellow { background-color: var(--accent-yellow-dim); color: #854d0e; opacity: 0.9; }
+        .bg-yellow { background-color: var(--accent-yellow-dim); color: #854d0e; }
 
+        /* الجداول والرسوم */
+        .yearly-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        .yearly-table th { background: #f5f3ff; color: var(--nav-purple); padding: 10px 5px; border: 1px solid var(--border-color); }
+        .yearly-table td { border: 1px solid var(--border-color); padding: 8px 5px; text-align: center; font-weight: bold; color: #475569; }
         .chart-wrapper { height: 260px; position: relative; }
 
         @media (max-width: 1100px) {
             .dashboard-grid { grid-template-columns: 1fr; gap: 20px; }
-            .spacer { display: none; }
+            .filters-grid { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
@@ -89,10 +102,10 @@
                         <th style="width: 25%;">الشهر</th>
                         <th style="width: 25%;">الهدف</th>
                         <th style="width: 25%;">المكتمل</th>
-                        <th style="width: 25%;">معلق</th> </tr>
+                        <th style="width: 25%;">معلق</th>
+                    </tr>
                 </thead>
-                <tbody id="monthsBody">
-                    </tbody>
+                <tbody id="monthsBody"></tbody>
             </table>
         </div>
 
@@ -100,12 +113,42 @@
 
         <div class="left-section">
             
+            <div class="filters-grid">
+                <div class="filter-card">
+                    <label>بحث</label>
+                    <input type="text" class="filter-input" placeholder="اسم العميل...">
+                </div>
+                <div class="filter-card">
+                    <label>مدير المبيعات</label>
+                    <select class="filter-input">
+                        <option>الكل</option>
+                        <option>أحمد الخالد</option>
+                    </select>
+                </div>
+                <div class="filter-card">
+                    <label>مشرف المبيعات</label>
+                    <select class="filter-input">
+                        <option>الكل</option>
+                        <option>سلطان العتيبي</option>
+                    </select>
+                </div>
+                <div class="filter-card">
+                    <label>مندوب المبيعات</label>
+                    <select class="filter-input">
+                        <option>الكل</option>
+                        <option>محمد المنصور</option>
+                    </select>
+                </div>
+            </div>
+            
             <div class="stats-cards">
                 <div class="stat-card bg-blue">
-                    <div class="label">إجمالي الهدف السنوي</div> <div class="value">180,000</div>
+                    <div class="label">إجمالي الهدف السنوي</div>
+                    <div class="value">180,000</div>
                 </div>
                 <div class="stat-card bg-green">
-                    <div class="label">إجمالي المبيعات السنوية</div> <div class="value">14,210</div>
+                    <div class="label">إجمالي المبيعات السنوية</div>
+                    <div class="value">14,210</div>
                 </div>
                 <div class="stat-card bg-yellow">
                     <div class="label">إجمالي المعلق</div>
@@ -125,18 +168,15 @@
 </div>
 
 <script>
+    // تعبئة الجدول
     const months = ["يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
     const tbody = document.getElementById('monthsBody');
-    
-    months.forEach((m, index) => {
+    months.forEach((m, i) => {
         const row = tbody.insertRow();
-        row.innerHTML = `
-            <td>${m}</td>
-            <td>15,000</td>
-            <td>${index === 0 ? '14,210' : '-'}</td>
-            <td>${index === 0 ? '790' : '-'}</td> `;
+        row.innerHTML = `<td>${m}</td><td>15,000</td><td>${i===0?'14,210':'-'}</td><td>${i===0?'790':'-'}</td>`;
     });
 
+    // رسم البياني
     const ctx = document.getElementById('performanceChart').getContext('2d');
     new Chart(ctx, {
         type: 'line',
