@@ -19,28 +19,37 @@
             --input-bg: #f8fafc;
         }
 
-        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
+        /* تكبير الخط العام درجة واحدة */
+        body { 
+            background-color: var(--bg-color); 
+            font-family: 'Cairo', sans-serif; 
+            margin: 0; 
+            line-height: 1.3; 
+            font-size: 15px; /* رفع الأساس من 14 إلى 15 */
+        }
 
+        /* استثناء شريط الصفحات العلوي (البقاء على 12px) */
         .navbar { 
             background-color: var(--nav-purple); display: flex; align-items: center; padding: 0 20px; 
             margin: 10px; border-radius: 15px; height: 37px; position: sticky; top: 10px; z-index: 1000;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); box-sizing: border-box;
         }
         .navbar a { 
-            color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; 
+            color: white; text-decoration: none; padding: 0 15px; font-weight: 700; 
+            font-size: 12px; /* لم يتغير */
             border-radius: 8px; transition: 0.3s; line-height: 26px; height: 26px; display: inline-block;
         }
         .navbar a.active { background-color: var(--nav-active); }
 
-        /* شريط معلومات الموظف المحدث */
+        /* تكبير خط شريط المعلومات */
         .employee-info-bar {
-            margin: 10px 10%; height: 35px; background-color: var(--white);
+            margin: 10px 10%; height: 40px; background-color: var(--white);
             border: 1px solid var(--border-color); border-radius: 20px;
             display: flex; align-items: center; justify-content: center;
             padding: 0 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         .info-content { display: flex; gap: 40px; align-items: center; }
-        .info-item { font-size: 11px; color: var(--nav-purple); font-weight: 700; }
+        .info-item { font-size: 13px; color: var(--nav-purple); font-weight: 700; } /* تم التكبير */
         .info-item span { color: #64748b; font-weight: 400; margin-right: 5px; }
 
         .container { padding: 5px 20px 20px 20px; }
@@ -53,22 +62,24 @@
         }
 
         .content-box { 
-            background: var(--white); padding: 15px; border-radius: 12px; 
+            background: var(--white); padding: 18px; border-radius: 12px; 
             border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
         }
 
-        h3 { font-size: 13px; margin: 0 0 15px 0; color: var(--nav-purple); font-weight: 800; border-right: 4px solid var(--accent-blue); padding-right: 8px; }
+        /* تكبير العناوين */
+        h3 { font-size: 15px; margin: 0 0 15px 0; color: var(--nav-purple); font-weight: 800; border-right: 4px solid var(--accent-blue); padding-right: 8px; }
 
+        /* تكبير خط الجدول */
         .yearly-table { 
             width: 100%; 
             border-collapse: separate; 
             border-spacing: 0; 
-            font-size: 10px; 
+            font-size: 12px; /* رفع من 10 إلى 12 */
             table-layout: fixed; 
         }
         .yearly-table th, .yearly-table td { 
             border: 1px solid var(--border-color); 
-            padding: 8px 2px; 
+            padding: 10px 2px; 
             text-align: center; 
             font-weight: bold; 
             color: #475569;
@@ -78,13 +89,16 @@
 
         .sep-column { border-right: 5px solid transparent !important; }
 
-        .filters-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
-        .filter-card { background: white; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 4px; }
-        .filter-card label { font-size: 9px; font-weight: 800; color: var(--nav-purple); }
-        .filter-input { width: 100%; border: none; background: var(--input-bg); font-family: 'Cairo'; font-size: 11px; padding: 5px; border-radius: 6px; outline: none; }
+        /* تكبير خط الفلاتر */
+        .filter-card label { font-size: 11px; font-weight: 800; color: var(--nav-purple); }
+        .filter-input { width: 100%; border: none; background: var(--input-bg); font-family: 'Cairo'; font-size: 13px; padding: 6px; border-radius: 6px; outline: none; }
+
+        /* تكبير خط مربعات الإحصائيات */
+        .stat-card .label-text { font-size: 11px; font-weight: bold; opacity: 0.9; }
+        .stat-card .value-text { font-size: 16px; font-weight: 800; }
 
         .stats-cards { display: flex; gap: 10px; margin-bottom: 15px; width: 100%; }
-        .stat-card { flex: 1; padding: 12px; border-radius: 12px; text-align: center; color: white; }
+        .stat-card { flex: 1; padding: 15px; border-radius: 12px; text-align: center; color: white; }
         .bg-blue { background-color: var(--accent-blue); }
         .bg-green { background-color: var(--accent-green); }
         .bg-yellow { background-color: var(--accent-yellow-dim); color: #854d0e; }
@@ -128,7 +142,8 @@
                         <th>الهدف</th>
                         <th>المكتمل</th>
                         <th class="sep-column">معلق</th>
-                        <th style="background:#eff6ff">عدد الزيارات</th> <th style="background:#f0fdf4">ناجحة</th>
+                        <th style="background:#eff6ff">عدد الزيارات</th>
+                        <th style="background:#f0fdf4">ناجحة</th>
                     </tr>
                 </thead>
                 <tbody id="monthsBody"></tbody>
@@ -146,14 +161,23 @@
             </div>
             
             <div class="stats-cards">
-                <div class="stat-card bg-blue"><div style="font-size: 9px;">إجمالي الهدف السنوي</div><div style="font-size: 14px; font-weight: 800;">180,000</div></div>
-                <div class="stat-card bg-green"><div style="font-size: 9px;">إجمالي المبيعات السنوية</div><div style="font-size: 14px; font-weight: 800;">14,210</div></div>
-                <div class="stat-card bg-yellow"><div style="font-size: 9px;">إجمالي المعلق</div><div style="font-size: 14px; font-weight: 800;">790</div></div>
+                <div class="stat-card bg-blue">
+                    <div class="label-text">إجمالي الهدف السنوي</div>
+                    <div class="value-text">180,000</div>
+                </div>
+                <div class="stat-card bg-green">
+                    <div class="label-text">إجمالي المبيعات السنوية</div>
+                    <div class="value-text">14,210</div>
+                </div>
+                <div class="stat-card bg-yellow">
+                    <div class="label-text">إجمالي المعلق</div>
+                    <div class="value-text">790</div>
+                </div>
             </div>
 
             <div class="content-box">
                 <h3>📈 تحليل الأداء الشهري</h3>
-                <div style="height: 260px; position: relative;"><canvas id="performanceChart"></canvas></div>
+                <div style="height: 280px; position: relative;"><canvas id="performanceChart"></canvas></div>
             </div>
         </div>
     </div>
@@ -180,11 +204,11 @@
 
     const r1 = tbody.insertRow();
     r1.style.background = "#f8fafc";
-    r1.innerHTML = `<td colspan="4" style="text-align:left; padding-left:10px;">إجمالي عدد الزيارات للسنة</td><td colspan="2" style="color:#3b82f6">45</td>`;
+    r1.innerHTML = `<td colspan="4" style="text-align:left; padding-left:15px; font-weight:800;">إجمالي عدد الزيارات للسنة</td><td colspan="2" style="color:#3b82f6">45</td>`;
 
     const r2 = tbody.insertRow();
     r2.style.background = "#f8fafc";
-    r2.innerHTML = `<td colspan="4" style="text-align:left; padding-left:10px;">إجمالي الزيارات الناجحة</td><td colspan="2" style="color:#22c55e">12</td>`;
+    r2.innerHTML = `<td colspan="4" style="text-align:left; padding-left:15px; font-weight:800;">إجمالي الزيارات الناجحة</td><td colspan="2" style="color:#22c55e">12</td>`;
 
     const ctx = document.getElementById('performanceChart').getContext('2d');
     new Chart(ctx, {
@@ -200,7 +224,15 @@
                 tension: 0.4
             }]
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { ticks: { font: { size: 12 } } },
+                x: { ticks: { font: { size: 12 } } }
+            }
+        }
     });
 </script>
 
