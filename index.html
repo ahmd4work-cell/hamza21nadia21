@@ -11,7 +11,7 @@
             --nav-purple: #2e1065; 
             --nav-active: #a78bfa;
             --bg-color: #f4f7f9;
-            --border-color: #e2e8f0; /* لون حدود أنحف وأخف */
+            --border-color: #e2e8f0;
             --white: #ffffff;
             --accent-blue: #3b82f6;
             --accent-green: #22c55e;
@@ -19,7 +19,6 @@
             --input-bg: #f8fafc;
         }
 
-        /* تقليل الخط العام درجة واحدة */
         body { 
             background-color: var(--bg-color); 
             font-family: 'Cairo', sans-serif; 
@@ -66,24 +65,25 @@
 
         h3 { font-size: 14px; margin: 0 0 15px 0; color: var(--nav-purple); font-weight: 800; border-right: 4px solid var(--accent-blue); padding-right: 8px; }
 
-        /* تنسيق الجدول بحدود نحيفة */
+        /* تعديلات الجدول مع تكبير الخط والحفاظ على المقاسات */
         .yearly-table { 
             width: 100%; 
             border-collapse: collapse; 
-            font-size: 11px; 
+            font-size: 12.5px; /* تم تكبير الخط هنا */
             table-layout: fixed; 
         }
         .yearly-table th, .yearly-table td { 
-            border: 0.5px solid var(--border-color); /* حدود نحيفة جداً */
-            padding: 8px 2px; 
+            border: 0.5px solid var(--border-color);
+            padding: 0; /* إزالة الحشو الداخلي للحفاظ على الارتفاع */
+            height: 32px; /* تحديد ارتفاع ثابت للصفوف */
             text-align: center; 
             font-weight: bold; 
             color: #475569;
-            width: 16.66%; 
+            overflow: hidden;
+            white-space: nowrap;
         }
         .yearly-table th { background: #f8fafc; color: var(--nav-purple); font-weight: 800; }
 
-        /* الخط الفاصل العريض بين معلق وعدد الزيارات */
         .thick-border { 
             border-left: 3px solid var(--nav-purple) !important; 
         }
@@ -140,7 +140,8 @@
                         <th>الشهر</th>
                         <th>الهدف</th>
                         <th>المكتمل</th>
-                        <th class="thick-border">معلق</th> <th style="background:#eff6ff">عدد الزيارات</th>
+                        <th class="thick-border">معلق</th>
+                        <th style="background:#eff6ff">عدد الزيارات</th>
                         <th style="background:#f0fdf4">ناجحة</th>
                     </tr>
                 </thead>
@@ -202,11 +203,11 @@
 
     const r1 = tbody.insertRow();
     r1.style.background = "#f8fafc";
-    r1.innerHTML = `<td colspan="4" style="text-align:left; padding-left:15px; font-weight:800; border-left: 3px solid var(--nav-purple);">إجمالي عدد الزيارات للسنة</td><td colspan="2" style="color:#3b82f6">45</td>`;
+    r1.innerHTML = `<td colspan="4" style="text-align:left; padding-right:15px; font-weight:800; border-left: 3px solid var(--nav-purple);">إجمالي عدد الزيارات للسنة</td><td colspan="2" style="color:#3b82f6">45</td>`;
 
     const r2 = tbody.insertRow();
     r2.style.background = "#f8fafc";
-    r2.innerHTML = `<td colspan="4" style="text-align:left; padding-left:15px; font-weight:800; border-left: 3px solid var(--nav-purple);">إجمالي الزيارات الناجحة</td><td colspan="2" style="color:#22c55e">12</td>`;
+    r2.innerHTML = `<td colspan="4" style="text-align:left; padding-right:15px; font-weight:800; border-left: 3px solid var(--nav-purple);">إجمالي الزيارات الناجحة</td><td colspan="2" style="color:#22c55e">12</td>`;
 
     const ctx = document.getElementById('performanceChart').getContext('2d');
     new Chart(ctx, {
