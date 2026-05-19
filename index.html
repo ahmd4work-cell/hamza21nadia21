@@ -17,6 +17,7 @@
             --accent-green: #22c55e;
             --accent-yellow-dim: #facc15;
             --input-bg: #f8fafc;
+            --navy-shiny: #1e1b4b; /* لون كحلي أساسي */
         }
 
         body { 
@@ -65,17 +66,16 @@
 
         h3 { font-size: 14px; margin: 0 0 15px 0; color: var(--nav-purple); font-weight: 800; border-right: 4px solid var(--accent-blue); padding-right: 8px; }
 
-        /* تعديلات الجدول مع تكبير الخط والحفاظ على المقاسات */
         .yearly-table { 
             width: 100%; 
             border-collapse: collapse; 
-            font-size: 12.5px; /* تم تكبير الخط هنا */
+            font-size: 12.5px; 
             table-layout: fixed; 
         }
         .yearly-table th, .yearly-table td { 
             border: 0.5px solid var(--border-color);
-            padding: 0; /* إزالة الحشو الداخلي للحفاظ على الارتفاع */
-            height: 32px; /* تحديد ارتفاع ثابت للصفوف */
+            padding: 0; 
+            height: 32px; 
             text-align: center; 
             font-weight: bold; 
             color: #475569;
@@ -176,7 +176,9 @@
 
             <div class="content-box">
                 <h3>📈 تحليل الأداء الشهري</h3>
-                <div style="height: 250px; position: relative;"><canvas id="performanceChart"></canvas></div>
+                <div style="height: 250px; position: relative;">
+                    <canvas id="performanceChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
@@ -210,23 +212,62 @@
     r2.innerHTML = `<td colspan="4" style="text-align:left; padding-right:15px; font-weight:800; border-left: 3px solid var(--nav-purple);">إجمالي الزيارات الناجحة</td><td colspan="2" style="color:#22c55e">12</td>`;
 
     const ctx = document.getElementById('performanceChart').getContext('2d');
+    
+    // إنشاء تدرج لوني كحلي لامع للعمود
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, '#2e1065');   // كحلي غامق
+    gradient.addColorStop(0.5, '#4338ca'); // درجة أفتح في المنتصف للمعان
+    gradient.addColorStop(1, '#1e1b4b');   // العودة للغامق في الأسفل
+
     new Chart(ctx, {
-        type: 'line',
+        type: 'bar', // تم تغيير النوع إلى أعمدة
         data: {
             labels: months,
-            datasets: [{
-                data: [14210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                borderColor: '#3b82f6',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                borderWidth: 2,
-                fill: true,
-                tension: 0.4
-            }]
+            datasets: [
+                {
+                    label: 'الهدف',
+                    data: [15000, 15000, 15000, 15000, 15000, 15000, 15000, 15000, 15000, 15000, 15000, 15000],
+                    backgroundColor: gradient,
+                    borderColor: '#1e1b4b',
+                    borderWidth: 1,
+                    borderRadius: 2, // زوايا خفيفة جداً
+                    barPercentage: 0.9,
+                    categoryPercentage: 0.8
+                },
+                {
+                    label: 'المحقق',
+                    data: [14210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    backgroundColor: '#ffffff',
+                    borderColor: '#cbd5e1',
+                    borderWidth: 1,
+                    borderRadius: 2,
+                    barPercentage: 0.9,
+                    categoryPercentage: 0.8
+                }
+            ]
         },
         options: { 
             responsive: true, 
             maintainAspectRatio: false, 
-            plugins: { legend: { display: false } }
+            plugins: { 
+                legend: { 
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        font: { family: 'Cairo', size: 10 }
+                    }
+                } 
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { family: 'Cairo', size: 10 } }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: { font: { family: 'Cairo', size: 10 } }
+                }
+            }
         }
     });
 </script>
