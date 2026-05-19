@@ -65,28 +65,29 @@
 
         h3 { font-size: 14px; margin: 0 0 15px 0; color: var(--nav-purple); font-weight: 800; border-right: 4px solid var(--accent-blue); padding-right: 8px; }
 
-        /* تعديلات الجدول مع تكبير الخط والحفاظ على المقاسات */
+        /* تعديلات الجدول للفصل البصري */
         .yearly-table { 
             width: 100%; 
-            border-collapse: collapse; 
-            font-size: 12.5px; /* تم تكبير الخط هنا */
+            border-collapse: separate; /* مهم للسماح بالمسافات */
+            border-spacing: 4px 0; /* مسافة 4 بكسل بين الأعمدة */
+            font-size: 12.5px; 
             table-layout: fixed; 
         }
         .yearly-table th, .yearly-table td { 
-            border: 0.5px solid var(--border-color);
-            padding: 0; /* إزالة الحشو الداخلي للحفاظ على الارتفاع */
-            height: 32px; /* تحديد ارتفاع ثابت للصفوف */
+            height: 32px; 
             text-align: center; 
             font-weight: bold; 
             color: #475569;
-            overflow: hidden;
-            white-space: nowrap;
+            border-radius: 4px; /* زوايا ناعمة لكل خلية */
         }
-        .yearly-table th { background: #f8fafc; color: var(--nav-purple); font-weight: 800; }
+        
+        /* خلايا الجدول الأساسي */
+        .main-cell { background: #fdfdfd; border: 0.5px solid var(--border-color); }
+        .yearly-table th.main-cell { background: #f8fafc; color: var(--nav-purple); }
 
-        .thick-border { 
-            border-left: 3px solid var(--nav-purple) !important; 
-        }
+        /* خلايا أعمدة الزيارات المنفصلة */
+        .visit-cell-blue { background: #eff6ff; border: 0.5px solid #dbeafe; color: var(--accent-blue) !important; }
+        .visit-cell-green { background: #f0fdf4; border: 0.5px solid #dcfce7; color: var(--accent-green) !important; }
 
         .filters-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
         .filter-card { background: white; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 4px; }
@@ -102,8 +103,7 @@
         .bg-green { background-color: var(--accent-green); }
         .bg-yellow { background-color: var(--accent-yellow-dim); color: #854d0e; }
 
-        .table-spacer { height: 10px; }
-        .table-spacer td { border: none !important; background: transparent !important; }
+        .table-spacer { height: 12px; }
 
         @media (max-width: 1100px) {
             .dashboard-grid { grid-template-columns: 1fr; }
@@ -137,12 +137,12 @@
             <table class="yearly-table">
                 <thead>
                     <tr>
-                        <th>الشهر</th>
-                        <th>الهدف</th>
-                        <th>المكتمل</th>
-                        <th class="thick-border">معلق</th>
-                        <th style="background:#eff6ff">عدد الزيارات</th>
-                        <th style="background:#f0fdf4">ناجحة</th>
+                        <th class="main-cell">الشهر</th>
+                        <th class="main-cell">الهدف</th>
+                        <th class="main-cell">المكتمل</th>
+                        <th class="main-cell">معلق</th>
+                        <th class="visit-cell-blue">عدد الزيارات</th>
+                        <th class="visit-cell-green">ناجحة</th>
                     </tr>
                 </thead>
                 <tbody id="monthsBody"></tbody>
@@ -189,25 +189,32 @@
     months.forEach((m, i) => {
         const row = tbody.insertRow();
         row.innerHTML = `
-            <td>${m}</td>
-            <td>15,000</td>
-            <td>${i===0?'14,210':'-'}</td>
-            <td class="thick-border">${i===0?'790':'-'}</td>
-            <td style="color:#3b82f6">${i===0?'45':'-'}</td>
-            <td style="color:#22c55e">${i===0?'12':'-'}</td>
+            <td class="main-cell">${m}</td>
+            <td class="main-cell">15,000</td>
+            <td class="main-cell">${i===0?'14,210':'-'}</td>
+            <td class="main-cell">${i===0?'790':'-'}</td>
+            <td class="visit-cell-blue">${i===0?'45':'-'}</td>
+            <td class="visit-cell-green">${i===0?'12':'-'}</td>
         `;
     });
 
-    const spacer = tbody.insertRow();
-    spacer.className = "table-spacer"; spacer.innerHTML = `<td colspan="6"></td>`;
+    // فاصل بصري قبل المجموع النهائي
+    const spacerRow = tbody.insertRow();
+    spacerRow.className = "table-spacer";
+    spacerRow.innerHTML = `<td colspan="6"></td>`;
 
+    // صفوف الإجماليات مع الحفاظ على التنسيق المنفصل
     const r1 = tbody.insertRow();
-    r1.style.background = "#f8fafc";
-    r1.innerHTML = `<td colspan="4" style="text-align:left; padding-right:15px; font-weight:800; border-left: 3px solid var(--nav-purple);">إجمالي عدد الزيارات للسنة</td><td colspan="2" style="color:#3b82f6">45</td>`;
+    r1.innerHTML = `
+        <td colspan="4" style="text-align:left; padding-left:15px; font-weight:800; background:#f8fafc; border:0.5px solid var(--border-color); border-radius:4px;">إجمالي عدد الزيارات للسنة</td>
+        <td colspan="2" class="visit-cell-blue" style="border-radius:4px;">45</td>
+    `;
 
     const r2 = tbody.insertRow();
-    r2.style.background = "#f8fafc";
-    r2.innerHTML = `<td colspan="4" style="text-align:left; padding-right:15px; font-weight:800; border-left: 3px solid var(--nav-purple);">إجمالي الزيارات الناجحة</td><td colspan="2" style="color:#22c55e">12</td>`;
+    r2.innerHTML = `
+        <td colspan="4" style="text-align:left; padding-left:15px; font-weight:800; background:#f8fafc; border:0.5px solid var(--border-color); border-radius:4px;">إجمالي الزيارات الناجحة</td>
+        <td colspan="2" class="visit-cell-green" style="border-radius:4px;">12</td>
+    `;
 
     const ctx = document.getElementById('performanceChart').getContext('2d');
     new Chart(ctx, {
