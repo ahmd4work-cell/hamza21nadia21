@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASGate - لوحة التحكم الموزعة</title>
+    <title>ASGate - لوحة التحكم الشاملة</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -14,6 +14,8 @@
             --border-color: #cbd5e1;
             --white: #ffffff;
             --accent-blue: #3b82f6;
+            --accent-green: #22c55e;
+            --accent-yellow-dim: #facc15; /* أصفر مطفي */
         }
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
@@ -32,12 +34,13 @@
 
         .container { padding: 20px; }
 
-        /* --- الهيكل الرئيسي المعتمد على النسب المئوية --- */
+        /* الهيكل الرئيسي المعتمد على النسب المئوية */
         .dashboard-grid {
             display: grid;
-            grid-template-columns: 40% 20% 40%; /* توزيع 40% يمين - 20% فراغ - 40% يسار */
+            grid-template-columns: 40% 20% 40%; 
             align-items: start;
             width: 100%;
+            gap: 0; /* الفجوة يتم التحكم بها عبر عمود الـ 20% */
         }
 
         /* تنسيق الصناديق */
@@ -48,18 +51,25 @@
 
         h3 { font-size: 13px; margin: 0 0 15px 0; color: var(--nav-purple); font-weight: 800; border-right: 4px solid var(--accent-blue); padding-right: 8px; }
 
-        /* جدول الشهور (جهة اليمين) */
+        /* جدول الشهور */
         .yearly-table { width: 100%; border-collapse: collapse; font-size: 11px; }
         .yearly-table th { background: #f5f3ff; color: var(--nav-purple); padding: 10px 5px; border: 1px solid var(--border-color); }
         .yearly-table td { border: 1px solid var(--border-color); padding: 8px 5px; text-align: center; font-weight: bold; color: #475569; }
 
-        /* الرسم البياني (جهة اليسار) */
-        .chart-wrapper { height: 300px; position: relative; }
+        /* المربعات العلوية الثلاثة */
+        .stats-cards { display: flex; gap: 10px; margin-bottom: 15px; width: 100%; }
+        .stat-card { flex: 1; padding: 12px; border-radius: 12px; text-align: center; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .stat-card .label { font-size: 10px; font-weight: bold; opacity: 0.9; margin-bottom: 4px; }
+        .stat-card .value { font-size: 16px; font-weight: 800; }
 
-        /* المسافة الفارغة */
-        .spacer { display: flex; align-items: center; justify-content: center; }
+        .bg-blue { background-color: var(--accent-blue); }
+        .bg-green { background-color: var(--accent-green); }
+        .bg-yellow { background-color: var(--accent-yellow-dim); color: #854d0e; opacity: 0.9; }
 
-        @media (max-width: 1000px) {
+        /* الرسم البياني */
+        .chart-wrapper { height: 260px; position: relative; }
+
+        @media (max-width: 1100px) {
             .dashboard-grid { grid-template-columns: 1fr; gap: 20px; }
             .spacer { display: none; }
         }
@@ -96,10 +106,28 @@
 
         <div class="spacer"></div>
 
-        <div class="content-box">
-            <h3>📈 تحليل الأداء الشهري</h3>
-            <div class="chart-wrapper">
-                <canvas id="performanceChart"></canvas>
+        <div class="left-section">
+            
+            <div class="stats-cards">
+                <div class="stat-card bg-blue">
+                    <div class="label">إجمالي الهدف</div>
+                    <div class="value">180,000</div>
+                </div>
+                <div class="stat-card bg-green">
+                    <div class="label">إجمالي المبيعات</div>
+                    <div class="value">14,210</div>
+                </div>
+                <div class="stat-card bg-yellow">
+                    <div class="label">إجمالي المعلق</div>
+                    <div class="value">790</div>
+                </div>
+            </div>
+
+            <div class="content-box">
+                <h3>📈 تحليل الأداء الشهري</h3>
+                <div class="chart-wrapper">
+                    <canvas id="performanceChart"></canvas>
+                </div>
             </div>
         </div>
 
@@ -117,32 +145,32 @@
             <td>${m}</td>
             <td>15,000</td>
             <td>${index === 0 ? '14,210' : '-'}</td>
-            <td style="color: ${index === 0 ? '#22c55e' : '#94a3b8'}">${index === 0 ? '● نشط' : 'قيد الانتظار'}</td>
+            <td style="color: ${index === 0 ? '#22c55e' : '#94a3b8'}">${index === 0 ? '● نشط' : 'إنتظار'}</td>
         `;
     });
 
-    // رسم البياني للأداء الشهري
+    // رسم البياني
     const ctx = document.getElementById('performanceChart').getContext('2d');
     new Chart(ctx, {
         type: 'line',
         data: {
             labels: months,
             datasets: [{
-                label: 'الإنجاز الشهري',
+                label: 'الإنجاز',
                 data: [14210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 borderColor: '#3b82f6',
                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
                 borderWidth: 3,
                 fill: true,
-                tension: 0.4
+                tension: 0.4,
+                pointRadius: 4,
+                pointBackgroundColor: '#3b82f6'
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false }
-            },
+            plugins: { legend: { display: false } },
             scales: {
                 y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
                 x: { grid: { display: false } }
