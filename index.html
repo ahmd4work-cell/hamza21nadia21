@@ -36,27 +36,17 @@
 
         .container { padding: 5px 20px 20px 20px; }
         .dashboard-grid { display: grid; grid-template-columns: 48% 4% 48%; align-items: start; width: 100%; }
-        .content-box { background: var(--white); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05); position: relative; }
+        .content-box { background: var(--white); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 
         .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         h3 { font-size: 14px; margin: 0; color: var(--nav-purple); font-weight: 800; border-right: 4px solid var(--accent-blue); padding-right: 8px; }
 
-        /* زر التحويل */
         .toggle-btn {
-            background: var(--nav-purple); color: white; border: none; padding: 4px 12px;
+            background: var(--nav-purple); color: white; border: none; padding: 5px 15px;
             border-radius: 20px; font-family: 'Cairo'; font-size: 10px; cursor: pointer;
             transition: 0.3s; font-weight: 700;
         }
-        .toggle-btn:hover { background: var(--nav-active); }
+        .toggle-btn:hover { background: var(--nav-active); opacity: 0.9; }
 
-        .yearly-table { width: 100%; border-collapse: collapse; font-size: 12.5px; table-layout: fixed; }
-        .yearly-table th, .yearly-table td { border: 0.5px solid var(--border-color); padding: 0; height: 32px; text-align: center; font-weight: bold; color: #475569; overflow: hidden; white-space: nowrap; }
-        .yearly-table th { background: #f8fafc; color: var(--nav-purple); font-weight: 800; }
-        .thick-border { border-left: 3px solid var(--nav-purple) !important; }
-
-        .filters-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
-        .filter-card { background: white; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 4px; }
-        .filter-card label { font-size: 10px; font-weight: 800; color: var(--nav-purple); }
-        .filter-input { width: 100%; border: none; background: var(--input-bg); font-family: 'Cairo'; font-size: 11px; padding: 5px; border-radius: 6px; outline: none; }
-
-        .stats-cards { display: flex; gap: 10px; margin-bottom: 15px; width:
+        /* الجدول بمقاسات ثابتة وخط كبير */
+        .yearly-table { width: 100%; border-collapse: collapse; font
