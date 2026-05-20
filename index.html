@@ -113,11 +113,20 @@
         .filter-card label { font-size: 9px; font-weight: 800; color: var(--nav-purple); }
         .filter-input { width: 100%; border: none; background: var(--input-bg); font-family: 'Cairo'; font-size: 10px; padding: 4px; border-radius: 6px; outline: none; }
 
-        .stat-card .label-text { font-size: 9px; font-weight: bold; opacity: 0.9; }
-        .stat-card .value-text { font-size: 13px; font-weight: 800; }
-
+        /* التعديل الجديد لجعل النص والرقم في سطر واحد */
         .stats-cards { display: flex; gap: 10px; margin-bottom: 15px; width: 100%; }
-        .stat-card { flex: 1; padding: 10px; border-radius: 12px; text-align: center; color: white; }
+        .stat-card { 
+            flex: 1; 
+            padding: 12px 15px; 
+            border-radius: 12px; 
+            color: white; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        .stat-card .label-text { font-size: 10px; font-weight: bold; opacity: 0.9; }
+        .stat-card .value-text { font-size: 14px; font-weight: 800; }
+
         .bg-blue { background-color: var(--accent-blue); }
         .bg-green { background-color: var(--accent-green); }
         .bg-yellow { background-color: var(--accent-yellow); color: #854d0e; }
