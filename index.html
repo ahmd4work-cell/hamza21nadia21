@@ -119,14 +119,16 @@
         .stats-cards { display: flex; gap: 8px; margin-bottom: 15px; width: 100%; }
         .stat-card { 
             flex: 1; 
-            padding: 10px 12px; 
+            height: 52px; /* تثبيت الارتفاع لضمان عدم التمدد */
+            padding: 5px 12px; 
             border-radius: 10px; 
             color: white; 
             display: flex; 
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-width: 0; /* منع التمدد الزائد */
+            min-width: 0;
+            box-sizing: border-box;
         }
         .stat-card-row {
             display: flex;
@@ -135,8 +137,9 @@
             align-items: center;
             gap: 5px;
         }
-        .stat-card .label-text { font-size: 9px; font-weight: bold; opacity: 0.9; white-space: nowrap; }
-        .stat-card .value-text { font-size: 12px; font-weight: 800; }
+        /* تكبير الخط درجة واحدة */
+        .stat-card .label-text { font-size: 10px; font-weight: bold; opacity: 0.9; white-space: nowrap; }
+        .stat-card .value-text { font-size: 13.5px; font-weight: 800; }
 
         .bg-blue { background-color: var(--accent-blue); }
         .bg-green { background-color: var(--accent-green); }
