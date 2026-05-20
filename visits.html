@@ -1,4 +1,219 @@
-// ... الكود السابق (CSS و HTML) يبقى كما هو
+<!DOCTYPE html>
+<html dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASGate - الزيارات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --nav-purple-dark: #2e1065;
+            --header-purple-mid: #8b5cf6;
+            --nav-active: #a78bfa;
+            --bg-color: #f8fafc;
+            --table-blue-alt: #eff6ff;
+            --accent-green-active: #22c55e;
+            --accent-blue: #3b82f6;
+            --accent-red: #ef4444;
+            --border-soft: #cbd5e1;
+            --sticker-yellow: #fff9c4;
+        }
+
+        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
+
+        .navbar { 
+            background-color: var(--nav-purple-dark); 
+            display: flex; 
+            align-items: center; 
+            padding: 0 20px; 
+            margin: 10px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 10px;
+            z-index: 1000;
+            height: 37px;
+            box-sizing: border-box;
+        }
+
+        .navbar a { 
+            color: #ffffff;
+            text-decoration: none; 
+            padding: 0 15px;
+            font-weight: 700; 
+            font-size: 12px;
+            border-radius: 6px; 
+            transition: 0.3s; 
+            line-height: 26px;
+            height: 26px;
+            display: inline-block;
+        }
+
+        .navbar a.active { 
+            background-color: var(--nav-active); 
+            color: var(--nav-purple-dark); 
+        }
+
+        .container { padding: 0 15px; }
+        
+        .action-bar { 
+            display: flex; 
+            align-items: center; 
+            margin: 8px 0; 
+            gap: 10px; 
+        }
+
+        .search-wrapper { flex-grow: 1; display: flex; justify-content: center; }
+        .search-input {
+            width: 350px; padding: 6px 15px; border-radius: 20px;
+            border: 1px solid var(--border-soft); font-family: 'Cairo';
+            font-size: 13px; outline: none;
+        }
+
+        .btn-top { border: none; padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; color: white; transition: 0.3s; }
+        .btn-add { background-color: var(--accent-blue); }
+        .btn-save-all { background-color: #cbd5e1; color: #64748b; pointer-events: none; }
+        .btn-save-all.active { background-color: var(--accent-green-active); color: white; pointer-events: auto; }
+
+        .table-wrapper { background: white; border-radius: 10px; overflow: hidden; border: 1px solid var(--border-soft); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        
+        th { 
+            background-color: var(--header-purple-mid);
+            padding: 10px 5px;
+            color: white; 
+            font-size: 11px; 
+            font-weight: 800;
+            text-align: center;
+            border-left: 1px solid rgba(255,255,255,0.1);
+        }
+
+        td { border-bottom: 1px solid var(--border-soft); text-align: center; height: 38px; font-size: 11px; }
+
+        tr:nth-child(even) { background-color: var(--table-blue-alt); }
+        tr:nth-child(odd) { background-color: #ffffff; }
+        tr:hover { background-color: #f1f5f9; }
+
+        .excel-input { width: 100%; height: 100%; border: none; padding: 0 5px; font-family: 'Cairo'; font-size: 11px; text-align: center; outline: none; background: transparent; }
+        .notes-cell { cursor: pointer; color: #64748b; font-size: 10px; padding: 0 8px; text-align: right; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .btn-delete { border: none; background: #fee2e2; color: var(--accent-red); padding: 3px 8px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold; }
+        
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 2000; }
+        .sticker-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 7cm; height: 12cm; background-color: var(--sticker-yellow); border-radius: 2px; box-shadow: 5px 5px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column; border-top: 20px solid #fff59d; }
+        .sticker-history { flex-grow: 1; overflow-y: auto; padding: 12px; font-size: 11px; border-bottom: 1px dashed #decb00; text-align: right; }
+        .sticker-editor { padding: 12px; height: 100px; text-align: right; }
+        .date-chip { display: inline-block; background: #fbc02d; color: #000; padding: 1px 7px; border-radius: 10px; font-weight: bold; font-size: 9px; margin-bottom: 5px; }
+        .sticker-textarea { width: 100%; border: none; background: transparent; font-family: 'Cairo'; font-size: 11px; resize: none; outline: none; height: 60px; text-align: right; }
+        .sticker-save-btn { width: 100%; border: none; padding: 7px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; background-color: #81c784; }
+        .sticker-save-btn.active { background-color: #22c55e; }
+
+        .custom-confirm { position: fixed; top: 30%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 3000; display: none; text-align: center; border: 2px solid var(--nav-purple-dark); min-width: 250px; }
+        .confirm-btns { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
+        .btn-yes { background: var(--accent-green-active); color: white; border: none; padding: 8px 25px; border-radius: 5px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
+        .btn-no { background: var(--accent-red); color: white; border: none; padding: 8px 25px; border-radius: 5px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
+    </style>
+</head>
+<body onload="loadSavedData()">
+
+<div id="confirmBox" class="custom-confirm">
+    <p id="confirmMsg" style="font-weight: bold;"></p>
+    <div class="confirm-btns">
+        <button class="btn-yes" id="confirmBtn">نعم</button>
+        <button class="btn-no" onclick="closeConfirm()">لا</button>
+    </div>
+</div>
+
+<nav class="navbar">
+    <a href="index.html">الرئيسية</a>
+    <a href="visits.html" class="active">الزيارات</a>
+    <a href="opportunities.html">الفرص البيعية</a>
+    <a href="customers.html">العملاء</a>
+    <a href="sales.html">المبيعات</a>
+</nav>
+
+<div class="container">
+    <div class="action-bar">
+        <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة زيارة</button>
+        <button id="saveAllBtn" class="btn-top btn-save-all" onclick="saveAllData()">حفظ التغييرات</button>
+        
+        <div class="search-wrapper">
+            <input type="text" id="searchInput" class="search-input" placeholder="بحث في كافة الحقول..." onkeyup="filterTable()">
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table id="mainTable">
+            <thead>
+                <tr>
+                    <th style="width: 13%;">الشركة</th>
+                    <th>المسؤول</th>
+                    <th style="width: 11%;">الموبايل</th>
+                    <th style="width: 14%;">الايميل</th> <th>السجل</th>
+                    <th>الخدمة الحالية</th>
+                    <th>الخدمة المقترحة</th>
+                    <th style="width: 80px;">الحالة</th>
+                    <th style="width: 105px;">تاريخ الزيارة</th>
+                    <th style="width: 16%;">ملاحظات</th>
+                    <th style="width: 90px;">تاريخ التعديل</th>
+                    <th style="width: 65px;">إجراء</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<div id="notesOverlay" class="modal-overlay" onclick="handleOutsideClick(event)">
+    <div class="sticker-container" onclick="event.stopPropagation()">
+        <div id="historyArea" class="sticker-history"></div>
+        <div class="sticker-editor">
+            <div id="currentDateChip" class="date-chip"></div>
+            <textarea id="stickerInput" class="sticker-textarea" placeholder="تحديث جديد..." oninput="updateStickerBtn()"></textarea>
+        </div>
+        <button id="saveStickerBtn" class="sticker-save-btn" onclick="confirmAndSaveNote()">حفظ التحديث</button>
+    </div>
+</div>
+
+<script>
+    let isDirty = false;
+    let activeCell = null;
+    let isStickerChanged = false;
+    const statusOrder = { "مهتم": 4, "50%": 3, "20%": 2, "فقدان": 1 };
+
+    function filterTable() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('#tableBody tr');
+        rows.forEach(row => {
+            const inputs = row.querySelectorAll('.excel-input');
+            if(inputs.length > 0) {
+                const text = Array.from(inputs).map(i => i.value.toLowerCase()).join(' ');
+                row.style.display = text.includes(query) ? '' : 'none';
+            }
+        });
+    }
+
+    function getDisplayNote(notesJson) {
+        try {
+            const notes = JSON.parse(notesJson);
+            if (notes.length > 0) {
+                let lastNote = notes[notes.length - 1].text;
+                return lastNote.replace(/<br>/g, " ").replace(/•/g, "").substring(0, 25) + "...";
+            }
+        } catch(e) {}
+        return "إضافة ملاحظة...";
+    }
+
+    function loadSavedData() {
+        const saved = localStorage.getItem('asgate_visits_data');
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+        if (saved) {
+            let data = JSON.parse(saved);
+            data.sort((a, b) => (statusOrder[b.status] || 0) - (statusOrder[a.status] || 0));
+            data.forEach(item => renderRow(item));
+        }
+        toggleSaveBtn(false);
+    }
 
     function renderRow(v, isNew = false) {
         const tbody = document.getElementById('tableBody');
@@ -30,12 +245,23 @@
 
     function insertNewRow() {
         const today = new Date().toISOString().split('T')[0];
-        // التأكد من تمرير كائن يحتوي على حقل email
-        renderRow({ 
-            comp:'', mgr:'', mob:'', email:'', cr:'', curr:'', prop:'', 
-            status:'', date: today, notes: '[]', updated: '-', created: today 
-        }, true);
+        // تمت إضافة حقل email للكائن الجديد
+        renderRow({ comp:'', mgr:'', mob:'', email:'', cr:'', curr:'', prop:'', status:'', date: today, notes: '[]', updated: '-', created: today }, true);
         toggleSaveBtn(true);
+    }
+
+    function markAsChanged(el) {
+        toggleSaveBtn(true);
+        const row = el.closest('tr');
+        if (row.getAttribute('data-created') !== new Date().toISOString().split('T')[0]) {
+            row.setAttribute('data-pending-update', new Date().toLocaleDateString('en-GB'));
+        }
+    }
+
+    function toggleSaveBtn(active) {
+        isDirty = active;
+        const btn = document.getElementById('saveAllBtn');
+        if(active) btn.classList.add('active'); else btn.classList.remove('active');
     }
 
     function saveAllData() {
@@ -46,12 +272,12 @@
             let updatedAt = row.querySelector('.updated-at').innerText;
             if (row.getAttribute('data-pending-update')) updatedAt = row.getAttribute('data-pending-update');
             
-            // ترتيب الـ index هنا مهم جداً ويجب أن يطابق ترتيب الـ inputs في renderRow
+            // تحديث الترتيب ليشمل الايميل (ins[3]) وزحزحة بقية الحقول
             allData.push({
                 comp: ins[0].value, 
                 mgr: ins[1].value, 
                 mob: ins[2].value,
-                email: ins[3].value, // هذا هو الترتيب الصحيح الآن
+                email: ins[3].value,
                 cr: ins[4].value, 
                 curr: ins[5].value, 
                 prop: ins[6].value,
@@ -65,3 +291,86 @@
         localStorage.setItem('asgate_visits_data', JSON.stringify(allData));
         loadSavedData();
     }
+
+    function checkStatus(el) {
+        markAsChanged(el);
+        if (el.value === 'مهتم') {
+            showConfirm("هل تريد نقل الزيارة إلى الفرص البيعية؟", () => transferToOpps(el.closest('tr')));
+        }
+    }
+
+    function transferToOpps(row) {
+        const ins = row.querySelectorAll('.excel-input');
+        const rowData = {
+            comp: ins[0].value, 
+            mgr: ins[1].value, 
+            mob: ins[2].value,
+            email: ins[3].value,
+            cr: ins[4].value, 
+            curr: ins[5].value, 
+            prop: ins[6].value,
+            status: 'مهتم', 
+            date: ins[7].value,
+            notes: row.querySelector('.notes-cell').getAttribute('data-notes') || "[]",
+            updated: new Date().toLocaleDateString('en-GB'),
+            created: row.getAttribute('data-created')
+        };
+        let oppsData = JSON.parse(localStorage.getItem('asgate_opportunities_data') || '[]');
+        oppsData.push(rowData);
+        localStorage.setItem('asgate_opportunities_data', JSON.stringify(oppsData));
+        row.remove();
+        saveAllData();
+    }
+
+    function openSticker(cell) {
+        activeCell = cell; isStickerChanged = false;
+        const notes = JSON.parse(cell.getAttribute('data-notes') || "[]");
+        let hHtml = "";
+        notes.forEach((n, idx) => {
+            hHtml += `<div style="margin-bottom:8px;"><strong>${n.date}</strong><br>${n.text}</div>`;
+            if(idx < notes.length - 1) hHtml += '<hr style="border:0; border-top:1px solid #decb00">';
+        });
+        document.getElementById('historyArea').innerHTML = hHtml;
+        const now = new Date();
+        const days = ['الأحد', 'الأثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+        document.getElementById('currentDateChip').innerText = `${days[now.getDay()]} ${now.toLocaleDateString('en-GB')}`;
+        document.getElementById('stickerInput').value = '';
+        document.getElementById('saveStickerBtn').classList.remove('active');
+        document.getElementById('notesOverlay').style.display = 'block';
+    }
+
+    function updateStickerBtn() {
+        isStickerChanged = document.getElementById('stickerInput').value.trim() !== "";
+        document.getElementById('saveStickerBtn').classList.toggle('active', isStickerChanged);
+    }
+
+    function confirmAndSaveNote() {
+        const text = document.getElementById('stickerInput').value.trim();
+        if (text) {
+            let notes = JSON.parse(activeCell.getAttribute('data-notes') || "[]");
+            const todayStr = document.getElementById('currentDateChip').innerText;
+            notes.push({ date: todayStr, text: text });
+            activeCell.setAttribute('data-notes', JSON.stringify(notes));
+            activeCell.innerText = getDisplayNote(JSON.stringify(notes));
+            toggleSaveBtn(true);
+        }
+        document.getElementById('notesOverlay').style.display = 'none';
+        closeConfirm();
+    }
+
+    function handleOutsideClick(e) {
+        if (isStickerChanged) showConfirm("هل تريد حفظ الملاحظات؟", confirmAndSaveNote);
+        else document.getElementById('notesOverlay').style.display = 'none';
+    }
+
+    function showConfirm(msg, action) {
+        document.getElementById('confirmMsg').innerText = msg;
+        document.getElementById('confirmBox').style.display = 'block';
+        document.getElementById('confirmBtn').onclick = () => { action(); closeConfirm(); };
+    }
+
+    function closeConfirm() { document.getElementById('confirmBox').style.display = 'none'; }
+    function deleteRow(btn) { if(confirm("هل أنت متأكد من حذف الزيارة؟")) { btn.closest('tr').remove(); saveAllData(); } }
+</script>
+</body>
+</html>
