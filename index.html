@@ -51,10 +51,10 @@
 
         .container { padding: 5px 20px 20px 20px; }
         
-        /* التوزيع الجديد: 30% للجدول - 10% مسافة - 60% للتحليل */
+        /* التوزيع الجديد: 38% للجدول - 2% مسافة - 60% للتحليل */
         .dashboard-grid { 
             display: grid; 
-            grid-template-columns: 30% 10% 60%; 
+            grid-template-columns: 38% 2% 60%; 
             align-items: start; 
             width: 100%; 
         }
@@ -89,7 +89,7 @@
         .yearly-table { 
             width: 100%; 
             border-collapse: collapse; 
-            font-size: 10.5px; /* تصغير الخط ليناسب الـ 30% */
+            font-size: 10.5px;
             table-layout: fixed; 
         }
         .yearly-table th, .yearly-table td { 
@@ -156,15 +156,16 @@
 <div class="container">
     <div class="dashboard-grid">
         <div class="content-box">
-            <h3>📅 سجل الأهداف (2026)</h3>
+            <h3>📅 سجل الأهداف والزيارات (2026)</h3>
             <table class="yearly-table">
                 <thead>
                     <tr>
-                        <th style="width: 25%;">الشهر</th>
+                        <th style="width: 22%;">الشهر</th>
                         <th>هدف</th>
                         <th>تم</th>
                         <th class="thick-border">معلق</th>
                         <th style="background:#eff6ff">زيارة</th>
+                        <th style="background:#f0fdf4">ناجحة</th>
                     </tr>
                 </thead>
                 <tbody id="monthsBody"></tbody>
@@ -221,16 +222,16 @@
             <td>${i===0?'14.2k':'-'}</td>
             <td class="thick-border">${i===0?'790':'-'}</td>
             <td style="color:#3b82f6">${i===0?'45':'-'}</td>
+            <td style="color:#22c55e">${i===0?'12':'-'}</td>
         `;
     });
 
-    // صفوف الإجمالي المختصرة
     const spacer = tbody.insertRow();
-    spacer.className = "table-spacer"; spacer.innerHTML = `<td colspan="5"></td>`;
+    spacer.className = "table-spacer"; spacer.innerHTML = `<td colspan="6"></td>`;
 
     const r1 = tbody.insertRow();
     r1.className = "summary-row";
-    r1.innerHTML = `<td colspan="4" style="text-align:left; padding-left:10px; font-weight:800; border-left: 3px solid var(--nav-purple);">إجمالي الزيارات</td><td style="color:#3b82f6">45</td>`;
+    r1.innerHTML = `<td colspan="4" style="text-align:left; padding-left:10px; font-weight:800; border-left: 3px solid var(--nav-purple);">إجمالي الزيارات الناجحة للسنة</td><td colspan="2" style="color:#22c55e">12</td>`;
 
     let myChart = null;
     let currentChartType = 'bar';
