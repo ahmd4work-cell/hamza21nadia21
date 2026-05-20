@@ -51,7 +51,6 @@
 
         .container { padding: 5px 20px 20px 20px; }
         
-        /* التوزيع الجديد: 38% للجدول - 2% مسافة - 60% للتحليل */
         .dashboard-grid { 
             display: grid; 
             grid-template-columns: 38% 2% 60%; 
@@ -176,8 +175,25 @@
 
         <div class="left-section">
             <div class="filters-grid">
-                <div class="filter-card"><label>بحث</label><input type="text" class="filter-input" placeholder="..."></div>
-                <div class="filter-card"><label>المدير</label><select class="filter-input"><option>الكل</option></select></div>
+                <div class="filter-card">
+                    <label>الشهر</label>
+                    <select class="filter-input">
+                        <option>الكل</option>
+                        <option>يناير</option>
+                        <option>فبراير</option>
+                        <option>مارس</option>
+                        <option>ابريل</option>
+                        <option>مايو</option>
+                        <option>يونيو</option>
+                        <option>يوليو</option>
+                        <option>أغسطس</option>
+                        <option>سبتمبر</option>
+                        <option>أكتوبر</option>
+                        <option>نوفمبر</option>
+                        <option>ديسمبر</option>
+                    </select>
+                </div>
+                <div class="filter-card"><label>المنطقة</label><select class="filter-input"><option>الكل</option></select></div>
                 <div class="filter-card"><label>المشرف</label><select class="filter-input"><option>الكل</option></select></div>
                 <div class="filter-card"><label>المندوب</label><select class="filter-input"><option>الكل</option></select></div>
             </div>
