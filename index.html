@@ -40,20 +40,21 @@
         .navbar a.active { background-color: var(--nav-active); }
 
         .employee-info-bar {
-            margin: 10px 10%; height: 35px; background-color: var(--white);
+            margin: 10px 20px; height: 35px; background-color: var(--white);
             border: 1px solid var(--border-color); border-radius: 20px;
             display: flex; align-items: center; justify-content: center;
             padding: 0 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         .info-content { display: flex; gap: 35px; align-items: center; }
-        .info-item { font-size: 12px; color: var(--nav-purple); font-weight: 700; }
+        .info-item { font-size: 11px; color: var(--nav-purple); font-weight: 700; }
         .info-item span { color: #64748b; font-weight: 400; margin-right: 5px; }
 
         .container { padding: 5px 20px 20px 20px; }
         
+        /* التوزيع الجديد: 30% للجدول - 10% مسافة - 60% للتحليل */
         .dashboard-grid { 
             display: grid; 
-            grid-template-columns: 48% 4% 48%; 
+            grid-template-columns: 30% 10% 60%; 
             align-items: start; 
             width: 100%; 
         }
@@ -70,36 +71,36 @@
             margin-bottom: 15px;
         }
 
-        h3 { font-size: 14px; margin: 0; color: var(--nav-purple); font-weight: 800; border-right: 4px solid var(--accent-blue); padding-right: 8px; }
+        h3 { font-size: 13px; margin: 0; color: var(--nav-purple); font-weight: 800; border-right: 4px solid var(--accent-blue); padding-right: 8px; }
 
         .toggle-btn {
             background-color: var(--nav-purple);
             color: white;
             border: none;
-            padding: 5px 15px;
+            padding: 4px 12px;
             border-radius: 20px;
             font-family: 'Cairo';
-            font-size: 10px;
+            font-size: 9px;
             cursor: pointer;
             transition: 0.3s;
         }
-
         .toggle-btn:hover { background-color: var(--accent-blue); }
 
         .yearly-table { 
             width: 100%; 
             border-collapse: collapse; 
-            font-size: 12.5px; 
+            font-size: 10.5px; /* تصغير الخط ليناسب الـ 30% */
             table-layout: fixed; 
         }
         .yearly-table th, .yearly-table td { 
             border: 0.5px solid var(--border-color);
-            padding: 0; 
-            height: 32px; 
+            padding: 2px; 
+            height: 30px; 
             text-align: center; 
             font-weight: bold; 
             color: #475569;
             overflow: hidden;
+            text-overflow: ellipsis;
             white-space: nowrap;
         }
         .yearly-table th { background: #f8fafc; color: var(--nav-purple); font-weight: 800; }
@@ -110,24 +111,26 @@
 
         .filters-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
         .filter-card { background: white; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 4px; }
-        .filter-card label { font-size: 10px; font-weight: 800; color: var(--nav-purple); }
-        .filter-input { width: 100%; border: none; background: var(--input-bg); font-family: 'Cairo'; font-size: 11px; padding: 5px; border-radius: 6px; outline: none; }
+        .filter-card label { font-size: 9px; font-weight: 800; color: var(--nav-purple); }
+        .filter-input { width: 100%; border: none; background: var(--input-bg); font-family: 'Cairo'; font-size: 10px; padding: 4px; border-radius: 6px; outline: none; }
 
-        .stat-card .label-text { font-size: 10px; font-weight: bold; opacity: 0.9; }
-        .stat-card .value-text { font-size: 14px; font-weight: 800; }
+        .stat-card .label-text { font-size: 9px; font-weight: bold; opacity: 0.9; }
+        .stat-card .value-text { font-size: 13px; font-weight: 800; }
 
         .stats-cards { display: flex; gap: 10px; margin-bottom: 15px; width: 100%; }
-        .stat-card { flex: 1; padding: 12px; border-radius: 12px; text-align: center; color: white; }
+        .stat-card { flex: 1; padding: 10px; border-radius: 12px; text-align: center; color: white; }
         .bg-blue { background-color: var(--accent-blue); }
         .bg-green { background-color: var(--accent-green); }
         .bg-yellow { background-color: var(--accent-yellow); color: #854d0e; }
 
-        .table-spacer { height: 10px; }
+        .table-spacer { height: 8px; }
         .table-spacer td { border: none !important; background: transparent !important; }
+
+        .summary-row { background: #f8fafc; font-size: 10px; }
 
         @media (max-width: 1100px) {
             .dashboard-grid { grid-template-columns: 1fr; }
-            .spacer { display: none; }
+            .spacer { height: 20px; }
         }
     </style>
 </head>
@@ -144,7 +147,7 @@
 <div class="employee-info-bar">
     <div class="info-content">
         <div class="info-item">الموظف: <span>محمد المنصور</span></div>
-        <div class="info-item">الرقم الوظيفي: <span>ASG-2026</span></div>
+        <div class="info-item">الرقم: <span>ASG-2026</span></div>
         <div class="info-item">الموبايل: <span>05XXXXXXXX</span></div>
         <div class="info-item">الايميل: <span>m.mansour@asgate.sa</span></div>
     </div>
@@ -153,16 +156,15 @@
 <div class="container">
     <div class="dashboard-grid">
         <div class="content-box">
-            <h3>📅 سجل الأهداف والزيارات (2026)</h3>
+            <h3>📅 سجل الأهداف (2026)</h3>
             <table class="yearly-table">
                 <thead>
                     <tr>
-                        <th>الشهر</th>
-                        <th>الهدف</th>
-                        <th>المكتمل</th>
+                        <th style="width: 25%;">الشهر</th>
+                        <th>هدف</th>
+                        <th>تم</th>
                         <th class="thick-border">معلق</th>
-                        <th style="background:#eff6ff">عدد الزيارات</th>
-                        <th style="background:#f0fdf4">ناجحة</th>
+                        <th style="background:#eff6ff">زيارة</th>
                     </tr>
                 </thead>
                 <tbody id="monthsBody"></tbody>
@@ -181,15 +183,15 @@
             
             <div class="stats-cards">
                 <div class="stat-card bg-blue">
-                    <div class="label-text">إجمالي الهدف السنوي</div>
+                    <div class="label-text">الهدف السنوي</div>
                     <div class="value-text">180,000</div>
                 </div>
                 <div class="stat-card bg-green">
-                    <div class="label-text">إجمالي المبيعات السنوية</div>
+                    <div class="label-text">المبيعات</div>
                     <div class="value-text">14,210</div>
                 </div>
                 <div class="stat-card bg-yellow">
-                    <div class="label-text">إجمالي المعلق</div>
+                    <div class="label-text">المعلق</div>
                     <div class="value-text">790</div>
                 </div>
             </div>
@@ -197,9 +199,9 @@
             <div class="content-box">
                 <div class="chart-header">
                     <h3>📈 تحليل الأداء</h3>
-                    <button class="toggle-btn" onclick="toggleChartType()">تبديل (أعمدة / دائري)</button>
+                    <button class="toggle-btn" onclick="toggleChartType()">تبديل العرض</button>
                 </div>
-                <div style="height: 250px; position: relative;">
+                <div style="height: 280px; position: relative;">
                     <canvas id="performanceChart"></canvas>
                 </div>
             </div>
@@ -215,44 +217,33 @@
         const row = tbody.insertRow();
         row.innerHTML = `
             <td>${m}</td>
-            <td>15,000</td>
-            <td>${i===0?'14,210':'-'}</td>
+            <td>15k</td>
+            <td>${i===0?'14.2k':'-'}</td>
             <td class="thick-border">${i===0?'790':'-'}</td>
             <td style="color:#3b82f6">${i===0?'45':'-'}</td>
-            <td style="color:#22c55e">${i===0?'12':'-'}</td>
         `;
     });
 
+    // صفوف الإجمالي المختصرة
     const spacer = tbody.insertRow();
-    spacer.className = "table-spacer"; spacer.innerHTML = `<td colspan="6"></td>`;
+    spacer.className = "table-spacer"; spacer.innerHTML = `<td colspan="5"></td>`;
 
     const r1 = tbody.insertRow();
-    r1.style.background = "#f8fafc";
-    r1.innerHTML = `<td colspan="4" style="text-align:left; padding-right:15px; font-weight:800; border-left: 3px solid var(--nav-purple);">إجمالي عدد الزيارات للسنة</td><td colspan="2" style="color:#3b82f6">45</td>`;
+    r1.className = "summary-row";
+    r1.innerHTML = `<td colspan="4" style="text-align:left; padding-left:10px; font-weight:800; border-left: 3px solid var(--nav-purple);">إجمالي الزيارات</td><td style="color:#3b82f6">45</td>`;
 
-    const r2 = tbody.insertRow();
-    r2.style.background = "#f8fafc";
-    r2.innerHTML = `<td colspan="4" style="text-align:left; padding-right:15px; font-weight:800; border-left: 3px solid var(--nav-purple);">إجمالي الزيارات الناجحة</td><td colspan="2" style="color:#22c55e">12</td>`;
-
-    // --- منطق الرسم البياني ---
     let myChart = null;
     let currentChartType = 'bar';
 
     function initChart(type) {
         const ctx = document.getElementById('performanceChart').getContext('2d');
-        
-        // تدمير الرسم القديم إذا وجد لتجنب الأخطاء
-        if (myChart) {
-            myChart.destroy();
-        }
+        if (myChart) myChart.destroy();
 
         const greenGrad = ctx.createLinearGradient(0, 0, 0, 400);
-        greenGrad.addColorStop(0, '#22c55e');
-        greenGrad.addColorStop(1, '#166534');
+        greenGrad.addColorStop(0, '#22c55e'); greenGrad.addColorStop(1, '#166534');
 
         const yellowGrad = ctx.createLinearGradient(0, 0, 0, 400);
-        yellowGrad.addColorStop(0, '#facc15');
-        yellowGrad.addColorStop(1, '#a16207');
+        yellowGrad.addColorStop(0, '#facc15'); yellowGrad.addColorStop(1, '#a16207');
 
         myChart = new Chart(ctx, {
             type: type,
@@ -263,17 +254,13 @@
                         label: 'المكتمل',
                         data: [14210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                         backgroundColor: greenGrad,
-                        borderRadius: type === 'bar' ? 3 : 0,
-                        barPercentage: 0.8,
-                        categoryPercentage: 0.7
+                        borderRadius: type === 'bar' ? 3 : 0
                     },
                     {
                         label: 'المعلق',
                         data: [790, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                         backgroundColor: yellowGrad,
-                        borderRadius: type === 'bar' ? 3 : 0,
-                        barPercentage: 0.8,
-                        categoryPercentage: 0.7
+                        borderRadius: type === 'bar' ? 3 : 0
                     }
                 ]
             },
@@ -281,15 +268,11 @@
                 responsive: true, 
                 maintainAspectRatio: false, 
                 plugins: { 
-                    legend: { 
-                        display: true,
-                        position: 'top',
-                        labels: { font: { family: 'Cairo', size: 10 }, usePointStyle: true }
-                    } 
+                    legend: { position: 'top', labels: { font: { family: 'Cairo', size: 10 }, usePointStyle: true } }
                 },
                 scales: type === 'bar' ? {
-                    x: { grid: { display: false }, ticks: { font: { family: 'Cairo', size: 10 } } },
-                    y: { beginAtZero: true, ticks: { font: { family: 'Cairo', size: 10 } } }
+                    x: { ticks: { font: { family: 'Cairo', size: 9 } } },
+                    y: { beginAtZero: true, ticks: { font: { family: 'Cairo', size: 9 } } }
                 } : {}
             }
         });
@@ -300,7 +283,6 @@
         initChart(currentChartType);
     }
 
-    // تشغيل الرسم البياني لأول مرة
     initChart(currentChartType);
 </script>
 
