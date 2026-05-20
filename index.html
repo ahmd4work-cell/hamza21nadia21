@@ -53,17 +53,28 @@
 
         .container { padding: 5px 20px 20px 20px; }
         
+        /* تعديل هنا لضمان تساوي الارتفاع */
         .dashboard-grid { 
-            display: grid; 
-            grid-template-columns: 38% 2% 60%; 
-            align-items: start; 
+            display: flex;
+            gap: 20px;
+            align-items: stretch; /* هذا يجعل العناصر متساوية الطول من الأسفل */
             width: 100%; 
         }
+
+        .right-section { flex: 38; }
+        .left-section { flex: 62; display: flex; flex-direction: column; gap: 15px; }
 
         .content-box { 
             background: var(--white); padding: 15px; border-radius: 12px; 
             border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+            height: 100%; /* ليمتد داخل الحاوية */
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
         }
+
+        /* تعديل خاص لصندوق الرسم البياني ليملأ المساحة المتبقية */
+        .chart-box { flex-grow: 1; }
 
         .chart-header {
             display: flex;
@@ -75,81 +86,34 @@
         h3 { font-size: 13px; margin: 0; color: var(--nav-purple); font-weight: 800; border-right: 4px solid var(--accent-blue); padding-right: 8px; }
 
         .toggle-btn {
-            background-color: var(--nav-purple);
-            color: white;
-            border: none;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-family: 'Cairo';
-            font-size: 9px;
-            cursor: pointer;
-            transition: 0.3s;
+            background-color: var(--nav-purple); color: white; border: none; padding: 4px 12px;
+            border-radius: 20px; font-family: 'Cairo'; font-size: 9px; cursor: pointer; transition: 0.3s;
         }
         .toggle-btn:hover { background-color: var(--accent-blue); }
 
         .yearly-table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            font-size: 10.5px;
-            table-layout: fixed; 
+            width: 100%; border-collapse: collapse; font-size: 10.5px; table-layout: fixed; 
         }
         .yearly-table th, .yearly-table td { 
-            border: 0.5px solid var(--border-color);
-            padding: 2px; 
-            height: 30px; 
-            text-align: center; 
-            font-weight: bold; 
-            color: #475569;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            border: 0.5px solid var(--border-color); padding: 2px; height: 30px; 
+            text-align: center; font-weight: bold; color: #475569;
         }
         .yearly-table th { background: #f8fafc; color: var(--nav-purple); font-weight: 800; }
+        .thick-border { border-left: 3px solid var(--nav-purple) !important; }
 
-        .thick-border { 
-            border-left: 3px solid var(--nav-purple) !important; 
-        }
-
-        .filters-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
+        .filters-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
         .filter-card { background: white; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 4px; }
         .filter-card label { font-size: 9px; font-weight: 800; color: var(--nav-purple); }
         .filter-input { width: 100%; border: none; background: var(--input-bg); font-family: 'Cairo'; font-size: 10px; padding: 4px; border-radius: 6px; outline: none; }
 
-        /* تعديلات بطاقات الإحصائيات */
-        .stats-cards { display: flex; gap: 8px; margin-bottom: 15px; width: 100%; align-items: center; }
-        
+        .stats-cards { display: flex; gap: 8px; width: 100%; align-items: center; }
         .stat-card { 
-            flex: 1; 
-            height: 52px;
-            padding: 5px 12px; 
-            border-radius: 10px; 
-            color: white; 
-            display: flex; 
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-width: 0;
-            box-sizing: border-box;
+            flex: 1; height: 52px; padding: 5px 12px; border-radius: 10px; color: white; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; min-width: 0; box-sizing: border-box;
         }
-
-        /* تصغير مربعات الزيارات */
-        .stat-card-small {
-            flex: 0.6; 
-        }
-
-        /* الفاصل بين المبيعات والزيارات */
-        .stat-spacer {
-            flex: 0.2; 
-        }
-
-        .stat-card-row {
-            display: flex;
-            width: 100%;
-            justify-content: space-between;
-            align-items: center;
-            gap: 5px;
-        }
-        
+        .stat-card-small { flex: 0.6; }
+        .stat-spacer { flex: 0.2; }
+        .stat-card-row { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 5px; }
         .stat-card .label-text { font-size: 10px; font-weight: bold; opacity: 0.9; white-space: nowrap; }
         .stat-card .value-text { font-size: 13.5px; font-weight: 800; }
 
@@ -159,9 +123,10 @@
         .bg-purple { background-color: var(--accent-purple); }
         .bg-orange { background-color: var(--accent-orange); }
 
+        .chart-wrapper { flex-grow: 1; position: relative; min-height: 250px; }
+
         @media (max-width: 1100px) {
-            .dashboard-grid { grid-template-columns: 1fr; }
-            .spacer { height: 20px; }
+            .dashboard-grid { flex-direction: column; }
             .stats-cards { flex-wrap: wrap; }
             .stat-card { flex: 1 1 45%; }
             .stat-card-small { flex: 1 1 45%; }
@@ -190,24 +155,24 @@
 
 <div class="container">
     <div class="dashboard-grid">
-        <div class="content-box">
-            <h3>📅 سجل الأهداف والزيارات (2026)</h3>
-            <table class="yearly-table">
-                <thead>
-                    <tr>
-                        <th style="width: 22%;">الشهر</th>
-                        <th>هدف</th>
-                        <th>تم</th>
-                        <th class="thick-border">معلق</th>
-                        <th style="background:#eff6ff">زيارة</th>
-                        <th style="background:#f0fdf4">ناجحة</th>
-                    </tr>
-                </thead>
-                <tbody id="monthsBody"></tbody>
-            </table>
+        <div class="right-section">
+            <div class="content-box">
+                <h3>📅 سجل الأهداف والزيارات (2026)</h3>
+                <table class="yearly-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 22%;">الشهر</th>
+                            <th>هدف</th>
+                            <th>تم</th>
+                            <th class="thick-border">معلق</th>
+                            <th style="background:#eff6ff">زيارة</th>
+                            <th style="background:#f0fdf4">ناجحة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="monthsBody"></tbody>
+                </table>
+            </div>
         </div>
-
-        <div class="spacer"></div>
 
         <div class="left-section">
             <div class="filters-grid">
@@ -216,9 +181,6 @@
                     <select class="filter-input">
                         <option>الكل</option>
                         <option>يناير</option><option>فبراير</option><option>مارس</option>
-                        <option>ابريل</option><option>مايو</option><option>يونيو</option>
-                        <option>يوليو</option><option>أغسطس</option><option>سبتمبر</option>
-                        <option>أكتوبر</option><option>نوفمبر</option><option>ديسمبر</option>
                     </select>
                 </div>
                 <div class="filter-card"><label>المنطقة</label><select class="filter-input"><option>الكل</option></select></div>
@@ -227,47 +189,20 @@
             </div>
             
             <div class="stats-cards">
-                <div class="stat-card bg-blue">
-                    <div class="stat-card-row">
-                        <div class="label-text">الهدف السنوي</div>
-                        <div class="value-text">180,000</div>
-                    </div>
-                </div>
-                <div class="stat-card bg-green">
-                    <div class="stat-card-row">
-                        <div class="label-text">المبيعات</div>
-                        <div class="value-text">14,210</div>
-                    </div>
-                </div>
-                <div class="stat-card bg-yellow">
-                    <div class="stat-card-row">
-                        <div class="label-text">المعلق</div>
-                        <div class="value-text">790</div>
-                    </div>
-                </div>
-
+                <div class="stat-card bg-blue"><div class="stat-card-row"><div class="label-text">الهدف السنوي</div><div class="value-text">180,000</div></div></div>
+                <div class="stat-card bg-green"><div class="stat-card-row"><div class="label-text">المبيعات</div><div class="value-text">14,210</div></div></div>
+                <div class="stat-card bg-yellow"><div class="stat-card-row"><div class="label-text">المعلق</div><div class="value-text">790</div></div></div>
                 <div class="stat-spacer"></div>
-
-                <div class="stat-card bg-purple stat-card-small">
-                    <div class="stat-card-row">
-                        <div class="label-text">الزيارات</div>
-                        <div class="value-text">45</div>
-                    </div>
-                </div>
-                <div class="stat-card bg-orange stat-card-small">
-                    <div class="stat-card-row">
-                        <div class="label-text">ناجحة</div>
-                        <div class="value-text">12</div>
-                    </div>
-                </div>
+                <div class="stat-card bg-purple stat-card-small"><div class="stat-card-row"><div class="label-text">الزيارات</div><div class="value-text">45</div></div></div>
+                <div class="stat-card bg-orange stat-card-small"><div class="stat-card-row"><div class="label-text">ناجحة</div><div class="value-text">12</div></div></div>
             </div>
 
-            <div class="content-box">
+            <div class="content-box chart-box">
                 <div class="chart-header">
                     <h3>📈 تحليل الأداء</h3>
                     <button class="toggle-btn" onclick="toggleChartType()">تبديل العرض</button>
                 </div>
-                <div style="height: 280px; position: relative;">
+                <div class="chart-wrapper">
                     <canvas id="performanceChart"></canvas>
                 </div>
             </div>
@@ -297,42 +232,18 @@
     function initChart(type) {
         const ctx = document.getElementById('performanceChart').getContext('2d');
         if (myChart) myChart.destroy();
-
-        const greenGrad = ctx.createLinearGradient(0, 0, 0, 400);
-        greenGrad.addColorStop(0, '#22c55e'); greenGrad.addColorStop(1, '#166534');
-
-        const yellowGrad = ctx.createLinearGradient(0, 0, 0, 400);
-        yellowGrad.addColorStop(0, '#facc15'); yellowGrad.addColorStop(1, '#a16207');
-
         myChart = new Chart(ctx, {
             type: type,
             data: {
                 labels: months,
                 datasets: [
-                    {
-                        label: 'المكتمل',
-                        data: [14210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                        backgroundColor: greenGrad,
-                        borderRadius: type === 'bar' ? 3 : 0
-                    },
-                    {
-                        label: 'المعلق',
-                        data: [790, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                        backgroundColor: yellowGrad,
-                        borderRadius: type === 'bar' ? 3 : 0
-                    }
+                    { label: 'المكتمل', data: [14210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], backgroundColor: '#22c55e' },
+                    { label: 'المعلق', data: [790, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], backgroundColor: '#facc15' }
                 ]
             },
             options: { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                plugins: { 
-                    legend: { position: 'top', labels: { font: { family: 'Cairo', size: 10 }, usePointStyle: true } }
-                },
-                scales: type === 'bar' ? {
-                    x: { ticks: { font: { family: 'Cairo', size: 9 } } },
-                    y: { beginAtZero: true, ticks: { font: { family: 'Cairo', size: 9 } } }
-                } : {}
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'top', labels: { font: { family: 'Cairo', size: 10 } } } }
             }
         });
     }
