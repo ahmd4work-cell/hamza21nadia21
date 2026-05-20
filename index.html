@@ -125,4 +125,55 @@
         .table-spacer { height: 8px; }
         .table-spacer td { border: none !important; background: transparent !important; }
 
-        .summary-row { background
+        .summary-row { background: #f8fafc; font-size: 10px; }
+
+        @media (max-width: 1100px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .spacer { height: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="index.html" class="active">الرئيسية</a>
+    <a href="visits.html">الزيارات</a>
+    <a href="opportunities.html">الفرص البيعية</a>
+    <a href="customers.html">العملاء</a>
+    <a href="sales.html">المبيعات</a>
+</nav>
+
+<div class="employee-info-bar">
+    <div class="info-content">
+        <div class="info-item">الموظف: <span>محمد المنصور</span></div>
+        <div class="info-item">الرقم: <span>ASG-2026</span></div>
+        <div class="info-item">الموبايل: <span>05XXXXXXXX</span></div>
+        <div class="info-item">الايميل: <span>m.mansour@asgate.sa</span></div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="dashboard-grid">
+        <div class="content-box">
+            <h3>📅 سجل الأهداف والزيارات (2026)</h3>
+            <table class="yearly-table">
+                <thead>
+                    <tr>
+                        <th style="width: 22%;">الشهر</th>
+                        <th>هدف</th>
+                        <th>تم</th>
+                        <th class="thick-border">معلق</th>
+                        <th style="background:#eff6ff">زيارة</th>
+                        <th style="background:#f0fdf4">ناجحة</th>
+                    </tr>
+                </thead>
+                <tbody id="monthsBody"></tbody>
+            </table>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="left-section">
+            <div class="filters-grid">
+                <div class="filter-card"><label>بحث</label><input type="text" class="filter-input" placeholder="..."></div>
+                <div class="filter-card"><label>المدير</label>
