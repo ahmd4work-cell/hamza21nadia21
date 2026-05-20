@@ -112,4 +112,266 @@
         .custom-confirm { position: fixed; top: 30%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 3000; display: none; text-align: center; border: 2px solid var(--nav-purple-dark); min-width: 250px; }
         .confirm-btns { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
         .btn-yes { background: var(--accent-green-active); color: white; border: none; padding: 8px 25px; border-radius: 5px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
-        .btn-no { background: var(--accent-red); color: white; border: none; padding: 8px 25px; border-radius: 5px; cursor: pointer; font
+        .btn-no { background: var(--accent-red); color: white; border: none; padding: 8px 25px; border-radius: 5px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
+    </style>
+</head>
+<body onload="loadSavedData()">
+
+<div id="confirmBox" class="custom-confirm">
+    <p id="confirmMsg" style="font-weight: bold;"></p>
+    <div class="confirm-btns">
+        <button class="btn-yes" id="confirmBtn">نعم</button>
+        <button class="btn-no" onclick="closeConfirm()">لا</button>
+    </div>
+</div>
+
+<nav class="navbar">
+    <a href="index.html">الرئيسية</a>
+    <a href="visits.html" class="active">الزيارات</a>
+    <a href="opportunities.html">الفرص البيعية</a>
+    <a href="customers.html">العملاء</a>
+    <a href="sales.html">المبيعات</a>
+</nav>
+
+<div class="container">
+    <div class="action-bar">
+        <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة زيارة</button>
+        <button id="saveAllBtn" class="btn-top btn-save-all" onclick="saveAllData()">حفظ التغييرات</button>
+        
+        <div class="search-wrapper">
+            <input type="text" id="searchInput" class="search-input" placeholder="بحث في كافة الحقول..." onkeyup="filterTable()">
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table id="mainTable">
+            <thead>
+                <tr>
+                    <th style="width: 12%;">الشركة</th>
+                    <th style="width: 8%;">المسؤول</th>
+                    <th style="width: 8%;">الموبايل</th>
+                    <th style="width: 8%;">الايميل</th>
+                    <th style="width: 8%;">السجل</th>
+                    <th style="width: 10%;">الخدمة الحالية</th>
+                    <th style="width: 10%;">الخدمة المقترحة</th>
+                    <th style="width: 6%;">الحالة</th>
+                    <th style="width: 8%;">تاريخ الزيارة</th>
+                    <th style="width: 10%;">ملاحظات</th>
+                    <th style="width: 8%;">تاريخ التعديل</th>
+                    <th style="width: 4%;">إجراء</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<div id="notesOverlay" class="modal-overlay" onclick="handleOutsideClick(event)">
+    <div class="sticker-container" onclick="event.stopPropagation()">
+        <div id="historyArea" class="sticker-history"></div>
+        <div class="sticker-editor">
+            <div id="currentDateChip" class="date-chip"></div>
+            <textarea id="stickerInput" class="sticker-textarea" placeholder="تحديث جديد..." oninput="updateStickerBtn()"></textarea>
+        </div>
+        <button id="saveStickerBtn" class="sticker-save-btn" onclick="confirmAndSaveNote()">حفظ التحديث</button>
+    </div>
+</div>
+
+<script>
+    let isDirty = false;
+    let activeCell = null;
+    let isStickerChanged = false;
+    const statusOrder = { "مهتم": 4, "50%": 3, "20%": 2, "فقدان": 1 };
+
+    function filterTable() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('#tableBody tr');
+        rows.forEach(row => {
+            const inputs = row.querySelectorAll('.excel-input');
+            if(inputs.length > 0) {
+                const text = Array.from(inputs).map(i => i.value.toLowerCase()).join(' ');
+                row.style.display = text.includes(query) ? '' : 'none';
+            }
+        });
+    }
+
+    function getDisplayNote(notesJson) {
+        try {
+            const notes = JSON.parse(notesJson);
+            if (notes.length > 0) {
+                let lastNote = notes[notes.length - 1].text;
+                return lastNote.replace(/<br>/g, " ").replace(/•/g, "").substring(0, 20) + "...";
+            }
+        } catch(e) {}
+        return "إضافة...";
+    }
+
+    function loadSavedData() {
+        const saved = localStorage.getItem('asgate_visits_data');
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+        if (saved) {
+            let data = JSON.parse(saved);
+            data.sort((a, b) => (statusOrder[b.status] || 0) - (statusOrder[a.status] || 0));
+            data.forEach(item => renderRow(item));
+        }
+        toggleSaveBtn(false);
+    }
+
+    function renderRow(v, isNew = false) {
+        const tbody = document.getElementById('tableBody');
+        const row = tbody.insertRow(isNew ? 0 : -1);
+        row.setAttribute('data-created', v.created || v.date);
+        row.innerHTML = `
+            <td><input type="text" class="excel-input" value="${v.comp || ''}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.mgr || ''}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.mob || ''}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.email || ''}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.cr || ''}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.curr || ''}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.prop || ''}" oninput="markAsChanged(this)"></td>
+            <td>
+                <select class="excel-input" onchange="checkStatus(this)">
+                    <option value="" ${!v.status ? 'selected' : ''}>-</option>
+                    <option ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option>
+                    <option ${v.status === '50%' ? 'selected' : ''}>50%</option>
+                    <option ${v.status === '20%' ? 'selected' : ''}>20%</option>
+                    <option ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option>
+                </select>
+            </td>
+            <td><input type="date" class="excel-input" value="${v.date || ''}" oninput="markAsChanged(this)"></td>
+            <td class="notes-cell" data-notes='${v.notes || "[]"}' onclick="openSticker(this)">${getDisplayNote(v.notes || "[]")}</td>
+            <td class="updated-at" style="color:#64748b; font-weight:bold;">${v.updated || '-'}</td>
+            <td><button class="btn-delete" onclick="deleteRow(this)">X</button></td>
+        `;
+    }
+
+    function insertNewRow() {
+        const today = new Date().toISOString().split('T')[0];
+        renderRow({ comp:'', mgr:'', mob:'', email:'', cr:'', curr:'', prop:'', status:'', date: today, notes: '[]', updated: '-', created: today }, true);
+        toggleSaveBtn(true);
+    }
+
+    function markAsChanged(el) {
+        toggleSaveBtn(true);
+        const row = el.closest('tr');
+        if (row.getAttribute('data-created') !== new Date().toISOString().split('T')[0]) {
+            row.setAttribute('data-pending-update', new Date().toLocaleDateString('en-GB'));
+        }
+    }
+
+    function toggleSaveBtn(active) {
+        isDirty = active;
+        const btn = document.getElementById('saveAllBtn');
+        if(active) btn.classList.add('active'); else btn.classList.remove('active');
+    }
+
+    function saveAllData() {
+        const rows = document.querySelectorAll('#tableBody tr');
+        const allData = [];
+        rows.forEach(row => {
+            const ins = row.querySelectorAll('.excel-input');
+            let updatedAt = row.querySelector('.updated-at').innerText;
+            if (row.getAttribute('data-pending-update')) updatedAt = row.getAttribute('data-pending-update');
+            
+            allData.push({
+                comp: ins[0].value, 
+                mgr: ins[1].value, 
+                mob: ins[2].value,
+                email: ins[3].value,
+                cr: ins[4].value, 
+                curr: ins[5].value, 
+                prop: ins[6].value,
+                status: row.querySelector('select').value, 
+                date: ins[7].value, 
+                notes: row.querySelector('.notes-cell').getAttribute('data-notes'),
+                updated: updatedAt, 
+                created: row.getAttribute('data-created')
+            });
+        });
+        localStorage.setItem('asgate_visits_data', JSON.stringify(allData));
+        loadSavedData();
+    }
+
+    function checkStatus(el) {
+        markAsChanged(el);
+        if (el.value === 'مهتم') {
+            showConfirm("هل تريد نقل الزيارة إلى الفرص البيعية؟", () => transferToOpps(el.closest('tr')));
+        }
+    }
+
+    function transferToOpps(row) {
+        const ins = row.querySelectorAll('.excel-input');
+        const rowData = {
+            comp: ins[0].value, 
+            mgr: ins[1].value, 
+            mob: ins[2].value,
+            email: ins[3].value,
+            cr: ins[4].value, 
+            curr: ins[5].value, 
+            prop: ins[6].value,
+            status: 'مهتم', 
+            date: ins[7].value,
+            notes: row.querySelector('.notes-cell').getAttribute('data-notes') || "[]",
+            updated: new Date().toLocaleDateString('en-GB'),
+            created: row.getAttribute('data-created')
+        };
+        let oppsData = JSON.parse(localStorage.getItem('asgate_opportunities_data') || '[]');
+        oppsData.push(rowData);
+        localStorage.setItem('asgate_opportunities_data', JSON.stringify(oppsData));
+        row.remove();
+        saveAllData();
+    }
+
+    function openSticker(cell) {
+        activeCell = cell; isStickerChanged = false;
+        const notes = JSON.parse(cell.getAttribute('data-notes') || "[]");
+        let hHtml = "";
+        notes.forEach((n, idx) => {
+            hHtml += `<div style="margin-bottom:8px;"><strong>${n.date}</strong><br>${n.text}</div>`;
+            if(idx < notes.length - 1) hHtml += '<hr style="border:0; border-top:1px solid #decb00">';
+        });
+        document.getElementById('historyArea').innerHTML = hHtml;
+        const now = new Date();
+        const days = ['الأحد', 'الأثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+        document.getElementById('currentDateChip').innerText = `${days[now.getDay()]} ${now.toLocaleDateString('en-GB')}`;
+        document.getElementById('stickerInput').value = '';
+        document.getElementById('saveStickerBtn').classList.remove('active');
+        document.getElementById('notesOverlay').style.display = 'block';
+    }
+
+    function updateStickerBtn() {
+        isStickerChanged = document.getElementById('stickerInput').value.trim() !== "";
+        document.getElementById('saveStickerBtn').classList.toggle('active', isStickerChanged);
+    }
+
+    function confirmAndSaveNote() {
+        const text = document.getElementById('stickerInput').value.trim();
+        if (text) {
+            let notes = JSON.parse(activeCell.getAttribute('data-notes') || "[]");
+            const todayStr = document.getElementById('currentDateChip').innerText;
+            notes.push({ date: todayStr, text: text });
+            activeCell.setAttribute('data-notes', JSON.stringify(notes));
+            activeCell.innerText = getDisplayNote(JSON.stringify(notes));
+            toggleSaveBtn(true);
+        }
+        document.getElementById('notesOverlay').style.display = 'none';
+        closeConfirm();
+    }
+
+    function handleOutsideClick(e) {
+        if (isStickerChanged) showConfirm("هل تريد حفظ الملاحظات؟", confirmAndSaveNote);
+        else document.getElementById('notesOverlay').style.display = 'none';
+    }
+
+    function showConfirm(msg, action) {
+        document.getElementById('confirmMsg').innerText = msg;
+        document.getElementById('confirmBox').style.display = 'block';
+        document.getElementById('confirmBtn').onclick = () => { action(); closeConfirm(); };
+    }
+
+    function closeConfirm() { document.getElementById('confirmBox').style.display = 'none'; }
+    function deleteRow(btn) { if(confirm("هل أنت متأكد من حذف الزيارة؟")) { btn.closest('tr').remove(); saveAllData(); } }
+</script>
+</body>
+</html>
