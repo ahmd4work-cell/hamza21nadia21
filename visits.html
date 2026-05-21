@@ -1,42 +1,582 @@
+<!DOCTYPE html>
+<html dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASGate - سجل الزيارات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --nav-purple-dark: #2e1065;
+            --header-purple-mid: #8b5cf6;
+            --nav-active: #a78bfa;
+            --bg-color: #f8fafc;
+            --accent-blue: #3b82f6;
+            --accent-green-active: #22c55e;
+            --border-soft: #cbd5e1;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            font-size: 13px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: var(--nav-purple-dark);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            margin: 10px;
+            border-radius: 15px;
+            height: 37px;
+            position: sticky;
+            top: 10px;
+            z-index: 1000;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 0 15px;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .navbar a.active {
+            background-color: var(--nav-active);
+            color: var(--nav-purple-dark);
+            border-radius: 8px;
+            line-height: 26px;
+            height: 26px;
+        }
+
+        .container {
+            padding: 0 10px;
+        }
+
+        .action-bar {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            gap: 15px;
+            padding: 0 10px;
+        }
+
+        .btn-top {
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-family: 'Cairo';
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: 0.2s;
+        }
+
+        .btn-add {
+            background-color: var(--accent-blue);
+        }
+
+        .btn-save {
+            background-color: var(--accent-green-active);
+            padding: 8px 12px;
+            font-size: 11px;
+        }
+
+        /* Table */
+        .table-wrapper {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-soft);
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        th {
+            background: var(--header-purple-mid);
+            color: white;
+            padding: 12px 5px;
+            font-size: 11px;
+            font-weight: 800;
+            text-align: center;
+        }
+
+        td {
+            border-bottom: 1px solid var(--border-soft);
+            text-align: center;
+            height: 45px;
+            padding: 2px;
+            position: relative;
+        }
+
+        .excel-input {
+            width: 95%;
+            border: none;
+            text-align: center;
+            font-family: 'Cairo';
+            outline: none;
+            background: transparent;
+            font-size: 11.5px;
+        }
+
+        .cell-container:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #334155;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            opacity: 0;
+            visibility: hidden;
+            z-index: 100;
+            pointer-events: none;
+            max-width: 250px;
+            white-space: pre-line;
+            line-height: 1.5;
+            text-align: right;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            width: 380px;
+            height: 420px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .modal-header {
+            font-weight: 800;
+            color: var(--nav-purple-dark);
+            margin-bottom: 10px;
+            font-size: 14px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .history-log {
+            flex-grow: 1;
+            overflow-y: auto;
+            background: #f8fafc;
+            border: 1px solid var(--border-soft);
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 12px;
+            color: #1e293b;
+            white-space: pre-wrap;
+            text-align: right;
+            line-height: 1.8;
+        }
+
+        .note-area {
+            height: 80px;
+            width: 100%;
+            border: 1.5px solid var(--border-soft);
+            border-radius: 6px;
+            padding: 8px;
+            font-family: 'Cairo';
+            resize: none;
+            outline: none;
+            box-sizing: border-box;
+            background-color: #fff;
+            font-size: 13px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        /* Columns */
+        .col-company { width: 12%; }
+        .col-manager { width: 8%; }
+        .col-mobile { width: 8%; }
+        .col-email { width: 8%; }
+        .col-record { width: 8%; }
+        .col-current-service { width: 10%; }
+        .col-proposed-service { width: 10%; }
+        .col-status { width: 6%; }
+        .col-date { width: 8%; }
+        .col-notes { width: 10%; }
+        .col-edit-date { width: 8%; }
+        .col-action { width: 4%; }
+
+        .notes-trigger {
+            cursor: pointer;
+            color: var(--accent-blue);
+            font-weight: 700;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body onload="loadSavedData()">
+
+<nav class="navbar">
+    <a href="index.html">الرئيسية</a>
+    <a href="visits.html" class="active">الزيارات</a>
+    <a href="#">الفرص البيعية</a>
+    <a href="#">العملاء</a>
+    <a href="#">المبيعات</a>
+</nav>
+
+<div class="container">
+
+    <div class="action-bar">
+        <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة زيارة</button>
+        <button class="btn-top btn-save" onclick="saveAllData()">حفظ</button>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th class="col-company">الشركة</th>
+                    <th class="col-manager">المسؤول</th>
+                    <th class="col-mobile">الموبايل</th>
+                    <th class="col-email">الايميل</th>
+                    <th class="col-record">السجل</th>
+                    <th class="col-current-service">الخدمة</th>
+                    <th class="col-proposed-service">المقترحة</th>
+                    <th class="col-status">الحالة</th>
+                    <th class="col-date">التاريخ</th>
+                    <th class="col-notes">ملاحظات</th>
+                    <th class="col-edit-date">تعديل</th>
+                    <th class="col-action">X</th>
+                </tr>
+            </thead>
+
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- Modal -->
+<div id="noteModal" class="modal">
+
+    <div class="modal-content">
+
+        <div class="modal-header">سجل المتابعة</div>
+
+        <div id="historyLog" class="history-log"></div>
+
+        <textarea
+            id="modalTextArea"
+            class="note-area"
+            placeholder="أدخل الملاحظة الجديدة هنا..."
+        ></textarea>
+
+        <div class="modal-footer">
+            <button
+                class="btn-top"
+                style="background:#94a3b8; font-size:11px;"
+                onclick="closeNote()"
+            >
+                إلغاء
+            </button>
+
+            <button class="btn-top btn-save" onclick="saveNote()">
+                إضافة
+            </button>
+        </div>
+
+    </div>
+
+</div>
+
 <script>
-function saveNote() {
-    if (currentActiveInput) {
 
-        const newText = document.getElementById('modalTextArea').value.trim();
+    let currentActiveInput = null;
 
-        if (newText !== "") {
+    function getFullDate() {
 
-            const todayHeader = getFullDate();
-            let currentVal = currentActiveInput.value.trim();
+        const days = [
+            'الأحد',
+            'الاثنين',
+            'الثلاثاء',
+            'الأربعاء',
+            'الخميس',
+            'الجمعة',
+            'السبت'
+        ];
 
-            // تقسيم الملاحظات الحالية
-            let lines = currentVal.split("\n");
+        const d = new Date();
 
-            // أول سطر موجود
-            let firstLine = lines[0] || "";
+        const dateStr =
+            d.getDate().toString().padStart(2, '0') +
+            '-' +
+            (d.getMonth() + 1).toString().padStart(2, '0') +
+            '-' +
+            d.getFullYear();
 
-            // إذا كان تاريخ اليوم موجود بالفعل
-            if (firstLine === todayHeader) {
+        return days[d.getDay()] + ' ' + dateStr;
+    }
 
-                // أضف النص مباشرة تحت آخر ملاحظة لنفس اليوم
-                lines.splice(1, 0, newText);
+    function loadSavedData() {
 
-                currentActiveInput.value = lines.join("\n");
+        const saved = localStorage.getItem('asgate_visits_v12');
 
-            } else {
+        const tableBody = document.getElementById('tableBody');
 
-                // يوم جديد → أضف عنوان التاريخ ثم النص
-                currentActiveInput.value =
-                    todayHeader +
-                    "\n" +
-                    newText +
-                    (currentVal ? "\n\n" + currentVal : "");
-            }
+        tableBody.innerHTML = '';
 
-            updateTooltip(currentActiveInput);
+        if (saved) {
+
+            JSON.parse(saved).forEach(item => renderRow(item));
+
+        } else {
+
+            insertNewRow();
         }
     }
 
-    closeNote();
-}
+    function renderRow(v = {}) {
+
+        const tbody = document.getElementById('tableBody');
+
+        const row = tbody.insertRow();
+
+        const createCell = (val, type, readonly, isSelect, isNotes) => {
+
+            let cell = row.insertCell();
+
+            cell.className = "cell-container";
+
+            if (isSelect) {
+
+                cell.innerHTML = `
+                    <select class="excel-input">
+                        <option value="جديد" ${val==='جديد'?'selected':''}>جديد</option>
+                        <option value="مهتم" ${val==='مهتم'?'selected':''}>مهتم</option>
+                        <option value="مغلق" ${val==='مغلق'?'selected':''}>مغلق</option>
+                    </select>
+                    <span class="tooltip">${val || 'جديد'}</span>
+                `;
+
+            } else if (isNotes) {
+
+                cell.innerHTML = `
+                    <input
+                        type="text"
+                        class="excel-input notes-trigger"
+                        value="${val || ''}"
+                        readonly
+                        onclick="openNote(this)"
+                        onmouseover="updateTooltip(this)"
+                    >
+                    <span class="tooltip">${val || 'فتح الملاحظات'}</span>
+                `;
+
+            } else {
+
+                const today = new Date().toLocaleDateString('en-GB');
+
+                cell.innerHTML = `
+                    <input
+                        type="text"
+                        class="excel-input"
+                        value="${val || (readonly ? today : '')}"
+                        ${readonly ? 'readonly' : ''}
+                        oninput="updateTooltip(this)"
+                        onmouseover="updateTooltip(this)"
+                    >
+                    <span class="tooltip">${val || '...'}</span>
+                `;
+            }
+        };
+
+        createCell(v.comp);
+        createCell(v.mgr);
+        createCell(v.mob);
+        createCell(v.email);
+        createCell(v.record);
+        createCell(v.curServ);
+        createCell(v.propServ);
+
+        createCell(v.status, "", false, true);
+
+        createCell(v.visitDate, "text", true);
+
+        createCell(v.notes, "text", false, false, true);
+
+        createCell(v.editDate, "text", true);
+
+        row.insertCell().innerHTML = `
+            <button
+                style="background:none;border:none;color:red;cursor:pointer;"
+                onclick="this.closest('tr').remove()"
+            >
+                ×
+            </button>
+        `;
+    }
+
+    function updateTooltip(el) {
+
+        const tooltip = el.parentElement.querySelector('.tooltip');
+
+        if (tooltip) {
+            tooltip.innerText = el.value || "...";
+        }
+    }
+
+    function openNote(inputEl) {
+
+        currentActiveInput = inputEl;
+
+        const historyLog = document.getElementById('historyLog');
+
+        historyLog.innerText =
+            inputEl.value || "لا توجد ملاحظات سابقة.";
+
+        document.getElementById('modalTextArea').value = "";
+
+        document.getElementById('noteModal').style.display = "flex";
+
+        setTimeout(() => {
+
+            document.getElementById('modalTextArea').focus();
+
+        }, 50);
+    }
+
+    function saveNote() {
+
+        if (currentActiveInput) {
+
+            const newText =
+                document.getElementById('modalTextArea').value.trim();
+
+            if (newText !== "") {
+
+                const todayHeader = getFullDate();
+
+                let currentVal =
+                    currentActiveInput.value.trim();
+
+                let lines = currentVal.split("\n");
+
+                let firstLine = lines[0] || "";
+
+                // إذا كان نفس اليوم
+                if (firstLine === todayHeader) {
+
+                    lines.splice(1, 0, newText);
+
+                    currentActiveInput.value =
+                        lines.join("\n");
+
+                } else {
+
+                    currentActiveInput.value =
+                        todayHeader +
+                        "\n" +
+                        newText +
+                        (currentVal ? "\n\n" + currentVal : "");
+                }
+
+                updateTooltip(currentActiveInput);
+            }
+        }
+
+        closeNote();
+    }
+
+    function closeNote() {
+
+        document.getElementById('noteModal').style.display = "none";
+    }
+
+    function insertNewRow() {
+
+        renderRow({
+            status: 'جديد'
+        });
+    }
+
+    function saveAllData() {
+
+        const data = [];
+
+        const today =
+            new Date().toLocaleDateString('en-GB');
+
+        document.querySelectorAll('#tableBody tr').forEach(row => {
+
+            const f = row.querySelectorAll('input, select');
+
+            data.push({
+
+                comp: f[0].value,
+                mgr: f[1].value,
+                mob: f[2].value,
+                email: f[3].value,
+                record: f[4].value,
+                curServ: f[5].value,
+                propServ: f[6].value,
+                status: f[7].value,
+                visitDate: f[8].value,
+                notes: f[9].value,
+                editDate: today
+
+            });
+        });
+
+        localStorage.setItem(
+            'asgate_visits_v12',
+            JSON.stringify(data)
+        );
+
+        alert("حفظ بنجاح");
+    }
+
+    window.onclick = function(e) {
+
+        if (e.target == document.getElementById('noteModal')) {
+
+            closeNote();
+        }
+    }
+
 </script>
+
+</body>
+</html>
