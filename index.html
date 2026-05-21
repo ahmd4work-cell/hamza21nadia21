@@ -27,7 +27,7 @@
             margin: 0; 
             line-height: 1.2; 
             font-size: 14px;
-            font-weight: 300;
+            font-weight: 300; /* خط نحيف للمظهر العام */
         }
 
         .navbar { 
@@ -112,14 +112,16 @@
 
         .chart-wrapper { flex-grow: 1; position: relative; min-height: 250px; }
 
+        /* تنسيق الرسم البياني للموظفين في الأسفل */
         .staff-performance-section {
             margin-top: 20px;
             width: 100%;
-            height: 250px; 
+            height: 250px; /* ارتفاع ثابت للرسم السفلي */
         }
 
         @media (max-width: 1100px) {
             .dashboard-grid { flex-direction: column; }
+            .stat-card { flex: 1 1 45%; }
         }
     </style>
 </head>
@@ -200,17 +202,17 @@
 </div>
 
 <script>
-    // إعداد جدول الأشهر
     const months = ["يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
     const tbody = document.getElementById('monthsBody');
+    
     months.forEach((m, i) => {
         const row = tbody.insertRow();
         row.innerHTML = `<td>${m}</td><td>15k</td><td>${i===0?'14.2k':'-'}</td><td class="thick-border">${i===0?'790':'-'}</td><td style="color:#3b82f6">${i===0?'45':'-'}</td><td style="color:#22c55e">${i===0?'12':'-'}</td>`;
     });
 
-    // إعداد الرسم البياني العلوي
     let myChart = null;
     let currentChartType = 'bar';
+
     function initChart(type) {
         const ctx = document.getElementById('performanceChart').getContext('2d');
         if (myChart) myChart.destroy();
@@ -226,15 +228,16 @@
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { font: { family: 'Cairo', size: 10 } } } } }
         });
     }
+
     function toggleChartType() {
         currentChartType = currentChartType === 'bar' ? 'pie' : 'bar';
         initChart(currentChartType);
     }
     initChart(currentChartType);
 
-    // الرسم البياني السفلي (تلاصق جانبي تام)
+    // الرسم البياني الجديد لـ 30 موظفاً
     const ctxStaff = document.getElementById('staffChart').getContext('2d');
-    const staffLabels = Array.from({length: 30}, (_, i) => `${i + 1}`);
+    const staffLabels = Array.from({length: 30}, (_, i) => `م ${i + 1}`);
 
     new Chart(ctxStaff, {
         type: 'bar',
@@ -245,15 +248,15 @@
                     label: 'الهدف',
                     data: Array.from({length: 30}, () => Math.floor(Math.random() * 5000) + 10000),
                     backgroundColor: '#22c55e',
-                    barPercentage: 1.0,      // ملء المساحة بالكامل
-                    categoryPercentage: 0.8  // فراغ فقط بين المندوبين
+                    barPercentage: 0.9,     // أعرض
+                    categoryPercentage: 1.0 // متلاصق
                 },
                 {
                     label: 'المعلق',
                     data: Array.from({length: 30}, () => Math.floor(Math.random() * 4000) + 1000),
                     backgroundColor: '#facc15',
-                    barPercentage: 0.4,      // عرض أنحف ملتصق تماماً بالأخضر
-                    categoryPercentage: 0.8  
+                    barPercentage: 0.5,     // أنحف
+                    categoryPercentage: 1.0 // متلاصق
                 }
             ]
         },
@@ -262,16 +265,12 @@
             maintainAspectRatio: false,
             scales: {
                 x: { 
-                    stacked: false, // لضمان الظهور جانباً إلى جنب
                     grid: { display: false },
                     ticks: { font: { family: 'Cairo', size: 9, weight: 300 } }
                 },
                 y: { display: false }
             },
-            plugins: { 
-                legend: { display: false },
-                tooltip: { enabled: true }
-            }
+            plugins: { legend: { display: false } }
         }
     });
 </script>
