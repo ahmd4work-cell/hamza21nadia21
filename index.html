@@ -109,7 +109,7 @@
         .staff-performance-section {
             margin-top: 20px;
             width: 100%;
-            height: 380px; 
+            height: 350px; 
         }
 
         @media (max-width: 1100px) {
@@ -183,7 +183,7 @@
     </div>
 
     <div class="content-box staff-performance-section">
-        <h3>👥 أداء فريق المبيعات (50 موظفاً)</h3>
+        <h3>👥 أداء فريق المبيعات (30 موظفاً)</h3>
         <div style="flex-grow: 1; position: relative; margin-top: 10px;">
             <canvas id="staffChart"></canvas>
         </div>
@@ -216,26 +216,26 @@
         options: { responsive: true, maintainAspectRatio: false }
     });
 
-    // الرسم السفلي المحدث: 50 موظفاً مع التصاق وتحكم بالعرض
+    // الرسم السفلي: الموظفين (الالتصاق التام)
     const ctxStaff = document.getElementById('staffChart').getContext('2d');
     new Chart(ctxStaff, {
         type: 'bar',
         data: {
-            labels: Array.from({length: 50}, (_, i) => `م${i + 1}`),
+            labels: Array.from({length: 30}, (_, i) => `م${i + 1}`),
             datasets: [
                 {
                     label: 'الهدف المكتمل',
-                    data: Array.from({length: 50}, () => Math.floor(Math.random() * 5000) + 25000),
+                    data: Array.from({length: 30}, () => Math.floor(Math.random() * 5000) + 25000),
                     backgroundColor: '#22c55e',
-                    barPercentage: 1.0,       // ملء المساحة للأخضر
-                    categoryPercentage: 0.85  // تحكم في التباعد بين المجموعات
+                    barPercentage: 1.0,       // ملء الحيز بالكامل لضمان الالتصاق
+                    categoryPercentage: 0.8   // مسافة معقولة بين كل مندوب والآخر
                 },
                 {
                     label: 'الهدف المعلق',
-                    data: Array.from({length: 50}, () => Math.floor(Math.random() * 3000) + 1000),
+                    data: Array.from({length: 30}, () => Math.floor(Math.random() * 3000) + 1000),
                     backgroundColor: '#facc15',
-                    barPercentage: 0.5,       // تقليل عرض العمود الأصفر للنصف
-                    categoryPercentage: 0.85  // نفس القيمة لضمان الالتصاق
+                    barPercentage: 1.0,       // ملء الحيز بالكامل لضمان الالتصاق
+                    categoryPercentage: 0.8   
                 }
             ]
         },
@@ -244,11 +244,9 @@
             maintainAspectRatio: false,
             scales: {
                 x: { 
-                    stacked: false, 
+                    stacked: false, // ليكونوا جنباً إلى جنب وليس فوق بعض
                     grid: { display: false },
-                    ticks: { 
-                        font: { family: 'Cairo', size: 7.5 } // تصغير حجم الخط لاستيعاب 50 عنصراً
-                    }
+                    ticks: { font: { family: 'Cairo', size: 9 } }
                 },
                 y: { 
                     beginAtZero: true,
@@ -256,10 +254,7 @@
                 }
             },
             plugins: { 
-                legend: { 
-                    position: 'top', 
-                    labels: { font: { family: 'Cairo' } } 
-                }
+                legend: { position: 'top', labels: { font: { family: 'Cairo' } } }
             }
         }
     });
