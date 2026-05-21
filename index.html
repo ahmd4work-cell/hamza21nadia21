@@ -91,14 +91,14 @@
         .bg-purple { background-color: var(--accent-purple); }
         .bg-orange { background-color: var(--accent-orange); }
 
-        /* تنسيق العداد الثلاثي */
+        /* التنسيق الجديد للمساحة التحليلية */
         .charts-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start; /* العداد للأعلى */
             flex-grow: 1;
-            padding: 10px 0;
-            gap: 10px;
+            padding-top: 5px;
+            gap: 5px;
         }
         .chart-item-wrapper {
             display: flex;
@@ -106,39 +106,40 @@
             align-items: center;
             flex: 1;
         }
-        .chart-container {
+        /* تكبير الدوائر الجانبية */
+        .chart-container-large {
             position: relative;
-            width: 110px;
-            height: 110px;
+            width: 165px;
+            height: 165px;
         }
-        /* حاوية الـ RPM */
-        .gauge-container {
+        /* تصغير عداد المنتصف ورفعه */
+        .gauge-container-small {
             position: relative;
-            width: 180px;
-            height: 110px;
+            width: 150px;
+            height: 90px;
+            margin-top: -10px; 
         }
         .chart-percentage {
             position: absolute;
-            top: 55%;
+            top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 14px;
+            font-size: 20px;
             font-weight: 800;
             color: var(--nav-purple);
         }
-        /* نص الـ RPM في المنتصف السفلي */
         .gauge-value {
             position: absolute;
             bottom: 5px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 18px;
+            font-size: 15px;
             font-weight: 900;
             color: #333;
         }
         .chart-label {
             text-align: center;
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 800;
             margin-top: 5px;
             color: #64748b;
@@ -209,23 +210,23 @@
                 <h3>📈 تحليل الأداء الإجمالي</h3>
                 <div class="charts-row">
                     <div class="chart-item-wrapper">
-                        <div class="chart-container">
+                        <div class="chart-container-large">
                             <canvas id="achievedChart"></canvas>
                             <div class="chart-percentage">82%</div>
                         </div>
                         <div class="chart-label">المحقق</div>
                     </div>
 
-                    <div class="chart-item-wrapper" style="flex: 1.5;">
-                        <div class="gauge-container">
+                    <div class="chart-item-wrapper" style="flex: 1.2;">
+                        <div class="gauge-container-small">
                             <canvas id="gaugeChart"></canvas>
                             <div class="gauge-value">200%</div>
                         </div>
-                        <div class="chart-label">مؤشر الإنجاز</div>
+                        <div class="chart-label" style="margin-top: 0;">مؤشر الإنجاز</div>
                     </div>
 
                     <div class="chart-item-wrapper">
-                        <div class="chart-container">
+                        <div class="chart-container-large">
                             <canvas id="pendingChart"></canvas>
                             <div class="chart-percentage">18%</div>
                         </div>
@@ -245,7 +246,6 @@
 </div>
 
 <script>
-    // تهيئة جدول الشهور
     const months = ["يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
     const tbody = document.getElementById('monthsBody');
     months.forEach((m, i) => {
@@ -253,20 +253,20 @@
         row.innerHTML = `<td>${m}</td><td>15k</td><td>${i===0?'14.2k':'-'}</td><td class="thick-border">${i===0?'790':'-'}</td><td style="color:#3b82f6">${i===0?'45':'-'}</td><td style="color:#22c55e">${i===0?'12':'-'}</td>`;
     });
 
-    // 1. دائرة المحقق (يمين)
+    // 1. دائرة المحقق (تكبير)
     new Chart(document.getElementById('achievedChart'), {
         type: 'doughnut',
-        data: { datasets: [{ data: [82, 18], backgroundColor: ['#22c55e', '#f1f5f9'], borderWidth: 0, borderRadius: 5 }] },
-        options: { cutout: '75%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        data: { datasets: [{ data: [82, 18], backgroundColor: ['#22c55e', '#f1f5f9'], borderWidth: 0, borderRadius: 8 }] },
+        options: { cutout: '80%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
 
-    // 2. عداد RPM (المنتصف)
+    // 2. عداد RPM (تصغير ورفع الإبرة)
     const gaugeCtx = document.getElementById('gaugeChart').getContext('2d');
-    const gaugeChart = new Chart(gaugeCtx, {
+    new Chart(gaugeCtx, {
         type: 'doughnut',
         data: {
             datasets: [{
-                data: [30, 30, 40, 100], // أحمر (30) - أصفر (30) - أخضر (40) + الجزء المخفي (100)
+                data: [30, 30, 40, 100], 
                 backgroundColor: ['#ff0000', '#ffcc00', '#00b050', 'transparent'],
                 borderWidth: 0,
                 circumference: 180,
@@ -274,13 +274,10 @@
             }]
         },
         options: {
-            cutout: '85%',
+            cutout: '88%',
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { 
-                legend: { display: false },
-                tooltip: { enabled: false }
-            }
+            plugins: { legend: { display: false }, tooltip: { enabled: false } }
         },
         plugins: [{
             id: 'needle',
@@ -288,39 +285,33 @@
                 const { ctx, width, height } = chart;
                 ctx.save();
                 const centerX = width / 2;
-                const centerY = height - 15;
-                const radius = (height - 30);
-                
-                // حساب زاوية الإبرة (200% في المثال تعني الزاوية جهة اليمين)
-                // المدى هو 180 درجة (من اليسار 0 إلى اليمين 180)
-                const angle = Math.PI + (160 * Math.PI / 180); // 160 درجة لتمثيل قيمة عالية
-                
+                const centerY = height - 10;
+                const radius = height - 25;
+                const angle = Math.PI + (160 * Math.PI / 180); 
                 ctx.translate(centerX, centerY);
                 ctx.rotate(angle);
                 ctx.beginPath();
-                ctx.moveTo(0, -3);
+                ctx.moveTo(0, -2);
                 ctx.lineTo(radius, 0);
-                ctx.lineTo(0, 3);
+                ctx.lineTo(0, 2);
                 ctx.fillStyle = '#333';
                 ctx.fill();
-                
-                // قاعدة الإبرة
                 ctx.beginPath();
-                ctx.arc(0, 0, 6, 0, Math.PI * 2);
+                ctx.arc(0, 0, 4, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.restore();
             }
         }]
     });
 
-    // 3. دائرة المعلق (يسار)
+    // 3. دائرة المعلق (تكبير)
     new Chart(document.getElementById('pendingChart'), {
         type: 'doughnut',
-        data: { datasets: [{ data: [18, 82], backgroundColor: ['#facc15', '#f1f5f9'], borderWidth: 0, borderRadius: 5 }] },
-        options: { cutout: '75%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        data: { datasets: [{ data: [18, 82], backgroundColor: ['#facc15', '#f1f5f9'], borderWidth: 0, borderRadius: 8 }] },
+        options: { cutout: '80%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
 
-    // الرسم السفلي: الموظفين
+    // بار الموظفين
     const ctxStaff = document.getElementById('staffChart').getContext('2d');
     new Chart(ctxStaff, {
         type: 'bar',
