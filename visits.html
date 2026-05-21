@@ -34,36 +34,38 @@
         .table-wrapper { background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-soft); margin-bottom: 30px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         
-        th { background: var(--header-purple-mid); color: white; padding: 12px 5px; font-size: 11px; font-weight: 800; text-align: center; position: relative; }
+        th { background: var(--header-purple-mid); color: white; padding: 12px 5px; font-size: 11px; font-weight: 800; text-align: center; }
         td { border-bottom: 1px solid var(--border-soft); border-left: 1px solid #f1f5f9; text-align: center; height: 45px; padding: 2px; position: relative; }
         
-        /* تأثير التكبير عند الكتابة */
+        /* تلميح ذكي يظهر محتوى الخانة */
+        .cell-container:hover .tooltip { opacity: 1; visibility: visible; }
+        .tooltip {
+            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+            background: #334155; color: white; padding: 5px 10px; border-radius: 6px;
+            font-size: 11px; white-space: nowrap; opacity: 0; visibility: hidden;
+            transition: 0.2s; z-index: 2000; pointer-events: none; box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        /* تكبير المربع بقدر الكتابة عند الضغط */
         .excel-input { 
             width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; 
             background: transparent; font-size: 11.5px; color: #334155; transition: all 0.2s ease;
-            z-index: 1;
         }
         .excel-input:focus { 
             background: #ffffff; 
-            transform: scale(1.2); 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            border-radius: 4px;
-            z-index: 10;
+            min-width: 150%; /* يتمدد للخارج */
+            transform: scale(1.1);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2);
+            border: 1px solid var(--accent-blue);
+            border-radius: 6px;
+            z-index: 1500;
             position: relative;
-            width: 100%;
-        }
-        
-        /* القائمة التي تظهر عند الوقوف بالسهم */
-        td:hover::after {
-            content: "تعديل البيانات";
-            position: absolute; top: -25px; left: 50%; transform: translateX(-50%);
-            background: var(--nav-purple-dark); color: white; padding: 2px 8px;
-            border-radius: 4px; font-size: 10px; white-space: nowrap; z-index: 100;
+            padding: 5px;
         }
 
         .btn-delete { background: none; border: none; color: var(--accent-red); cursor: pointer; font-weight: bold; font-size: 16px; }
         
-        /* النسب المطلوبة */
+        /* عرض الأعمدة المطلوب */
         .col-company { width: 12%; } .col-manager { width: 8%; } .col-mobile { width: 8%; } .col-email { width: 8%; }
         .col-record { width: 8%; } .col-current-service { width: 10%; } .col-proposed-service { width: 10%; }
         .col-status { width: 6%; } .col-date { width: 8%; } .col-notes { width: 10%; }
@@ -92,18 +94,10 @@
         <table>
             <thead>
                 <tr>
-                    <th class="col-company">الشركة</th>
-                    <th class="col-manager">المسؤول</th>
-                    <th class="col-mobile">الموبايل</th>
-                    <th class="col-email">الايميل</th>
-                    <th class="col-record">السجل</th>
-                    <th class="col-current-service">الخدمة الحالية</th>
-                    <th class="col-proposed-service">الخدمة المقترحة</th>
-                    <th class="col-status">الحالة</th>
-                    <th class="col-date">تاريخ الزيارة</th>
-                    <th class="col-notes">ملاحظات</th>
-                    <th class="col-edit-date">تاريخ التعديل</th>
-                    <th class="col-action">إجراء</th>
+                    <th class="col-company">الشركة</th><th class="col-manager">المسؤول</th><th class="col-mobile">الموبايل</th>
+                    <th class="col-email">الايميل</th><th class="col-record">السجل</th><th class="col-current-service">الخدمة الحالية</th>
+                    <th class="col-proposed-service">الخدمة المقترحة</th><th class="col-status">الحالة</th><th class="col-date">تاريخ الزيارة</th>
+                    <th class="col-notes">ملاحظات</th><th class="col-edit-date">تاريخ التعديل</th><th class="col-action">إجراء</th>
                 </tr>
             </thead>
             <tbody id="tableBody"></tbody>
@@ -115,40 +109,55 @@
     function getToday() { return new Date().toISOString().split('T')[0]; }
 
     function loadSavedData() {
-        const saved = localStorage.getItem('asgate_visits_v3');
-        if (saved) {
-            JSON.parse(saved).forEach(item => renderRow(item));
-        } else { insertNewRow(); }
+        const saved = localStorage.getItem('asgate_visits_v4');
+        if (saved) JSON.parse(saved).forEach(item => renderRow(item));
+        else insertNewRow();
+    }
+
+    // دالة لتحديث نص التلميح فور الكتابة
+    function updateTooltip(input) {
+        const tooltip = input.parentElement.querySelector('.tooltip');
+        if (tooltip) tooltip.innerText = input.value || "...";
     }
 
     function renderRow(v = {}) {
         const tbody = document.getElementById('tableBody');
         const row = tbody.insertRow();
         
-        row.innerHTML = `
-            <td><input type="text" class="excel-input" value="${v.comp || ''}"></td>
-            <td><input type="text" class="excel-input" value="${v.mgr || ''}"></td>
-            <td><input type="text" class="excel-input" value="${v.mob || ''}"></td>
-            <td><input type="email" class="excel-input" value="${v.email || ''}"></td>
-            <td><input type="text" class="excel-input" value="${v.record || ''}"></td>
-            <td><input type="text" class="excel-input" value="${v.curServ || ''}"></td>
-            <td><input type="text" class="excel-input" value="${v.propServ || ''}"></td>
-            <td>
-                <select class="excel-input">
-                    <option value="جديد" ${v.status==='جديد'?'selected':''}>جديد</option>
-                    <option value="مهتم" ${v.status==='مهتم'?'selected':''}>مهتم</option>
-                    <option value="مغلق" ${v.status==='مغلق'?'selected':''}>مغلق</option>
-                </select>
-            </td>
-            <td><input type="text" class="excel-input readonly-style" value="${v.visitDate || getToday()}" readonly></td>
-            <td><input type="text" class="excel-input" value="${v.notes || ''}"></td>
-            <td><input type="text" class="excel-input readonly-style" value="${v.editDate || getToday()}" readonly></td>
-            <td><button class="btn-delete" onclick="deleteRow(this)">×</button></td>
-        `;
+        const createCell = (val, type = "text", readonly = false, isSelect = false) => {
+            let cell = row.insertCell();
+            cell.className = "cell-container";
+            
+            if (isSelect) {
+                cell.innerHTML = `
+                    <select class="excel-input" onchange="updateTooltip(this)">
+                        <option value="جديد" ${val==='جديد'?'selected':''}>جديد</option>
+                        <option value="مهتم" ${val==='مهتم'?'selected':''}>مهتم</option>
+                        <option value="مغلق" ${val==='مغلق'?'selected':''}>مغلق</option>
+                    </select>
+                    <span class="tooltip">${val || 'جديد'}</span>`;
+            } else {
+                cell.innerHTML = `
+                    <input type="${type}" class="excel-input ${readonly ? 'readonly-style' : ''}" 
+                           value="${val || ''}" ${readonly ? 'readonly' : ''} 
+                           oninput="updateTooltip(this)" onmouseover="updateTooltip(this)">
+                    <span class="tooltip">${val || '...'}</span>`;
+            }
+        };
+
+        createCell(v.comp); createCell(v.mgr); createCell(v.mob); createCell(v.email, "email");
+        createCell(v.record); createCell(v.curServ); createCell(v.propServ);
+        createCell(v.status, "text", false, true);
+        createCell(v.visitDate || getToday(), "text", true);
+        createCell(v.notes);
+        createCell(v.editDate || getToday(), "text", true);
+
+        // خلية الحذف
+        let actionCell = row.insertCell();
+        actionCell.innerHTML = `<button class="btn-delete" onclick="deleteRow(this)">×</button>`;
     }
 
-    function insertNewRow() { renderRow({ visitDate: getToday(), editDate: getToday(), status: 'جديد' }); }
-
+    function insertNewRow() { renderRow({ status: 'جديد' }); }
     function deleteRow(btn) { if(confirm('حذف؟')) btn.closest('tr').remove(); }
 
     function saveAllData() {
@@ -161,7 +170,7 @@
                 status: f[7].value, visitDate: f[8].value, notes: f[9].value, editDate: getToday()
             });
         });
-        localStorage.setItem('asgate_visits_v3', JSON.stringify(data));
+        localStorage.setItem('asgate_visits_v4', JSON.stringify(data));
         alert("✅ تم الحفظ");
         location.reload();
     }
