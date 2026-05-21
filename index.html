@@ -200,17 +200,17 @@
 </div>
 
 <script>
+    // إعداد جدول الأشهر
     const months = ["يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
     const tbody = document.getElementById('monthsBody');
-    
     months.forEach((m, i) => {
         const row = tbody.insertRow();
         row.innerHTML = `<td>${m}</td><td>15k</td><td>${i===0?'14.2k':'-'}</td><td class="thick-border">${i===0?'790':'-'}</td><td style="color:#3b82f6">${i===0?'45':'-'}</td><td style="color:#22c55e">${i===0?'12':'-'}</td>`;
     });
 
+    // إعداد الرسم البياني العلوي
     let myChart = null;
     let currentChartType = 'bar';
-
     function initChart(type) {
         const ctx = document.getElementById('performanceChart').getContext('2d');
         if (myChart) myChart.destroy();
@@ -226,14 +226,13 @@
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { font: { family: 'Cairo', size: 10 } } } } }
         });
     }
-
     function toggleChartType() {
         currentChartType = currentChartType === 'bar' ? 'pie' : 'bar';
         initChart(currentChartType);
     }
     initChart(currentChartType);
 
-    // الرسم البياني السفلي مع تلاصق جانبي تام (Side-by-Side Tight)
+    // الرسم البياني السفلي (تلاصق جانبي تام)
     const ctxStaff = document.getElementById('staffChart').getContext('2d');
     const staffLabels = Array.from({length: 30}, (_, i) => `${i + 1}`);
 
@@ -246,15 +245,15 @@
                     label: 'الهدف',
                     data: Array.from({length: 30}, () => Math.floor(Math.random() * 5000) + 10000),
                     backgroundColor: '#22c55e',
-                    barPercentage: 1.0,      // ملء العمود الأخضر بالكامل
-                    categoryPercentage: 0.7  // المسافة الفاصلة بين مندوب وآخر فقط
+                    barPercentage: 1.0,      // ملء المساحة بالكامل
+                    categoryPercentage: 0.8  // فراغ فقط بين المندوبين
                 },
                 {
                     label: 'المعلق',
                     data: Array.from({length: 30}, () => Math.floor(Math.random() * 4000) + 1000),
                     backgroundColor: '#facc15',
-                    barPercentage: 0.4,      // عرض العمود الأصفر أنحف
-                    categoryPercentage: 0.7
+                    barPercentage: 0.4,      // عرض أنحف ملتصق تماماً بالأخضر
+                    categoryPercentage: 0.8  
                 }
             ]
         },
@@ -263,7 +262,7 @@
             maintainAspectRatio: false,
             scales: {
                 x: { 
-                    stacked: false, // بجانب بعض وليس فوق بعض
+                    stacked: false, // لضمان الظهور جانباً إلى جنب
                     grid: { display: false },
                     ticks: { font: { family: 'Cairo', size: 9, weight: 300 } }
                 },
