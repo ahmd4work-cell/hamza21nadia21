@@ -245,15 +245,15 @@
                     label: 'الهدف',
                     data: Array.from({length: 30}, () => Math.floor(Math.random() * 5000) + 10000),
                     backgroundColor: '#22c55e',
-                    barPercentage: 1.0,      // ملء العمود بالكامل في مساحته
-                    categoryPercentage: 0.8  // الفراغ فقط بين موظف وآخر
+                    barPercentage: 0.8,      // عرض العمود الأخضر
+                    categoryPercentage: 0.7  // المسافة الإجمالية بين الموظفين
                 },
                 {
                     label: 'المعلق',
                     data: Array.from({length: 30}, () => Math.floor(Math.random() * 4000) + 1000),
                     backgroundColor: '#facc15',
-                    barPercentage: 1.0,      // ملء العمود بالكامل في مساحته
-                    categoryPercentage: 0.8  // الفراغ فقط بين موظف وآخر
+                    barPercentage: 0.4,      // تقليل عرض العمود الأصفر للنصف مقارنة بالأخضر
+                    categoryPercentage: 0.7
                 }
             ]
         },
@@ -262,7 +262,7 @@
             maintainAspectRatio: false,
             scales: {
                 x: { 
-                    stacked: false, // لضمان ظهورهم بجانب بعضهم
+                    stacked: false, 
                     grid: { display: false },
                     ticks: { font: { family: 'Cairo', size: 9, weight: 300 } }
                 },
