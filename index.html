@@ -87,14 +87,14 @@
         .bg-purple { background-color: var(--accent-purple); }
         .bg-orange { background-color: var(--accent-orange); }
 
-        /* منطقة التحليل */
+        /* منطقة التحليل المعدلة بالتصغير 10% */
         .charts-row {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
+            justify-content: space-around;
+            align-items: center;
             flex-grow: 1;
             padding: 0;
-            gap: 10px;
+            gap: 5px;
         }
         .chart-item-wrapper {
             display: flex;
@@ -102,18 +102,18 @@
             align-items: center;
             flex: 1;
         }
-        /* تكبير الدوائر الخضراء والصفراء لأقصى حد */
-        .chart-container-extra-large {
+        /* تصغير المحقق والمعلق بنسبة 10% */
+        .chart-container-reduced {
             position: relative;
-            width: 230px;
-            height: 230px;
-            margin-bottom: 5px; /* مساحة للكلمة تحتها */
+            width: 205px;
+            height: 205px;
+            margin-bottom: 5px;
         }
-        /* تصغير مؤشر الإنجاز */
-        .gauge-container-small {
+        /* تصغير مؤشر الإنجاز بنسبة 10% */
+        .gauge-container-reduced {
             position: relative;
-            width: 140px;
-            height: 80px;
+            width: 125px;
+            height: 72px;
             margin-top: 10px;
         }
         .chart-percentage {
@@ -121,7 +121,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 28px;
+            font-size: 24px; /* تصغير طفيف للخط ليتناسب مع الدائرة */
             font-weight: 800;
             color: var(--nav-purple);
         }
@@ -130,14 +130,13 @@
             bottom: -5px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 900;
             color: #1e293b;
         }
-        /* تعديل ظهور الكلمات تحت الدوائر */
         .chart-label {
             text-align: center;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 800;
             color: #475569;
             margin-top: 5px;
@@ -210,23 +209,23 @@
                 <h3>📈 تحليل الأداء الإجمالي</h3>
                 <div class="charts-row">
                     <div class="chart-item-wrapper">
-                        <div class="chart-container-extra-large">
+                        <div class="chart-container-reduced">
                             <canvas id="achievedChart"></canvas>
                             <div class="chart-percentage">82%</div>
                         </div>
                         <div class="chart-label">المحقق</div>
                     </div>
 
-                    <div class="chart-item-wrapper" style="flex: 0.7;">
-                        <div class="gauge-container-small">
+                    <div class="chart-item-wrapper" style="flex: 0.6;">
+                        <div class="gauge-container-reduced">
                             <canvas id="gaugeChart"></canvas>
                             <div class="gauge-value">200%</div>
                         </div>
-                        <div class="chart-label" style="margin-top: 20px;">مؤشر الإنجاز</div>
+                        <div class="chart-label" style="margin-top: 25px;">مؤشر الإنجاز</div>
                     </div>
 
                     <div class="chart-item-wrapper">
-                        <div class="chart-container-extra-large">
+                        <div class="chart-container-reduced">
                             <canvas id="pendingChart"></canvas>
                             <div class="chart-percentage">18%</div>
                         </div>
@@ -253,14 +252,14 @@
         row.innerHTML = `<td>${m}</td><td>15k</td><td>${i===0?'14.2k':'-'}</td><td class="thick-border">${i===0?'790':'-'}</td><td style="color:#3b82f6">${i===0?'45':'-'}</td><td style="color:#22c55e">${i===0?'12':'-'}</td>`;
     });
 
-    // 1. المحقق - تكبير مع الحفاظ على النسب
+    // 1. المحقق
     new Chart(document.getElementById('achievedChart'), {
         type: 'doughnut',
         data: { datasets: [{ data: [82, 18], backgroundColor: ['#22c55e', '#f1f5f9'], borderWidth: 0, borderRadius: 10 }] },
         options: { cutout: '85%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
 
-    // 2. العداد الرباعي - تصغير
+    // 2. مؤشر الإنجاز (نصف دائرة - 4 ألوان)
     const gaugeCtx = document.getElementById('gaugeChart').getContext('2d');
     new Chart(gaugeCtx, {
         type: 'doughnut',
@@ -286,7 +285,7 @@
                 ctx.save();
                 const centerX = width / 2;
                 const centerY = height - 5;
-                const radius = height - 20;
+                const radius = height - 18;
                 const angle = Math.PI + (165 * Math.PI / 180); 
                 ctx.translate(centerX, centerY);
                 ctx.rotate(angle);
@@ -298,7 +297,7 @@
         }]
     });
 
-    // 3. المعلق - تكبير
+    // 3. المعلق
     new Chart(document.getElementById('pendingChart'), {
         type: 'doughnut',
         data: { datasets: [{ data: [18, 82], backgroundColor: ['#facc15', '#f1f5f9'], borderWidth: 0, borderRadius: 10 }] },
