@@ -46,7 +46,7 @@
             max-width: 250px; white-space: pre-line; line-height: 1.5; text-align: right;
         }
 
-        /* Modal التصميم الذي أعجبك */
+        /* Modal - الحجم المصغر المعتمد */
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; }
         .modal-content { 
             background: white; padding: 15px; border-radius: 10px; 
@@ -67,6 +67,7 @@
         }
         .modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
 
+        /* Columns */
         .col-company { width: 12%; } .col-manager { width: 8%; } .col-mobile { width: 8%; } .col-email { width: 8%; }
         .col-record { width: 8%; } .col-current-service { width: 10%; } .col-proposed-service { width: 10%; }
         .col-status { width: 6%; } .col-date { width: 8%; } .col-notes { width: 10%; }
@@ -110,7 +111,7 @@
     <div class="modal-content">
         <div class="modal-header">سجل المتابعة</div>
         <div id="historyLog" class="history-log"></div>
-        <textarea id="modalTextArea" class="note-area" placeholder="أضف ملاحظتك هنا..."></textarea>
+        <textarea id="modalTextArea" class="note-area" placeholder="أدخل الملاحظة الجديدة هنا..."></textarea>
         <div class="modal-footer">
             <button class="btn-top" style="background:#94a3b8; font-size:11px;" onclick="closeNote()">إلغاء</button>
             <button class="btn-top btn-save" onclick="saveNote()">إضافة</button>
@@ -129,7 +130,7 @@
     }
 
     function loadSavedData() {
-        const saved = localStorage.getItem('asgate_visits_v11');
+        const saved = localStorage.getItem('asgate_visits_v12');
         const tableBody = document.getElementById('tableBody');
         tableBody.innerHTML = '';
         if (saved) JSON.parse(saved).forEach(item => renderRow(item));
@@ -148,7 +149,7 @@
                 cell.innerHTML = `<input type="text" class="excel-input notes-trigger" value="${val || ''}" readonly onclick="openNote(this)" onmouseover="updateTooltip(this)"><span class="tooltip">${val || 'فتح الملاحظات'}</span>`;
             } else {
                 const today = new Date().toLocaleDateString('en-GB');
-                cell.innerHTML = `<input type="${type}" class="excel-input" value="${val || (readonly ? today : '')}" ${readonly ? 'readonly' : ''} oninput="updateTooltip(this)" onmouseover="updateTooltip(this)"><span class="tooltip">${val || '...'}</span>`;
+                cell.innerHTML = `<input type="text" class="excel-input" value="${val || (readonly ? today : '')}" ${readonly ? 'readonly' : ''} oninput="updateTooltip(this)" onmouseover="updateTooltip(this)"><span class="tooltip">${val || '...'}</span>`;
             }
         };
         createCell(v.comp); createCell(v.mgr); createCell(v.mob); createCell(v.email);
@@ -181,14 +182,14 @@
                 const header = getFullDate();
                 let currentVal = currentActiveInput.value;
                 
-                // البحث عما إذا كان التاريخ مسجلاً كعنوان في البداية
+                // إذا كان السجل يبدأ بعنوان اليوم الحالي
                 if (currentVal.startsWith(header)) {
-                    // إذا كان العنوان موجوداً، نضيف النص الجديد تحته مباشرة (بداية السطر)
+                    // أضف النص الجديد في سطر جديد تحت العنوان مباشرة
                     let parts = currentVal.split("\n");
-                    parts.splice(1, 0, newText); // إدراج النص في السطر الثاني
+                    parts.splice(1, 0, newText); 
                     currentActiveInput.value = parts.join("\n");
                 } else {
-                    // إذا كان يوماً جديداً، نضع العنوان ثم النص ثم فاصل بسيط للملاحظات القديمة
+                    // إذا كان يوماً جديداً: التاريخ في سطر، النص في سطر، ثم الملاحظات القديمة
                     const separator = currentVal ? "\n--------------------\n" : "";
                     currentActiveInput.value = header + "\n" + newText + separator + currentVal;
                 }
@@ -212,10 +213,10 @@
                 status: f[7].value, visitDate: f[8].value, notes: f[9].value, editDate: today
             });
         });
-        localStorage.setItem('asgate_visits_v11', JSON.stringify(data));
-        alert("تم الحفظ بنجاح");
+        localStorage.setItem('asgate_visits_v12', JSON.stringify(data));
+        alert("حفظ بنجاح");
     }
-    
+
     window.onclick = function(e) { if (e.target == document.getElementById('noteModal')) closeNote(); }
 </script>
 </body>
