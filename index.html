@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASGate - لوحة تحكم المبيعات</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -27,6 +27,7 @@
             margin: 0; 
             line-height: 1.2; 
             font-size: 14px; 
+            font-weight: 300; /* تنحيف الخط الافتراضي */
         }
 
         .navbar { 
@@ -36,8 +37,7 @@
         }
         .navbar a { 
             color: white; text-decoration: none; padding: 0 15px; font-weight: 700; 
-            font-size: 12px; 
-            border-radius: 8px; transition: 0.3s; line-height: 26px; height: 26px; display: inline-block;
+            font-size: 12px; border-radius: 8px; transition: 0.3s; line-height: 26px; height: 26px; display: inline-block;
         }
         .navbar a.active { background-color: var(--nav-active); }
 
@@ -49,16 +49,12 @@
         }
         .info-content { display: flex; gap: 35px; align-items: center; }
         .info-item { font-size: 11px; color: var(--nav-purple); font-weight: 700; }
-        .info-item span { color: #64748b; font-weight: 400; margin-right: 5px; }
+        .info-item span { color: #64748b; font-weight: 300; margin-right: 5px; }
 
         .container { padding: 5px 20px 20px 20px; }
         
-        /* تعديل هنا لضمان تساوي الارتفاع */
         .dashboard-grid { 
-            display: flex;
-            gap: 20px;
-            align-items: stretch; /* هذا يجعل العناصر متساوية الطول من الأسفل */
-            width: 100%; 
+            display: flex; gap: 20px; align-items: stretch; width: 100%; 
         }
 
         .right-section { flex: 38; }
@@ -67,36 +63,24 @@
         .content-box { 
             background: var(--white); padding: 15px; border-radius: 12px; 
             border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
-            height: 100%; /* ليمتد داخل الحاوية */
-            display: flex;
-            flex-direction: column;
-            box-sizing: border-box;
+            display: flex; flex-direction: column; box-sizing: border-box;
         }
 
-        /* تعديل خاص لصندوق الرسم البياني ليملأ المساحة المتبقية */
         .chart-box { flex-grow: 1; }
 
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        h3 { font-size: 13px; margin: 0; color: var(--nav-purple); font-weight: 800; border-right: 4px solid var(--accent-blue); padding-right: 8px; }
+        h3 { font-size: 13px; margin: 0 0 10px 0; color: var(--nav-purple); font-weight: 800; border-right: 4px solid var(--accent-blue); padding-right: 8px; }
 
         .toggle-btn {
             background-color: var(--nav-purple); color: white; border: none; padding: 4px 12px;
             border-radius: 20px; font-family: 'Cairo'; font-size: 9px; cursor: pointer; transition: 0.3s;
         }
-        .toggle-btn:hover { background-color: var(--accent-blue); }
 
         .yearly-table { 
             width: 100%; border-collapse: collapse; font-size: 10.5px; table-layout: fixed; 
         }
         .yearly-table th, .yearly-table td { 
             border: 0.5px solid var(--border-color); padding: 2px; height: 30px; 
-            text-align: center; font-weight: bold; color: #475569;
+            text-align: center; font-weight: 300; color: #475569;
         }
         .yearly-table th { background: #f8fafc; color: var(--nav-purple); font-weight: 800; }
         .thick-border { border-left: 3px solid var(--nav-purple) !important; }
@@ -104,18 +88,15 @@
         .filters-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
         .filter-card { background: white; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 4px; }
         .filter-card label { font-size: 9px; font-weight: 800; color: var(--nav-purple); }
-        .filter-input { width: 100%; border: none; background: var(--input-bg); font-family: 'Cairo'; font-size: 10px; padding: 4px; border-radius: 6px; outline: none; }
+        .filter-input { width: 100%; border: none; background: var(--input-bg); font-family: 'Cairo'; font-size: 10px; padding: 4px; border-radius: 6px; outline: none; font-weight: 300; }
 
         .stats-cards { display: flex; gap: 8px; width: 100%; align-items: center; }
         .stat-card { 
             flex: 1; height: 52px; padding: 5px 12px; border-radius: 10px; color: white; 
             display: flex; flex-direction: column; justify-content: center; align-items: center; min-width: 0; box-sizing: border-box;
         }
-        .stat-card-small { flex: 0.6; }
-        .stat-spacer { flex: 0.2; }
-        .stat-card-row { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 5px; }
-        .stat-card .label-text { font-size: 10px; font-weight: bold; opacity: 0.9; white-space: nowrap; }
-        .stat-card .value-text { font-size: 13.5px; font-weight: 800; }
+        .stat-card .label-text { font-size: 10px; font-weight: 400; opacity: 0.9; white-space: nowrap; }
+        .stat-card .value-text { font-size: 13.5px; font-weight: 300; }
 
         .bg-blue { background-color: var(--accent-blue); }
         .bg-green { background-color: var(--accent-green); }
@@ -124,13 +105,14 @@
         .bg-orange { background-color: var(--accent-orange); }
 
         .chart-wrapper { flex-grow: 1; position: relative; min-height: 250px; }
+        
+        /* تصميم صندوق المناديب في الأسفل */
+        .delegates-section { margin-top: 15px; height: 190px; }
+        .delegates-chart-wrapper { height: 150px; width: 100%; }
 
         @media (max-width: 1100px) {
             .dashboard-grid { flex-direction: column; }
-            .stats-cards { flex-wrap: wrap; }
             .stat-card { flex: 1 1 45%; }
-            .stat-card-small { flex: 1 1 45%; }
-            .stat-spacer { display: none; }
         }
     </style>
 </head>
@@ -156,7 +138,7 @@
 <div class="container">
     <div class="dashboard-grid">
         <div class="right-section">
-            <div class="content-box">
+            <div class="content-box" style="height: 100%;">
                 <h3>📅 سجل الأهداف والزيارات (2026)</h3>
                 <table class="yearly-table">
                     <thead>
@@ -180,7 +162,7 @@
                     <label>الشهر</label>
                     <select class="filter-input">
                         <option>الكل</option>
-                        <option>يناير</option><option>فبراير</option><option>مارس</option>
+                        <option>يناير</option><option>فبراير</option>
                     </select>
                 </div>
                 <div class="filter-card"><label>المنطقة</label><select class="filter-input"><option>الكل</option></select></div>
@@ -189,17 +171,14 @@
             </div>
             
             <div class="stats-cards">
-                <div class="stat-card bg-blue"><div class="stat-card-row"><div class="label-text">الهدف السنوي</div><div class="value-text">180,000</div></div></div>
-                <div class="stat-card bg-green"><div class="stat-card-row"><div class="label-text">المبيعات</div><div class="value-text">14,210</div></div></div>
-                <div class="stat-card bg-yellow"><div class="stat-card-row"><div class="label-text">المعلق</div><div class="value-text">790</div></div></div>
-                <div class="stat-spacer"></div>
-                <div class="stat-card bg-purple stat-card-small"><div class="stat-card-row"><div class="label-text">الزيارات</div><div class="value-text">45</div></div></div>
-                <div class="stat-card bg-orange stat-card-small"><div class="stat-card-row"><div class="label-text">ناجحة</div><div class="value-text">12</div></div></div>
+                <div class="stat-card bg-blue"><div class="stat-card-row" style="display:flex; justify-content:space-between; width:100%"><span class="label-text">الهدف السنوي</span><span class="value-text">180,000</span></div></div>
+                <div class="stat-card bg-green"><div class="stat-card-row" style="display:flex; justify-content:space-between; width:100%"><span class="label-text">المبيعات</span><span class="value-text">14,210</span></div></div>
+                <div class="stat-card bg-yellow"><div class="stat-card-row" style="display:flex; justify-content:space-between; width:100%"><span class="label-text">المعلق</span><span class="value-text">790</span></div></div>
             </div>
 
             <div class="content-box chart-box">
-                <div class="chart-header">
-                    <h3>📈 تحليل الأداء</h3>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <h3>📈 تحليل الأداء العام</h3>
                     <button class="toggle-btn" onclick="toggleChartType()">تبديل العرض</button>
                 </div>
                 <div class="chart-wrapper">
@@ -208,27 +187,34 @@
             </div>
         </div>
     </div>
+
+    <div class="content-box delegates-section">
+        <h3>👥 أداء المناديب (الهدف vs المعلق)</h3>
+        <div class="delegates-chart-wrapper">
+            <canvas id="delegatesChart"></canvas>
+        </div>
+    </div>
 </div>
 
 <script>
+    // 1. جدول الأشهر
     const months = ["يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
     const tbody = document.getElementById('monthsBody');
-    
     months.forEach((m, i) => {
         const row = tbody.insertRow();
         row.innerHTML = `
-            <td>${m}</td>
+            <td style="font-weight:700">${m}</td>
             <td>15k</td>
             <td>${i===0?'14.2k':'-'}</td>
-            <td class="thick-border">${i===0?'790':'-'}</td>
-            <td style="color:#3b82f6">${i===0?'45':'-'}</td>
-            <td style="color:#22c55e">${i===0?'12':'-'}</td>
+            <td class="thick-border" style="font-weight:300">${i===0?'790':'-'}</td>
+            <td style="color:#3b82f6; font-weight:300">${i===0?'45':'-'}</td>
+            <td style="color:#22c55e; font-weight:300">${i===0?'12':'-'}</td>
         `;
     });
 
+    // 2. الرسم البياني الرئيسي (أعلى)
     let myChart = null;
     let currentChartType = 'bar';
-
     function initChart(type) {
         const ctx = document.getElementById('performanceChart').getContext('2d');
         if (myChart) myChart.destroy();
@@ -243,17 +229,59 @@
             },
             options: { 
                 responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { position: 'top', labels: { font: { family: 'Cairo', size: 10 } } } }
+                plugins: { legend: { position: 'top', labels: { font: { family: 'Cairo', size: 10, weight: 300 } } } }
             }
         });
     }
-
     function toggleChartType() {
         currentChartType = currentChartType === 'bar' ? 'pie' : 'bar';
         initChart(currentChartType);
     }
-
     initChart(currentChartType);
+
+    // 3. الرسم البياني للمناديب (أسفل الصفحة)
+    const ctxDelegates = document.getElementById('delegatesChart').getContext('2d');
+    const delegateNames = ["أحمد", "سارة", "خالد", "ليلى", "عمر", "نورة", "فهد", "ريم", "ياسر", "هند"];
+    
+    new Chart(ctxDelegates, {
+        type: 'bar',
+        data: {
+            labels: delegateNames,
+            datasets: [
+                {
+                    label: 'الهدف',
+                    data: [15000, 12000, 18000, 14000, 16000, 13000, 17000, 15500, 14000, 12500],
+                    backgroundColor: '#22c55e',
+                    barPercentage: 0.9,       // جعل العمود عريض ليشغل مساحته
+                    categoryPercentage: 0.4   // تقريب الأعمدة من بعضها جداً لإلغاء الفواصل داخل المجموعة
+                },
+                {
+                    label: 'المعلق',
+                    data: [2000, 1500, 3000, 1000, 2500, 800, 2200, 1200, 1100, 900],
+                    backgroundColor: '#facc15',
+                    barPercentage: 0.9,
+                    categoryPercentage: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { 
+                legend: { display: false } // إخفاء المفتاح لتوفير مساحة عمودية
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { family: 'Cairo', size: 10, weight: 300 } }
+                },
+                y: {
+                    beginAtZero: true,
+                    display: false // إخفاء المحور الجانبي لتركيز المساحة على الأعمدة
+                }
+            }
+        }
+    });
 </script>
 
 </body>
