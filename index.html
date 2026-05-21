@@ -18,7 +18,6 @@
             --accent-yellow: #facc15;
             --accent-purple: #8b5cf6;
             --accent-orange: #f97316;
-            --input-bg: #f8fafc;
         }
 
         body { 
@@ -27,7 +26,7 @@
             margin: 0; 
             line-height: 1.2; 
             font-size: 14px;
-            font-weight: 300; /* تنحيف الخط الافتراضي */
+            font-weight: 300; 
         }
 
         .navbar { 
@@ -61,19 +60,10 @@
         .content-box { 
             background: var(--white); padding: 15px; border-radius: 12px; 
             border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
-            height: 100%; display: flex; flex-direction: column; box-sizing: border-box;
+            display: flex; flex-direction: column; box-sizing: border-box;
         }
 
-        .chart-box { flex-grow: 1; }
-        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-
-        h3 { font-size: 13px; margin: 0; color: var(--nav-purple); font-weight: 800; border-right: 4px solid var(--accent-blue); padding-right: 8px; }
-
-        .toggle-btn {
-            background-color: var(--nav-purple); color: white; border: none; padding: 4px 12px;
-            border-radius: 20px; font-family: 'Cairo'; font-size: 9px; cursor: pointer; transition: 0.3s;
-        }
-        .toggle-btn:hover { background-color: var(--accent-blue); }
+        h3 { font-size: 13px; margin: 0 0 10px 0; color: var(--nav-purple); font-weight: 800; border-right: 4px solid var(--accent-blue); padding-right: 8px; }
 
         .yearly-table { width: 100%; border-collapse: collapse; font-size: 10.5px; table-layout: fixed; }
         .yearly-table th, .yearly-table td { 
@@ -86,15 +76,77 @@
         .filters-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
         .filter-card { background: white; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 4px; }
         .filter-card label { font-size: 9px; font-weight: 800; color: var(--nav-purple); }
-        .filter-input { width: 100%; border: none; background: var(--input-bg); font-family: 'Cairo'; font-size: 10px; padding: 4px; border-radius: 6px; outline: none; font-weight: 300; }
+        .filter-input { width: 100%; border: none; background: #f8fafc; font-family: 'Cairo'; font-size: 10px; padding: 4px; border-radius: 6px; outline: none; }
 
         .stats-cards { display: flex; gap: 8px; width: 100%; align-items: center; }
         .stat-card { 
             flex: 1; height: 52px; padding: 5px 12px; border-radius: 10px; color: white; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; min-width: 0; box-sizing: border-box;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
-        .stat-card .label-text { font-size: 10px; font-weight: 700; opacity: 0.9; white-space: nowrap; }
+        .stat-card .label-text { font-size: 10px; font-weight: 700; }
         .stat-card .value-text { font-size: 13.5px; font-weight: 300; }
 
         .bg-blue { background-color: var(--accent-blue); }
-        .bg-green { background-color: var(--accent-green
+        .bg-green { background-color: var(--accent-green); }
+        .bg-yellow { background-color: var(--accent-yellow); color: #854d0e; }
+
+        .chart-wrapper { flex-grow: 1; position: relative; min-height: 250px; }
+
+        /* حاوية الرسم البياني لـ 30 موظف */
+        .staff-section { margin-top: 20px; height: 210px; }
+        .staff-chart-container { height: 150px; width: 100%; }
+
+        @media (max-width: 1100px) {
+            .dashboard-grid { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="#" class="active">الرئيسية</a>
+    <a href="#">الزيارات</a>
+    <a href="#">الفرص البيعية</a>
+    <a href="#">العملاء</a>
+    <a href="#">المبيعات</a>
+</nav>
+
+<div class="employee-info-bar">
+    <div class="info-content">
+        <div class="info-item">الموظف: <span>محمد المنصور</span></div>
+        <div class="info-item">الرقم: <span>ASG-2026</span></div>
+        <div class="info-item">الموبايل: <span>05XXXXXXXX</span></div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="dashboard-grid">
+        <div class="right-section">
+            <div class="content-box">
+                <h3>📅 سجل الأهداف والزيارات</h3>
+                <table class="yearly-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 22%;">الشهر</th>
+                            <th>هدف</th>
+                            <th>تم</th>
+                            <th class="thick-border">معلق</th>
+                            <th style="background:#eff6ff">زيارة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="monthsBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="left-section">
+            <div class="filters-grid">
+                <div class="filter-card"><label>الشهر</label><select class="filter-input"><option>الكل</option></select></div>
+                <div class="filter-card"><label>المنطقة</label><select class="filter-input"><option>الكل</option></select></div>
+                <div class="filter-card"><label>المشرف</label><select class="filter-input"><option>الكل</option></select></div>
+                <div class="filter-card"><label>المندوب</label><select class="filter-input"><option>الكل</option></select></div>
+            </div>
+            
+            <div class="stats-cards">
+                <div class="stat-card bg-blue"><span class="label-text">الهدف السنوي</span><span class="value-text">180,000</span></div>
+                <div class="stat-card bg-green"><span class="label-text
