@@ -30,7 +30,6 @@
             font-weight: 300;
         }
 
-        /* Navbar Style */
         .navbar { 
             background-color: var(--nav-purple); display: flex; align-items: center; padding: 0 20px; 
             margin: 10px; border-radius: 15px; height: 37px; position: sticky; top: 10px; z-index: 1000;
@@ -42,7 +41,6 @@
         }
         .navbar a.active { background-color: var(--nav-active); }
 
-        /* Employee Bar */
         .employee-info-bar {
             margin: 10px 20px; height: 35px; background-color: var(--white);
             border: 1px solid var(--border-color); border-radius: 20px;
@@ -54,29 +52,18 @@
         .info-item span { color: #64748b; font-weight: 300; margin-right: 5px; }
 
         .container { padding: 5px 20px 20px 20px; }
-        
-        .dashboard-grid { 
-            display: flex;
-            gap: 20px;
-            align-items: stretch; 
-            width: 100%; 
-        }
-
+        .dashboard-grid { display: flex; gap: 20px; align-items: stretch; width: 100%; }
         .right-section { flex: 38; }
         .left-section { flex: 62; display: flex; flex-direction: column; gap: 15px; }
 
         .content-box { 
             background: var(--white); padding: 15px; border-radius: 12px; 
             border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            box-sizing: border-box;
+            height: 100%; display: flex; flex-direction: column; box-sizing: border-box;
         }
 
-        h3 { font-size: 13px; margin: 0; color: var(--nav-purple); font-weight: 800; border-right: 4px solid var(--accent-blue); padding-right: 8px; }
+        h3 { font-size: 13px; margin: 0; color: var(--nav-purple); font-weight: 800; border-right: 4px solid var(--accent-blue); padding-right: 8px; margin-bottom: 15px; }
 
-        /* Tables & Stats */
         .yearly-table { width: 100%; border-collapse: collapse; font-size: 10.5px; table-layout: fixed; }
         .yearly-table th, .yearly-table td { 
             border: 0.5px solid var(--border-color); padding: 2px; height: 30px; 
@@ -104,17 +91,39 @@
         .bg-purple { background-color: var(--accent-purple); }
         .bg-orange { background-color: var(--accent-orange); }
 
-        .chart-wrapper { flex-grow: 1; position: relative; min-height: 250px; }
-
-        .staff-performance-section {
-            margin-top: 20px;
-            width: 100%;
-            height: 350px; 
+        /* تنسيق حاوية الدوائر البيانية */
+        .charts-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-grow: 1;
+            padding: 10px 0;
+        }
+        .chart-container {
+            position: relative;
+            width: 140px;
+            height: 140px;
+        }
+        .chart-percentage {
+            position: absolute;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--nav-purple);
+        }
+        .chart-label {
+            text-align: center;
+            font-size: 11px;
+            font-weight: 800;
+            margin-top: 5px;
+            color: #64748b;
         }
 
-        @media (max-width: 1100px) {
-            .dashboard-grid { flex-direction: column; }
-        }
+        .staff-performance-section { margin-top: 20px; width: 100%; height: 350px; }
+
+        @media (max-width: 1100px) { .dashboard-grid { flex-direction: column; } }
     </style>
 </head>
 <body>
@@ -174,9 +183,22 @@
             </div>
 
             <div class="content-box">
-                <h3>📈 تحليل الأداء</h3>
-                <div class="chart-wrapper">
-                    <canvas id="performanceChart"></canvas>
+                <h3>📈 تحليل الأداء الإجمالي</h3>
+                <div class="charts-row">
+                    <div>
+                        <div class="chart-container">
+                            <canvas id="achievedChart"></canvas>
+                            <div class="chart-percentage">82%</div>
+                        </div>
+                        <div class="chart-label">المحقق الفعلي</div>
+                    </div>
+                    <div>
+                        <div class="chart-container">
+                            <canvas id="pendingChart"></canvas>
+                            <div class="chart-percentage">18%</div>
+                        </div>
+                        <div class="chart-label">المعلق الحالي</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -199,24 +221,43 @@
         row.innerHTML = `<td>${m}</td><td>15k</td><td>${i===0?'14.2k':'-'}</td><td class="thick-border">${i===0?'790':'-'}</td><td style="color:#3b82f6">${i===0?'45':'-'}</td><td style="color:#22c55e">${i===0?'12':'-'}</td>`;
     });
 
-    // الرسم العلوي (تحليل الأداء)
-    new Chart(document.getElementById('performanceChart'), {
-        type: 'line',
+    // إعدادات مشتركة للدوائر
+    const doughnutOptions = {
+        cutout: '75%',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { enabled: true } }
+    };
+
+    // 1. دائرة المحقق (الخضراء) - اليمين
+    new Chart(document.getElementById('achievedChart'), {
+        type: 'doughnut',
         data: {
-            labels: months,
             datasets: [{
-                label: 'الأداء',
-                data: [400, 300, 500, 400, 800, 850, 1100, 600, 800, 950, 1000, 1500],
-                borderColor: '#3b82f6',
-                tension: 0.4,
-                fill: true,
-                backgroundColor: 'rgba(59, 130, 246, 0.1)'
+                data: [82, 18],
+                backgroundColor: ['#22c55e', '#f1f5f9'],
+                borderWidth: 0,
+                borderRadius: 5
             }]
         },
-        options: { responsive: true, maintainAspectRatio: false }
+        options: doughnutOptions
     });
 
-    // الرسم السفلي: الموظفين (الالتصاق التام)
+    // 2. دائرة المعلق (الصفراء) - اليسار
+    new Chart(document.getElementById('pendingChart'), {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [18, 82],
+                backgroundColor: ['#facc15', '#f1f5f9'],
+                borderWidth: 0,
+                borderRadius: 5
+            }]
+        },
+        options: doughnutOptions
+    });
+
+    // الرسم السفلي: الموظفين
     const ctxStaff = document.getElementById('staffChart').getContext('2d');
     new Chart(ctxStaff, {
         type: 'bar',
@@ -227,15 +268,15 @@
                     label: 'الهدف المكتمل',
                     data: Array.from({length: 30}, () => Math.floor(Math.random() * 5000) + 25000),
                     backgroundColor: '#22c55e',
-                    barPercentage: 1.0,       // ملء الحيز بالكامل لضمان الالتصاق
-                    categoryPercentage: 0.8   // مسافة معقولة بين كل مندوب والآخر
+                    barPercentage: 1.0,
+                    categoryPercentage: 0.8
                 },
                 {
                     label: 'الهدف المعلق',
                     data: Array.from({length: 30}, () => Math.floor(Math.random() * 3000) + 1000),
                     backgroundColor: '#facc15',
-                    barPercentage: 1.0,       // ملء الحيز بالكامل لضمان الالتصاق
-                    categoryPercentage: 0.8   
+                    barPercentage: 1.0,
+                    categoryPercentage: 0.8
                 }
             ]
         },
@@ -243,19 +284,10 @@
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                x: { 
-                    stacked: false, // ليكونوا جنباً إلى جنب وليس فوق بعض
-                    grid: { display: false },
-                    ticks: { font: { family: 'Cairo', size: 9 } }
-                },
-                y: { 
-                    beginAtZero: true,
-                    ticks: { font: { family: 'Cairo', size: 10 } }
-                }
+                x: { stacked: false, grid: { display: false }, ticks: { font: { family: 'Cairo', size: 9 } } },
+                y: { beginAtZero: true, ticks: { font: { family: 'Cairo', size: 10 } } }
             },
-            plugins: { 
-                legend: { position: 'top', labels: { font: { family: 'Cairo' } } }
-            }
+            plugins: { legend: { position: 'top', labels: { font: { family: 'Cairo' } } } }
         }
     });
 </script>
