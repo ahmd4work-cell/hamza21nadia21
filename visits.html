@@ -18,6 +18,7 @@
         }
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; font-size: 13px; }
 
+        /* Navbar & layout */
         .navbar { 
             background-color: var(--nav-purple-dark); display: flex; align-items: center; padding: 0 20px; 
             margin: 10px; border-radius: 15px; height: 37px; position: sticky; top: 10px; z-index: 1000;
@@ -27,51 +28,56 @@
 
         .container { padding: 0 10px; }
         .action-bar { display: flex; align-items: center; margin: 15px 0; gap: 15px; padding: 0 10px; }
-        .btn-top { border: none; padding: 8px 20px; border-radius: 10px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; }
+        .btn-top { border: none; padding: 8px 20px; border-radius: 10px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; }
         .btn-add { background-color: var(--accent-blue); }
         .btn-save { background-color: var(--accent-green-active); }
 
-        .table-wrapper { background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-soft); margin-bottom: 30px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        /* Table Styles */
+        .table-wrapper { background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-soft); margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        
         th { background: var(--header-purple-mid); color: white; padding: 12px 5px; font-size: 11px; font-weight: 800; text-align: center; }
-        td { border-bottom: 1px solid var(--border-soft); border-left: 1px solid #f1f5f9; text-align: center; height: 45px; padding: 2px; position: relative; }
+        td { border-bottom: 1px solid var(--border-soft); text-align: center; height: 45px; padding: 2px; position: relative; }
         
-        /* تلميح ذكي يظهر محتوى الخانة */
+        /* Inputs & Tooltips */
+        .excel-input { 
+            width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; 
+            background: transparent; font-size: 11.5px; transition: all 0.2s ease;
+        }
+        .excel-input:focus { 
+            background: #ffffff; min-width: 140%; transform: scale(1.1);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1); border-radius: 6px; z-index: 50; position: relative;
+        }
+
         .cell-container:hover .tooltip { opacity: 1; visibility: visible; }
         .tooltip {
             position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
-            background: #334155; color: white; padding: 5px 10px; border-radius: 6px;
-            font-size: 11px; white-space: nowrap; opacity: 0; visibility: hidden;
-            transition: 0.2s; z-index: 2000; pointer-events: none; box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            background: #334155; color: white; padding: 4px 8px; border-radius: 4px;
+            font-size: 10px; opacity: 0; visibility: hidden; z-index: 100; pointer-events: none;
         }
 
-        /* تكبير المربع بقدر الكتابة عند الضغط */
-        .excel-input { 
-            width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; 
-            background: transparent; font-size: 11.5px; color: #334155; transition: all 0.2s ease;
+        /* Notes Modal (النوت) */
+        .modal {
+            display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); align-items: center; justify-content: center;
         }
-        .excel-input:focus { 
-            background: #ffffff; 
-            min-width: 150%; /* يتمدد للخارج */
-            transform: scale(1.1);
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2);
-            border: 1px solid var(--accent-blue);
-            border-radius: 6px;
-            z-index: 1500;
-            position: relative;
-            padding: 5px;
+        .modal-content {
+            background: white; padding: 20px; border-radius: 15px; width: 400px; box-shadow: 0 20px 25px rgba(0,0,0,0.2);
         }
+        .modal-header { font-weight: 800; color: var(--nav-purple-dark); margin-bottom: 10px; border-bottom: 2px solid var(--bg-color); padding-bottom: 5px; }
+        .note-area { 
+            width: 100%; height: 150px; border: 1px solid var(--border-soft); border-radius: 10px; 
+            padding: 10px; font-family: 'Cairo'; resize: none; outline: none; box-sizing: border-box;
+        }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
 
-        .btn-delete { background: none; border: none; color: var(--accent-red); cursor: pointer; font-weight: bold; font-size: 16px; }
-        
-        /* عرض الأعمدة المطلوب */
+        /* Column Widths */
         .col-company { width: 12%; } .col-manager { width: 8%; } .col-mobile { width: 8%; } .col-email { width: 8%; }
         .col-record { width: 8%; } .col-current-service { width: 10%; } .col-proposed-service { width: 10%; }
         .col-status { width: 6%; } .col-date { width: 8%; } .col-notes { width: 10%; }
         .col-edit-date { width: 8%; } .col-action { width: 4%; }
 
-        .readonly-style { color:#94a3b8; font-size:10px; cursor: default; }
+        .readonly-style { color:#94a3b8; font-size:10px; }
+        .notes-trigger { cursor: pointer; color: var(--accent-blue); font-weight: 700; text-decoration: underline; }
     </style>
 </head>
 <body onload="loadSavedData()">
@@ -105,60 +111,89 @@
     </div>
 </div>
 
+<div id="noteModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">📝 إضافة ملاحظة</div>
+        <textarea id="modalTextArea" class="note-area"></textarea>
+        <div class="modal-footer">
+            <button class="btn-top" style="background:#94a3b8" onclick="closeNote()">إلغاء</button>
+            <button class="btn-top btn-save" onclick="saveNote()">حفظ الملاحظة</button>
+        </div>
+    </div>
+</div>
+
 <script>
-    function getToday() { return new Date().toISOString().split('T')[0]; }
+    let currentActiveInput = null;
+
+    function getToday() { return new Date().toLocaleDateString('en-GB'); }
 
     function loadSavedData() {
-        const saved = localStorage.getItem('asgate_visits_v4');
+        const saved = localStorage.getItem('asgate_visits_final');
         if (saved) JSON.parse(saved).forEach(item => renderRow(item));
         else insertNewRow();
     }
 
-    // دالة لتحديث نص التلميح فور الكتابة
-    function updateTooltip(input) {
-        const tooltip = input.parentElement.querySelector('.tooltip');
-        if (tooltip) tooltip.innerText = input.value || "...";
+    function updateTooltip(el) {
+        const tooltip = el.parentElement.querySelector('.tooltip');
+        if (tooltip) tooltip.innerText = el.value || "...";
     }
 
     function renderRow(v = {}) {
         const tbody = document.getElementById('tableBody');
         const row = tbody.insertRow();
         
-        const createCell = (val, type = "text", readonly = false, isSelect = false) => {
+        const createCell = (val, type, readonly, isSelect, isNotes) => {
             let cell = row.insertCell();
             cell.className = "cell-container";
-            
             if (isSelect) {
-                cell.innerHTML = `
-                    <select class="excel-input" onchange="updateTooltip(this)">
-                        <option value="جديد" ${val==='جديد'?'selected':''}>جديد</option>
-                        <option value="مهتم" ${val==='مهتم'?'selected':''}>مهتم</option>
-                        <option value="مغلق" ${val==='مغلق'?'selected':''}>مغلق</option>
-                    </select>
-                    <span class="tooltip">${val || 'جديد'}</span>`;
+                cell.innerHTML = `<select class="excel-input" onchange="updateTooltip(this)"><option value="جديد" ${val==='جديد'?'selected':''}>جديد</option><option value="مهتم" ${val==='مهتم'?'selected':''}>مهتم</option><option value="مغلق" ${val==='مغلق'?'selected':''}>مغلق</option></select><span class="tooltip">${val || 'جديد'}</span>`;
+            } else if (isNotes) {
+                cell.innerHTML = `<input type="text" class="excel-input notes-trigger" value="${val || ''}" readonly onclick="openNote(this)" onmouseover="updateTooltip(this)"><span class="tooltip">${val || 'اضغط لكتابة ملاحظة'}</span>`;
             } else {
-                cell.innerHTML = `
-                    <input type="${type}" class="excel-input ${readonly ? 'readonly-style' : ''}" 
-                           value="${val || ''}" ${readonly ? 'readonly' : ''} 
-                           oninput="updateTooltip(this)" onmouseover="updateTooltip(this)">
-                    <span class="tooltip">${val || '...'}</span>`;
+                cell.innerHTML = `<input type="${type}" class="excel-input ${readonly ? 'readonly-style' : ''}" value="${val || ''}" ${readonly ? 'readonly' : ''} oninput="updateTooltip(this)" onmouseover="updateTooltip(this)"><span class="tooltip">${val || '...'}</span>`;
             }
         };
 
-        createCell(v.comp); createCell(v.mgr); createCell(v.mob); createCell(v.email, "email");
-        createCell(v.record); createCell(v.curServ); createCell(v.propServ);
-        createCell(v.status, "text", false, true);
+        createCell(v.comp, "text"); createCell(v.mgr, "text"); createCell(v.mob, "text"); createCell(v.email, "text");
+        createCell(v.record, "text"); createCell(v.curServ, "text"); createCell(v.propServ, "text");
+        createCell(v.status, "", false, true);
         createCell(v.visitDate || getToday(), "text", true);
-        createCell(v.notes);
+        createCell(v.notes, "text", false, false, true);
         createCell(v.editDate || getToday(), "text", true);
 
-        // خلية الحذف
-        let actionCell = row.insertCell();
-        actionCell.innerHTML = `<button class="btn-delete" onclick="deleteRow(this)">×</button>`;
+        row.insertCell().innerHTML = `<button style="background:none;border:none;color:red;cursor:pointer;font-weight:bold" onclick="this.closest('tr').remove()">×</button>`;
+    }
+
+    // وظائف المودال (النوت)
+    function openNote(inputEl) {
+        currentActiveInput = inputEl;
+        const modal = document.getElementById('noteModal');
+        const textArea = document.getElementById('modalTextArea');
+        
+        // إذا كانت الخانة فارغة، نضع التاريخ فوراً
+        if (!inputEl.value) {
+            textArea.value = `تاريخ: ${getToday()}\n----------------\n`;
+        } else {
+            textArea.value = inputEl.value;
+        }
+        
+        modal.style.display = "flex";
+        textArea.focus();
+    }
+
+    function saveNote() {
+        if (currentActiveInput) {
+            currentActiveInput.value = document.getElementById('modalTextArea').value;
+            updateTooltip(currentActiveInput);
+        }
+        closeNote();
+    }
+
+    function closeNote() {
+        document.getElementById('noteModal').style.display = "none";
     }
 
     function insertNewRow() { renderRow({ status: 'جديد' }); }
-    function deleteRow(btn) { if(confirm('حذف؟')) btn.closest('tr').remove(); }
 
     function saveAllData() {
         const data = [];
@@ -170,9 +205,8 @@
                 status: f[7].value, visitDate: f[8].value, notes: f[9].value, editDate: getToday()
             });
         });
-        localStorage.setItem('asgate_visits_v4', JSON.stringify(data));
-        alert("✅ تم الحفظ");
-        location.reload();
+        localStorage.setItem('asgate_visits_final', JSON.stringify(data));
+        alert("✅ تم حفظ سجلات ASGate");
     }
 </script>
 </body>
