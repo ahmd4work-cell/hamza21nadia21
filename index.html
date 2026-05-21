@@ -6,6 +6,7 @@
     <title>ASGate - لوحة تحكم المبيعات</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <style>
         :root {
             --nav-purple: #2e1065; 
@@ -18,8 +19,11 @@
             --accent-yellow: #facc15;
             --accent-purple: #8b5cf6;
             --accent-orange: #f97316;
+            --accent-red: #ef4444;
             --input-bg: #f8fafc;
         }
+
+        * { box-sizing: border-box; }
 
         body { 
             background-color: var(--bg-color); 
@@ -32,14 +36,14 @@
         .navbar { 
             background-color: var(--nav-purple); display: flex; align-items: center; padding: 0 20px; 
             margin: 10px; border-radius: 15px; height: 37px; position: sticky; top: 10px; z-index: 1000;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); box-sizing: border-box;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         .navbar a { 
             color: white; text-decoration: none; padding: 0 15px; font-weight: 700; 
             font-size: 12px; 
             border-radius: 8px; transition: 0.3s; line-height: 26px; height: 26px; display: inline-block;
         }
-        .navbar a.active { background-color: var(--nav-active); }
+        .navbar a:hover, .navbar a.active { background-color: var(--nav-active); }
 
         .employee-info-bar {
             margin: 10px 20px; height: 35px; background-color: var(--white);
@@ -51,13 +55,12 @@
         .info-item { font-size: 11px; color: var(--nav-purple); font-weight: 700; }
         .info-item span { color: #64748b; font-weight: 400; margin-right: 5px; }
 
-        .container { padding: 5px 20px 20px 20px; }
+        .container { padding: 20px; }
         
-        /* تعديل هنا لضمان تساوي الارتفاع */
         .dashboard-grid { 
             display: flex;
             gap: 20px;
-            align-items: stretch; /* هذا يجعل العناصر متساوية الطول من الأسفل */
+            align-items: stretch;
             width: 100%; 
         }
 
@@ -67,13 +70,11 @@
         .content-box { 
             background: var(--white); padding: 15px; border-radius: 12px; 
             border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
-            height: 100%; /* ليمتد داخل الحاوية */
+            height: 100%;
             display: flex;
             flex-direction: column;
-            box-sizing: border-box;
         }
 
-        /* تعديل خاص لصندوق الرسم البياني ليملأ المساحة المتبقية */
         .chart-box { flex-grow: 1; }
 
         .chart-header {
@@ -81,56 +82,158 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
-        h3 { font-size: 13px; margin: 0; color: var(--nav-purple); font-weight: 800; border-right: 4px solid var(--accent-blue); padding-right: 8px; }
+        h3 { 
+            font-size: 14px; margin: 0; color: var(--nav-purple); font-weight: 800; 
+            border-right: 4px solid var(--accent-blue); padding-right: 8px; 
+        }
 
         .toggle-btn {
-            background-color: var(--nav-purple); color: white; border: none; padding: 4px 12px;
-            border-radius: 20px; font-family: 'Cairo'; font-size: 9px; cursor: pointer; transition: 0.3s;
+            background-color: var(--nav-purple); color: white; border: none; padding: 5px 12px;
+            border-radius: 20px; font-family: 'Cairo'; font-size: 10px; cursor: pointer; transition: 0.3s;
         }
         .toggle-btn:hover { background-color: var(--accent-blue); }
 
-        .yearly-table { 
-            width: 100%; border-collapse: collapse; font-size: 10.5px; table-layout: fixed; 
+        /* جدول المبيعات */
+        .sales-table { 
+            width: 100%; border-collapse: collapse; font-size: 11px; table-layout: auto;
         }
-        .yearly-table th, .yearly-table td { 
-            border: 0.5px solid var(--border-color); padding: 2px; height: 30px; 
-            text-align: center; font-weight: bold; color: #475569;
+        .sales-table th, .sales-table td { 
+            border: 0.5px solid var(--border-color); padding: 8px; height: auto;
+            text-align: center; color: #475569;
         }
-        .yearly-table th { background: #f8fafc; color: var(--nav-purple); font-weight: 800; }
-        .thick-border { border-left: 3px solid var(--nav-purple) !important; }
+        .sales-table th { 
+            background: linear-gradient(135deg, #2e1065 0%, #3b82f6 100%);
+            color: white; font-weight: 800; font-size: 10px;
+        }
+        .sales-table tbody tr { transition: background-color 0.2s; }
+        .sales-table tbody tr:hover { background-color: #f8fafc; }
+        .sales-table td:first-child { font-weight: 700; color: var(--nav-purple); text-align: right; }
+        
+        .progress-bar {
+            width: 100%; background-color: #e2e8f0; border-radius: 10px; height: 20px;
+            overflow: hidden; position: relative;
+        }
+        .progress-fill {
+            height: 100%; border-radius: 10px; display: flex;
+            align-items: center; justify-content: center;
+            font-size: 9px; color: white; font-weight: bold;
+        }
 
-        .filters-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .filter-card { background: white; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 4px; }
-        .filter-card label { font-size: 9px; font-weight: 800; color: var(--nav-purple); }
-        .filter-input { width: 100%; border: none; background: var(--input-bg); font-family: 'Cairo'; font-size: 10px; padding: 4px; border-radius: 6px; outline: none; }
+        .filters-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
+        .filter-card { background: white; padding: 10px; border-radius: 12px; border: 1px solid var(--border-color); }
+        .filter-card label { font-size: 10px; font-weight: 800; color: var(--nav-purple); display: block; margin-bottom: 5px; }
+        .filter-input { width: 100%; border: 1px solid var(--border-color); background: var(--input-bg); font-family: 'Cairo'; font-size: 11px; padding: 6px; border-radius: 6px; outline: none; }
+        .filter-input:focus { border-color: var(--accent-blue); background: white; }
 
-        .stats-cards { display: flex; gap: 8px; width: 100%; align-items: center; }
+        .stats-cards { display: flex; gap: 8px; width: 100%; align-items: center; flex-wrap: wrap; }
         .stat-card { 
-            flex: 1; height: 52px; padding: 5px 12px; border-radius: 10px; color: white; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; min-width: 0; box-sizing: border-box;
+            flex: 1; min-width: 120px; height: 70px; padding: 10px; border-radius: 10px; 
+            color: white; display: flex; flex-direction: column; justify-content: center; 
+            align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: transform 0.3s;
         }
-        .stat-card-small { flex: 0.6; }
-        .stat-spacer { flex: 0.2; }
-        .stat-card-row { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 5px; }
-        .stat-card .label-text { font-size: 10px; font-weight: bold; opacity: 0.9; white-space: nowrap; }
-        .stat-card .value-text { font-size: 13.5px; font-weight: 800; }
+        .stat-card:hover { transform: translateY(-2px); }
+        .stat-card .label-text { font-size: 10px; font-weight: 600; opacity: 0.9; }
+        .stat-card .value-text { font-size: 18px; font-weight: 800; margin-top: 3px; }
+        .stat-card .sub-text { font-size: 9px; opacity: 0.8; margin-top: 2px; }
 
-        .bg-blue { background-color: var(--accent-blue); }
-        .bg-green { background-color: var(--accent-green); }
-        .bg-yellow { background-color: var(--accent-yellow); color: #854d0e; }
-        .bg-purple { background-color: var(--accent-purple); }
-        .bg-orange { background-color: var(--accent-orange); }
+        .bg-blue { background: linear-gradient(135deg, var(--accent-blue) 0%, #1e40af 100%); }
+        .bg-green { background: linear-gradient(135deg, var(--accent-green) 0%, #15803d 100%); }
+        .bg-yellow { background: linear-gradient(135deg, var(--accent-yellow) 0%, #f59e0b 100%); color: #854d0e; }
+        .bg-purple { background: linear-gradient(135deg, var(--accent-purple) 0%, #6d28d9 100%); }
+        .bg-orange { background: linear-gradient(135deg, var(--accent-orange) 0%, #c2410c 100%); }
+        .bg-red { background: linear-gradient(135deg, var(--accent-red) 0%, #991b1b 100%); }
 
-        .chart-wrapper { flex-grow: 1; position: relative; min-height: 250px; }
+        .chart-wrapper { flex-grow: 1; position: relative; min-height: 280px; }
+
+        /* بطاقات الموظفين */
+        .employee-card {
+            background: white; border: 1px solid var(--border-color); border-radius: 12px;
+            padding: 12px; margin-bottom: 10px; transition: all 0.3s;
+            cursor: pointer;
+        }
+        .employee-card:hover {
+            box-shadow: 0 4px 12px rgba(46, 16, 101, 0.15);
+            border-color: var(--accent-blue);
+        }
+        .employee-card-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px;
+        }
+        .employee-name {
+            font-weight: 800; color: var(--nav-purple); font-size: 12px;
+        }
+        .employee-id {
+            font-size: 9px; color: #64748b;
+        }
+        .employee-stats {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;
+            font-size: 10px;
+        }
+        .employee-stat {
+            background: #f8fafc; padding: 6px; border-radius: 6px; text-align: center;
+        }
+        .employee-stat-value {
+            font-weight: 800; color: var(--nav-purple);
+        }
+        .employee-stat-label {
+            color: #64748b; font-size: 9px;
+        }
+
+        /* شريط البحث المتقدم */
+        .advanced-search {
+            background: white; border: 1px solid var(--border-color); border-radius: 12px;
+            padding: 12px; margin-bottom: 15px;
+        }
+        .search-input-group {
+            display: flex; gap: 8px; align-items: center;
+        }
+        .search-input-group input {
+            flex: 1; padding: 8px; border: 1px solid var(--border-color);
+            border-radius: 6px; font-family: 'Cairo'; font-size: 11px;
+        }
+        .search-btn {
+            background-color: var(--accent-blue); color: white; border: none;
+            padding: 8px 16px; border-radius: 6px; cursor: pointer; font-family: 'Cairo';
+            font-size: 11px; font-weight: 700;
+        }
+        .search-btn:hover { background-color: #1e40af; }
+
+        .tabs-container {
+            display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 2px solid var(--border-color);
+        }
+        .tab-btn {
+            background: none; border: none; padding: 10px 15px;
+            font-family: 'Cairo'; font-size: 12px; font-weight: 700;
+            color: #64748b; cursor: pointer; position: relative;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab-btn.active {
+            color: var(--nav-purple);
+            border-bottom-color: var(--accent-blue);
+        }
+        .tab-btn:hover {
+            color: var(--nav-purple);
+        }
 
         @media (max-width: 1100px) {
             .dashboard-grid { flex-direction: column; }
+            .filters-grid { grid-template-columns: repeat(2, 1fr); }
             .stats-cards { flex-wrap: wrap; }
-            .stat-card { flex: 1 1 45%; }
-            .stat-card-small { flex: 1 1 45%; }
-            .stat-spacer { display: none; }
+            .stat-card { flex: 1 1 calc(50% - 4px); }
+        }
+
+        @media (max-width: 768px) {
+            .filters-grid { grid-template-columns: 1fr; }
+            .right-section { flex: 100%; }
+            .left-section { flex: 100%; }
+            .info-content { flex-direction: column; gap: 10px; }
+            .sales-table { font-size: 9px; }
+            .sales-table th, .sales-table td { padding: 5px; }
         }
     </style>
 </head>
@@ -154,106 +257,552 @@
 </div>
 
 <div class="container">
-    <div class="dashboard-grid">
-        <div class="right-section">
-            <div class="content-box">
-                <h3>📅 سجل الأهداف والزيارات (2026)</h3>
-                <table class="yearly-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 22%;">الشهر</th>
-                            <th>هدف</th>
-                            <th>تم</th>
-                            <th class="thick-border">معلق</th>
-                            <th style="background:#eff6ff">زيارة</th>
-                            <th style="background:#f0fdf4">ناجحة</th>
-                        </tr>
-                    </thead>
-                    <tbody id="monthsBody"></tbody>
-                </table>
+    <div class="advanced-search">
+        <div class="search-input-group">
+            <input type="text" id="searchInput" placeholder="🔍 ابحث عن موظف أو منطقة...">
+            <button class="search-btn" onclick="performSearch()">بحث</button>
+            <button class="search-btn" onclick="resetSearch()" style="background-color: #64748b;">إعادة تعيين</button>
+        </div>
+    </div>
+
+    <div class="tabs-container">
+        <button class="tab-btn active" onclick="switchTab('sales-by-employees')">أداء الموظفين</button>
+        <button class="tab-btn" onclick="switchTab('sales-by-months')">أداء الشهور</button>
+        <button class="tab-btn" onclick="switchTab('comparison')">المقارنة</button>
+    </div>
+
+    <!-- تبويب أداء الموظفين -->
+    <div id="sales-by-employees" class="tab-content">
+        <div class="dashboard-grid">
+            <div class="right-section">
+                <div class="content-box">
+                    <h3>📊 ترتيب الموظفين حسب الأداء</h3>
+                    <div id="employeesList"></div>
+                </div>
+            </div>
+
+            <div class="left-section">
+                <div class="filters-grid">
+                    <div class="filter-card">
+                        <label>القسم</label>
+                        <select class="filter-input" id="departmentFilter" onchange="updateCharts()">
+                            <option>الكل</option>
+                            <option>المبيعات المباشرة</option>
+                            <option>المندوبين</option>
+                            <option>الشركاء</option>
+                        </select>
+                    </div>
+                    <div class="filter-card">
+                        <label>المنطقة</label>
+                        <select class="filter-input" id="regionFilter" onchange="updateCharts()">
+                            <option>الكل</option>
+                            <option>الرياض</option>
+                            <option>جدة</option>
+                            <option>الدمام</option>
+                        </select>
+                    </div>
+                    <div class="filter-card">
+                        <label>الفترة</label>
+                        <select class="filter-input" id="periodFilter" onchange="updateCharts()">
+                            <option>هذا الشهر</option>
+                            <option>آخر 3 أشهر</option>
+                            <option>آخر 6 أشهر</option>
+                            <option>السنة كاملة</option>
+                        </select>
+                    </div>
+                    <div class="filter-card">
+                        <label>ترتيب حسب</label>
+                        <select class="filter-input" id="sortFilter" onchange="updateCharts()">
+                            <option>المبيعات</option>
+                            <option>الهدف المحقق</option>
+                            <option>الزيارات</option>
+                            <option>معدل النجاح</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="stats-cards">
+                    <div class="stat-card bg-blue">
+                        <div class="label-text">أفضل موظف</div>
+                        <div class="value-text" id="topEmployeeValue">0</div>
+                        <div class="sub-text" id="topEmployeeName">-</div>
+                    </div>
+                    <div class="stat-card bg-green">
+                        <div class="label-text">إجمالي المبيعات</div>
+                        <div class="value-text" id="totalSalesValue">0</div>
+                        <div class="sub-text">ريال</div>
+                    </div>
+                    <div class="stat-card bg-purple">
+                        <div class="label-text">متوسط الأداء</div>
+                        <div class="value-text" id="avgPerformanceValue">0%</div>
+                        <div class="sub-text">من الهدف</div>
+                    </div>
+                    <div class="stat-card bg-orange">
+                        <div class="label-text">عدد الموظفين</div>
+                        <div class="value-text" id="employeeCountValue">0</div>
+                        <div class="sub-text">موظف نشط</div>
+                    </div>
+                </div>
+
+                <div class="content-box chart-box">
+                    <div class="chart-header">
+                        <h3>📈 مقارنة الأداء</h3>
+                        <button class="toggle-btn" onclick="toggleEmployeeChartType()">تبديل العرض</button>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="employeeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- تبويب أداء الشهور -->
+    <div id="sales-by-months" class="tab-content" style="display: none;">
+        <div class="content-box">
+            <h3>📅 جدول أداء الشهور والأهداف</h3>
+            <table class="sales-table">
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">الشهر</th>
+                        <th style="width: 12%;">الهدف</th>
+                        <th style="width: 12%;">المحقق</th>
+                        <th style="width: 12%;">المعلق</th>
+                        <th style="width: 15%;">النسبة</th>
+                        <th style="width: 12%;">الزيارات</th>
+                        <th style="width: 12%;">ناجحة</th>
+                        <th style="width: 10%;">الحالة</th>
+                    </tr>
+                </thead>
+                <tbody id="monthsTable"></tbody>
+            </table>
+        </div>
+
+        <div class="stats-cards" style="margin-top: 15px;">
+            <div class="stat-card bg-blue">
+                <div class="label-text">إجمالي الهدف</div>
+                <div class="value-text">180,000</div>
+                <div class="sub-text">ريال</div>
+            </div>
+            <div class="stat-card bg-green">
+                <div class="label-text">الإجمالي المحقق</div>
+                <div class="value-text" id="monthlyTotal">0</div>
+                <div class="sub-text">ريال</div>
+            </div>
+            <div class="stat-card bg-yellow" style="color: #854d0e;">
+                <div class="label-text">الإجمالي المعلق</div>
+                <div class="value-text" id="monthlyPending">0</div>
+                <div class="sub-text">ريال</div>
+            </div>
+            <div class="stat-card bg-purple">
+                <div class="label-text">نسبة التحقق</div>
+                <div class="value-text" id="monthlyPercentage">0%</div>
+                <div class="sub-text">من الهدف</div>
             </div>
         </div>
 
-        <div class="left-section">
-            <div class="filters-grid">
-                <div class="filter-card">
-                    <label>الشهر</label>
-                    <select class="filter-input">
-                        <option>الكل</option>
-                        <option>يناير</option><option>فبراير</option><option>مارس</option>
-                    </select>
-                </div>
-                <div class="filter-card"><label>المنطقة</label><select class="filter-input"><option>الكل</option></select></div>
-                <div class="filter-card"><label>المشرف</label><select class="filter-input"><option>الكل</option></select></div>
-                <div class="filter-card"><label>المندوب</label><select class="filter-input"><option>الكل</option></select></div>
+        <div class="content-box" style="margin-top: 15px; min-height: 300px;">
+            <div class="chart-header">
+                <h3>📊 تحليل الأداء الشهري</h3>
+                <button class="toggle-btn" onclick="toggleMonthlyChartType()">تبديل العرض</button>
             </div>
-            
-            <div class="stats-cards">
-                <div class="stat-card bg-blue"><div class="stat-card-row"><div class="label-text">الهدف السنوي</div><div class="value-text">180,000</div></div></div>
-                <div class="stat-card bg-green"><div class="stat-card-row"><div class="label-text">المبيعات</div><div class="value-text">14,210</div></div></div>
-                <div class="stat-card bg-yellow"><div class="stat-card-row"><div class="label-text">المعلق</div><div class="value-text">790</div></div></div>
-                <div class="stat-spacer"></div>
-                <div class="stat-card bg-purple stat-card-small"><div class="stat-card-row"><div class="label-text">الزيارات</div><div class="value-text">45</div></div></div>
-                <div class="stat-card bg-orange stat-card-small"><div class="stat-card-row"><div class="label-text">ناجحة</div><div class="value-text">12</div></div></div>
+            <div class="chart-wrapper">
+                <canvas id="monthlyChart"></canvas>
             </div>
+        </div>
+    </div>
 
-            <div class="content-box chart-box">
-                <div class="chart-header">
-                    <h3>📈 تحليل الأداء</h3>
-                    <button class="toggle-btn" onclick="toggleChartType()">تبديل العرض</button>
-                </div>
-                <div class="chart-wrapper">
-                    <canvas id="performanceChart"></canvas>
-                </div>
+    <!-- تبويب المقارنة -->
+    <div id="comparison" class="tab-content" style="display: none;">
+        <div class="stats-cards">
+            <div class="stat-card bg-blue">
+                <div class="label-text">أفضل شهر</div>
+                <div class="value-text">يناير</div>
+                <div class="sub-text">14,210 ريال</div>
+            </div>
+            <div class="stat-card bg-red">
+                <div class="label-text">أقل شهر</div>
+                <div class="value-text">-</div>
+                <div class="sub-text">قيد الانتظار</div>
+            </div>
+            <div class="stat-card bg-green">
+                <div class="label-text">المتوسط الشهري</div>
+                <div class="value-text">14,210</div>
+                <div class="sub-text">ريال</div>
+            </div>
+            <div class="stat-card bg-purple">
+                <div class="label-text">نسبة النمو</div>
+                <div class="value-text">+15%</div>
+                <div class="sub-text">توقع بنهاية العام</div>
+            </div>
+        </div>
+
+        <div class="content-box" style="margin-top: 15px; min-height: 400px;">
+            <div class="chart-header">
+                <h3>🔍 مقارنة شاملة الأداء</h3>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="comparisonChart"></canvas>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    const months = ["يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
-    const tbody = document.getElementById('monthsBody');
-    
-    months.forEach((m, i) => {
-        const row = tbody.insertRow();
-        row.innerHTML = `
-            <td>${m}</td>
-            <td>15k</td>
-            <td>${i===0?'14.2k':'-'}</td>
-            <td class="thick-border">${i===0?'790':'-'}</td>
-            <td style="color:#3b82f6">${i===0?'45':'-'}</td>
-            <td style="color:#22c55e">${i===0?'12':'-'}</td>
-        `;
-    });
+    // بيانات الموظفين
+    const employeesData = [
+        { id: 1, name: 'محمد المنصور', department: 'المبيعات المباشرة', region: 'الرياض', target: 15000, achieved: 14210, visits: 45, successful: 12 },
+        { id: 2, name: 'فاطمة الغامدي', department: 'المندوبين', region: 'جدة', target: 12000, achieved: 11800, visits: 38, successful: 10 },
+        { id: 3, name: 'عمر السعيد', department: 'الشركاء', region: 'الدمام', target: 13000, achieved: 9500, visits: 32, successful: 8 },
+        { id: 4, name: 'هند الأحمري', department: 'المبيعات المباشرة', region: 'الرياض', target: 14000, achieved: 13200, visits: 42, successful: 11 },
+        { id: 5, name: 'سارة المطيري', department: 'المندوبين', region: 'جدة', target: 11000, achieved: 10500, visits: 35, successful: 9 },
+    ];
 
-    let myChart = null;
-    let currentChartType = 'bar';
+    // بيانات الشهور
+    const monthsData = [
+        { month: 'يناير', target: 15000, achieved: 14210, pending: 790, visits: 45, successful: 12 },
+        { month: 'فبراير', target: 15000, achieved: 0, pending: 0, visits: 0, successful: 0 },
+        { month: 'مارس', target: 15000, achieved: 0, pending: 0, visits: 0, successful: 0 },
+        { month: 'ابريل', target: 15000, achieved: 0, pending: 0, visits: 0, successful: 0 },
+        { month: 'مايو', target: 15000, achieved: 0, pending: 0, visits: 0, successful: 0 },
+        { month: 'يونيو', target: 15000, achieved: 0, pending: 0, visits: 0, successful: 0 },
+        { month: 'يوليو', target: 15000, achieved: 0, pending: 0, visits: 0, successful: 0 },
+        { month: 'أغسطس', target: 15000, achieved: 0, pending: 0, visits: 0, successful: 0 },
+        { month: 'سبتمبر', target: 15000, achieved: 0, pending: 0, visits: 0, successful: 0 },
+        { month: 'أكتوبر', target: 15000, achieved: 0, pending: 0, visits: 0, successful: 0 },
+        { month: 'نوفمبر', target: 15000, achieved: 0, pending: 0, visits: 0, successful: 0 },
+        { month: 'ديسمبر', target: 15000, achieved: 0, pending: 0, visits: 0, successful: 0 },
+    ];
 
-    function initChart(type) {
-        const ctx = document.getElementById('performanceChart').getContext('2d');
-        if (myChart) myChart.destroy();
-        myChart = new Chart(ctx, {
-            type: type,
+    let employeeChart = null;
+    let monthlyChart = null;
+    let comparisonChart = null;
+    let currentEmployeeChartType = 'bar';
+    let currentMonthlyChartType = 'line';
+
+    // الدالة لتحميل بيانات الموظفين
+    function loadEmployeesList() {
+        const container = document.getElementById('employeesList');
+        container.innerHTML = '';
+        
+        employeesData.forEach(emp => {
+            const percentage = (emp.achieved / emp.target * 100).toFixed(1);
+            const progressColor = percentage >= 100 ? 'var(--accent-green)' : percentage >= 80 ? 'var(--accent-yellow)' : 'var(--accent-red)';
+            
+            const card = document.createElement('div');
+            card.className = 'employee-card';
+            card.innerHTML = `
+                <div class="employee-card-header">
+                    <div>
+                        <div class="employee-name">${emp.name}</div>
+                        <div class="employee-id">${emp.department} • ${emp.region}</div>
+                    </div>
+                    <div style="font-size: 12px; font-weight: 800; color: ${progressColor};">${percentage}%</div>
+                </div>
+                <div style="margin-bottom: 8px;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${Math.min(percentage, 100)}%; background: ${progressColor};">
+                            ${Math.min(percentage, 100).toFixed(0)}%
+                        </div>
+                    </div>
+                </div>
+                <div class="employee-stats">
+                    <div class="employee-stat">
+                        <div class="employee-stat-value">${emp.achieved.toLocaleString()}</div>
+                        <div class="employee-stat-label">المحقق</div>
+                    </div>
+                    <div class="employee-stat">
+                        <div class="employee-stat-value">${emp.visits}</div>
+                        <div class="employee-stat-label">زيارات</div>
+                    </div>
+                    <div class="employee-stat">
+                        <div class="employee-stat-value">${emp.successful}</div>
+                        <div class="employee-stat-label">ناجحة</div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+        updateStats();
+    }
+
+    // تحديث الإحصائيات
+    function updateStats() {
+        const totalSales = employeesData.reduce((sum, e) => sum + e.achieved, 0);
+        const avgPerformance = (employeesData.reduce((sum, e) => sum + (e.achieved / e.target * 100), 0) / employeesData.length).toFixed(0);
+        const topEmployee = employeesData.reduce((max, e) => e.achieved > max.achieved ? e : max);
+
+        document.getElementById('topEmployeeValue').textContent = topEmployee.achieved.toLocaleString();
+        document.getElementById('topEmployeeName').textContent = topEmployee.name;
+        document.getElementById('totalSalesValue').textContent = totalSales.toLocaleString();
+        document.getElementById('avgPerformanceValue').textContent = avgPerformance + '%';
+        document.getElementById('employeeCountValue').textContent = employeesData.length;
+    }
+
+    // تحديث رسوم بيانية الموظفين
+    function initEmployeeChart() {
+        const ctx = document.getElementById('employeeChart');
+        if (!ctx) return;
+        
+        if (employeeChart) employeeChart.destroy();
+
+        const names = employeesData.map(e => e.name);
+        const achieved = employeesData.map(e => e.achieved);
+        const target = employeesData.map(e => e.target);
+
+        employeeChart = new Chart(ctx, {
+            type: currentEmployeeChartType,
             data: {
-                labels: months,
+                labels: names,
                 datasets: [
-                    { label: 'المكتمل', data: [14210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], backgroundColor: '#22c55e' },
-                    { label: 'المعلق', data: [790, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], backgroundColor: '#facc15' }
+                    {
+                        label: 'المحقق',
+                        data: achieved,
+                        backgroundColor: '#22c55e',
+                        borderColor: '#15803d',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'الهدف',
+                        data: target,
+                        backgroundColor: '#3b82f6',
+                        borderColor: '#1e40af',
+                        borderWidth: 1
+                    }
                 ]
             },
-            options: { 
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { position: 'top', labels: { font: { family: 'Cairo', size: 10 } } } }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: currentEmployeeChartType === 'bar' ? 'y' : undefined,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { font: { family: 'Cairo', size: 11 } }
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true },
+                    x: { beginAtZero: true }
+                }
             }
         });
     }
 
-    function toggleChartType() {
-        currentChartType = currentChartType === 'bar' ? 'pie' : 'bar';
-        initChart(currentChartType);
+    // تحديث رسوم بيانية الشهور
+    function initMonthlyChart() {
+        const ctx = document.getElementById('monthlyChart');
+        if (!ctx) return;
+        
+        if (monthlyChart) monthlyChart.destroy();
+
+        const months = monthsData.map(m => m.month);
+        const achieved = monthsData.map(m => m.achieved);
+        const target = monthsData.map(m => m.target);
+        const pending = monthsData.map(m => m.pending);
+
+        monthlyChart = new Chart(ctx, {
+            type: currentMonthlyChartType,
+            data: {
+                labels: months,
+                datasets: [
+                    {
+                        label: 'الهدف',
+                        data: target,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'المحقق',
+                        data: achieved,
+                        borderColor: '#22c55e',
+                        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'المعلق',
+                        data: pending,
+                        borderColor: '#facc15',
+                        backgroundColor: 'rgba(250, 204, 21, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { font: { family: 'Cairo', size: 11 } }
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        // تحديث إحصائيات الشهور
+        const totalAchieved = monthsData.reduce((sum, m) => sum + m.achieved, 0);
+        const totalPending = monthsData.reduce((sum, m) => sum + m.pending, 0);
+        const totalTarget = monthsData.reduce((sum, m) => sum + m.target, 0);
+        const percentage = (totalAchieved / totalTarget * 100).toFixed(1);
+
+        document.getElementById('monthlyTotal').textContent = totalAchieved.toLocaleString();
+        document.getElementById('monthlyPending').textContent = totalPending.toLocaleString();
+        document.getElementById('monthlyPercentage').textContent = percentage + '%';
     }
 
-    initChart(currentChartType);
+    // تحديث جدول الشهور
+    function loadMonthsTable() {
+        const tbody = document.getElementById('monthsTable');
+        tbody.innerHTML = '';
+        
+        monthsData.forEach(m => {
+            const percentage = m.target > 0 ? (m.achieved / m.target * 100).toFixed(1) : 0;
+            const status = percentage >= 100 ? '✅ متجاوز' : percentage >= 80 ? '📊 جيد' : percentage > 0 ? '⚠️ متأخر' : '⏳ لم يبدأ';
+            const statusColor = percentage >= 100 ? '#22c55e' : percentage >= 80 ? '#facc15' : percentage > 0 ? '#ef4444' : '#cbd5e1';
+            
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td>${m.month}</td>
+                <td>${m.target.toLocaleString()}</td>
+                <td>${m.achieved.toLocaleString()}</td>
+                <td>${m.pending.toLocaleString()}</td>
+                <td><div class="progress-bar"><div class="progress-fill" style="width: ${Math.min(percentage, 100)}%; background: ${statusColor};">${percentage}%</div></div></td>
+                <td>${m.visits}</td>
+                <td>${m.successful}</td>
+                <td style="color: ${statusColor}; font-weight: 700; font-size: 11px;">${status}</td>
+            `;
+        });
+    }
+
+    // تبديل التبويبات
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
+        document.getElementById(tabName).style.display = 'block';
+        
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        setTimeout(() => {
+            if (tabName === 'sales-by-employees') initEmployeeChart();
+            if (tabName === 'sales-by-months') initMonthlyChart();
+            if (tabName === 'comparison') initComparisonChart();
+        }, 100);
+    }
+
+    // تبديل نوع الرسم البياني للموظفين
+    function toggleEmployeeChartType() {
+        currentEmployeeChartType = currentEmployeeChartType === 'bar' ? 'line' : 'bar';
+        initEmployeeChart();
+    }
+
+    // تبديل نوع الرسم البياني للشهور
+    function toggleMonthlyChartType() {
+        currentMonthlyChartType = currentMonthlyChartType === 'line' ? 'bar' : 'line';
+        initMonthlyChart();
+    }
+
+    // رسم بياني المقارنة
+    function initComparisonChart() {
+        const ctx = document.getElementById('comparisonChart');
+        if (!ctx) return;
+        
+        if (comparisonChart) comparisonChart.destroy();
+
+        const months = monthsData.map(m => m.month);
+        const achieved = monthsData.map(m => m.achieved);
+        const visits = monthsData.map(m => m.visits * 1000);
+
+        comparisonChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [
+                    {
+                        label: 'المبيعات (ريال)',
+                        data: achieved,
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'الزيارات',
+                        data: visits,
+                        borderColor: '#f97316',
+                        backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { font: { family: 'Cairo', size: 11 } }
+                    }
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right'
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left'
+                    }
+                }
+            }
+        });
+    }
+
+    // دوال البحث
+    function performSearch() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        // يمكن إضافة منطق البحث هنا
+        console.log('البحث عن:', searchTerm);
+    }
+
+    function resetSearch() {
+        document.getElementById('searchInput').value = '';
+        loadEmployeesList();
+    }
+
+    function updateCharts() {
+        loadEmployeesList();
+        initEmployeeChart();
+    }
+
+    // تحميل البيانات عند تحميل الصفحة
+    window.addEventListener('load', () => {
+        loadEmployeesList();
+        loadMonthsTable();
+        setTimeout(() => {
+            initEmployeeChart();
+            initMonthlyChart();
+        }, 100);
+    });
 </script>
 
 </body>
