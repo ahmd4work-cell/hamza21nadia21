@@ -39,21 +39,24 @@
         
         .excel-input { width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; font-size: 11.5px; }
 
-        /* Tooltip */
-        .notes-cell { position: relative; }
+        /* Tooltip Generic System */
+        .custom-tooltip-cell { position: relative; }
+        .tooltip-box {
+            position: absolute; top: 100%; right: 0; background: #334155; color: #fff;
+            padding: 8px 12px; border-radius: 8px; width: 200px; font-size: 11px;
+            line-height: 1.6; white-space: pre-wrap; text-align: right;
+            opacity: 0; visibility: hidden; transition: 0.2s; z-index: 9999;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            pointer-events: none; /* لمنع تداخل المربع مع الماوس */
+        }
+        .custom-tooltip-cell:hover .tooltip-box { opacity: 1; visibility: visible; }
+
+        /* Notes Specific */
         .notes-preview {
             width: 95%; border: none; background: transparent; font-family: 'Cairo'; font-size: 11px;
             text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700;
             overflow: hidden; white-space: nowrap; text-overflow: ellipsis; display: block; margin: 0 auto;
         }
-        .notes-tooltip {
-            position: absolute; top: 100%; right: 0; background: #334155; color: #fff;
-            padding: 10px; border-radius: 8px; width: 260px; font-size: 11px;
-            line-height: 1.8; white-space: pre-wrap; text-align: right;
-            opacity: 0; visibility: hidden; transition: 0.2s; z-index: 9999;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-        .notes-cell:hover .notes-tooltip { opacity: 1; visibility: visible; }
 
         /* Modal */
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; }
@@ -115,7 +118,7 @@
 
 <div id="noteModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header">سجل المتابعة (الأحدث في الأسفل)</div>
+        <div class="modal-header">سجل المتابعة</div>
         <div id="historyLog" class="history-log"></div>
         <textarea id="modalTextArea" class="note-area" placeholder="أدخل الملاحظة الجديدة هنا..."></textarea>
         <div class="modal-footer">
@@ -141,6 +144,12 @@
         return lines.length > 0 ? lines[lines.length - 1] : 'لا توجد ملاحظات';
     }
 
+    // تحديث التلميح عند الكتابة في الخانات العادية
+    function updateTooltip(input) {
+        const tooltip = input.parentElement.querySelector('.tooltip-box');
+        if (tooltip) tooltip.innerText = input.value;
+    }
+
     function openNote(el) {
         currentActivePreview = el;
         const log = document.getElementById('historyLog');
@@ -159,17 +168,15 @@
             const today = getFullDate();
             let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
             let updatedNotes = "";
-
             if (oldNotes.includes(today)) {
                 updatedNotes = oldNotes + "\n" + newText;
             } else {
                 const separator = oldNotes ? "\n--------------------\n" : "";
                 updatedNotes = oldNotes + separator + today + "\n" + newText;
             }
-
             currentActivePreview.setAttribute('data-full-notes', updatedNotes);
             currentActivePreview.innerText = getLastNoteOnly(updatedNotes);
-            currentActivePreview.parentElement.querySelector('.notes-tooltip').innerText = updatedNotes;
+            currentActivePreview.parentElement.querySelector('.tooltip-box').innerText = updatedNotes;
         }
         closeNote();
     }
@@ -187,8 +194,17 @@
             <td><input type="text" class="excel-input" value="${v.mob || ''}"></td>
             <td><input type="text" class="excel-input" value="${v.email || ''}"></td>
             <td><input type="text" class="excel-input" value="${v.record || ''}"></td>
-            <td><input type="text" class="excel-input" value="${v.curServ || ''}"></td>
-            <td><input type="text" class="excel-input" value="${v.propServ || ''}"></td>
+            
+            <td class="custom-tooltip-cell">
+                <input type="text" class="excel-input" value="${v.curServ || ''}" oninput="updateTooltip(this)">
+                <div class="tooltip-box">${v.curServ || ''}</div>
+            </td>
+            
+            <td class="custom-tooltip-cell">
+                <input type="text" class="excel-input" value="${v.propServ || ''}" oninput="updateTooltip(this)">
+                <div class="tooltip-box">${v.propServ || ''}</div>
+            </td>
+            
             <td>
                 <select class="excel-input">
                     <option value="جديد" ${v.status==='جديد'?'selected':''}>جديد</option>
@@ -197,10 +213,12 @@
                 </select>
             </td>
             <td><input type="text" class="excel-input" value="${v.visitDate || today}" readonly></td>
-            <td class="notes-cell">
+            
+            <td class="custom-tooltip-cell">
                 <div class="notes-preview" onclick="openNote(this)" data-full-notes="${v.notes || ''}">${getLastNoteOnly(v.notes)}</div>
-                <div class="notes-tooltip">${v.notes || 'لا توجد ملاحظات'}</div>
+                <div class="tooltip-box">${v.notes || 'لا توجد ملاحظات'}</div>
             </td>
+            
             <td><input type="text" class="excel-input" value="${v.editDate || today}" readonly></td>
             <td><button style="background:none;border:none;color:red;cursor:pointer;font-weight:bold" onclick="this.closest('tr').remove()">×</button></td>
         `;
@@ -220,12 +238,12 @@
                 status: inputs[7].value, visitDate: inputs[8].value, notes: noteDiv.getAttribute('data-full-notes'), editDate: today
             });
         });
-        localStorage.setItem('asgate_visits_v18_final', JSON.stringify(data));
+        localStorage.setItem('asgate_visits_final_v18', JSON.stringify(data));
         alert("تم الحفظ بنجاح!");
     }
 
     function loadSavedData() {
-        const saved = localStorage.getItem('asgate_visits_v18_final');
+        const saved = localStorage.getItem('asgate_visits_final_v18');
         const tableBody = document.getElementById('tableBody');
         tableBody.innerHTML = '';
         if (saved) JSON.parse(saved).forEach(item => renderRow(item));
