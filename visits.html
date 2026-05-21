@@ -32,7 +32,7 @@
         .btn-save { background-color: var(--accent-green-active); padding: 8px 12px; font-size: 11px; }
 
         /* Table */
-        .table-wrapper { background: white; border-radius: 12px; overflow: visible; border: 1px solid var(--border-soft); margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .table-wrapper { background: white; border-radius: 12px; border: 1px solid var(--border-soft); margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         th { background: var(--header-purple-mid); color: white; padding: 12px 5px; font-size: 11px; font-weight: 800; text-align: center; position: relative; z-index: 10; }
         td { border-bottom: 1px solid var(--border-soft); text-align: center; height: 45px; padding: 2px; position: relative; }
@@ -44,7 +44,7 @@
         .notes-preview {
             width: 95%; border: none; background: transparent; font-family: 'Cairo'; font-size: 11px;
             text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700;
-            overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+            overflow: hidden; white-space: nowrap; text-overflow: ellipsis; display: block; margin: 0 auto;
         }
         .notes-tooltip {
             position: absolute; top: 100%; right: 0; background: #334155; color: #fff;
@@ -59,28 +59,14 @@
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; }
         .modal-content { 
             background: white; padding: 15px; border-radius: 10px; 
-            width: 380px; height: 420px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+            width: 380px; height: 440px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
         }
         .modal-header { font-weight: 800; color: #2e1065; margin-bottom: 10px; font-size: 14px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
         
         .history-log {
             flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft);
             border-radius: 6px; padding: 12px; margin-bottom: 10px; font-size: 12px; color: #1e293b;
-            text-align: right; line-height: 1.8;
-        }
-
-        /* تنسيق التاريخ المظلل */
-        .date-header {
-            background-color: #ede9fe;
-            color: #5b21b6;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-weight: 800;
-            display: inline-block;
-            margin-top: 8px;
-            margin-bottom: 4px;
-            border-right: 3px solid var(--header-purple-mid);
-            font-size: 11px;
+            text-align: right; line-height: 1.8; white-space: pre-wrap;
         }
 
         .note-area { 
@@ -109,7 +95,7 @@
 <div class="container">
     <div class="action-bar">
         <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة زيارة</button>
-        <button class="btn-top btn-save" onclick="saveAllData()">حفظ</button>
+        <button class="btn-top btn-save" onclick="saveAllData()">حفظ البيانات</button>
     </div>
     
     <div class="table-wrapper">
@@ -129,85 +115,36 @@
 
 <div id="noteModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header">سجل المتابعة</div>
+        <div class="modal-header">سجل المتابعة (الأحدث في الأسفل)</div>
         <div id="historyLog" class="history-log"></div>
         <textarea id="modalTextArea" class="note-area" placeholder="أدخل الملاحظة الجديدة هنا..."></textarea>
         <div class="modal-footer">
             <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:Cairo;">إلغاء</button>
-            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:Cairo;">إضافة</button>
+            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:Cairo;">إضافة ملاحظة</button>
         </div>
     </div>
 </div>
 
 <script>
-    let currentActiveInput = null;
+    let currentActivePreview = null;
 
     function getFullDate() {
         const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
         const d = new Date();
-        return days[d.getDay()] + ' ' + d.getDate().toString().padStart(2, '0') + '-' + (d.getMonth() + 1).toString().padStart(2, '0') + '-' + d.getFullYear();
+        const dateStr = d.getDate().toString().padStart(2, '0') + '-' + (d.getMonth() + 1).toString().padStart(2, '0') + '-' + d.getFullYear();
+        return "🗓️ " + days[d.getDay()] + " " + dateStr;
     }
 
-    function getLastNotePreview(html) {
-        if (!html) return '';
-        const temp = document.createElement("div");
-        temp.innerHTML = html;
-        const text = temp.innerText;
-        const lines = text.split('\n').filter(x => x.trim() !== '');
-        const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-        for (let i = lines.length - 1; i >= 0; i--) {
-            const line = lines[i].trim();
-            if (!days.some(day => line.startsWith(day)) && line !== "") return line;
-        }
-        return '';
+    function getLastNoteOnly(fullText) {
+        if (!fullText) return 'لا توجد ملاحظات';
+        const lines = fullText.split('\n').filter(l => l.trim() !== "" && !l.includes("🗓️") && !l.includes("---"));
+        return lines.length > 0 ? lines[lines.length - 1] : 'لا توجد ملاحظات';
     }
 
-    function createNotesCell(cell, value = '') {
-        const previewText = getLastNotePreview(value);
-        cell.className = "notes-cell";
-        cell.innerHTML = `
-            <div class="notes-preview" onclick="openNote(this)">${previewText || 'لا توجد ملاحظات'}</div>
-            <div class="notes-tooltip">${value || 'لا توجد ملاحظات'}</div>
-        `;
-        cell.querySelector('.notes-preview').dataset.notes = value || '';
-    }
-
-    function loadSavedData() {
-        const saved = localStorage.getItem('asgate_visits_final_v17');
-        const tableBody = document.getElementById('tableBody');
-        tableBody.innerHTML = '';
-        if (saved) JSON.parse(saved).forEach(item => renderRow(item));
-        else insertNewRow();
-    }
-
-    function renderRow(v = {}) {
-        const tbody = document.getElementById('tableBody');
-        const row = tbody.insertRow();
-        const createCell = (val, type, readonly, isSelect, isNotes) => {
-            let cell = row.insertCell();
-            if (isNotes) {
-                createNotesCell(cell, val);
-            } else if (isSelect) {
-                cell.innerHTML = `<select class="excel-input"><option value="جديد" ${val==='جديد'?'selected':''}>جديد</option><option value="مهتم" ${val==='مهتم'?'selected':''}>مهتم</option><option value="مغلق" ${val==='مغلق'?'selected':''}>مغلق</option></select>`;
-            } else {
-                const today = new Date().toLocaleDateString('en-GB');
-                cell.innerHTML = `<input type="text" class="excel-input" value="${val || (readonly ? today : '')}" ${readonly ? 'readonly' : ''}>`;
-            }
-        };
-        createCell(v.comp); createCell(v.mgr); createCell(v.mob); createCell(v.email);
-        createCell(v.record); createCell(v.curServ); createCell(v.propServ);
-        createCell(v.status, "", false, true);
-        createCell(v.visitDate, "text", true);
-        createCell(v.notes, "text", false, false, true);
-        createCell(v.editDate, "text", true);
-        row.insertCell().innerHTML = `<button style="background:none;border:none;color:red;cursor:pointer;font-weight:bold" onclick="this.closest('tr').remove()">×</button>`;
-    }
-
-    function openNote(inputEl) {
-        currentActiveInput = inputEl;
+    function openNote(el) {
+        currentActivePreview = el;
         const log = document.getElementById('historyLog');
-        // هنا كان الخطأ، تم استخدام innerHTML لاسترجاع الوسوم بشكل صحيح
-        log.innerHTML = inputEl.dataset.notes || "لا توجد ملاحظات سابقة.";
+        log.innerText = el.getAttribute('data-full-notes') || "لا توجد ملاحظات سابقة.";
         document.getElementById('modalTextArea').value = "";
         document.getElementById('noteModal').style.display = "flex";
         setTimeout(() => {
@@ -217,50 +154,82 @@
     }
 
     function saveNote() {
-        if (currentActiveInput) {
-            const newText = document.getElementById('modalTextArea').value.trim();
-            if (newText !== "") {
-                const todayHeader = getFullDate();
-                let currentVal = currentActiveInput.dataset.notes || "";
-                let updatedHTML = "";
+        const newText = document.getElementById('modalTextArea').value.trim();
+        if (newText !== "" && currentActivePreview) {
+            const today = getFullDate();
+            let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
+            let updatedNotes = "";
 
-                if (currentVal.includes(todayHeader)) {
-                    updatedHTML = currentVal + `<div>${newText}</div>`;
-                } else {
-                    const separator = currentVal ? '<div style="border-bottom:1px dashed #cbd5e1; margin:8px 0;"></div>' : "";
-                    updatedHTML = currentVal + separator + `<span class="date-header">${todayHeader}</span>` + `<div>${newText}</div>`;
-                }
-
-                currentActiveInput.dataset.notes = updatedHTML;
-                currentActiveInput.innerText = getLastNotePreview(updatedHTML);
-                currentActiveInput.parentElement.querySelector('.notes-tooltip').innerHTML = updatedHTML;
-                document.getElementById('historyLog').innerHTML = updatedHTML;
-                
-                const log = document.getElementById('historyLog');
-                log.scrollTop = log.scrollHeight;
+            if (oldNotes.includes(today)) {
+                updatedNotes = oldNotes + "\n" + newText;
+            } else {
+                const separator = oldNotes ? "\n--------------------\n" : "";
+                updatedNotes = oldNotes + separator + today + "\n" + newText;
             }
+
+            currentActivePreview.setAttribute('data-full-notes', updatedNotes);
+            currentActivePreview.innerText = getLastNoteOnly(updatedNotes);
+            currentActivePreview.parentElement.querySelector('.notes-tooltip').innerText = updatedNotes;
         }
         closeNote();
     }
 
     function closeNote() { document.getElementById('noteModal').style.display = "none"; }
+
+    function renderRow(v = {}) {
+        const tbody = document.getElementById('tableBody');
+        const row = tbody.insertRow();
+        const today = new Date().toLocaleDateString('en-GB');
+
+        row.innerHTML = `
+            <td><input type="text" class="excel-input" value="${v.comp || ''}"></td>
+            <td><input type="text" class="excel-input" value="${v.mgr || ''}"></td>
+            <td><input type="text" class="excel-input" value="${v.mob || ''}"></td>
+            <td><input type="text" class="excel-input" value="${v.email || ''}"></td>
+            <td><input type="text" class="excel-input" value="${v.record || ''}"></td>
+            <td><input type="text" class="excel-input" value="${v.curServ || ''}"></td>
+            <td><input type="text" class="excel-input" value="${v.propServ || ''}"></td>
+            <td>
+                <select class="excel-input">
+                    <option value="جديد" ${v.status==='جديد'?'selected':''}>جديد</option>
+                    <option value="مهتم" ${v.status==='مهتم'?'selected':''}>مهتم</option>
+                    <option value="مغلق" ${v.status==='مغلق'?'selected':''}>مغلق</option>
+                </select>
+            </td>
+            <td><input type="text" class="excel-input" value="${v.visitDate || today}" readonly></td>
+            <td class="notes-cell">
+                <div class="notes-preview" onclick="openNote(this)" data-full-notes="${v.notes || ''}">${getLastNoteOnly(v.notes)}</div>
+                <div class="notes-tooltip">${v.notes || 'لا توجد ملاحظات'}</div>
+            </td>
+            <td><input type="text" class="excel-input" value="${v.editDate || today}" readonly></td>
+            <td><button style="background:none;border:none;color:red;cursor:pointer;font-weight:bold" onclick="this.closest('tr').remove()">×</button></td>
+        `;
+    }
+
     function insertNewRow() { renderRow({ status: 'جديد' }); }
 
     function saveAllData() {
         const data = [];
         const today = new Date().toLocaleDateString('en-GB');
         document.querySelectorAll('#tableBody tr').forEach(row => {
-            const f = row.querySelectorAll('input, select, .notes-preview');
-            if(f.length > 0) {
-                data.push({
-                    comp: f[0].value, mgr: f[1].value, mob: f[2].value, email: f[3].value,
-                    record: f[4].value, curServ: f[5].value, propServ: f[6].value,
-                    status: f[7].value, visitDate: f[8].value, notes: f[9].dataset.notes, editDate: today
-                });
-            }
+            const inputs = row.querySelectorAll('input, select');
+            const noteDiv = row.querySelector('.notes-preview');
+            data.push({
+                comp: inputs[0].value, mgr: inputs[1].value, mob: inputs[2].value, email: inputs[3].value,
+                record: inputs[4].value, curServ: inputs[5].value, propServ: inputs[6].value,
+                status: inputs[7].value, visitDate: inputs[8].value, notes: noteDiv.getAttribute('data-full-notes'), editDate: today
+            });
         });
-        localStorage.setItem('asgate_visits_final_v17', JSON.stringify(data));
-        alert("تم الحفظ بنجاح");
+        localStorage.setItem('asgate_visits_v18_final', JSON.stringify(data));
+        alert("تم الحفظ بنجاح!");
+    }
+
+    function loadSavedData() {
+        const saved = localStorage.getItem('asgate_visits_v18_final');
+        const tableBody = document.getElementById('tableBody');
+        tableBody.innerHTML = '';
+        if (saved) JSON.parse(saved).forEach(item => renderRow(item));
+        else insertNewRow();
     }
 
     window.onclick = function(e) { if (e.target == document.getElementById('noteModal')) closeNote(); }
