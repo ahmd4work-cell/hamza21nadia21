@@ -29,7 +29,7 @@
         .action-bar { display: flex; align-items: center; margin: 15px 0; gap: 15px; padding: 0 10px; }
         .btn-top { border: none; padding: 8px 15px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
         .btn-add { background-color: var(--accent-blue); }
-        .btn-save { background-color: var(--accent-green-active); padding: 8px 12px; font-size: 11px; } /* تصغير زر الحفظ */
+        .btn-save { background-color: var(--accent-green-active); padding: 8px 12px; font-size: 11px; }
 
         /* Table */
         .table-wrapper { background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-soft); margin-bottom: 30px; }
@@ -46,23 +46,18 @@
             max-width: 250px; white-space: pre-line; line-height: 1.5; text-align: right;
         }
 
-        /* Modal - تقليص العرض بنسبة 25% */
+        /* Modal التصميم الذي أعجبك */
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; }
         .modal-content { 
             background: white; padding: 15px; border-radius: 10px; 
-            width: 380px; /* تقليص العرض */
-            height: 420px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+            width: 380px; height: 420px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
         }
-        .modal-header { font-weight: 800; color: var(--nav-purple-dark); margin-bottom: 10px; font-size: 14px; }
+        .modal-header { font-weight: 800; color: var(--nav-purple-dark); margin-bottom: 10px; font-size: 14px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
         
         .history-log {
             flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft);
             border-radius: 6px; padding: 10px; margin-bottom: 10px; font-size: 12px; color: #1e293b;
             white-space: pre-wrap; text-align: right; line-height: 1.6;
-        }
-
-        .date-title { 
-            color: var(--accent-blue); font-weight: 800; font-size: 12px; margin: 5px 0; display: block; border-bottom: 1px solid #e2e8f0; 
         }
 
         .note-area { 
@@ -113,9 +108,9 @@
 
 <div id="noteModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header">سجل الملاحظات</div>
+        <div class="modal-header">سجل المتابعة</div>
         <div id="historyLog" class="history-log"></div>
-        <textarea id="modalTextArea" class="note-area" placeholder="اكتب ملاحظة جديدة..."></textarea>
+        <textarea id="modalTextArea" class="note-area" placeholder="أضف ملاحظتك هنا..."></textarea>
         <div class="modal-footer">
             <button class="btn-top" style="background:#94a3b8; font-size:11px;" onclick="closeNote()">إلغاء</button>
             <button class="btn-top btn-save" onclick="saveNote()">إضافة</button>
@@ -129,11 +124,12 @@
     function getFullDate() {
         const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
         const d = new Date();
-        return days[d.getDay()] + ' ' + d.getDate().toString().padStart(2, '0') + '-' + (d.getMonth() + 1).toString().padStart(2, '0') + '-' + d.getFullYear();
+        const dateStr = d.getDate().toString().padStart(2, '0') + '-' + (d.getMonth() + 1).toString().padStart(2, '0') + '-' + d.getFullYear();
+        return days[d.getDay()] + ' ' + dateStr;
     }
 
     function loadSavedData() {
-        const saved = localStorage.getItem('asgate_visits_v10');
+        const saved = localStorage.getItem('asgate_visits_v11');
         const tableBody = document.getElementById('tableBody');
         tableBody.innerHTML = '';
         if (saved) JSON.parse(saved).forEach(item => renderRow(item));
@@ -172,7 +168,7 @@
     function openNote(inputEl) {
         currentActiveInput = inputEl;
         const historyLog = document.getElementById('historyLog');
-        historyLog.innerText = inputEl.value || "لا توجد ملاحظات.";
+        historyLog.innerText = inputEl.value || "لا توجد ملاحظات سابقة.";
         document.getElementById('modalTextArea').value = "";
         document.getElementById('noteModal').style.display = "flex";
         setTimeout(() => document.getElementById('modalTextArea').focus(), 50);
@@ -184,12 +180,17 @@
             if (newText !== "") {
                 const header = getFullDate();
                 let currentVal = currentActiveInput.value;
-                if (currentVal.includes(header)) {
-                    // إذا كان التاريخ موجوداً، أضف تحت الترويسة مباشرة
-                    currentActiveInput.value = currentVal.replace(header, header + "\n- " + newText);
+                
+                // البحث عما إذا كان التاريخ مسجلاً كعنوان في البداية
+                if (currentVal.startsWith(header)) {
+                    // إذا كان العنوان موجوداً، نضيف النص الجديد تحته مباشرة (بداية السطر)
+                    let parts = currentVal.split("\n");
+                    parts.splice(1, 0, newText); // إدراج النص في السطر الثاني
+                    currentActiveInput.value = parts.join("\n");
                 } else {
-                    // يوم جديد، ترويسة جديدة في القمة
-                    currentActiveInput.value = header + "\n- " + newText + "\n" + (currentVal ? "----------\n" + currentVal : "");
+                    // إذا كان يوماً جديداً، نضع العنوان ثم النص ثم فاصل بسيط للملاحظات القديمة
+                    const separator = currentVal ? "\n--------------------\n" : "";
+                    currentActiveInput.value = header + "\n" + newText + separator + currentVal;
                 }
                 updateTooltip(currentActiveInput);
             }
@@ -211,9 +212,11 @@
                 status: f[7].value, visitDate: f[8].value, notes: f[9].value, editDate: today
             });
         });
-        localStorage.setItem('asgate_visits_v10', JSON.stringify(data));
-        alert("حفظ بنجاح");
+        localStorage.setItem('asgate_visits_v11', JSON.stringify(data));
+        alert("تم الحفظ بنجاح");
     }
+    
+    window.onclick = function(e) { if (e.target == document.getElementById('noteModal')) closeNote(); }
 </script>
 </body>
 </html>
