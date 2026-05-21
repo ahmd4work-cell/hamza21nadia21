@@ -26,6 +26,7 @@
             margin: 0; line-height: 1.2; font-size: 14px; font-weight: 300;
         }
 
+        /* القائمة العلوية */
         .navbar { 
             background-color: var(--nav-purple); display: flex; align-items: center; padding: 0 20px; 
             margin: 10px; border-radius: 15px; height: 37px; position: sticky; top: 10px; z-index: 1000;
@@ -34,8 +35,10 @@
         .navbar a { 
             color: white; text-decoration: none; padding: 0 15px; font-weight: 700; 
             font-size: 12px; border-radius: 8px; transition: 0.3s; line-height: 26px; height: 26px; display: inline-block;
+            cursor: pointer;
         }
         .navbar a.active { background-color: var(--nav-active); }
+        .navbar a:hover:not(.active) { background-color: rgba(167, 139, 250, 0.3); }
 
         .employee-info-bar {
             margin: 10px 20px; height: 35px; background-color: var(--white);
@@ -87,7 +90,7 @@
         .bg-purple { background-color: var(--accent-purple); }
         .bg-orange { background-color: var(--accent-orange); }
 
-        /* منطقة التحليل المعدلة بالتصغير 10% */
+        /* منطقة التحليل المعدلة */
         .charts-row {
             display: flex;
             justify-content: space-around;
@@ -102,14 +105,14 @@
             align-items: center;
             flex: 1;
         }
-        /* تصغير المحقق والمعلق بنسبة 10% */
+        /* تصغير الدوائر الجانبية */
         .chart-container-reduced {
             position: relative;
             width: 205px;
             height: 205px;
             margin-bottom: 5px;
         }
-        /* تصغير مؤشر الإنجاز بنسبة 10% */
+        /* تصغير العداد الأوسط */
         .gauge-container-reduced {
             position: relative;
             width: 125px;
@@ -121,7 +124,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 24px; /* تصغير طفيف للخط ليتناسب مع الدائرة */
+            font-size: 24px;
             font-weight: 800;
             color: var(--nav-purple);
         }
@@ -151,7 +154,7 @@
 </head>
 <body>
 
-<nav class="navbar">
+<nav class="navbar" id="mainNav">
     <a href="#" class="active">الرئيسية</a>
     <a href="#">الزيارات</a>
     <a href="#">الفرص البيعية</a>
@@ -245,6 +248,17 @@
 </div>
 
 <script>
+    // تفعيل التنقل العلوي
+    document.querySelectorAll('#mainNav a').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelectorAll('#mainNav a').forEach(a => a.classList.remove('active'));
+            this.classList.add('active');
+            // ملاحظة: يمكنك هنا إضافة كود لفتح صفحات مختلفة
+        });
+    });
+
+    // تعبئة الجدول
     const months = ["يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
     const tbody = document.getElementById('monthsBody');
     months.forEach((m, i) => {
@@ -252,14 +266,14 @@
         row.innerHTML = `<td>${m}</td><td>15k</td><td>${i===0?'14.2k':'-'}</td><td class="thick-border">${i===0?'790':'-'}</td><td style="color:#3b82f6">${i===0?'45':'-'}</td><td style="color:#22c55e">${i===0?'12':'-'}</td>`;
     });
 
-    // 1. المحقق
+    // الرسم البياني: المحقق
     new Chart(document.getElementById('achievedChart'), {
         type: 'doughnut',
         data: { datasets: [{ data: [82, 18], backgroundColor: ['#22c55e', '#f1f5f9'], borderWidth: 0, borderRadius: 10 }] },
         options: { cutout: '85%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
 
-    // 2. مؤشر الإنجاز (نصف دائرة - 4 ألوان)
+    // الرسم البياني: مؤشر الإنجاز
     const gaugeCtx = document.getElementById('gaugeChart').getContext('2d');
     new Chart(gaugeCtx, {
         type: 'doughnut',
@@ -297,14 +311,14 @@
         }]
     });
 
-    // 3. المعلق
+    // الرسم البياني: المعلق
     new Chart(document.getElementById('pendingChart'), {
         type: 'doughnut',
         data: { datasets: [{ data: [18, 82], backgroundColor: ['#facc15', '#f1f5f9'], borderWidth: 0, borderRadius: 10 }] },
         options: { cutout: '85%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
 
-    // بار الموظفين
+    // الرسم البياني: أداء الفريق
     const ctxStaff = document.getElementById('staffChart').getContext('2d');
     new Chart(ctxStaff, {
         type: 'bar',
