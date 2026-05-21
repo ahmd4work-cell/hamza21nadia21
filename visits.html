@@ -30,32 +30,46 @@
         .btn-top { border: none; padding: 8px 20px; border-radius: 10px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; }
         .btn-add { background-color: var(--accent-blue); }
         .btn-save { background-color: var(--accent-green-active); }
-        .btn-top:hover { opacity: 0.8; transform: translateY(-1px); }
 
         .table-wrapper { background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-soft); margin-bottom: 30px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; } /* تثبيت عرض الجدول */
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         
-        th { background: var(--header-purple-mid); color: white; padding: 12px 5px; font-size: 11px; font-weight: 800; text-align: center; }
-        td { border-bottom: 1px solid var(--border-soft); border-left: 1px solid #f1f5f9; text-align: center; height: 45px; padding: 2px; }
+        th { background: var(--header-purple-mid); color: white; padding: 12px 5px; font-size: 11px; font-weight: 800; text-align: center; position: relative; }
+        td { border-bottom: 1px solid var(--border-soft); border-left: 1px solid #f1f5f9; text-align: center; height: 45px; padding: 2px; position: relative; }
         
-        .excel-input { width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; font-size: 11.5px; color: #334155; }
-        .excel-input:focus { background: #f0f9ff; border-radius: 4px; }
+        /* تأثير التكبير عند الكتابة */
+        .excel-input { 
+            width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; 
+            background: transparent; font-size: 11.5px; color: #334155; transition: all 0.2s ease;
+            z-index: 1;
+        }
+        .excel-input:focus { 
+            background: #ffffff; 
+            transform: scale(1.2); 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-radius: 4px;
+            z-index: 10;
+            position: relative;
+            width: 100%;
+        }
         
+        /* القائمة التي تظهر عند الوقوف بالسهم */
+        td:hover::after {
+            content: "تعديل البيانات";
+            position: absolute; top: -25px; left: 50%; transform: translateX(-50%);
+            background: var(--nav-purple-dark); color: white; padding: 2px 8px;
+            border-radius: 4px; font-size: 10px; white-space: nowrap; z-index: 100;
+        }
+
         .btn-delete { background: none; border: none; color: var(--accent-red); cursor: pointer; font-weight: bold; font-size: 16px; }
         
-        /* توزيع النسب المئوية للأعمدة */
-        .col-company { width: 12%; }
-        .col-manager { width: 8%; }
-        .col-mobile { width: 8%; }
-        .col-email { width: 8%; }
-        .col-record { width: 8%; }
-        .col-current-service { width: 10%; }
-        .col-proposed-service { width: 10%; }
-        .col-status { width: 6%; }
-        .col-date { width: 8%; }
-        .col-notes { width: 10%; }
-        .col-edit-date { width: 8%; }
-        .col-action { width: 4%; }
+        /* النسب المطلوبة */
+        .col-company { width: 12%; } .col-manager { width: 8%; } .col-mobile { width: 8%; } .col-email { width: 8%; }
+        .col-record { width: 8%; } .col-current-service { width: 10%; } .col-proposed-service { width: 10%; }
+        .col-status { width: 6%; } .col-date { width: 8%; } .col-notes { width: 10%; }
+        .col-edit-date { width: 8%; } .col-action { width: 4%; }
+
+        .readonly-style { color:#94a3b8; font-size:10px; cursor: default; }
     </style>
 </head>
 <body onload="loadSavedData()">
@@ -92,27 +106,19 @@
                     <th class="col-action">إجراء</th>
                 </tr>
             </thead>
-            <tbody id="tableBody">
-                </tbody>
+            <tbody id="tableBody"></tbody>
         </table>
     </div>
 </div>
 
 <script>
-    // دالة إنشاء التاريخ الحالي بتنسيق YYYY-MM-DD
-    function getToday() {
-        return new Date().toISOString().split('T')[0];
-    }
+    function getToday() { return new Date().toISOString().split('T')[0]; }
 
     function loadSavedData() {
-        const saved = localStorage.getItem('asgate_visits_detailed');
+        const saved = localStorage.getItem('asgate_visits_v3');
         if (saved) {
-            const data = JSON.parse(saved);
-            data.forEach(item => renderRow(item));
-        } else {
-            // إضافة صف فارغ افتراضي إذا كان السجل فارغاً
-            insertNewRow();
-        }
+            JSON.parse(saved).forEach(item => renderRow(item));
+        } else { insertNewRow(); }
     }
 
     function renderRow(v = {}) {
@@ -120,62 +126,44 @@
         const row = tbody.insertRow();
         
         row.innerHTML = `
-            <td><input type="text" class="excel-input" value="${v.comp || ''}" placeholder="..."></td>
-            <td><input type="text" class="excel-input" value="${v.mgr || ''}" placeholder="..."></td>
-            <td><input type="text" class="excel-input" value="${v.mob || ''}" placeholder="..."></td>
-            <td><input type="email" class="excel-input" value="${v.email || ''}" placeholder="..."></td>
-            <td><input type="text" class="excel-input" value="${v.record || ''}" placeholder="..."></td>
-            <td><input type="text" class="excel-input" value="${v.curServ || ''}" placeholder="..."></td>
-            <td><input type="text" class="excel-input" value="${v.propServ || ''}" placeholder="..."></td>
+            <td><input type="text" class="excel-input" value="${v.comp || ''}"></td>
+            <td><input type="text" class="excel-input" value="${v.mgr || ''}"></td>
+            <td><input type="text" class="excel-input" value="${v.mob || ''}"></td>
+            <td><input type="email" class="excel-input" value="${v.email || ''}"></td>
+            <td><input type="text" class="excel-input" value="${v.record || ''}"></td>
+            <td><input type="text" class="excel-input" value="${v.curServ || ''}"></td>
+            <td><input type="text" class="excel-input" value="${v.propServ || ''}"></td>
             <td>
                 <select class="excel-input">
                     <option value="جديد" ${v.status==='جديد'?'selected':''}>جديد</option>
                     <option value="مهتم" ${v.status==='مهتم'?'selected':''}>مهتم</option>
-                    <option value="متابعة" ${v.status==='متابعة'?'selected':''}>متابعة</option>
                     <option value="مغلق" ${v.status==='مغلق'?'selected':''}>مغلق</option>
                 </select>
             </td>
-            <td><input type="date" class="excel-input" value="${v.visitDate || getToday()}"></td>
-            <td><input type="text" class="excel-input" value="${v.notes || ''}" placeholder="أضف ملاحظة"></td>
-            <td><input type="text" class="excel-input" value="${v.editDate || getToday()}" readonly style="color:#94a3b8; font-size:10px;"></td>
+            <td><input type="text" class="excel-input readonly-style" value="${v.visitDate || getToday()}" readonly></td>
+            <td><input type="text" class="excel-input" value="${v.notes || ''}"></td>
+            <td><input type="text" class="excel-input readonly-style" value="${v.editDate || getToday()}" readonly></td>
             <td><button class="btn-delete" onclick="deleteRow(this)">×</button></td>
         `;
     }
 
-    function insertNewRow() {
-        renderRow({ visitDate: getToday(), editDate: getToday(), status: 'جديد' });
-    }
+    function insertNewRow() { renderRow({ visitDate: getToday(), editDate: getToday(), status: 'جديد' }); }
 
-    function deleteRow(btn) {
-        if(confirm('هل أنت متأكد من حذف هذا السجل؟')) {
-            btn.closest('tr').remove();
-        }
-    }
+    function deleteRow(btn) { if(confirm('حذف؟')) btn.closest('tr').remove(); }
 
     function saveAllData() {
         const data = [];
-        const rows = document.querySelectorAll('#tableBody tr');
-        
-        rows.forEach(row => {
-            const fields = row.querySelectorAll('input, select');
+        document.querySelectorAll('#tableBody tr').forEach(row => {
+            const f = row.querySelectorAll('input, select');
             data.push({
-                comp: fields[0].value,
-                mgr: fields[1].value,
-                mob: fields[2].value,
-                email: fields[3].value,
-                record: fields[4].value,
-                curServ: fields[5].value,
-                propServ: fields[6].value,
-                status: fields[7].value,
-                visitDate: fields[8].value,
-                notes: fields[9].value,
-                editDate: getToday() // تحديث تاريخ التعديل عند الحفظ
+                comp: f[0].value, mgr: f[1].value, mob: f[2].value, email: f[3].value,
+                record: f[4].value, curServ: f[5].value, propServ: f[6].value,
+                status: f[7].value, visitDate: f[8].value, notes: f[9].value, editDate: getToday()
             });
         });
-
-        localStorage.setItem('asgate_visits_detailed', JSON.stringify(data));
-        alert("✅ تم حفظ جميع البيانات بنجاح في ASGate");
-        location.reload(); // إعادة التحميل لتحديث تواريخ التعديل
+        localStorage.setItem('asgate_visits_v3', JSON.stringify(data));
+        alert("✅ تم الحفظ");
+        location.reload();
     }
 </script>
 </body>
