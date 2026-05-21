@@ -253,7 +253,7 @@
     new Chart(document.getElementById('achievedChart'), {
         type: 'doughnut',
         data: { datasets: [{ data: [82, 18], backgroundColor: ['#22c55e', '#f1f5f9'], borderWidth: 0, borderRadius: 10 }] },
-        options: { cutout: '82%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        options: { cutout: '90%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
 
     // 2. عداد RPM (نصف دائرة - 4 ألوان)
@@ -263,7 +263,7 @@
         data: {
             datasets: [{
                 // أحمر، أصفر، أخضر، أخضر غامق + الجزء المخفي للسفلي
-                data: [25, 25, 25, 25, 100], 
+                data: [50, 50, 50, 50], 
                 backgroundColor: ['#ef4444', '#fbbf24', '#22c55e', '#15803d', 'transparent'],
                 borderWidth: 0,
                 circumference: 180,
@@ -271,7 +271,7 @@
             }]
         },
         options: {
-            cutout: '85%',
+            cutout: '95%',
             responsive: true,
             maintainAspectRatio: false,
             plugins: { legend: { display: false }, tooltip: { enabled: false } }
@@ -285,7 +285,7 @@
                 const centerY = height - 15;
                 const radius = height - 30;
                 // الإبرة تشير للأخضر الغامق (قيمة عالية)
-                const angle = Math.PI + (155 * Math.PI / 180); 
+                const angle = Math.PI + (170 * Math.PI / 200); 
                 ctx.translate(centerX, centerY);
                 ctx.rotate(angle);
                 ctx.beginPath();
