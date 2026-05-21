@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASGate - الزيارات</title>
+    <title>ASGate - سجل الزيارات</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -13,9 +13,10 @@
             --bg-color: #f8fafc;
             --accent-blue: #3b82f6;
             --accent-green-active: #22c55e;
+            --accent-red: #ef4444;
             --border-soft: #cbd5e1;
         }
-        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; }
+        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; font-size: 13px; }
 
         .navbar { 
             background-color: var(--nav-purple-dark); display: flex; align-items: center; padding: 0 20px; 
@@ -24,19 +25,37 @@
         .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; }
         .navbar a.active { background-color: var(--nav-active); color: var(--nav-purple-dark); border-radius: 8px; line-height: 26px; height: 26px; }
 
-        .container { padding: 0 20px; }
-        .action-bar { display: flex; align-items: center; margin: 15px 0; gap: 15px; }
-        .btn-top { border: none; padding: 8px 20px; border-radius: 10px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; }
+        .container { padding: 0 10px; }
+        .action-bar { display: flex; align-items: center; margin: 15px 0; gap: 15px; padding: 0 10px; }
+        .btn-top { border: none; padding: 8px 20px; border-radius: 10px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; }
         .btn-add { background-color: var(--accent-blue); }
         .btn-save { background-color: var(--accent-green-active); }
+        .btn-top:hover { opacity: 0.8; transform: translateY(-1px); }
 
-        .table-wrapper { background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-soft); }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: var(--header-purple-mid); color: white; padding: 12px; font-size: 11px; }
-        td { border-bottom: 1px solid var(--border-soft); text-align: center; height: 45px; }
+        .table-wrapper { background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-soft); margin-bottom: 30px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; } /* تثبيت عرض الجدول */
         
-        .excel-input { width: 90%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; }
-        .notes-cell { cursor: pointer; color: var(--accent-blue); text-decoration: underline; font-weight: bold; }
+        th { background: var(--header-purple-mid); color: white; padding: 12px 5px; font-size: 11px; font-weight: 800; text-align: center; }
+        td { border-bottom: 1px solid var(--border-soft); border-left: 1px solid #f1f5f9; text-align: center; height: 45px; padding: 2px; }
+        
+        .excel-input { width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; font-size: 11.5px; color: #334155; }
+        .excel-input:focus { background: #f0f9ff; border-radius: 4px; }
+        
+        .btn-delete { background: none; border: none; color: var(--accent-red); cursor: pointer; font-weight: bold; font-size: 16px; }
+        
+        /* توزيع النسب المئوية للأعمدة */
+        .col-company { width: 12%; }
+        .col-manager { width: 8%; }
+        .col-mobile { width: 8%; }
+        .col-email { width: 8%; }
+        .col-record { width: 8%; }
+        .col-current-service { width: 10%; }
+        .col-proposed-service { width: 10%; }
+        .col-status { width: 6%; }
+        .col-date { width: 8%; }
+        .col-notes { width: 10%; }
+        .col-edit-date { width: 8%; }
+        .col-action { width: 4%; }
     </style>
 </head>
 <body onload="loadSavedData()">
@@ -51,50 +70,112 @@
 
 <div class="container">
     <div class="action-bar">
-        <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة زيارة</button>
-        <button class="btn-top btn-save" onclick="saveAllData()">حفظ التغييرات</button>
+        <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة زيارة جديدة</button>
+        <button class="btn-top btn-save" onclick="saveAllData()">حفظ البيانات</button>
     </div>
+    
     <div class="table-wrapper">
         <table>
             <thead>
                 <tr>
-                    <th>الشركة</th><th>المسؤول</th><th>الموبايل</th><th>الحالة</th><th>التاريخ</th><th>ملاحظات</th><th>حذف</th>
+                    <th class="col-company">الشركة</th>
+                    <th class="col-manager">المسؤول</th>
+                    <th class="col-mobile">الموبايل</th>
+                    <th class="col-email">الايميل</th>
+                    <th class="col-record">السجل</th>
+                    <th class="col-current-service">الخدمة الحالية</th>
+                    <th class="col-proposed-service">الخدمة المقترحة</th>
+                    <th class="col-status">الحالة</th>
+                    <th class="col-date">تاريخ الزيارة</th>
+                    <th class="col-notes">ملاحظات</th>
+                    <th class="col-edit-date">تاريخ التعديل</th>
+                    <th class="col-action">إجراء</th>
                 </tr>
             </thead>
-            <tbody id="tableBody"></tbody>
+            <tbody id="tableBody">
+                </tbody>
         </table>
     </div>
 </div>
 
 <script>
-    function loadSavedData() {
-        const saved = localStorage.getItem('asgate_visits_data');
-        if (saved) JSON.parse(saved).forEach(item => renderRow(item));
+    // دالة إنشاء التاريخ الحالي بتنسيق YYYY-MM-DD
+    function getToday() {
+        return new Date().toISOString().split('T')[0];
     }
 
-    function renderRow(v) {
-        const row = document.getElementById('tableBody').insertRow();
+    function loadSavedData() {
+        const saved = localStorage.getItem('asgate_visits_detailed');
+        if (saved) {
+            const data = JSON.parse(saved);
+            data.forEach(item => renderRow(item));
+        } else {
+            // إضافة صف فارغ افتراضي إذا كان السجل فارغاً
+            insertNewRow();
+        }
+    }
+
+    function renderRow(v = {}) {
+        const tbody = document.getElementById('tableBody');
+        const row = tbody.insertRow();
+        
         row.innerHTML = `
-            <td><input type="text" class="excel-input" value="${v.comp || ''}"></td>
-            <td><input type="text" class="excel-input" value="${v.mgr || ''}"></td>
-            <td><input type="text" class="excel-input" value="${v.mob || ''}"></td>
-            <td><select class="excel-input"><option ${v.status==='مهتم'?'selected':''}>مهتم</option></select></td>
-            <td><input type="date" class="excel-input" value="${v.date || ''}"></td>
-            <td class="notes-cell" onclick="alert('خاصية الملاحظات مفعلة')">ملاحظات</td>
-            <td><button onclick="this.closest('tr').remove()">X</button></td>
+            <td><input type="text" class="excel-input" value="${v.comp || ''}" placeholder="..."></td>
+            <td><input type="text" class="excel-input" value="${v.mgr || ''}" placeholder="..."></td>
+            <td><input type="text" class="excel-input" value="${v.mob || ''}" placeholder="..."></td>
+            <td><input type="email" class="excel-input" value="${v.email || ''}" placeholder="..."></td>
+            <td><input type="text" class="excel-input" value="${v.record || ''}" placeholder="..."></td>
+            <td><input type="text" class="excel-input" value="${v.curServ || ''}" placeholder="..."></td>
+            <td><input type="text" class="excel-input" value="${v.propServ || ''}" placeholder="..."></td>
+            <td>
+                <select class="excel-input">
+                    <option value="جديد" ${v.status==='جديد'?'selected':''}>جديد</option>
+                    <option value="مهتم" ${v.status==='مهتم'?'selected':''}>مهتم</option>
+                    <option value="متابعة" ${v.status==='متابعة'?'selected':''}>متابعة</option>
+                    <option value="مغلق" ${v.status==='مغلق'?'selected':''}>مغلق</option>
+                </select>
+            </td>
+            <td><input type="date" class="excel-input" value="${v.visitDate || getToday()}"></td>
+            <td><input type="text" class="excel-input" value="${v.notes || ''}" placeholder="أضف ملاحظة"></td>
+            <td><input type="text" class="excel-input" value="${v.editDate || getToday()}" readonly style="color:#94a3b8; font-size:10px;"></td>
+            <td><button class="btn-delete" onclick="deleteRow(this)">×</button></td>
         `;
     }
 
-    function insertNewRow() { renderRow({date: new Date().toISOString().split('T')[0]}); }
+    function insertNewRow() {
+        renderRow({ visitDate: getToday(), editDate: getToday(), status: 'جديد' });
+    }
+
+    function deleteRow(btn) {
+        if(confirm('هل أنت متأكد من حذف هذا السجل؟')) {
+            btn.closest('tr').remove();
+        }
+    }
 
     function saveAllData() {
         const data = [];
-        document.querySelectorAll('#tableBody tr').forEach(row => {
-            const ins = row.querySelectorAll('input');
-            data.push({ comp: ins[0].value, mgr: ins[1].value, mob: ins[2].value, date: ins[3].value });
+        const rows = document.querySelectorAll('#tableBody tr');
+        
+        rows.forEach(row => {
+            const fields = row.querySelectorAll('input, select');
+            data.push({
+                comp: fields[0].value,
+                mgr: fields[1].value,
+                mob: fields[2].value,
+                email: fields[3].value,
+                record: fields[4].value,
+                curServ: fields[5].value,
+                propServ: fields[6].value,
+                status: fields[7].value,
+                visitDate: fields[8].value,
+                notes: fields[9].value,
+                editDate: getToday() // تحديث تاريخ التعديل عند الحفظ
+            });
         });
-        localStorage.setItem('asgate_visits_data', JSON.stringify(data));
-        alert("تم الحفظ");
+
+        localStorage.setItem('asgate_visits_detailed', JSON.stringify(data));
+        alert("✅ تم حفظ جميع البيانات بنجاح في ASGate");
+        location.reload(); // إعادة التحميل لتحديث تواريخ التعديل
     }
 </script>
 </body>
