@@ -64,60 +64,62 @@
 
         h3 { font-size: 13px; margin: 0; color: var(--nav-purple); font-weight: 800; border-right: 4px solid var(--accent-blue); padding-right: 8px; margin-bottom: 15px; }
 
-        .yearly-table { width: 100%; border-collapse: collapse; font-size: 10.5px; table-layout: fixed; }
-        .yearly-table th, .yearly-table td { 
-            border: 0.5px solid var(--border-color); padding: 2px; height: 30px; 
-            text-align: center; font-weight: bold; color: #475569;
-        }
-        .yearly-table th { background: #f8fafc; color: var(--nav-purple); font-weight: 800; }
-        .thick-border { border-left: 3px solid var(--nav-purple) !important; }
-
-        .filters-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .filter-card { background: white; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 4px; }
-        .filter-card label { font-size: 9px; font-weight: 800; color: var(--nav-purple); }
-        .filter-input { width: 100%; border: none; background: var(--input-bg); font-family: 'Cairo'; font-size: 10px; padding: 4px; border-radius: 6px; outline: none; }
-
-        .stats-cards { display: flex; gap: 8px; width: 100%; align-items: center; }
-        .stat-card { 
-            flex: 1; height: 52px; padding: 5px 12px; border-radius: 10px; color: white; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; min-width: 0; box-sizing: border-box;
-        }
-        .stat-card .label-text { font-size: 10px; font-weight: bold; opacity: 0.9; }
-        .stat-card .value-text { font-size: 13.5px; font-weight: 800; }
-
-        .bg-blue { background-color: var(--accent-blue); }
-        .bg-green { background-color: var(--accent-green); }
-        .bg-yellow { background-color: var(--accent-yellow); color: #854d0e; }
-        .bg-purple { background-color: var(--accent-purple); }
-        .bg-orange { background-color: var(--accent-orange); }
-
-        /* تنسيق حاوية الدوائر البيانية */
+        /* تنسيق صف الرسوم البيانية */
         .charts-row {
             display: flex;
-            justify-content: space-around;
-            align-items: center;
+            justify-content: space-between;
+            align-items: flex-end;
             flex-grow: 1;
-            padding: 10px 0;
+            padding: 5px 0;
         }
+
+        .chart-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
         .chart-container {
             position: relative;
-            width: 140px;
-            height: 140px;
+            width: 110px;
+            height: 110px;
         }
+
+        /* حاوية الـ RPM (أكبر قليلاً) */
+        .rpm-container {
+            position: relative;
+            width: 180px;
+            height: 100px; /* نصف ارتفاع تقريباً */
+            overflow: hidden;
+        }
+
         .chart-percentage {
             position: absolute;
             top: 55%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 800;
             color: var(--nav-purple);
         }
+
+        /* نسبة الـ RPM تكون في الأسفل قليلاً */
+        .rpm-value {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--accent-blue);
+        }
+
         .chart-label {
             text-align: center;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 800;
-            margin-top: 5px;
+            margin-top: 8px;
             color: #64748b;
         }
 
@@ -127,23 +129,6 @@
     </style>
 </head>
 <body>
-
-<nav class="navbar">
-    <a href="#" class="active">الرئيسية</a>
-    <a href="#">الزيارات</a>
-    <a href="#">الفرص البيعية</a>
-    <a href="#">العملاء</a>
-    <a href="#">المبيعات</a>
-</nav>
-
-<div class="employee-info-bar">
-    <div class="info-content">
-        <div class="info-item">الموظف: <span>محمد المنصور</span></div>
-        <div class="info-item">الرقم: <span>ASG-2026</span></div>
-        <div class="info-item">الموبايل: <span>05XXXXXXXX</span></div>
-        <div class="info-item">الايميل: <span>m.mansour@asgate.sa</span></div>
-    </div>
-</div>
 
 <div class="container">
     <div class="dashboard-grid">
@@ -167,37 +152,37 @@
         </div>
 
         <div class="left-section">
-            <div class="filters-grid">
-                <div class="filter-card"><label>الشهر</label><select class="filter-input"><option>الكل</option></select></div>
-                <div class="filter-card"><label>المنطقة</label><select class="filter-input"><option>الكل</option></select></div>
-                <div class="filter-card"><label>المشرف</label><select class="filter-input"><option>الكل</option></select></div>
-                <div class="filter-card"><label>المندوب</label><select class="filter-input"><option>الكل</option></select></div>
-            </div>
-            
             <div class="stats-cards">
                 <div class="stat-card bg-blue"><div class="label-text">الهدف السنوي</div><div class="value-text">180,000</div></div>
                 <div class="stat-card bg-green"><div class="label-text">المبيعات</div><div class="value-text">14,210</div></div>
                 <div class="stat-card bg-yellow"><div class="label-text">المعلق</div><div class="value-text">790</div></div>
-                <div class="stat-card bg-purple" style="flex:0.6"><div class="label-text">الزيارات</div><div class="value-text">45</div></div>
-                <div class="stat-card bg-orange" style="flex:0.6"><div class="label-text">ناجحة</div><div class="value-text">12</div></div>
             </div>
 
             <div class="content-box">
                 <h3>📈 تحليل الأداء الإجمالي</h3>
                 <div class="charts-row">
-                    <div>
+                    <div class="chart-item">
                         <div class="chart-container">
                             <canvas id="achievedChart"></canvas>
                             <div class="chart-percentage">82%</div>
                         </div>
-                        <div class="chart-label">المحقق الفعلي</div>
+                        <div class="chart-label">المحقق</div>
                     </div>
-                    <div>
+
+                    <div class="chart-item" style="flex: 1.5;">
+                        <div class="rpm-container">
+                            <canvas id="rpmChart"></canvas>
+                            <div class="rpm-value">920</div>
+                        </div>
+                        <div class="chart-label">مؤشر سرعة الأداء (RPM)</div>
+                    </div>
+
+                    <div class="chart-item">
                         <div class="chart-container">
                             <canvas id="pendingChart"></canvas>
                             <div class="chart-percentage">18%</div>
                         </div>
-                        <div class="chart-label">المعلق الحالي</div>
+                        <div class="chart-label">المعلق</div>
                     </div>
                 </div>
             </div>
@@ -206,14 +191,12 @@
 
     <div class="content-box staff-performance-section">
         <h3>👥 أداء فريق المبيعات (30 موظفاً)</h3>
-        <div style="flex-grow: 1; position: relative; margin-top: 10px;">
-            <canvas id="staffChart"></canvas>
-        </div>
+        <canvas id="staffChart"></canvas>
     </div>
 </div>
 
 <script>
-    // تهيئة جدول الشهور
+    // تهيئة الجدول
     const months = ["يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
     const tbody = document.getElementById('monthsBody');
     months.forEach((m, i) => {
@@ -221,73 +204,56 @@
         row.innerHTML = `<td>${m}</td><td>15k</td><td>${i===0?'14.2k':'-'}</td><td class="thick-border">${i===0?'790':'-'}</td><td style="color:#3b82f6">${i===0?'45':'-'}</td><td style="color:#22c55e">${i===0?'12':'-'}</td>`;
     });
 
-    // إعدادات مشتركة للدوائر
-    const doughnutOptions = {
-        cutout: '75%',
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false }, tooltip: { enabled: true } }
-    };
-
-    // 1. دائرة المحقق (الخضراء) - اليمين
+    // 1. دائرة المحقق (يمين)
     new Chart(document.getElementById('achievedChart'), {
         type: 'doughnut',
-        data: {
-            datasets: [{
-                data: [82, 18],
-                backgroundColor: ['#22c55e', '#f1f5f9'],
-                borderWidth: 0,
-                borderRadius: 5
-            }]
-        },
-        options: doughnutOptions
+        data: { datasets: [{ data: [82, 18], backgroundColor: ['#22c55e', '#f1f5f9'], borderWidth: 0, borderRadius: 5 }] },
+        options: { cutout: '75%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
 
-    // 2. دائرة المعلق (الصفراء) - اليسار
-    new Chart(document.getElementById('pendingChart'), {
+    // 2. مؤشر RPM (المنتصف) - "نصف دائرة"
+    new Chart(document.getElementById('rpmChart'), {
         type: 'doughnut',
         data: {
             datasets: [{
-                data: [18, 82],
-                backgroundColor: ['#facc15', '#f1f5f9'],
+                data: [920, 80, 1000], // القيمة، المتبقي للسرعة، والجزء المخفي (السفلي)
+                backgroundColor: ['#3b82f6', '#e2e8f0', 'transparent'],
                 borderWidth: 0,
-                borderRadius: 5
+                circumference: 180, // نصف دائرة
+                rotation: 270,      // تبدأ من اليسار لليمين
             }]
         },
-        options: doughnutOptions
+        options: {
+            cutout: '80%',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { enabled: false } }
+        }
     });
 
-    // الرسم السفلي: الموظفين
+    // 3. دائرة المعلق (يسار)
+    new Chart(document.getElementById('pendingChart'), {
+        type: 'doughnut',
+        data: { datasets: [{ data: [18, 82], backgroundColor: ['#facc15', '#f1f5f9'], borderWidth: 0, borderRadius: 5 }] },
+        options: { cutout: '75%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    });
+
+    // رسم فريق المبيعات
     const ctxStaff = document.getElementById('staffChart').getContext('2d');
     new Chart(ctxStaff, {
         type: 'bar',
         data: {
             labels: Array.from({length: 30}, (_, i) => `م${i + 1}`),
             datasets: [
-                {
-                    label: 'الهدف المكتمل',
-                    data: Array.from({length: 30}, () => Math.floor(Math.random() * 5000) + 25000),
-                    backgroundColor: '#22c55e',
-                    barPercentage: 1.0,
-                    categoryPercentage: 0.8
-                },
-                {
-                    label: 'الهدف المعلق',
-                    data: Array.from({length: 30}, () => Math.floor(Math.random() * 3000) + 1000),
-                    backgroundColor: '#facc15',
-                    barPercentage: 1.0,
-                    categoryPercentage: 0.8
-                }
+                { label: 'المحقق', data: Array.from({length: 30}, () => Math.floor(Math.random() * 5000) + 25000), backgroundColor: '#22c55e', barPercentage: 1.0, categoryPercentage: 0.8 },
+                { label: 'المعلق', data: Array.from({length: 30}, () => Math.floor(Math.random() * 3000) + 1000), backgroundColor: '#facc15', barPercentage: 1.0, categoryPercentage: 0.8 }
             ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            scales: {
-                x: { stacked: false, grid: { display: false }, ticks: { font: { family: 'Cairo', size: 9 } } },
-                y: { beginAtZero: true, ticks: { font: { family: 'Cairo', size: 10 } } }
-            },
-            plugins: { legend: { position: 'top', labels: { font: { family: 'Cairo' } } } }
+            scales: { x: { grid: { display: false } }, y: { beginAtZero: true } },
+            plugins: { legend: { display: false } }
         }
     });
 </script>
