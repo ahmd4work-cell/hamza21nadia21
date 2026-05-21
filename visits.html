@@ -52,6 +52,7 @@
             font-size: 10px; opacity: 0; visibility: hidden; z-index: 100; pointer-events: none;
         }
 
+        /* المودال */
         .modal {
             display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.4); align-items: center; justify-content: center;
@@ -60,7 +61,15 @@
             background: white; padding: 20px; border-radius: 8px; width: 500px; height: 250px; 
             display: flex; flex-direction: column; box-shadow: 0 15px 30px rgba(0,0,0,0.2);
         }
-        .modal-header { font-weight: 800; color: var(--nav-purple-dark); margin-bottom: 8px; font-size: 14px; }
+        .modal-header { font-weight: 800; color: var(--nav-purple-dark); margin-bottom: 5px; font-size: 14px; }
+        
+        /* تصميم التاريخ غير القابل للحذف */
+        .fixed-date-label {
+            background: #f1f5f9; color: #475569; padding: 5px 10px; border-radius: 5px;
+            font-size: 12px; font-weight: bold; margin-bottom: 10px; border: 1px solid var(--border-soft);
+            display: inline-block; width: fit-content;
+        }
+
         .note-area { 
             flex-grow: 1; width: 100%; border: 1px solid var(--border-soft); border-radius: 5px; 
             padding: 10px; font-family: 'Cairo'; resize: none; outline: none; box-sizing: border-box;
@@ -111,6 +120,7 @@
 <div id="noteModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">📝 ملاحظات الزيارة</div>
+        <div id="fixedDateDisplay" class="fixed-date-label"></div>
         <textarea id="modalTextArea" class="note-area" placeholder="اكتب الملاحظة هنا..."></textarea>
         <div class="modal-footer">
             <button class="btn-top" style="background:#94a3b8; padding: 6px 15px;" onclick="closeNote()">إلغاء</button>
@@ -130,7 +140,7 @@
     function loadSavedData() {
         const saved = localStorage.getItem('asgate_visits_detailed_v5');
         const tableBody = document.getElementById('tableBody');
-        tableBody.innerHTML = ''; // تنظيف الجدول قبل التحميل
+        tableBody.innerHTML = '';
         if (saved) {
             JSON.parse(saved).forEach(item => renderRow(item));
         } else {
@@ -173,25 +183,32 @@
         renderRow({ status: 'جديد', visitDate: getToday(), editDate: getToday() }); 
     }
 
+    // فتح الملاحظة مع تاريخ ثابت
     function openNote(inputEl) {
         currentActiveInput = inputEl;
         const modal = document.getElementById('noteModal');
         const textArea = document.getElementById('modalTextArea');
-        if (!inputEl.value || inputEl.value.trim() === "") {
-            textArea.value = `التاريخ: ${getToday()}\nالملاحظة: `;
-        } else {
-            textArea.value = inputEl.value;
+        const dateDisplay = document.getElementById('fixedDateDisplay');
+        
+        // عرض التاريخ في عنصر منفصل غير قابل للحذف
+        dateDisplay.innerText = "التاريخ: " + getToday();
+
+        // تنظيف النص من التاريخ القديم إذا كان مخزناً داخل النص لعرض الملاحظة فقط
+        let cleanValue = inputEl.value;
+        if (cleanValue.includes("التاريخ:")) {
+            cleanValue = cleanValue.split('\n').slice(1).join('\n').replace("الملاحظة: ", "");
         }
+        
+        textArea.value = cleanValue.trim();
         modal.style.display = "flex";
-        setTimeout(() => {
-            textArea.focus();
-            textArea.setSelectionRange(textArea.value.length, textArea.value.length);
-        }, 50);
+        setTimeout(() => textArea.focus(), 50);
     }
 
     function saveNote() {
         if (currentActiveInput) {
-            currentActiveInput.value = document.getElementById('modalTextArea').value;
+            const textArea = document.getElementById('modalTextArea');
+            // حفظ التاريخ مع النص في الخلفية لضمان بقائه في البيانات
+            currentActiveInput.value = "التاريخ: " + getToday() + "\nالملاحظة: " + textArea.value;
             updateTooltip(currentActiveInput);
         }
         closeNote();
