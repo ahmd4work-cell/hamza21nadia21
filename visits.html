@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html dir="rtl">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>ASGate - سجل الزيارات</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
@@ -132,11 +134,49 @@ td{
     font-size:11.5px;
 }
 
-.notes-trigger{
+/* Notes */
+
+.notes-cell{
+    position:relative;
+}
+
+.notes-preview{
+    width:95%;
+    border:none;
+    background:transparent;
+    font-family:'Cairo';
+    font-size:11px;
+    text-align:center;
     cursor:pointer;
     color:var(--accent-blue);
     font-weight:700;
-    text-decoration:underline;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+}
+
+.notes-tooltip{
+    position:absolute;
+    bottom:110%;
+    right:0;
+    background:#334155;
+    color:#fff;
+    padding:10px;
+    border-radius:8px;
+    width:260px;
+    font-size:11px;
+    line-height:1.8;
+    white-space:pre-wrap;
+    text-align:right;
+    opacity:0;
+    visibility:hidden;
+    transition:0.2s;
+    z-index:1000;
+}
+
+.notes-cell:hover .notes-tooltip{
+    opacity:1;
+    visibility:visible;
 }
 
 /* Modal */
@@ -338,6 +378,34 @@ function getFullDate(){
     return days[d.getDay()] + ' ' + dateStr;
 }
 
+/* آخر ملاحظة */
+
+function getLastNotePreview(text){
+
+    if(!text) return '';
+
+    const lines=text.split('\n').filter(x=>x.trim() !== '');
+
+    for(let i=lines.length-1;i>=0;i--){
+
+        const line=lines[i].trim();
+
+        if(
+            !line.includes('الأحد') &&
+            !line.includes('الاثنين') &&
+            !line.includes('الثلاثاء') &&
+            !line.includes('الأربعاء') &&
+            !line.includes('الخميس') &&
+            !line.includes('الجمعة') &&
+            !line.includes('السبت')
+        ){
+            return line;
+        }
+    }
+
+    return '';
+}
+
 /* تحميل البيانات */
 
 function loadSavedData(){
@@ -382,16 +450,27 @@ function renderRow(v={}){
 
         }else if(isNotes){
 
+            const previewText=getLastNotePreview(val || '');
+
+            cell.className="notes-cell";
+
             cell.innerHTML=`
-            <input
-            type="text"
-            class="excel-input notes-trigger"
-            value="فتح"
-            readonly
-            onclick="openNote(this)">
+
+            <div
+            class="notes-preview"
+            onclick="openNote(this)"
+            >
+            ${previewText || 'لا توجد ملاحظات'}
+            </div>
+
+            <div class="notes-tooltip">
+            ${val || 'لا توجد ملاحظات'}
+            </div>
+
             `;
 
-            cell.querySelector('input').dataset.notes=val || '';
+            cell.querySelector('.notes-preview').dataset.notes =
+                val || '';
 
         }else{
 
@@ -473,25 +552,39 @@ function saveNote(){
 
             let updatedText="";
 
-            if(currentNotes.startsWith(todayHeader)){
+            /* الأقدم فوق - الأحدث تحت */
 
-                updatedText =
-                    todayHeader +
+            if(currentNotes.includes(todayHeader)){
+
+                updatedText=
+                    currentNotes +
                     "\n" +
-                    newText +
-                    "\n" +
-                    currentNotes.replace(todayHeader,"").trim();
+                    newText;
 
             }else{
 
-                updatedText =
+                updatedText=
+                    currentNotes +
+                    (currentNotes ? "\n\n" : "") +
                     todayHeader +
                     "\n" +
-                    newText +
-                    (currentNotes ? "\n\n" + currentNotes : "");
+                    newText;
             }
 
             currentActiveInput.dataset.notes=updatedText;
+
+            /* تحديث المعاينة */
+
+            currentActiveInput.innerText=
+                getLastNotePreview(updatedText);
+
+            /* تحديث التلميح */
+
+            currentActiveInput.parentElement
+                .querySelector('.notes-tooltip')
+                .innerText=updatedText;
+
+            /* تحديث نافذة السجل */
 
             document.getElementById('historyLog').innerText=
                 updatedText;
@@ -528,7 +621,7 @@ function saveAllData(){
 
     document.querySelectorAll('#tableBody tr').forEach(row=>{
 
-        const f=row.querySelectorAll('input, select');
+        const f=row.querySelectorAll('input, select, .notes-preview');
 
         data.push({
 
@@ -544,7 +637,7 @@ function saveAllData(){
 
             notes:f[9].dataset.notes || '',
 
-            editDate:today
+            editDate:f[10].value
         });
     });
 
@@ -560,9 +653,10 @@ function saveAllData(){
 
 window.onclick=function(e){
 
-    if(e.target ==
-        document.getElementById('noteModal')){
-
+    if(
+        e.target ==
+        document.getElementById('noteModal')
+    ){
         closeNote();
     }
 }
