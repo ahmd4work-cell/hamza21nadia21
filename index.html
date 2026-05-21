@@ -64,36 +64,59 @@
 
         h3 { font-size: 13px; margin: 0; color: var(--nav-purple); font-weight: 800; border-right: 4px solid var(--accent-blue); padding-right: 8px; margin-bottom: 15px; }
 
-        /* تنسيق صف الرسوم البيانية */
+        .yearly-table { width: 100%; border-collapse: collapse; font-size: 10.5px; table-layout: fixed; }
+        .yearly-table th, .yearly-table td { 
+            border: 0.5px solid var(--border-color); padding: 2px; height: 30px; 
+            text-align: center; font-weight: bold; color: #475569;
+        }
+        .yearly-table th { background: #f8fafc; color: var(--nav-purple); font-weight: 800; }
+        .thick-border { border-left: 3px solid var(--nav-purple) !important; }
+
+        .filters-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .filter-card { background: white; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 4px; }
+        .filter-card label { font-size: 9px; font-weight: 800; color: var(--nav-purple); }
+        .filter-input { width: 100%; border: none; background: var(--input-bg); font-family: 'Cairo'; font-size: 10px; padding: 4px; border-radius: 6px; outline: none; }
+
+        .stats-cards { display: flex; gap: 8px; width: 100%; align-items: center; }
+        .stat-card { 
+            flex: 1; height: 52px; padding: 5px 12px; border-radius: 10px; color: white; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; min-width: 0; box-sizing: border-box;
+        }
+        .stat-card .label-text { font-size: 10px; font-weight: bold; opacity: 0.9; }
+        .stat-card .value-text { font-size: 13.5px; font-weight: 800; }
+
+        .bg-blue { background-color: var(--accent-blue); }
+        .bg-green { background-color: var(--accent-green); }
+        .bg-yellow { background-color: var(--accent-yellow); color: #854d0e; }
+        .bg-purple { background-color: var(--accent-purple); }
+        .bg-orange { background-color: var(--accent-orange); }
+
+        /* تنسيق العداد الثلاثي */
         .charts-row {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
+            align-items: center;
             flex-grow: 1;
-            padding: 5px 0;
+            padding: 10px 0;
+            gap: 10px;
         }
-
-        .chart-item {
+        .chart-item-wrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
             flex: 1;
         }
-
         .chart-container {
             position: relative;
             width: 110px;
             height: 110px;
         }
-
-        /* حاوية الـ RPM (أكبر قليلاً) */
-        .rpm-container {
+        /* حاوية الـ RPM */
+        .gauge-container {
             position: relative;
             width: 180px;
-            height: 100px; /* نصف ارتفاع تقريباً */
-            overflow: hidden;
+            height: 110px;
         }
-
         .chart-percentage {
             position: absolute;
             top: 55%;
@@ -103,23 +126,21 @@
             font-weight: 800;
             color: var(--nav-purple);
         }
-
-        /* نسبة الـ RPM تكون في الأسفل قليلاً */
-        .rpm-value {
+        /* نص الـ RPM في المنتصف السفلي */
+        .gauge-value {
             position: absolute;
             bottom: 5px;
             left: 50%;
             transform: translateX(-50%);
             font-size: 18px;
-            font-weight: 800;
-            color: var(--accent-blue);
+            font-weight: 900;
+            color: #333;
         }
-
         .chart-label {
             text-align: center;
             font-size: 10px;
             font-weight: 800;
-            margin-top: 8px;
+            margin-top: 5px;
             color: #64748b;
         }
 
@@ -129,6 +150,23 @@
     </style>
 </head>
 <body>
+
+<nav class="navbar">
+    <a href="#" class="active">الرئيسية</a>
+    <a href="#">الزيارات</a>
+    <a href="#">الفرص البيعية</a>
+    <a href="#">العملاء</a>
+    <a href="#">المبيعات</a>
+</nav>
+
+<div class="employee-info-bar">
+    <div class="info-content">
+        <div class="info-item">الموظف: <span>محمد المنصور</span></div>
+        <div class="info-item">الرقم: <span>ASG-2026</span></div>
+        <div class="info-item">الموبايل: <span>05XXXXXXXX</span></div>
+        <div class="info-item">الايميل: <span>m.mansour@asgate.sa</span></div>
+    </div>
+</div>
 
 <div class="container">
     <div class="dashboard-grid">
@@ -152,16 +190,25 @@
         </div>
 
         <div class="left-section">
+            <div class="filters-grid">
+                <div class="filter-card"><label>الشهر</label><select class="filter-input"><option>الكل</option></select></div>
+                <div class="filter-card"><label>المنطقة</label><select class="filter-input"><option>الكل</option></select></div>
+                <div class="filter-card"><label>المشرف</label><select class="filter-input"><option>الكل</option></select></div>
+                <div class="filter-card"><label>المندوب</label><select class="filter-input"><option>الكل</option></select></div>
+            </div>
+            
             <div class="stats-cards">
                 <div class="stat-card bg-blue"><div class="label-text">الهدف السنوي</div><div class="value-text">180,000</div></div>
                 <div class="stat-card bg-green"><div class="label-text">المبيعات</div><div class="value-text">14,210</div></div>
                 <div class="stat-card bg-yellow"><div class="label-text">المعلق</div><div class="value-text">790</div></div>
+                <div class="stat-card bg-purple" style="flex:0.6"><div class="label-text">الزيارات</div><div class="value-text">45</div></div>
+                <div class="stat-card bg-orange" style="flex:0.6"><div class="label-text">ناجحة</div><div class="value-text">12</div></div>
             </div>
 
             <div class="content-box">
                 <h3>📈 تحليل الأداء الإجمالي</h3>
                 <div class="charts-row">
-                    <div class="chart-item">
+                    <div class="chart-item-wrapper">
                         <div class="chart-container">
                             <canvas id="achievedChart"></canvas>
                             <div class="chart-percentage">82%</div>
@@ -169,15 +216,15 @@
                         <div class="chart-label">المحقق</div>
                     </div>
 
-                    <div class="chart-item" style="flex: 1.5;">
-                        <div class="rpm-container">
-                            <canvas id="rpmChart"></canvas>
-                            <div class="rpm-value">920</div>
+                    <div class="chart-item-wrapper" style="flex: 1.5;">
+                        <div class="gauge-container">
+                            <canvas id="gaugeChart"></canvas>
+                            <div class="gauge-value">200%</div>
                         </div>
-                        <div class="chart-label">مؤشر سرعة الأداء (RPM)</div>
+                        <div class="chart-label">مؤشر الإنجاز</div>
                     </div>
 
-                    <div class="chart-item">
+                    <div class="chart-item-wrapper">
                         <div class="chart-container">
                             <canvas id="pendingChart"></canvas>
                             <div class="chart-percentage">18%</div>
@@ -191,12 +238,14 @@
 
     <div class="content-box staff-performance-section">
         <h3>👥 أداء فريق المبيعات (30 موظفاً)</h3>
-        <canvas id="staffChart"></canvas>
+        <div style="flex-grow: 1; position: relative; margin-top: 10px;">
+            <canvas id="staffChart"></canvas>
+        </div>
     </div>
 </div>
 
 <script>
-    // تهيئة الجدول
+    // تهيئة جدول الشهور
     const months = ["يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
     const tbody = document.getElementById('monthsBody');
     months.forEach((m, i) => {
@@ -211,24 +260,57 @@
         options: { cutout: '75%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
 
-    // 2. مؤشر RPM (المنتصف) - "نصف دائرة"
-    new Chart(document.getElementById('rpmChart'), {
+    // 2. عداد RPM (المنتصف)
+    const gaugeCtx = document.getElementById('gaugeChart').getContext('2d');
+    const gaugeChart = new Chart(gaugeCtx, {
         type: 'doughnut',
         data: {
             datasets: [{
-                data: [920, 80, 1000], // القيمة، المتبقي للسرعة، والجزء المخفي (السفلي)
-                backgroundColor: ['#3b82f6', '#e2e8f0', 'transparent'],
+                data: [30, 30, 40, 100], // أحمر (30) - أصفر (30) - أخضر (40) + الجزء المخفي (100)
+                backgroundColor: ['#ff0000', '#ffcc00', '#00b050', 'transparent'],
                 borderWidth: 0,
-                circumference: 180, // نصف دائرة
-                rotation: 270,      // تبدأ من اليسار لليمين
+                circumference: 180,
+                rotation: 270
             }]
         },
         options: {
-            cutout: '80%',
+            cutout: '85%',
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false }, tooltip: { enabled: false } }
-        }
+            plugins: { 
+                legend: { display: false },
+                tooltip: { enabled: false }
+            }
+        },
+        plugins: [{
+            id: 'needle',
+            afterDraw: (chart) => {
+                const { ctx, width, height } = chart;
+                ctx.save();
+                const centerX = width / 2;
+                const centerY = height - 15;
+                const radius = (height - 30);
+                
+                // حساب زاوية الإبرة (200% في المثال تعني الزاوية جهة اليمين)
+                // المدى هو 180 درجة (من اليسار 0 إلى اليمين 180)
+                const angle = Math.PI + (160 * Math.PI / 180); // 160 درجة لتمثيل قيمة عالية
+                
+                ctx.translate(centerX, centerY);
+                ctx.rotate(angle);
+                ctx.beginPath();
+                ctx.moveTo(0, -3);
+                ctx.lineTo(radius, 0);
+                ctx.lineTo(0, 3);
+                ctx.fillStyle = '#333';
+                ctx.fill();
+                
+                // قاعدة الإبرة
+                ctx.beginPath();
+                ctx.arc(0, 0, 6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }]
     });
 
     // 3. دائرة المعلق (يسار)
@@ -238,22 +320,25 @@
         options: { cutout: '75%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
 
-    // رسم فريق المبيعات
+    // الرسم السفلي: الموظفين
     const ctxStaff = document.getElementById('staffChart').getContext('2d');
     new Chart(ctxStaff, {
         type: 'bar',
         data: {
             labels: Array.from({length: 30}, (_, i) => `م${i + 1}`),
             datasets: [
-                { label: 'المحقق', data: Array.from({length: 30}, () => Math.floor(Math.random() * 5000) + 25000), backgroundColor: '#22c55e', barPercentage: 1.0, categoryPercentage: 0.8 },
-                { label: 'المعلق', data: Array.from({length: 30}, () => Math.floor(Math.random() * 3000) + 1000), backgroundColor: '#facc15', barPercentage: 1.0, categoryPercentage: 0.8 }
+                { label: 'الهدف المكتمل', data: Array.from({length: 30}, () => Math.floor(Math.random() * 5000) + 25000), backgroundColor: '#22c55e', barPercentage: 1.0, categoryPercentage: 0.8 },
+                { label: 'الهدف المعلق', data: Array.from({length: 30}, () => Math.floor(Math.random() * 3000) + 1000), backgroundColor: '#facc15', barPercentage: 1.0, categoryPercentage: 0.8 }
             ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            scales: { x: { grid: { display: false } }, y: { beginAtZero: true } },
-            plugins: { legend: { display: false } }
+            scales: {
+                x: { stacked: false, grid: { display: false }, ticks: { font: { family: 'Cairo', size: 9 } } },
+                y: { beginAtZero: true, ticks: { font: { family: 'Cairo', size: 10 } } }
+            },
+            plugins: { legend: { position: 'top', labels: { font: { family: 'Cairo' } } } }
         }
     });
 </script>
