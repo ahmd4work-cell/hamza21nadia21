@@ -39,7 +39,7 @@
         
         .excel-input { width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; font-size: 11.5px; }
 
-        /* تعديل CSS التلميح لضمان الظهور */
+        /* Tooltip Logic */
         .notes-cell { position: relative; }
         .notes-preview {
             width: 95%; border: none; background: transparent; font-family: 'Cairo'; font-size: 11px;
@@ -48,13 +48,13 @@
         }
         .notes-tooltip {
             position: absolute; 
-            top: 100%; /* التغيير ليكون لأسفل بدلاً من أعلى لتجنب الاختفاء تحت الهيدر */
+            top: 100%; /* تظهر تحت الصف */
             right: 0; 
             background: #334155; color: #fff;
             padding: 10px; border-radius: 8px; width: 260px; font-size: 11px;
             line-height: 1.8; white-space: pre-wrap; text-align: right;
             opacity: 0; visibility: hidden; transition: 0.2s; 
-            z-index: 9999; /* رفع الطبقة لأقصى حد */
+            z-index: 9999;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
         .notes-cell:hover .notes-tooltip { opacity: 1; visibility: visible; }
@@ -143,6 +143,7 @@
         if (!text) return '';
         const lines = text.split('\n').filter(x => x.trim() !== '');
         const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+        // للحصول على آخر نص تمت كتابته (في أسفل القائمة)
         for (let i = lines.length - 1; i >= 0; i--) {
             const line = lines[i].trim();
             const isHeader = days.some(day => line.startsWith(day));
@@ -166,7 +167,7 @@
     }
 
     function loadSavedData() {
-        const saved = localStorage.getItem('asgate_visits_v13');
+        const saved = localStorage.getItem('asgate_visits_final_v15');
         const tableBody = document.getElementById('tableBody');
         tableBody.innerHTML = '';
         if (saved) JSON.parse(saved).forEach(item => renderRow(item));
@@ -199,31 +200,41 @@
 
     function openNote(inputEl) {
         currentActiveInput = inputEl;
-        document.getElementById('historyLog').innerText = inputEl.dataset.notes || "لا توجد ملاحظات سابقة.";
+        const log = document.getElementById('historyLog');
+        log.innerText = inputEl.dataset.notes || "لا توجد ملاحظات سابقة.";
         document.getElementById('modalTextArea').value = "";
         document.getElementById('noteModal').style.display = "flex";
-        setTimeout(() => document.getElementById('modalTextArea').focus(), 50);
+        setTimeout(() => {
+            document.getElementById('modalTextArea').focus();
+            log.scrollTop = log.scrollHeight; // التمرير للأسفل لرؤية آخر ملاحظة
+        }, 50);
     }
 
     function saveNote() {
         if (currentActiveInput) {
             const newText = document.getElementById('modalTextArea').value.trim();
             if (newText !== "") {
-                const header = getFullDate();
+                const todayHeader = getFullDate();
                 let currentVal = currentActiveInput.dataset.notes || "";
+                
                 let updatedText = "";
-                if (currentVal.startsWith(header)) {
-                    let parts = currentVal.split("\n");
-                    parts.splice(1, 0, newText); 
-                    updatedText = parts.join("\n");
+                // المنطق: الأقدم فوق والأحدث تحت
+                if (currentVal.includes(todayHeader)) {
+                    // إذا كان التاريخ موجوداً، نضيف النص الجديد في نهاية السجل تماماً
+                    updatedText = currentVal + "\n" + newText;
                 } else {
-                    const separator = currentVal ? "\n--------------------\n" : "";
-                    updatedText = header + "\n" + newText + separator + currentVal;
+                    // إذا كان يوماً جديداً، نضيف التاريخ أولاً ثم النص تحته
+                    const separator = currentVal ? "\n\n--------------------\n\n" : "";
+                    updatedText = currentVal + separator + todayHeader + "\n" + newText;
                 }
+
                 currentActiveInput.dataset.notes = updatedText;
                 currentActiveInput.innerText = getLastNotePreview(updatedText);
                 currentActiveInput.parentElement.querySelector('.notes-tooltip').innerText = updatedText;
                 document.getElementById('historyLog').innerText = updatedText;
+                
+                const log = document.getElementById('historyLog');
+                log.scrollTop = log.scrollHeight;
             }
         }
         closeNote();
@@ -243,7 +254,7 @@
                 status: f[7].value, visitDate: f[8].value, notes: f[9].dataset.notes, editDate: today
             });
         });
-        localStorage.setItem('asgate_visits_v13', JSON.stringify(data));
+        localStorage.setItem('asgate_visits_final_v15', JSON.stringify(data));
         alert("تم الحفظ بنجاح");
     }
 
