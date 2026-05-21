@@ -91,10 +91,10 @@
         .charts-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             flex-grow: 1;
             padding: 0;
-            gap: 5px;
+            gap: 0;
         }
         .chart-item-wrapper {
             display: flex;
@@ -102,31 +102,31 @@
             align-items: center;
             flex: 1;
         }
-        /* تكبير الدوائر لأقصى حد */
+        /* تكبير الدوائر الخضراء والصفراء */
         .chart-container-extra-large {
             position: relative;
-            width: 185px;
-            height: 185px;
+            width: 210px;
+            height: 210px;
         }
-        /* عداد المنتصف */
+        /* العداد الوسطي المصغر والمرتفع */
         .gauge-container-medium {
             position: relative;
-            width: 180px;
-            height: 110px;
-            margin-bottom: 20px;
+            width: 170px;
+            height: 100px;
+            margin-top: -5px;
         }
         .chart-percentage {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 800;
             color: var(--nav-purple);
         }
         .gauge-value {
             position: absolute;
-            bottom: 10px;
+            bottom: 0px;
             left: 50%;
             transform: translateX(-50%);
             font-size: 18px;
@@ -137,7 +137,7 @@
             text-align: center;
             font-size: 12px;
             font-weight: 800;
-            margin-top: -5px;
+            margin-top: -10px;
             color: #475569;
         }
 
@@ -213,12 +213,12 @@
                         <div class="chart-label">المحقق</div>
                     </div>
 
-                    <div class="chart-item-wrapper" style="flex: 1.2;">
+                    <div class="chart-item-wrapper" style="flex: 0.8;">
                         <div class="gauge-container-medium">
                             <canvas id="gaugeChart"></canvas>
                             <div class="gauge-value">200%</div>
                         </div>
-                        <div class="chart-label">مؤشر الإنجاز</div>
+                        <div class="chart-label" style="margin-top: 5px;">مؤشر الإنجاز</div>
                     </div>
 
                     <div class="chart-item-wrapper">
@@ -249,29 +249,28 @@
         row.innerHTML = `<td>${m}</td><td>15k</td><td>${i===0?'14.2k':'-'}</td><td class="thick-border">${i===0?'790':'-'}</td><td style="color:#3b82f6">${i===0?'45':'-'}</td><td style="color:#22c55e">${i===0?'12':'-'}</td>`;
     });
 
-    // 1. دائرة المحقق
+    // 1. المحقق
     new Chart(document.getElementById('achievedChart'), {
         type: 'doughnut',
         data: { datasets: [{ data: [82, 18], backgroundColor: ['#22c55e', '#f1f5f9'], borderWidth: 0, borderRadius: 10 }] },
-        options: { cutout: '90%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        options: { cutout: '85%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
 
-    // 2. عداد RPM (نصف دائرة - 4 ألوان)
+    // 2. العداد الرباعي (نصف دائرة)
     const gaugeCtx = document.getElementById('gaugeChart').getContext('2d');
     new Chart(gaugeCtx, {
         type: 'doughnut',
         data: {
             datasets: [{
-                // أحمر، أصفر، أخضر، أخضر غامق + الجزء المخفي للسفلي
-                data: [50, 50, 50, 50], 
-                backgroundColor: ['#ef4444', '#fbbf24', '#22c55e', '#15803d', 'transparent'],
+                data: [25, 25, 25, 25], 
+                backgroundColor: ['#ef4444', '#fbbf24', '#4ade80', '#15803d'],
                 borderWidth: 0,
                 circumference: 180,
                 rotation: 270
             }]
         },
         options: {
-            cutout: '95%',
+            cutout: '90%',
             responsive: true,
             maintainAspectRatio: false,
             plugins: { legend: { display: false }, tooltip: { enabled: false } }
@@ -282,10 +281,9 @@
                 const { ctx, width, height } = chart;
                 ctx.save();
                 const centerX = width / 2;
-                const centerY = height - 15;
-                const radius = height - 30;
-                // الإبرة تشير للأخضر الغامق (قيمة عالية)
-                const angle = Math.PI + (170 * Math.PI / 200); 
+                const centerY = height - 10;
+                const radius = height - 25;
+                const angle = Math.PI + (165 * Math.PI / 180); 
                 ctx.translate(centerX, centerY);
                 ctx.rotate(angle);
                 ctx.beginPath();
@@ -295,18 +293,18 @@
                 ctx.fillStyle = '#1e293b';
                 ctx.fill();
                 ctx.beginPath();
-                ctx.arc(0, 0, 6, 0, Math.PI * 2);
+                ctx.arc(0, 0, 5, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.restore();
             }
         }]
     });
 
-    // 3. دائرة المعلق
+    // 3. المعلق
     new Chart(document.getElementById('pendingChart'), {
         type: 'doughnut',
         data: { datasets: [{ data: [18, 82], backgroundColor: ['#facc15', '#f1f5f9'], borderWidth: 0, borderRadius: 10 }] },
-        options: { cutout: '82%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        options: { cutout: '85%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
 
     // بار الموظفين
