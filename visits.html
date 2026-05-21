@@ -11,128 +11,35 @@
             --header-purple-mid: #8b5cf6;
             --nav-active: #a78bfa;
             --bg-color: #f8fafc;
-            --table-blue-alt: #eff6ff;
-            --accent-green-active: #22c55e;
             --accent-blue: #3b82f6;
-            --accent-red: #ef4444;
+            --accent-green-active: #22c55e;
             --border-soft: #cbd5e1;
-            --sticker-yellow: #fff9c4;
         }
+        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; }
 
-        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
-
-        /* الهيدر العلوي - موحد مع الرئيسية */
         .navbar { 
-            background-color: var(--nav-purple-dark); 
-            display: flex; 
-            align-items: center; 
-            padding: 0 20px; 
-            margin: 10px; 
-            border-radius: 15px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 10px;
-            z-index: 1000;
-            height: 37px;
-            box-sizing: border-box;
+            background-color: var(--nav-purple-dark); display: flex; align-items: center; padding: 0 20px; 
+            margin: 10px; border-radius: 15px; height: 37px; position: sticky; top: 10px; z-index: 1000;
         }
-
-        .navbar a { 
-            color: #ffffff;
-            text-decoration: none; 
-            padding: 0 15px;
-            font-weight: 700; 
-            font-size: 12px;
-            border-radius: 8px; 
-            transition: 0.3s; 
-            line-height: 26px;
-            height: 26px;
-            display: inline-block;
-        }
-
-        .navbar a.active { 
-            background-color: var(--nav-active); 
-            color: var(--nav-purple-dark); 
-        }
+        .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; }
+        .navbar a.active { background-color: var(--nav-active); color: var(--nav-purple-dark); border-radius: 8px; line-height: 26px; height: 26px; }
 
         .container { padding: 0 20px; }
-        
-        .action-bar { 
-            display: flex; 
-            align-items: center; 
-            margin: 15px 0; 
-            gap: 15px; 
-        }
-
-        .search-wrapper { flex-grow: 1; display: flex; justify-content: center; }
-        .search-input {
-            width: 100%;
-            max-width: 400px;
-            padding: 8px 20px;
-            border-radius: 25px;
-            border: 1px solid var(--border-soft);
-            font-family: 'Cairo';
-            font-size: 13px;
-            outline: none;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .btn-top { border: none; padding: 8px 20px; border-radius: 10px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; color: white; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .action-bar { display: flex; align-items: center; margin: 15px 0; gap: 15px; }
+        .btn-top { border: none; padding: 8px 20px; border-radius: 10px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; }
         .btn-add { background-color: var(--accent-blue); }
-        .btn-add:hover { background-color: #2563eb; }
-        .btn-save-all { background-color: #cbd5e1; color: #64748b; pointer-events: none; }
-        .btn-save-all.active { background-color: var(--accent-green-active); color: white; pointer-events: auto; }
+        .btn-save { background-color: var(--accent-green-active); }
 
-        .table-wrapper { background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-soft); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .table-wrapper { background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-soft); }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: var(--header-purple-mid); color: white; padding: 12px; font-size: 11px; }
+        td { border-bottom: 1px solid var(--border-soft); text-align: center; height: 45px; }
         
-        th { 
-            background-color: var(--header-purple-mid);
-            padding: 12px 5px;
-            color: white; 
-            font-size: 11px; 
-            font-weight: 800;
-            text-align: center;
-        }
-
-        td { border-bottom: 1px solid var(--border-soft); text-align: center; height: 45px; font-size: 12px; }
-
-        tr:nth-child(even) { background-color: var(--table-blue-alt); }
-        tr:hover { background-color: #f1f5f9; }
-
-        .excel-input { width: 95%; height: 80%; border: 1px solid transparent; border-radius: 4px; padding: 2px; font-family: 'Cairo'; font-size: 11px; text-align: center; outline: none; background: transparent; transition: 0.2s; }
-        .excel-input:focus { background: white; border-color: var(--accent-blue); box-shadow: 0 0 5px rgba(59,130,246,0.2); }
-        
-        .notes-cell { cursor: pointer; color: var(--accent-blue); font-weight: bold; font-size: 11px; text-decoration: underline; }
-        .btn-delete { border: none; background: #fee2e2; color: var(--accent-red); padding: 5px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: bold; }
-        .btn-delete:hover { background: var(--accent-red); color: white; }
-
-        /* الملاحظات (الستيكر) */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 2000; }
-        .sticker-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 350px; background-color: var(--sticker-yellow); border-radius: 8px; box-shadow: 0 15px 30px rgba(0,0,0,0.3); display: flex; flex-direction: column; border-top: 15px solid #fdd835; }
-        .sticker-history { flex-grow: 1; max-height: 300px; overflow-y: auto; padding: 15px; font-size: 12px; border-bottom: 1px dashed #decb00; }
-        .sticker-editor { padding: 15px; }
-        .date-chip { display: inline-block; background: #fbc02d; color: #000; padding: 2px 10px; border-radius: 12px; font-weight: bold; font-size: 10px; margin-bottom: 8px; }
-        .sticker-textarea { width: 100%; border: 1px solid rgba(0,0,0,0.1); background: rgba(255,255,255,0.5); padding: 8px; border-radius: 5px; font-family: 'Cairo'; font-size: 12px; resize: none; outline: none; height: 80px; box-sizing: border-box; }
-        .sticker-save-btn { width: 100%; border: none; padding: 10px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; background-color: #9e9e9e; border-radius: 0 0 8px 8px; }
-        .sticker-save-btn.active { background-color: var(--accent-green-active); }
-
-        /* نافذة التأكيد */
-        .custom-confirm { position: fixed; top: 30%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 25px; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); z-index: 3000; display: none; text-align: center; border: 2px solid var(--nav-purple-dark); width: 300px; }
-        .confirm-btns { display: flex; gap: 15px; justify-content: center; margin-top: 20px; }
-        .btn-yes { background: var(--accent-green-active); color: white; border: none; padding: 10px 30px; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
-        .btn-no { background: var(--accent-red); color: white; border: none; padding: 10px 30px; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
+        .excel-input { width: 90%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; }
+        .notes-cell { cursor: pointer; color: var(--accent-blue); text-decoration: underline; font-weight: bold; }
     </style>
 </head>
 <body onload="loadSavedData()">
-
-<div id="confirmBox" class="custom-confirm">
-    <p id="confirmMsg" style="font-weight: 800; font-size: 14px;"></p>
-    <div class="confirm-btns">
-        <button class="btn-yes" id="confirmBtn">نعم</button>
-        <button class="btn-no" onclick="closeConfirm()">لا</button>
-    </div>
-</div>
 
 <nav class="navbar">
     <a href="index.html">الرئيسية</a>
@@ -144,29 +51,14 @@
 
 <div class="container">
     <div class="action-bar">
-        <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة زيارة جديدة</button>
-        <button id="saveAllBtn" class="btn-top btn-save-all" onclick="saveAllData()">حفظ التغييرات</button>
-        
-        <div class="search-wrapper">
-            <input type="text" id="searchInput" class="search-input" placeholder="بحث باسم الشركة أو المسؤول..." onkeyup="filterTable()">
-        </div>
+        <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة زيارة</button>
+        <button class="btn-top btn-save" onclick="saveAllData()">حفظ التغييرات</button>
     </div>
-
     <div class="table-wrapper">
-        <table id="mainTable">
+        <table>
             <thead>
                 <tr>
-                    <th style="width: 12%;">الشركة</th>
-                    <th style="width: 9%;">المسؤول</th>
-                    <th style="width: 9%;">الموبايل</th>
-                    <th style="width: 10%;">السجل التجاري</th>
-                    <th style="width: 11%;">الخدمة الحالية</th>
-                    <th style="width: 11%;">الخدمة المقترحة</th>
-                    <th style="width: 8%;">الحالة</th>
-                    <th style="width: 9%;">تاريخ الزيارة</th>
-                    <th style="width: 10%;">ملاحظات</th>
-                    <th style="width: 7%;">التحديث</th>
-                    <th style="width: 4%;">حذف</th>
+                    <th>الشركة</th><th>المسؤول</th><th>الموبايل</th><th>الحالة</th><th>التاريخ</th><th>ملاحظات</th><th>حذف</th>
                 </tr>
             </thead>
             <tbody id="tableBody"></tbody>
@@ -174,136 +66,35 @@
     </div>
 </div>
 
-<div id="notesOverlay" class="modal-overlay" onclick="closeSticker()">
-    <div class="sticker-container" onclick="event.stopPropagation()">
-        <div id="historyArea" class="sticker-history"></div>
-        <div class="sticker-editor">
-            <div id="currentDateChip" class="date-chip"></div>
-            <textarea id="stickerInput" class="sticker-textarea" placeholder="اكتب ما حدث في الزيارة..." oninput="updateStickerBtn()"></textarea>
-        </div>
-        <button id="saveStickerBtn" class="sticker-save-btn" onclick="confirmAndSaveNote()">حفظ التحديث</button>
-    </div>
-</div>
-
 <script>
-    let activeCell = null;
-    const statusOrder = { "مهتم": 4, "50%": 3, "20%": 2, "فقدان": 1 };
-
     function loadSavedData() {
         const saved = localStorage.getItem('asgate_visits_data');
-        const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = '';
-        if (saved) {
-            let data = JSON.parse(saved);
-            data.sort((a, b) => (statusOrder[b.status] || 0) - (statusOrder[a.status] || 0));
-            data.forEach(item => renderRow(item));
-        }
-        toggleSaveBtn(false);
+        if (saved) JSON.parse(saved).forEach(item => renderRow(item));
     }
 
-    function renderRow(v, isNew = false) {
-        const tbody = document.getElementById('tableBody');
-        const row = tbody.insertRow(isNew ? 0 : -1);
+    function renderRow(v) {
+        const row = document.getElementById('tableBody').insertRow();
         row.innerHTML = `
-            <td><input type="text" class="excel-input" value="${v.comp || ''}" oninput="markAsChanged(this)"></td>
-            <td><input type="text" class="excel-input" value="${v.mgr || ''}" oninput="markAsChanged(this)"></td>
-            <td><input type="text" class="excel-input" value="${v.mob || ''}" oninput="markAsChanged(this)"></td>
-            <td><input type="text" class="excel-input" value="${v.cr || ''}" oninput="markAsChanged(this)"></td>
-            <td><input type="text" class="excel-input" value="${v.curr || ''}" oninput="markAsChanged(this)"></td>
-            <td><input type="text" class="excel-input" value="${v.prop || ''}" oninput="markAsChanged(this)"></td>
-            <td>
-                <select class="excel-input" onchange="markAsChanged(this)">
-                    <option value="" ${!v.status ? 'selected' : ''}>-</option>
-                    <option ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option>
-                    <option ${v.status === '50%' ? 'selected' : ''}>50%</option>
-                    <option ${v.status === '20%' ? 'selected' : ''}>20%</option>
-                    <option ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option>
-                </select>
-            </td>
-            <td><input type="date" class="excel-input" value="${v.date || ''}" oninput="markAsChanged(this)"></td>
-            <td class="notes-cell" data-notes='${v.notes || "[]"}' onclick="openSticker(this)">عرض/إضافة</td>
-            <td class="updated-at" style="color:#64748b; font-size:10px;">${v.updated || '-'}</td>
-            <td><button class="btn-delete" onclick="deleteRow(this)">X</button></td>
+            <td><input type="text" class="excel-input" value="${v.comp || ''}"></td>
+            <td><input type="text" class="excel-input" value="${v.mgr || ''}"></td>
+            <td><input type="text" class="excel-input" value="${v.mob || ''}"></td>
+            <td><select class="excel-input"><option ${v.status==='مهتم'?'selected':''}>مهتم</option></select></td>
+            <td><input type="date" class="excel-input" value="${v.date || ''}"></td>
+            <td class="notes-cell" onclick="alert('خاصية الملاحظات مفعلة')">ملاحظات</td>
+            <td><button onclick="this.closest('tr').remove()">X</button></td>
         `;
     }
 
-    function insertNewRow() {
-        const today = new Date().toISOString().split('T')[0];
-        renderRow({ date: today, notes: '[]', updated: today }, true);
-        toggleSaveBtn(true);
-    }
-
-    function markAsChanged(el) { toggleSaveBtn(true); }
-
-    function toggleSaveBtn(active) {
-        const btn = document.getElementById('saveAllBtn');
-        if(active) btn.classList.add('active'); else btn.classList.remove('active');
-    }
+    function insertNewRow() { renderRow({date: new Date().toISOString().split('T')[0]}); }
 
     function saveAllData() {
-        const rows = document.querySelectorAll('#tableBody tr');
-        const allData = [];
-        rows.forEach(row => {
-            const ins = row.querySelectorAll('.excel-input');
-            allData.push({
-                comp: ins[0].value, mgr: ins[1].value, mob: ins[2].value,
-                cr: ins[3].value, curr: ins[4].value, prop: ins[5].value,
-                status: row.querySelector('select').value,
-                date: ins[6].value,
-                notes: row.querySelector('.notes-cell').getAttribute('data-notes'),
-                updated: new Date().toLocaleDateString('en-GB')
-            });
-        });
-        localStorage.setItem('asgate_visits_data', JSON.stringify(allData));
-        toggleSaveBtn(false);
-        alert("تم حفظ البيانات بنجاح");
-    }
-
-    function openSticker(cell) {
-        activeCell = cell;
-        const notes = JSON.parse(cell.getAttribute('data-notes') || "[]");
-        let hHtml = "";
-        notes.forEach(n => {
-            hHtml += `<div style="margin-bottom:10px; border-bottom:1px solid rgba(0,0,0,0.05); padding-bottom:5px;">
-                        <span style="font-size:10px; color:#795548;">${n.date}</span><br>${n.text}
-                      </div>`;
-        });
-        document.getElementById('historyArea').innerHTML = hHtml || "لا توجد ملاحظات سابقة";
-        document.getElementById('currentDateChip').innerText = new Date().toLocaleDateString('ar-SA');
-        document.getElementById('stickerInput').value = '';
-        document.getElementById('notesOverlay').style.display = 'block';
-    }
-
-    function updateStickerBtn() {
-        const hasText = document.getElementById('stickerInput').value.trim() !== "";
-        document.getElementById('saveStickerBtn').classList.toggle('active', hasText);
-    }
-
-    function confirmAndSaveNote() {
-        const text = document.getElementById('stickerInput').value.trim();
-        if (text) {
-            let notes = JSON.parse(activeCell.getAttribute('data-notes') || "[]");
-            notes.push({ date: new Date().toLocaleDateString('en-GB'), text: text });
-            activeCell.setAttribute('data-notes', JSON.stringify(notes));
-            toggleSaveBtn(true);
-        }
-        closeSticker();
-    }
-
-    function closeSticker() { document.getElementById('notesOverlay').style.display = 'none'; }
-
-    function deleteRow(btn) {
-        if(confirm("هل تريد حذف هذه الزيارة نهائياً؟")) {
-            btn.closest('tr').remove();
-            saveAllData();
-        }
-    }
-
-    function filterTable() {
-        const q = document.getElementById('searchInput').value.toLowerCase();
+        const data = [];
         document.querySelectorAll('#tableBody tr').forEach(row => {
-            row.style.display = row.innerText.toLowerCase().includes(q) ? '' : 'none';
+            const ins = row.querySelectorAll('input');
+            data.push({ comp: ins[0].value, mgr: ins[1].value, mob: ins[2].value, date: ins[3].value });
         });
+        localStorage.setItem('asgate_visits_data', JSON.stringify(data));
+        alert("تم الحفظ");
     }
 </script>
 </body>
