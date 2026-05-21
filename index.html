@@ -233,6 +233,7 @@
     }
     initChart(currentChartType);
 
+    // --- تعديل الرسم البياني السفلي للتلاصق الجانبي التام ---
     const ctxStaff = document.getElementById('staffChart').getContext('2d');
     const staffLabels = Array.from({length: 30}, (_, i) => `${i + 1}`);
 
@@ -245,15 +246,15 @@
                     label: 'الهدف',
                     data: Array.from({length: 30}, () => Math.floor(Math.random() * 5000) + 10000),
                     backgroundColor: '#22c55e',
-                    barPercentage: 0.8,      // عرض العمود الأخضر
-                    categoryPercentage: 0.7  // المسافة الإجمالية بين الموظفين
+                    barPercentage: 1.0,      // ملء العمود الأخضر لحيزه بالكامل ليلصق بما بعده
+                    categoryPercentage: 0.8  // التحكم في المسافة بين كل موظف والآخر
                 },
                 {
                     label: 'المعلق',
                     data: Array.from({length: 30}, () => Math.floor(Math.random() * 4000) + 1000),
                     backgroundColor: '#facc15',
-                    barPercentage: 0.4,      // تقليل عرض العمود الأصفر للنصف مقارنة بالأخضر
-                    categoryPercentage: 0.7
+                    barPercentage: 0.5,      // العمود الأصفر أنحف (نصف العرض)
+                    categoryPercentage: 0.8
                 }
             ]
         },
@@ -262,7 +263,7 @@
             maintainAspectRatio: false,
             scales: {
                 x: { 
-                    stacked: false, 
+                    stacked: false, // بجانب بعضهما أفقيًا
                     grid: { display: false },
                     ticks: { font: { family: 'Cairo', size: 9, weight: 300 } }
                 },
