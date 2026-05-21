@@ -39,7 +39,7 @@
         
         .excel-input { width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; font-size: 11.5px; }
 
-        /* Tooltip Style */
+        /* Tooltip */
         .notes-cell { position: relative; }
         .notes-preview {
             width: 95%; border: none; background: transparent; font-family: 'Cairo'; font-size: 11px;
@@ -47,19 +47,15 @@
             overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
         }
         .notes-tooltip {
-            position: absolute; 
-            top: 100%; 
-            right: 0; 
-            background: #334155; color: #fff;
+            position: absolute; top: 100%; right: 0; background: #334155; color: #fff;
             padding: 10px; border-radius: 8px; width: 260px; font-size: 11px;
             line-height: 1.8; white-space: pre-wrap; text-align: right;
-            opacity: 0; visibility: hidden; transition: 0.2s; 
-            z-index: 9999;
+            opacity: 0; visibility: hidden; transition: 0.2s; z-index: 9999;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
         .notes-cell:hover .notes-tooltip { opacity: 1; visibility: visible; }
 
-        /* Modal Style */
+        /* Modal */
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; }
         .modal-content { 
             background: white; padding: 15px; border-radius: 10px; 
@@ -70,20 +66,21 @@
         .history-log {
             flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft);
             border-radius: 6px; padding: 12px; margin-bottom: 10px; font-size: 12px; color: #1e293b;
-            text-align: right; line-height: 2;
+            text-align: right; line-height: 1.8;
         }
 
-        /* تنسيق سطر التاريخ المظلل */
+        /* تنسيق التاريخ المظلل */
         .date-header {
-            background-color: #ede9fe; /* لون بنفسجي فاتح جداً */
+            background-color: #ede9fe;
             color: #5b21b6;
             padding: 2px 8px;
             border-radius: 4px;
             font-weight: 800;
-            display: block;
-            margin-top: 10px;
-            margin-bottom: 5px;
+            display: inline-block;
+            margin-top: 8px;
+            margin-bottom: 4px;
             border-right: 3px solid var(--header-purple-mid);
+            font-size: 11px;
         }
 
         .note-area { 
@@ -148,23 +145,19 @@
     function getFullDate() {
         const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
         const d = new Date();
-        const dateStr = d.getDate().toString().padStart(2, '0') + '-' + (d.getMonth() + 1).toString().padStart(2, '0') + '-' + d.getFullYear();
-        return days[d.getDay()] + ' ' + dateStr;
+        return days[d.getDay()] + ' ' + d.getDate().toString().padStart(2, '0') + '-' + (d.getMonth() + 1).toString().padStart(2, '0') + '-' + d.getFullYear();
     }
 
     function getLastNotePreview(html) {
         if (!html) return '';
-        // تحويل الـ HTML إلى نص عادي لاستخراج آخر ملاحظة للمعاينة
         const temp = document.createElement("div");
         temp.innerHTML = html;
         const text = temp.innerText;
         const lines = text.split('\n').filter(x => x.trim() !== '');
         const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-        
         for (let i = lines.length - 1; i >= 0; i--) {
             const line = lines[i].trim();
-            const isHeader = days.some(day => line.startsWith(day));
-            if (!isHeader && line !== "--------------------" && line !== "") return line;
+            if (!days.some(day => line.startsWith(day)) && line !== "") return line;
         }
         return '';
     }
@@ -173,18 +166,14 @@
         const previewText = getLastNotePreview(value);
         cell.className = "notes-cell";
         cell.innerHTML = `
-            <div class="notes-preview" onclick="openNote(this)">
-                ${previewText || 'لا توجد ملاحظات'}
-            </div>
-            <div class="notes-tooltip">
-                ${value || 'لا توجد ملاحظات'}
-            </div>
+            <div class="notes-preview" onclick="openNote(this)">${previewText || 'لا توجد ملاحظات'}</div>
+            <div class="notes-tooltip">${value || 'لا توجد ملاحظات'}</div>
         `;
         cell.querySelector('.notes-preview').dataset.notes = value || '';
     }
 
     function loadSavedData() {
-        const saved = localStorage.getItem('asgate_visits_final_v16');
+        const saved = localStorage.getItem('asgate_visits_final_v17');
         const tableBody = document.getElementById('tableBody');
         tableBody.innerHTML = '';
         if (saved) JSON.parse(saved).forEach(item => renderRow(item));
@@ -199,7 +188,6 @@
             if (isNotes) {
                 createNotesCell(cell, val);
             } else if (isSelect) {
-                cell.className = "cell-container";
                 cell.innerHTML = `<select class="excel-input"><option value="جديد" ${val==='جديد'?'selected':''}>جديد</option><option value="مهتم" ${val==='مهتم'?'selected':''}>مهتم</option><option value="مغلق" ${val==='مغلق'?'selected':''}>مغلق</option></select>`;
             } else {
                 const today = new Date().toLocaleDateString('en-GB');
@@ -218,6 +206,7 @@
     function openNote(inputEl) {
         currentActiveInput = inputEl;
         const log = document.getElementById('historyLog');
+        // هنا كان الخطأ، تم استخدام innerHTML لاسترجاع الوسوم بشكل صحيح
         log.innerHTML = inputEl.dataset.notes || "لا توجد ملاحظات سابقة.";
         document.getElementById('modalTextArea').value = "";
         document.getElementById('noteModal').style.display = "flex";
@@ -233,18 +222,13 @@
             if (newText !== "") {
                 const todayHeader = getFullDate();
                 let currentVal = currentActiveInput.dataset.notes || "";
-                
                 let updatedHTML = "";
-                // المنطق: الأقدم فوق والأحدث تحت مع تظليل التاريخ
-                const dateHTML = `<span class="date-header">${todayHeader}</span>`;
-                
+
                 if (currentVal.includes(todayHeader)) {
-                    // إذا كان التاريخ موجوداً، أضف الملاحظة في النهاية
-                    updatedHTML = currentVal + "<div>" + newText + "</div>";
+                    updatedHTML = currentVal + `<div>${newText}</div>`;
                 } else {
-                    // يوم جديد: إضافة فاصل وتاريخ مظلل وملاحظة
-                    const separator = currentVal ? '<div style="border-bottom:1px dashed #cbd5e1; margin:10px 0;"></div>' : "";
-                    updatedHTML = currentVal + separator + dateHTML + "<div>" + newText + "</div>";
+                    const separator = currentVal ? '<div style="border-bottom:1px dashed #cbd5e1; margin:8px 0;"></div>' : "";
+                    updatedHTML = currentVal + separator + `<span class="date-header">${todayHeader}</span>` + `<div>${newText}</div>`;
                 }
 
                 currentActiveInput.dataset.notes = updatedHTML;
@@ -267,13 +251,15 @@
         const today = new Date().toLocaleDateString('en-GB');
         document.querySelectorAll('#tableBody tr').forEach(row => {
             const f = row.querySelectorAll('input, select, .notes-preview');
-            data.push({
-                comp: f[0].value, mgr: f[1].value, mob: f[2].value, email: f[3].value,
-                record: f[4].value, curServ: f[5].value, propServ: f[6].value,
-                status: f[7].value, visitDate: f[8].value, notes: f[9].dataset.notes, editDate: today
-            });
+            if(f.length > 0) {
+                data.push({
+                    comp: f[0].value, mgr: f[1].value, mob: f[2].value, email: f[3].value,
+                    record: f[4].value, curServ: f[5].value, propServ: f[6].value,
+                    status: f[7].value, visitDate: f[8].value, notes: f[9].dataset.notes, editDate: today
+                });
+            }
         });
-        localStorage.setItem('asgate_visits_final_v16', JSON.stringify(data));
+        localStorage.setItem('asgate_visits_final_v17', JSON.stringify(data));
         alert("تم الحفظ بنجاح");
     }
 
