@@ -32,66 +32,53 @@
         .btn-add { background-color: var(--accent-blue); }
         .btn-save { background-color: var(--accent-green-active); }
 
-        /* Table Styles */
+        /* Table */
         .table-wrapper { background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-soft); margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         th { background: var(--header-purple-mid); color: white; padding: 12px 5px; font-size: 11px; font-weight: 800; text-align: center; }
         td { border-bottom: 1px solid var(--border-soft); text-align: center; height: 45px; padding: 2px; position: relative; }
         
-        .excel-input { 
-            width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; 
-            background: transparent; font-size: 11.5px; transition: all 0.2s ease;
-        }
-        .excel-input:focus { 
-            background: #ffffff; min-width: 140%; transform: scale(1.1);
-            box-shadow: 0 10px 15px rgba(0,0,0,0.1); border-radius: 6px; z-index: 50; position: relative;
-        }
+        /* Inputs & Tooltips */
+        .excel-input { width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; font-size: 11.5px; transition: all 0.2s ease; }
+        .excel-input:focus { background: #ffffff; min-width: 140%; transform: scale(1.1); box-shadow: 0 10px 15px rgba(0,0,0,0.1); border-radius: 6px; z-index: 50; position: relative; }
 
         .cell-container:hover .tooltip { opacity: 1; visibility: visible; }
         .tooltip {
             position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
-            background: #334155; color: white; padding: 4px 8px; border-radius: 4px;
+            background: #334155; color: white; padding: 6px 10px; border-radius: 4px;
             font-size: 10px; opacity: 0; visibility: hidden; z-index: 100; pointer-events: none;
-            max-width: 200px; white-space: normal; line-height: 1.4;
+            max-width: 250px; white-space: pre-line; line-height: 1.4; text-align: right;
         }
 
-        /* المودال - سجل الكتابة */
-        .modal {
-            display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.4); align-items: center; justify-content: center;
-        }
-        .modal-content {
-            background: white; padding: 20px; border-radius: 8px; width: 500px; height: 350px; 
-            display: flex; flex-direction: column; box-shadow: 0 15px 30px rgba(0,0,0,0.2);
-        }
-        .modal-header { font-weight: 800; color: var(--nav-purple-dark); margin-bottom: 10px; font-size: 14px; border-bottom: 1px solid #eee; padding-bottom: 5px;}
+        /* Modal - Professional Note Log */
+        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 20px; border-radius: 10px; width: 550px; height: 400px; display: flex; flex-direction: column; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .modal-header { font-weight: 800; color: var(--nav-purple-dark); margin-bottom: 12px; font-size: 15px; border-bottom: 2px solid var(--bg-color); padding-bottom: 8px; }
         
-        /* منطقة عرض السجل القديم */
         .history-log {
-            flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft);
-            border-radius: 5px; padding: 10px; margin-bottom: 10px; font-size: 11px; color: #64748b;
-            white-space: pre-wrap; text-align: right;
+            flex-grow: 1; overflow-y: auto; background: #f1f5f9; border: 1px solid var(--border-soft);
+            border-radius: 6px; padding: 12px; margin-bottom: 12px; font-size: 12px; color: #334155;
+            white-space: pre-wrap; text-align: right; line-height: 1.6;
         }
 
-        .fixed-date-label {
-            background: var(--nav-purple-dark); color: white; padding: 3px 10px; border-radius: 4px;
-            font-size: 11px; font-weight: bold; margin-bottom: 5px; display: inline-block;
-        }
+        .current-day-badge { background: var(--accent-blue); color: white; padding: 2px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; margin-bottom: 8px; display: inline-block; }
 
         .note-area { 
-            height: 80px; width: 100%; border: 1px solid var(--accent-blue); border-radius: 5px; 
-            padding: 8px; font-family: 'Cairo'; resize: none; outline: none; box-sizing: border-box;
-            background-color: #fffdf7; font-size: 12px;
+            height: 90px; width: 100%; border: 2px solid var(--border-soft); border-radius: 6px; 
+            padding: 10px; font-family: 'Cairo'; resize: none; outline: none; box-sizing: border-box;
+            background-color: #ffffff; font-size: 13px; transition: border-color 0.3s;
         }
-        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; }
+        .note-area:focus { border-color: var(--accent-blue); }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 12px; }
 
+        /* Column Config */
         .col-company { width: 12%; } .col-manager { width: 8%; } .col-mobile { width: 8%; } .col-email { width: 8%; }
         .col-record { width: 8%; } .col-current-service { width: 10%; } .col-proposed-service { width: 10%; }
         .col-status { width: 6%; } .col-date { width: 8%; } .col-notes { width: 10%; }
         .col-edit-date { width: 8%; } .col-action { width: 4%; }
 
         .readonly-style { color:#94a3b8; font-size:10px; }
-        .notes-trigger { cursor: pointer; color: var(--accent-blue); font-weight: 700; text-decoration: underline; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .notes-trigger { cursor: pointer; color: var(--accent-blue); font-weight: 700; text-decoration: underline; text-overflow: ellipsis; }
     </style>
 </head>
 <body onload="loadSavedData()">
@@ -127,16 +114,13 @@
 
 <div id="noteModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header">📝 سجل ملاحظات الزيارة</div>
-        
+        <div class="modal-header">📝 سجل متابعة الملاحظات</div>
         <div id="historyLog" class="history-log"></div>
-        
-        <div id="fixedDateDisplay" class="fixed-date-label"></div>
-        <textarea id="modalTextArea" class="note-area" placeholder="اكتب إضافة جديدة للسجل..."></textarea>
-        
+        <div class="current-day-badge" id="dayLabel"></div>
+        <textarea id="modalTextArea" class="note-area" placeholder="اكتب ملاحظة اليوم هنا..."></textarea>
         <div class="modal-footer">
-            <button class="btn-top" style="background:#94a3b8; padding: 5px 12px;" onclick="closeNote()">إلغاء</button>
-            <button class="btn-top btn-save" style="padding: 5px 12px;" onclick="saveNote()">إضافة للسجل</button>
+            <button class="btn-top" style="background:#94a3b8" onclick="closeNote()">إلغاء</button>
+            <button class="btn-top btn-save" onclick="saveNote()">تحديث السجل</button>
         </div>
     </div>
 </div>
@@ -150,14 +134,34 @@
     }
 
     function loadSavedData() {
-        const saved = localStorage.getItem('asgate_visits_detailed_v6');
+        const saved = localStorage.getItem('asgate_visits_pro_v7');
         const tableBody = document.getElementById('tableBody');
         tableBody.innerHTML = '';
-        if (saved) {
-            JSON.parse(saved).forEach(item => renderRow(item));
-        } else {
-            insertNewRow();
-        }
+        if (saved) JSON.parse(saved).forEach(item => renderRow(item));
+        else insertNewRow();
+    }
+
+    function renderRow(v = {}) {
+        const tbody = document.getElementById('tableBody');
+        const row = tbody.insertRow();
+        const createCell = (val, type, readonly, isSelect, isNotes) => {
+            let cell = row.insertCell();
+            cell.className = "cell-container";
+            if (isSelect) {
+                cell.innerHTML = `<select class="excel-input"><option value="جديد" ${val==='جديد'?'selected':''}>جديد</option><option value="مهتم" ${val==='مهتم'?'selected':''}>مهتم</option><option value="مغلق" ${val==='مغلق'?'selected':''}>مغلق</option></select><span class="tooltip">${val || 'جديد'}</span>`;
+            } else if (isNotes) {
+                cell.innerHTML = `<input type="text" class="excel-input notes-trigger" value="${val || ''}" readonly onclick="openNote(this)" onmouseover="updateTooltip(this)"><span class="tooltip">${val || 'فتح السجل'}</span>`;
+            } else {
+                cell.innerHTML = `<input type="${type}" class="excel-input ${readonly ? 'readonly-style' : ''}" value="${val || ''}" ${readonly ? 'readonly' : ''} oninput="updateTooltip(this)" onmouseover="updateTooltip(this)"><span class="tooltip">${val || '...'}</span>`;
+            }
+        };
+        createCell(v.comp, "text"); createCell(v.mgr, "text"); createCell(v.mob, "text"); createCell(v.email, "text");
+        createCell(v.record, "text"); createCell(v.curServ, "text"); createCell(v.propServ, "text");
+        createCell(v.status, "", false, true);
+        createCell(v.visitDate || getToday(), "text", true);
+        createCell(v.notes, "text", false, false, true);
+        createCell(v.editDate || getToday(), "text", true);
+        row.insertCell().innerHTML = `<button style="background:none;border:none;color:red;cursor:pointer;font-weight:bold;font-size:18px" onclick="this.closest('tr').remove()">×</button>`;
     }
 
     function updateTooltip(el) {
@@ -165,68 +169,36 @@
         if (tooltip) tooltip.innerText = el.value || "...";
     }
 
-    function renderRow(v = {}) {
-        const tbody = document.getElementById('tableBody');
-        const row = tbody.insertRow();
-        
-        const createCell = (val, type, readonly, isSelect, isNotes) => {
-            let cell = row.insertCell();
-            cell.className = "cell-container";
-            if (isSelect) {
-                cell.innerHTML = `<select class="excel-input" onchange="updateTooltip(this)"><option value="جديد" ${val==='جديد'?'selected':''}>جديد</option><option value="مهتم" ${val==='مهتم'?'selected':''}>مهتم</option><option value="مغلق" ${val==='مغلق'?'selected':''}>مغلق</option></select><span class="tooltip">${val || 'جديد'}</span>`;
-            } else if (isNotes) {
-                cell.innerHTML = `<input type="text" class="excel-input notes-trigger" value="${val || ''}" readonly onclick="openNote(this)" onmouseover="updateTooltip(this)"><span class="tooltip">${val || 'اضغط لفتح السجل'}</span>`;
-            } else {
-                cell.innerHTML = `<input type="${type}" class="excel-input ${readonly ? 'readonly-style' : ''}" value="${val || ''}" ${readonly ? 'readonly' : ''} oninput="updateTooltip(this)" onmouseover="updateTooltip(this)"><span class="tooltip">${val || '...'}</span>`;
-            }
-        };
-
-        createCell(v.comp, "text"); createCell(v.mgr, "text"); createCell(v.mob, "text"); createCell(v.email, "text");
-        createCell(v.record, "text"); createCell(v.curServ, "text"); createCell(v.propServ, "text");
-        createCell(v.status, "", false, true);
-        createCell(v.visitDate || getToday(), "text", true);
-        createCell(v.notes, "text", false, false, true);
-        createCell(v.editDate || getToday(), "text", true);
-
-        row.insertCell().innerHTML = `<button style="background:none;border:none;color:red;cursor:pointer;font-weight:bold;font-size:18px" onclick="this.closest('tr').remove()">×</button>`;
-    }
-
-    function insertNewRow() { 
-        renderRow({ status: 'جديد', visitDate: getToday(), editDate: getToday() }); 
-    }
-
     function openNote(inputEl) {
         currentActiveInput = inputEl;
         const modal = document.getElementById('noteModal');
         const historyLog = document.getElementById('historyLog');
         const textArea = document.getElementById('modalTextArea');
-        const dateDisplay = document.getElementById('fixedDateDisplay');
+        const dayLabel = document.getElementById('dayLabel');
         
-        dateDisplay.innerText = "إضافة بتاريخ: " + getToday();
-        
-        // عرض السجل السابق في منطقة العرض فقط
-        historyLog.innerText = inputEl.value || "لا توجد ملاحظات سابقة.";
-        
-        // تفريغ ساحة الكتابة لإضافة ملاحظة جديدة
+        dayLabel.innerText = "تاريخ اليوم: " + getToday();
+        historyLog.innerText = inputEl.value || "السجل فارغ..";
         textArea.value = "";
-        
         modal.style.display = "flex";
         setTimeout(() => textArea.focus(), 50);
     }
 
     function saveNote() {
         if (currentActiveInput) {
-            const textArea = document.getElementById('modalTextArea');
-            const newEntry = textArea.value.trim();
-            
-            if (newEntry !== "") {
-                const timestamp = "[" + getToday() + "]";
-                const currentHistory = currentActiveInput.value;
+            const newText = document.getElementById('modalTextArea').value.trim();
+            if (newText !== "") {
+                const today = getToday();
+                let currentVal = currentActiveInput.value;
+                const dateHeader = `📅 [${today}]`;
                 
-                // إضافة الملاحظة الجديدة في بداية السجل مع التاريخ
-                const updatedHistory = timestamp + "\n" + newEntry + "\n" + "----------------\n" + currentHistory;
-                
-                currentActiveInput.value = updatedHistory;
+                // التحقق: هل يوجد ترويسة لتاريخ اليوم في الأعلى؟
+                if (currentVal.startsWith(dateHeader)) {
+                    // إذا كان التاريخ موجوداً، ندرج النص الجديد تحته مباشرة (قبل الملاحظات القديمة لنفس اليوم)
+                    currentActiveInput.value = dateHeader + "\n- " + newText + "\n" + currentVal.replace(dateHeader + "\n", "");
+                } else {
+                    // إذا كان يوماً جديداً، ندرج التاريخ الجديد في البداية مع النص
+                    currentActiveInput.value = dateHeader + "\n- " + newText + "\n" + (currentVal ? "----------------\n" + currentVal : "");
+                }
                 updateTooltip(currentActiveInput);
             }
         }
@@ -234,6 +206,7 @@
     }
 
     function closeNote() { document.getElementById('noteModal').style.display = "none"; }
+    function insertNewRow() { renderRow({ status: 'جديد' }); }
 
     function saveAllData() {
         const data = [];
@@ -245,7 +218,7 @@
                 status: f[7].value, visitDate: f[8].value, notes: f[9].value, editDate: getToday()
             });
         });
-        localStorage.setItem('asgate_visits_detailed_v6', JSON.stringify(data));
+        localStorage.setItem('asgate_visits_pro_v7', JSON.stringify(data));
         alert("✅ تم حفظ السجل بنجاح");
     }
 
