@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASGate - لوحة تحكم المبيعات</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -27,6 +27,7 @@
             margin: 0; 
             line-height: 1.2; 
             font-size: 14px; 
+            font-weight: 300; /* جعل الخط الافتراضي أنحف */
         }
 
         .navbar { 
@@ -49,15 +50,14 @@
         }
         .info-content { display: flex; gap: 35px; align-items: center; }
         .info-item { font-size: 11px; color: var(--nav-purple); font-weight: 700; }
-        .info-item span { color: #64748b; font-weight: 400; margin-right: 5px; }
+        .info-item span { color: #64748b; font-weight: 300; margin-right: 5px; }
 
         .container { padding: 5px 20px 20px 20px; }
         
-        /* تعديل هنا لضمان تساوي الارتفاع */
         .dashboard-grid { 
             display: flex;
             gap: 20px;
-            align-items: stretch; /* هذا يجعل العناصر متساوية الطول من الأسفل */
+            align-items: stretch;
             width: 100%; 
         }
 
@@ -67,13 +67,12 @@
         .content-box { 
             background: var(--white); padding: 15px; border-radius: 12px; 
             border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
-            height: 100%; /* ليمتد داخل الحاوية */
+            height: 100%;
             display: flex;
             flex-direction: column;
             box-sizing: border-box;
         }
 
-        /* تعديل خاص لصندوق الرسم البياني ليملأ المساحة المتبقية */
         .chart-box { flex-grow: 1; }
 
         .chart-header {
@@ -88,6 +87,7 @@
         .toggle-btn {
             background-color: var(--nav-purple); color: white; border: none; padding: 4px 12px;
             border-radius: 20px; font-family: 'Cairo'; font-size: 9px; cursor: pointer; transition: 0.3s;
+            font-weight: 700;
         }
         .toggle-btn:hover { background-color: var(--accent-blue); }
 
@@ -96,15 +96,15 @@
         }
         .yearly-table th, .yearly-table td { 
             border: 0.5px solid var(--border-color); padding: 2px; height: 30px; 
-            text-align: center; font-weight: bold; color: #475569;
+            text-align: center; font-weight: 300; color: #475569; /* تنحيف خط خلايا الجدول */
         }
-        .yearly-table th { background: #f8fafc; color: var(--nav-purple); font-weight: 800; }
+        .yearly-table th { background: #f8fafc; color: var(--nav-purple); font-weight: 700; }
         .thick-border { border-left: 3px solid var(--nav-purple) !important; }
 
         .filters-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
         .filter-card { background: white; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 4px; }
         .filter-card label { font-size: 9px; font-weight: 800; color: var(--nav-purple); }
-        .filter-input { width: 100%; border: none; background: var(--input-bg); font-family: 'Cairo'; font-size: 10px; padding: 4px; border-radius: 6px; outline: none; }
+        .filter-input { width: 100%; border: none; background: var(--input-bg); font-family: 'Cairo'; font-size: 10px; padding: 4px; border-radius: 6px; outline: none; font-weight: 300; }
 
         .stats-cards { display: flex; gap: 8px; width: 100%; align-items: center; }
         .stat-card { 
@@ -114,8 +114,8 @@
         .stat-card-small { flex: 0.6; }
         .stat-spacer { flex: 0.2; }
         .stat-card-row { display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 5px; }
-        .stat-card .label-text { font-size: 10px; font-weight: bold; opacity: 0.9; white-space: nowrap; }
-        .stat-card .value-text { font-size: 13.5px; font-weight: 800; }
+        .stat-card .label-text { font-size: 10px; font-weight: 400; opacity: 0.9; white-space: nowrap; }
+        .stat-card .value-text { font-size: 13.5px; font-weight: 700; }
 
         .bg-blue { background-color: var(--accent-blue); }
         .bg-green { background-color: var(--accent-green); }
@@ -184,77 +184,4 @@
                     </select>
                 </div>
                 <div class="filter-card"><label>المنطقة</label><select class="filter-input"><option>الكل</option></select></div>
-                <div class="filter-card"><label>المشرف</label><select class="filter-input"><option>الكل</option></select></div>
-                <div class="filter-card"><label>المندوب</label><select class="filter-input"><option>الكل</option></select></div>
-            </div>
-            
-            <div class="stats-cards">
-                <div class="stat-card bg-blue"><div class="stat-card-row"><div class="label-text">الهدف السنوي</div><div class="value-text">180,000</div></div></div>
-                <div class="stat-card bg-green"><div class="stat-card-row"><div class="label-text">المبيعات</div><div class="value-text">14,210</div></div></div>
-                <div class="stat-card bg-yellow"><div class="stat-card-row"><div class="label-text">المعلق</div><div class="value-text">790</div></div></div>
-                <div class="stat-spacer"></div>
-                <div class="stat-card bg-purple stat-card-small"><div class="stat-card-row"><div class="label-text">الزيارات</div><div class="value-text">45</div></div></div>
-                <div class="stat-card bg-orange stat-card-small"><div class="stat-card-row"><div class="label-text">ناجحة</div><div class="value-text">12</div></div></div>
-            </div>
-
-            <div class="content-box chart-box">
-                <div class="chart-header">
-                    <h3>📈 تحليل الأداء</h3>
-                    <button class="toggle-btn" onclick="toggleChartType()">تبديل العرض</button>
-                </div>
-                <div class="chart-wrapper">
-                    <canvas id="performanceChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    const months = ["يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
-    const tbody = document.getElementById('monthsBody');
-    
-    months.forEach((m, i) => {
-        const row = tbody.insertRow();
-        row.innerHTML = `
-            <td>${m}</td>
-            <td>15k</td>
-            <td>${i===0?'14.2k':'-'}</td>
-            <td class="thick-border">${i===0?'790':'-'}</td>
-            <td style="color:#3b82f6">${i===0?'45':'-'}</td>
-            <td style="color:#22c55e">${i===0?'12':'-'}</td>
-        `;
-    });
-
-    let myChart = null;
-    let currentChartType = 'bar';
-
-    function initChart(type) {
-        const ctx = document.getElementById('performanceChart').getContext('2d');
-        if (myChart) myChart.destroy();
-        myChart = new Chart(ctx, {
-            type: type,
-            data: {
-                labels: months,
-                datasets: [
-                    { label: 'المكتمل', data: [14210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], backgroundColor: '#22c55e' },
-                    { label: 'المعلق', data: [790, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], backgroundColor: '#facc15' }
-                ]
-            },
-            options: { 
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { position: 'top', labels: { font: { family: 'Cairo', size: 10 } } } }
-            }
-        });
-    }
-
-    function toggleChartType() {
-        currentChartType = currentChartType === 'bar' ? 'pie' : 'bar';
-        initChart(currentChartType);
-    }
-
-    initChart(currentChartType);
-</script>
-
-</body>
-</html>
+                <div class="filter-card"><label>المشرف</label><select class="filter-input"><option>الكل</option></select
