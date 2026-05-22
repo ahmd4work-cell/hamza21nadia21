@@ -38,6 +38,7 @@
         td { border-bottom: 1px solid var(--border-soft); text-align: center; height: 45px; padding: 2px; position: relative; }
         
         .excel-input { width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; font-size: 11.5px; position: relative; z-index: 5; }
+        .readonly-input { color: #64748b; cursor: default; }
 
         /* Tooltip System */
         .custom-tooltip-cell { position: relative; }
@@ -131,10 +132,16 @@
 <script>
     let currentActivePreview = null;
 
-    function getFullDate() {
+    // الحصول على التاريخ الحالي بتنسيق DD/MM/YYYY
+    function getTodayFormatted() {
+        const d = new Date();
+        return d.getDate().toString().padStart(2, '0') + '/' + (d.getMonth() + 1).toString().padStart(2, '0') + '/' + d.getFullYear();
+    }
+
+    function getFullDateForNotes() {
         const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
         const d = new Date();
-        const dateStr = d.getDate().toString().padStart(2, '0') + '-' + (d.getMonth() + 1).toString().padStart(2, '0') + '-' + d.getFullYear();
+        const dateStr = getTodayFormatted();
         return "🗓️ " + days[d.getDay()] + " " + dateStr;
     }
 
@@ -142,6 +149,14 @@
         if (!fullText) return 'لا توجد ملاحظات';
         const lines = fullText.split('\n').filter(l => l.trim() !== "" && !l.includes("🗓️") && !l.includes("---"));
         return lines.length > 0 ? lines[lines.length - 1] : 'لا توجد ملاحظات';
+    }
+
+    // تحديث تاريخ التعديل بمجرد تغيير أي خلية
+    function markAsEdited(el) {
+        const row = el.closest('tr');
+        const editInput = row.querySelector('.edit-date-field');
+        editInput.value = getTodayFormatted();
+        updateTooltip(el);
     }
 
     function updateTooltip(input) {
@@ -164,7 +179,7 @@
     function saveNote() {
         const newText = document.getElementById('modalTextArea').value.trim();
         if (newText !== "" && currentActivePreview) {
-            const today = getFullDate();
+            const today = getFullDateForNotes();
             let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
             let updatedNotes = "";
             if (oldNotes.includes(today)) {
@@ -176,6 +191,9 @@
             currentActivePreview.setAttribute('data-full-notes', updatedNotes);
             currentActivePreview.innerText = getLastNoteOnly(updatedNotes);
             currentActivePreview.parentElement.querySelector('.tooltip-box').innerText = updatedNotes;
+            
+            // تحديث تاريخ التعديل عند إضافة ملاحظة
+            markAsEdited(currentActivePreview);
         }
         closeNote();
         saveAllData();
@@ -183,49 +201,52 @@
 
     function closeNote() { document.getElementById('noteModal').style.display = "none"; }
 
-    function renderRow(v = {}) {
+    function renderRow(v = {}, prepend = false) {
         const tbody = document.getElementById('tableBody');
-        const row = tbody.insertRow();
-        const today = new Date().toLocaleDateString('en-GB');
+        const row = prepend ? tbody.insertRow(0) : tbody.insertRow();
+        const today = getTodayFormatted();
 
         row.innerHTML = `
-            <td><input type="text" class="excel-input" value="${v.comp || ''}"></td>
-            <td><input type="text" class="excel-input" value="${v.mgr || ''}"></td>
-            <td><input type="text" class="excel-input" value="${v.mob || ''}"></td>
-            <td><input type="text" class="excel-input" value="${v.email || ''}"></td>
-            <td><input type="text" class="excel-input" value="${v.record || ''}"></td>
+            <td><input type="text" class="excel-input" value="${v.comp || ''}" oninput="markAsEdited(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.mgr || ''}" oninput="markAsEdited(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.mob || ''}" oninput="markAsEdited(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.email || ''}" oninput="markAsEdited(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.record || ''}" oninput="markAsEdited(this)"></td>
             
             <td class="custom-tooltip-cell">
-                <input type="text" class="excel-input" value="${v.curServ || ''}" oninput="updateTooltip(this)">
+                <input type="text" class="excel-input" value="${v.curServ || ''}" oninput="markAsEdited(this)">
                 <div class="tooltip-box">${v.curServ || ''}</div>
             </td>
             
             <td class="custom-tooltip-cell">
-                <input type="text" class="excel-input" value="${v.propServ || ''}" oninput="updateTooltip(this)">
+                <input type="text" class="excel-input" value="${v.propServ || ''}" oninput="markAsEdited(this)">
                 <div class="tooltip-box">${v.propServ || ''}</div>
             </td>
             
             <td>
-                <select class="excel-input">
+                <select class="excel-input" onchange="markAsEdited(this)">
                     <option value="مهتم" ${v.status==='مهتم'?'selected':''}>مهتم</option>
                     <option value="50%" ${v.status==='50%'?'selected':''}>50%</option>
                     <option value="20%" ${v.status==='20%'?'selected':''}>20%</option>
                     <option value="فقدان" ${v.status==='فقدان'?'selected':''}>فقدان</option>
                 </select>
             </td>
-            <td><input type="text" class="excel-input" value="${v.visitDate || today}"></td>
+            <td><input type="text" class="excel-input readonly-input" value="${v.visitDate || today}" readonly></td>
             
             <td class="custom-tooltip-cell">
                 <div class="notes-preview" onclick="openNote(this)" data-full-notes="${v.notes || ''}">${getLastNoteOnly(v.notes)}</div>
                 <div class="tooltip-box">${v.notes || 'لا توجد ملاحظات'}</div>
             </td>
             
-            <td><input type="text" class="excel-input" value="${v.editDate || today}"></td>
-            <td><button style="background:none;border:none;color:red;cursor:pointer;font-weight:bold" onclick="this.closest('tr').remove()">×</button></td>
+            <td><input type="text" class="excel-input readonly-input edit-date-field" value="${v.editDate || ''}" readonly placeholder=""></td>
+            <td><button style="background:none;border:none;color:red;cursor:pointer;font-weight:bold" onclick="this.closest('tr').remove(); saveAllData();">×</button></td>
         `;
     }
 
-    function insertNewRow() { renderRow({ status: 'مهتم' }); }
+    function insertNewRow() { 
+        renderRow({ status: 'مهتم', editDate: '' }, true); 
+        saveAllData(); 
+    }
 
     function saveAllData() {
         const data = [];
@@ -240,7 +261,15 @@
                 });
             }
         });
-        localStorage.setItem('asgate_visits_final_v19', JSON.stringify(data));
+        
+        // ترتيب البيانات من الأحدث للأقدم قبل الحفظ
+        data.sort((a, b) => {
+            const dateA = a.visitDate.split('/').reverse().join('');
+            const dateB = b.visitDate.split('/').reverse().join('');
+            return dateB.localeCompare(dateA);
+        });
+
+        localStorage.setItem('asgate_visits_final_v20', JSON.stringify(data));
         
         const saveBtn = document.getElementById('saveBtn');
         const originalText = saveBtn.innerText;
@@ -253,11 +282,15 @@
     }
 
     function loadSavedData() {
-        const saved = localStorage.getItem('asgate_visits_final_v19');
+        const saved = localStorage.getItem('asgate_visits_final_v20');
         const tableBody = document.getElementById('tableBody');
         tableBody.innerHTML = '';
-        if (saved) JSON.parse(saved).forEach(item => renderRow(item));
-        else insertNewRow();
+        if (saved) {
+            const data = JSON.parse(saved);
+            data.forEach(item => renderRow(item));
+        } else {
+            insertNewRow();
+        }
     }
 
     window.onclick = function(e) { if (e.target == document.getElementById('noteModal')) closeNote(); }
