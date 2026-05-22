@@ -132,7 +132,6 @@
 <script>
     let currentActivePreview = null;
 
-    // الحصول على التاريخ الحالي بتنسيق DD/MM/YYYY
     function getTodayFormatted() {
         const d = new Date();
         return d.getDate().toString().padStart(2, '0') + '/' + (d.getMonth() + 1).toString().padStart(2, '0') + '/' + d.getFullYear();
@@ -141,8 +140,7 @@
     function getFullDateForNotes() {
         const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
         const d = new Date();
-        const dateStr = getTodayFormatted();
-        return "🗓️ " + days[d.getDay()] + " " + dateStr;
+        return "🗓️ " + days[d.getDay()] + " " + getTodayFormatted();
     }
 
     function getLastNoteOnly(fullText) {
@@ -151,11 +149,17 @@
         return lines.length > 0 ? lines[lines.length - 1] : 'لا توجد ملاحظات';
     }
 
-    // تحديث تاريخ التعديل بمجرد تغيير أي خلية
+    // المنطق الجديد لتاريخ التعديل
     function markAsEdited(el) {
         const row = el.closest('tr');
-        const editInput = row.querySelector('.edit-date-field');
-        editInput.value = getTodayFormatted();
+        const visitDateInput = row.querySelectorAll('.readonly-input')[0];
+        const editDateInput = row.querySelector('.edit-date-field');
+        const today = getTodayFormatted();
+
+        // لا يتم وضع تاريخ التعديل إلا إذا كان تاريخ اليوم يختلف عن تاريخ إنشاء الزيارة
+        if (visitDateInput.value !== today) {
+            editDateInput.value = today;
+        }
         updateTooltip(el);
     }
 
@@ -179,20 +183,19 @@
     function saveNote() {
         const newText = document.getElementById('modalTextArea').value.trim();
         if (newText !== "" && currentActivePreview) {
-            const today = getFullDateForNotes();
+            const todayStr = getFullDateForNotes();
             let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
             let updatedNotes = "";
-            if (oldNotes.includes(today)) {
+            if (oldNotes.includes(todayStr)) {
                 updatedNotes = oldNotes + "\n" + newText;
             } else {
                 const separator = oldNotes ? "\n--------------------\n" : "";
-                updatedNotes = oldNotes + separator + today + "\n" + newText;
+                updatedNotes = oldNotes + separator + todayStr + "\n" + newText;
             }
             currentActivePreview.setAttribute('data-full-notes', updatedNotes);
             currentActivePreview.innerText = getLastNoteOnly(updatedNotes);
             currentActivePreview.parentElement.querySelector('.tooltip-box').innerText = updatedNotes;
             
-            // تحديث تاريخ التعديل عند إضافة ملاحظة
             markAsEdited(currentActivePreview);
         }
         closeNote();
@@ -238,7 +241,7 @@
                 <div class="tooltip-box">${v.notes || 'لا توجد ملاحظات'}</div>
             </td>
             
-            <td><input type="text" class="excel-input readonly-input edit-date-field" value="${v.editDate || ''}" readonly placeholder=""></td>
+            <td><input type="text" class="excel-input readonly-input edit-date-field" value="${v.editDate || ''}" readonly></td>
             <td><button style="background:none;border:none;color:red;cursor:pointer;font-weight:bold" onclick="this.closest('tr').remove(); saveAllData();">×</button></td>
         `;
     }
@@ -262,14 +265,13 @@
             }
         });
         
-        // ترتيب البيانات من الأحدث للأقدم قبل الحفظ
         data.sort((a, b) => {
             const dateA = a.visitDate.split('/').reverse().join('');
             const dateB = b.visitDate.split('/').reverse().join('');
             return dateB.localeCompare(dateA);
         });
 
-        localStorage.setItem('asgate_visits_final_v20', JSON.stringify(data));
+        localStorage.setItem('asgate_visits_final_v21', JSON.stringify(data));
         
         const saveBtn = document.getElementById('saveBtn');
         const originalText = saveBtn.innerText;
@@ -282,12 +284,11 @@
     }
 
     function loadSavedData() {
-        const saved = localStorage.getItem('asgate_visits_final_v20');
+        const saved = localStorage.getItem('asgate_visits_final_v21');
         const tableBody = document.getElementById('tableBody');
         tableBody.innerHTML = '';
         if (saved) {
-            const data = JSON.parse(saved);
-            data.forEach(item => renderRow(item));
+            JSON.parse(saved).forEach(item => renderRow(item));
         } else {
             insertNewRow();
         }
