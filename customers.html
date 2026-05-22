@@ -2,6 +2,7 @@
 <html dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASGate - العملاء</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
@@ -12,256 +13,65 @@
             --bg-color: #f4f7f9;
             --zebra-blue: #eff6ff;
             --border-color: #cbd5e1;
-            --sticker-yellow: #fff9c4;
             --accent-green-active: #22c55e;
-            --accent-blue: #3b82f6; /* تم توحيده مع كود الزيارات */
-            --accent-blue-hover: #1d4ed8;
+            --accent-blue: #3b82f6;
+            --border-soft: #cbd5e1;
         }
 
-        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
+        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; font-size: 13px; }
 
-        /* شريط الصفحات العلوي */
+        /* Navbar */
         .navbar { 
-            background-color: var(--nav-bg); 
-            display: flex; 
-            align-items: center; 
-            padding: 0 20px; 
-            margin: 10px; 
-            border-radius: 12px; 
-            height: 37px;
-            position: sticky; 
-            top: 10px; 
-            z-index: 1000; 
-            box-sizing: border-box;
+            background-color: var(--nav-bg); display: flex; align-items: center; padding: 0 20px; 
+            margin: 10px; border-radius: 12px; height: 37px; position: sticky; top: 10px; z-index: 1000;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        .navbar a { 
-            color: #ffffff; 
-            text-decoration: none; 
-            padding: 0 15px; 
-            font-weight: 700; 
-            font-size: 12px; 
-            border-radius: 6px; 
-            transition: 0.3s; 
-            line-height: 26px; 
-            height: 26px; 
-            display: inline-block;
-        }
-        .navbar a.active { background-color: var(--nav-active); color: var(--nav-bg); }
-        .navbar a:hover:not(.active) { background-color: rgba(255,255,255,0.1); }
+        .navbar a { color: #ffffff; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; height: 26px; line-height: 26px; display: inline-block; transition: 0.3s; }
+        .navbar a.active { background-color: var(--nav-active); color: var(--nav-bg); border-radius: 6px; }
 
-        .container { padding: 0 15px; } /* تقليل الحشو ليتناسب مع الزيارات */
+        .container { padding: 0 15px; }
         
-        /* شريط الأزرار - المسافات المطلوبة */
-        .action-bar { 
-            display: flex; 
-            align-items: center; 
-            margin: 8px 0; /* تقليل المسافة فوق وتحت الأزرار */
-            gap: 10px; 
-        }
+        .action-bar { display: flex; align-items: center; margin: 8px 0; gap: 10px; }
 
-        /* حجم الأزرار المحدث */
-        .btn-top { 
-            border: none; 
-            padding: 7px 18px; /* الحجم الصغير المطلوب */
-            border-radius: 8px; 
-            font-family: 'Cairo'; 
-            font-weight: bold; 
-            cursor: pointer; 
-            font-size: 12px; 
-            color: white; 
-            transition: 0.3s; 
-        }
+        .btn-top { border: none; padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; color: white; transition: 0.3s; }
         .btn-add { background-color: var(--accent-blue); }
         .btn-save-all { background-color: #cbd5e1; color: #64748b; pointer-events: none; }
         .btn-save-all.active { background-color: var(--accent-green-active); color: white; pointer-events: auto; }
 
-        /* الجدول */
+        /* Table */
         .table-wrapper { background: white; border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th { 
-            background-color: var(--header-purple); 
-            padding: 10px 5px; 
-            color: #ffffff; 
-            font-size: 11px; 
-            font-weight: 800; 
-            border-left: 1px solid rgba(255,255,255,0.1); 
-            text-align: center;
-        }
-        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 38px; font-size: 11px; font-weight: 600; }
+        th { background-color: var(--header-purple); padding: 10px 5px; color: #ffffff; font-size: 11px; font-weight: 800; text-align: center; }
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; position: relative; }
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
-        tbody tr:nth-child(odd) { background-color: #ffffff; }
 
-        /* الأنماط الأخرى المكملة */
-        .company-wrapper { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; gap: 5px; }
-        .company-link { color: var(--accent-blue); text-decoration: none; font-weight: 700; padding: 2px 5px; }
-        .edit-trigger { cursor: pointer; font-size: 12px; color: #94a3b8; visibility: hidden; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; }
+        /* Inputs */
+        .excel-input-standard { width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; font-size: 11.5px; }
+        
+        .company-wrapper { display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .company-link { color: var(--accent-blue); text-decoration: none; font-weight: 700; }
+        .edit-trigger { cursor: pointer; color: #94a3b8; visibility: hidden; font-size: 12px; }
         td:hover .edit-trigger { visibility: visible; }
-        .edit-input { width: 85%; height: 28px; border: 1px solid var(--accent-blue); border-radius: 4px; text-align: center; font-family: 'Cairo'; font-size: 11px; display: none; outline: none; }
-        .excel-input-standard { width: 100%; height: 100%; border: none; text-align: center; font-family: 'Cairo'; font-size: 11px; background: transparent; outline: none; }
-        .notes-cell { cursor: pointer; color: #475569; font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 8px; font-style: italic; }
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 2000; }
-        .sticker-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 7cm; height: 12cm; background-color: var(--sticker-yellow); border-radius: 2px; display: flex; flex-direction: column; border-top: 20px solid #fff59d; }
-        .sticker-save-btn { width: 100%; border: none; padding: 7px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; background-color: #22c55e; }
-    </style>
-</head>
-<body onload="loadSavedData()">
+        .edit-input { width: 85%; height: 28px; border: 1px solid var(--accent-blue); border-radius: 4px; text-align: center; font-family: 'Cairo'; display: none; outline: none; }
 
-<nav class="navbar">
-    <a href="index.html">الرئيسية</a>
-    <a href="visits.html">الزيارات</a>
-    <a href="opportunities.html">الفرص البيعية</a>
-    <a href="customers.html" class="active">العملاء</a>
-    <a href="sales.html">المبيعات</a>
-</nav>
-
-<div class="container">
-    <div class="action-bar">
-        <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة عميل جديد</button>
-        <button id="saveAllBtn" class="btn-top btn-save-all" onclick="saveAllData()">حفظ التغييرات</button>
-    </div>
-    
-    <div class="table-wrapper">
-        <table id="mainTable">
-            <thead>
-                <tr>
-                    <th style="width: 14%;">الشركة (✎)</th>
-                    <th style="width: 15%;">العنوان</th>
-                    <th style="width: 10%;">المسؤول</th>
-                    <th style="width: 12%;">الموبايل</th>
-                    <th style="width: 10%;">السجل</th>
-                    <th style="width: 18%;">ملاحظات</th>
-                    <th style="width: 10%;">تاريخ الإنشاء</th>
-                    <th style="width: 70px;">إجراء</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-        </table>
-    </div>
-</div>
-
-<div id="notesOverlay" class="modal-overlay" onclick="this.style.display='none'">
-    <div class="sticker-container" onclick="event.stopPropagation()">
-        <div id="historyArea" class="sticker-history" style="flex-grow: 1; overflow-y: auto; padding: 12px; font-size: 11px; text-align: right;"></div>
-        <div class="sticker-editor" style="padding: 12px; height: 100px;">
-            <textarea id="stickerInput" style="width:100%; height:60px; border:none; background:transparent; font-family:'Cairo'; outline:none; font-size: 11px; resize: none; text-align: right;" placeholder="تحديث جديد..."></textarea>
-        </div>
-        <button class="sticker-save-btn" onclick="confirmAndSaveNote()">حفظ التحديث</button>
-    </div>
-</div>
-
-<script>
-    let isDirty = false;
-    let activeCell = null;
-
-    function loadSavedData() {
-        const saved = localStorage.getItem('asgate_customers_data');
-        const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = '';
-        if (saved) { JSON.parse(saved).forEach(item => renderRow(item)); }
-        toggleSaveBtn(false);
-    }
-
-    function renderRow(v, isNew = false) {
-        const tbody = document.getElementById('tableBody');
-        const row = tbody.insertRow(isNew ? 0 : -1);
-        const today = new Date().toLocaleDateString('en-GB'); 
-        const creationDate = v.created || today;
-
-        const compCell = row.insertCell(0);
-        compCell.innerHTML = `
-            <div class="company-wrapper">
-                <a href="customer-profile.html?name=${encodeURIComponent(v.comp || '')}" class="company-link">${v.comp || 'اسم الشركة...'}</a>
-                <span class="edit-trigger" onclick="startEdit(this.parentElement)">✎</span>
-            </div>
-            <input type="text" class="edit-input" value="${v.comp || ''}" onblur="finalizeEdit(this)" onkeydown="if(event.key==='Enter') this.blur()">
-        `;
-
-        row.innerHTML += `
-            <td><input type="text" class="excel-input-standard" value="${v.address || ''}" oninput="markAsChanged()"></td>
-            <td><input type="text" class="excel-input-standard" value="${v.mgr || ''}" oninput="markAsChanged()"></td>
-            <td><input type="text" class="excel-input-standard" value="${v.mob || ''}" oninput="markAsChanged()"></td>
-            <td><input type="text" class="excel-input-standard" value="${v.cr || ''}" oninput="markAsChanged()"></td>
-            <td class="notes-cell" data-notes='${v.notes || "[]"}' onclick="openSticker(this)">${getDisplayNote(v.notes || "[]")}</td>
-            <td><span class="date-text" style="color:#64748b; font-size:10px;">${creationDate}</span><input type="hidden" class="creation-val" value="${creationDate}"></td>
-            <td><button style="border:none; background:#fee2e2; color:red; cursor:pointer; padding:3px 8px; border-radius:4px; font-family:'Cairo'; font-size:10px; font-weight:bold;" onclick="deleteRow(this)">حذف</button></td>
-        `;
-    }
-
-    function startEdit(wrapper) {
-        const td = wrapper.parentElement;
-        const input = td.querySelector('.edit-input');
-        wrapper.style.display = 'none';
-        input.style.display = 'block';
-        input.focus();
-    }
-
-    function finalizeEdit(input) {
-        const td = input.parentElement;
-        const wrapper = td.querySelector('.company-wrapper');
-        const link = wrapper.querySelector('.company-link');
-        if (link.innerText !== input.value) markAsChanged();
-        link.innerText = input.value || 'اسم الشركة...';
-        link.href = "customer-profile.html?name=" + encodeURIComponent(input.value);
-        wrapper.style.display = 'flex';
-        input.style.display = 'none';
-    }
-
-    function getDisplayNote(json) {
-        try {
-            const arr = JSON.parse(json);
-            if (arr.length > 0) return arr[arr.length-1].text.substring(0,25) + '...';
-        } catch(e) {}
-        return 'إضافة ملاحظة...';
-    }
-
-    function markAsChanged() { isDirty = true; document.getElementById('saveAllBtn').classList.add('active'); }
-    function toggleSaveBtn(active) { isDirty = active; document.getElementById('saveAllBtn').classList.toggle('active', active); }
-
-    function openSticker(cell) {
-        activeCell = cell;
-        const notes = JSON.parse(cell.getAttribute('data-notes') || "[]");
-        let hHtml = "";
-        notes.forEach((n, idx) => {
-            hHtml += `<div style="margin-bottom:8px;"><strong>${n.date}</strong><br>${n.text}</div>`;
-            if(idx < notes.length - 1) hHtml += '<hr style="border:0; border-top:1px solid #decb00">';
-        });
-        document.getElementById('historyArea').innerHTML = hHtml;
-        document.getElementById('notesOverlay').style.display = 'block';
-    }
-
-    function confirmAndSaveNote() {
-        const text = document.getElementById('stickerInput').value.trim();
-        if(text) {
-            let notes = JSON.parse(activeCell.getAttribute('data-notes') || "[]");
-            notes.push({ date: new Date().toLocaleDateString('en-GB'), text: text });
-            activeCell.setAttribute('data-notes', JSON.stringify(notes));
-            activeCell.innerText = getDisplayNote(JSON.stringify(notes));
-            markAsChanged();
+        /* Notes Style (Same as Visits/Opportunities) */
+        .custom-tooltip-cell { position: relative; }
+        .tooltip-box {
+            position: absolute; top: 100%; right: 0; background: #334155; color: #fff;
+            padding: 8px 12px; border-radius: 8px; width: 200px; font-size: 11px;
+            line-height: 1.6; white-space: pre-wrap; text-align: right;
+            opacity: 0; visibility: hidden; transition: 0.2s; z-index: 9999;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); pointer-events: none; 
         }
-        document.getElementById('notesOverlay').style.display = 'none';
-        document.getElementById('stickerInput').value = '';
-    }
+        .custom-tooltip-cell:hover .tooltip-box { opacity: 1; visibility: visible; }
+        .notes-preview {
+            width: 95%; border: none; background: transparent; font-family: 'Cairo'; font-size: 11px;
+            text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700;
+            overflow: hidden; white-space: nowrap; text-overflow: ellipsis; display: block; margin: 0 auto;
+        }
 
-    function saveAllData() {
-        const allData = [];
-        document.querySelectorAll('#tableBody tr').forEach(row => {
-            const compVal = row.cells[0].querySelector('.edit-input').value;
-            const otherInputs = row.querySelectorAll('input.excel-input-standard');
-            const createdDate = row.querySelector('.creation-val').value;
-            allData.push({
-                comp: compVal, address: otherInputs[0].value, mgr: otherInputs[1].value,
-                mob: otherInputs[2].value, cr: otherInputs[3].value,
-                notes: row.querySelector('.notes-cell').getAttribute('data-notes'),
-                created: createdDate
-            });
-        });
-        localStorage.setItem('asgate_customers_data', JSON.stringify(allData));
-        toggleSaveBtn(false);
-    }
-
-    function insertNewRow() { renderRow({}, true); markAsChanged(); }
-    function deleteRow(btn) { if(confirm("هل أنت متأكد من حذف هذا العميل؟")) { btn.closest('tr').remove(); saveAllData(); } }
-</script>
-</body>
-</html>
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 15px; border-radius: 10px; width: 380px; height: 440px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .modal-header { font-weight: 800; color: #2e1065; margin-bottom: 10px; font-size: 14px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .history-log { flex-grow: 1;
