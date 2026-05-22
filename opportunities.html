@@ -26,7 +26,7 @@
         .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; }
         .navbar a.active { background-color: var(--nav-active); color: var(--nav-purple-dark); border-radius: 8px; line-height: 26px; height: 26px; }
 
-        /* Employee Bar */
+        /* Employee Info Bar */
         .employee-info-bar {
             margin: 10px 20px; height: 35px; background-color: white;
             border: 1px solid var(--border-soft); border-radius: 20px;
@@ -35,14 +35,15 @@
         }
         .info-content { display: flex; gap: 35px; align-items: center; }
         .info-item { font-size: 11px; color: var(--nav-purple-dark); font-weight: 700; }
-        .info-item span { color: #64748b; font-weight: 300; margin-right: 5px; }
+        .info-item span { color: #64748b; font-weight: 400; margin-right: 5px; }
 
         .container { padding: 0 10px; }
         .action-bar { display: flex; align-items: center; margin: 15px 0; gap: 15px; padding: 0 10px; }
-        .search-wrapper { flex-grow: 1; }
+        
+        .search-wrapper { flex-grow: 1; display: flex; justify-content: center; }
         .search-input { 
-            width: 300px; padding: 6px 15px; border-radius: 20px; border: 1px solid var(--border-soft); 
-            font-family: 'Cairo'; font-size: 12px; outline: none;
+            width: 350px; padding: 6px 15px; border-radius: 20px; border: 1px solid var(--border-soft); 
+            font-family: 'Cairo'; font-size: 12px; outline: none; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
         }
 
         .btn-top { border: none; padding: 8px 15px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; }
@@ -50,11 +51,12 @@
         .btn-save { background-color: var(--accent-green-muted); padding: 8px 12px; font-size: 11px; }
         .btn-save.needs-save { background-color: var(--accent-green-active); box-shadow: 0 0 10px rgba(34, 197, 94, 0.4); }
 
-        /* Table */
-        .table-wrapper { background: white; border-radius: 12px; border: 1px solid var(--border-soft); margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        /* Table Design */
+        .table-wrapper { background: white; border-radius: 12px; border: 1px solid var(--border-soft); margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden; }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         th { background: var(--header-purple-mid); color: white; padding: 12px 5px; font-size: 11px; font-weight: 800; text-align: center; }
         td { border-bottom: 1px solid var(--border-soft); text-align: center; height: 45px; padding: 2px; }
+        tr:nth-child(even) { background-color: #f8fafc; }
         
         .excel-input { width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; font-size: 11.5px; }
         .readonly-input { color: #64748b; cursor: default; }
@@ -63,7 +65,7 @@
         .custom-tooltip-cell { position: relative; }
         .tooltip-box {
             position: absolute; top: 100%; right: 0; background: #334155; color: #fff;
-            padding: 8px 12px; border-radius: 8px; width: 200px; font-size: 11px;
+            padding: 8px 12px; border-radius: 8px; width: 220px; font-size: 11px;
             line-height: 1.6; white-space: pre-wrap; text-align: right;
             opacity: 0; visibility: hidden; transition: 0.2s; z-index: 9999;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3); pointer-events: none; 
@@ -71,27 +73,27 @@
         .custom-tooltip-cell:hover .tooltip-box { opacity: 1; visibility: visible; }
 
         .notes-preview {
-            width: 95%; border: none; background: transparent; font-family: 'Cairo'; font-size: 11px;
+            width: 90%; border: none; background: transparent; font-family: 'Cairo'; font-size: 11px;
             text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700;
             overflow: hidden; white-space: nowrap; text-overflow: ellipsis; display: block; margin: 0 auto;
         }
 
-        /* Modal */
+        /* Modal Settings */
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; }
         .modal-content { 
             background: white; padding: 15px; border-radius: 10px; 
-            width: 380px; height: 440px; display: flex; flex-direction: column; 
+            width: 380px; height: 440px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
         .history-log {
-            flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft);
-            border-radius: 6px; padding: 12px; margin-bottom: 10px; font-size: 12px; text-align: right; white-space: pre-wrap;
+            flex-grow: 1; overflow-y: auto; background: #f1f5f9; border: 1px solid var(--border-soft);
+            border-radius: 6px; padding: 12px; margin-bottom: 10px; font-size: 12px; text-align: right; line-height: 1.6; white-space: pre-wrap;
         }
-        .note-area { height: 80px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 8px; font-family: 'Cairo'; resize: none; outline: none; box-sizing: border-box; }
+        .note-area { height: 80px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 8px; font-family: 'Cairo'; resize: none; outline: none; box-sizing: border-box; font-size: 13px; }
 
         /* Column Widths */
-        .col-comp { width: 14%; } .col-mgr { width: 10%; } .col-mob { width: 10%; }
+        .col-comp { width: 15%; } .col-mgr { width: 10%; } .col-mob { width: 10%; }
         .col-serv { width: 10%; } .col-status { width: 8%; } .col-date { width: 9%; }
-        .col-notes { width: 15%; } .col-edit { width: 9%; } .col-del { width: 5%; }
+        .col-notes { width: 15%; } .col-edit { width: 9%; } .col-del { width: 4%; }
     </style>
 </head>
 <body onload="loadSavedData()">
@@ -100,24 +102,24 @@
     <a href="index.html">الرئيسية</a>
     <a href="visits.html">الزيارات</a>
     <a href="opportunities.html" class="active">الفرص البيعية</a>
-    <a href="#">العملاء</a>
-    <a href="#">المبيعات</a>
+    <a href="customers.html">العملاء</a>
+    <a href="sales.html">المبيعات</a>
 </nav>
 
 <div class="employee-info-bar">
     <div class="info-content">
         <div class="info-item">الموظف: <span>محمد المنصور</span></div>
-        <div class="info-item">القسم: <span>الفرص البيعية</span></div>
-        <div class="info-item">المشروع: <span>ASGate</span></div>
+        <div class="info-item">القسم: <span>تطوير الأعمال</span></div>
+        <div class="info-item">النظام: <span>ASGate CRM</span></div>
     </div>
 </div>
 
 <div class="container">
     <div class="action-bar">
         <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة فرصة</button>
-        <button id="saveBtn" class="btn-top btn-save" onclick="saveAllData()">حفظ التغييرات</button>
+        <button id="saveBtn" class="btn-top btn-save" onclick="saveAllData()">حفظ البيانات</button>
         <div class="search-wrapper">
-            <input type="text" id="searchInput" class="search-input" placeholder="بحث عن شركة أو مسؤول..." onkeyup="filterTable()">
+            <input type="text" id="searchInput" class="search-input" placeholder="بحث عن شركة، مسؤول، أو خدمة..." onkeyup="filterTable()">
         </div>
     </div>
     
@@ -125,10 +127,16 @@
         <table id="mainTable">
             <thead>
                 <tr>
-                    <th class="col-comp">الشركة</th><th class="col-mgr">المسؤول</th><th class="col-mob">الموبايل</th>
-                    <th class="col-serv">الخدمة الحالية</th><th class="col-serv">المقترحة</th>
-                    <th class="col-status">الحالة</th><th class="col-date">التاريخ</th>
-                    <th class="col-notes">آخر الملاحظات</th><th class="col-edit">تعديل</th><th class="col-del">X</th>
+                    <th class="col-comp">الشركة</th>
+                    <th class="col-mgr">المسؤول</th>
+                    <th class="col-mob">الموبايل</th>
+                    <th class="col-serv">الحالية</th>
+                    <th class="col-serv">المقترحة</th>
+                    <th class="col-status">الحالة</th>
+                    <th class="col-date">التاريخ</th>
+                    <th class="col-notes">الملاحظات</th>
+                    <th class="col-edit">تعديل</th>
+                    <th class="col-del">X</th>
                 </tr>
             </thead>
             <tbody id="tableBody"></tbody>
@@ -138,12 +146,12 @@
 
 <div id="noteModal" class="modal">
     <div class="modal-content">
-        <div style="font-weight: 800; color: #2e1065; margin-bottom: 10px;">سجل متابعة الفرصة</div>
+        <div style="font-weight: 800; color: #2e1065; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">سجل متابعة الفرصة</div>
         <div id="historyLog" class="history-log"></div>
-        <textarea id="modalTextArea" class="note-area" placeholder="أدخل الملاحظة الجديدة هنا..."></textarea>
+        <textarea id="modalTextArea" class="note-area" placeholder="اكتب تحديثاً جديداً..."></textarea>
         <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;">
             <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:Cairo;">إلغاء</button>
-            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:Cairo;">تحديث</button>
+            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:Cairo;">حفظ التحديث</button>
         </div>
     </div>
 </div>
@@ -157,33 +165,37 @@
         return d.getDate().toString().padStart(2, '0') + '/' + (d.getMonth() + 1).toString().padStart(2, '0') + '/' + d.getFullYear();
     }
 
-    function triggerNeedsSave() { document.getElementById('saveBtn').classList.add('needs-save'); }
+    function triggerNeedsSave() { 
+        document.getElementById('saveBtn').classList.add('needs-save'); 
+    }
 
     function markAsEdited(el) {
         const row = el.closest('tr');
-        const editDateInput = row.querySelector('.edit-date-field');
-        editDateInput.value = getTodayFormatted();
+        const editField = row.querySelector('.edit-date-field');
+        if(editField) editField.value = getTodayFormatted();
         triggerNeedsSave();
     }
 
     function openNote(el) {
         currentActivePreview = el;
         const log = document.getElementById('historyLog');
-        log.innerText = el.getAttribute('data-full-notes') || "لا يوجد سجل ملاحظات.";
+        log.innerText = el.getAttribute('data-full-notes') || "لا يوجد ملاحظات سابقة لهذه الفرصة.";
         document.getElementById('modalTextArea').value = "";
         document.getElementById('noteModal').style.display = "flex";
+        setTimeout(() => document.getElementById('modalTextArea').focus(), 50);
     }
 
     function saveNote() {
-        const newText = document.getElementById('modalTextArea').value.trim();
-        if (newText !== "" && currentActivePreview) {
+        const text = document.getElementById('modalTextArea').value.trim();
+        if (text !== "" && currentActivePreview) {
             const today = getTodayFormatted();
-            let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
-            const separator = oldNotes ? "\n---\n" : "";
-            let updatedNotes = oldNotes + separator + "🗓️ " + today + ": " + newText;
+            let old = currentActivePreview.getAttribute('data-full-notes') || "";
+            const sep = old ? "\n------------------\n" : "";
+            let updated = old + sep + "🗓️ " + today + "\n" + text;
             
-            currentActivePreview.setAttribute('data-full-notes', updatedNotes);
-            currentActivePreview.innerText = newText.substring(0, 20) + "...";
+            currentActivePreview.setAttribute('data-full-notes', updated);
+            currentActivePreview.innerText = text.substring(0, 15) + "...";
+            currentActivePreview.parentElement.querySelector('.tooltip-box').innerText = updated;
             markAsEdited(currentActivePreview);
         }
         closeNote();
@@ -216,7 +228,7 @@
                 <div class="tooltip-box">${v.notes || 'لا توجد ملاحظات'}</div>
             </td>
             <td><input type="text" class="excel-input readonly-input edit-date-field" value="${v.editDate || ''}" readonly></td>
-            <td><button style="color:red; cursor:pointer; border:none; background:none; font-weight:bold" onclick="if(confirm('حذف؟')){this.closest('tr').remove(); triggerNeedsSave();}">×</button></td>
+            <td><button style="color:red; cursor:pointer; border:none; background:none; font-weight:bold; font-size:16px;" onclick="if(confirm('حذف هذه الفرصة؟')){this.closest('tr').remove(); triggerNeedsSave();}">×</button></td>
         `;
     }
 
@@ -237,13 +249,19 @@
         const btn = document.getElementById('saveBtn');
         btn.innerText = "تم الحفظ ✓";
         btn.classList.remove('needs-save');
-        setTimeout(() => btn.innerText = "حفظ التغييرات", 1500);
+        setTimeout(() => btn.innerText = "حفظ البيانات", 1500);
     }
 
     function loadSavedData() {
         const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) JSON.parse(saved).forEach(item => renderRow(item));
-        else insertNewRow();
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+        if (saved) {
+            JSON.parse(saved).forEach(item => renderRow(item));
+        } else {
+            insertNewRow();
+        }
+        document.getElementById('saveBtn').classList.remove('needs-save');
     }
 
     function filterTable() {
@@ -253,6 +271,8 @@
             row.style.display = text.includes(q) ? '' : 'none';
         });
     }
+
+    window.onclick = function(e) { if (e.target == document.getElementById('noteModal')) closeNote(); }
 </script>
 </body>
 </html>
