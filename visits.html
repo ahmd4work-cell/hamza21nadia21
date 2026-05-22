@@ -12,7 +12,8 @@
             --nav-active: #a78bfa;
             --bg-color: #f8fafc;
             --accent-blue: #3b82f6;
-            --accent-green-active: #22c55e;
+            --accent-green-active: #22c55e; /* الأخضر اللامع */
+            --accent-green-muted: #86a789;  /* الأخضر المطفي */
             --border-soft: #cbd5e1;
         }
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; font-size: 13px; }
@@ -27,9 +28,12 @@
 
         .container { padding: 0 10px; }
         .action-bar { display: flex; align-items: center; margin: 15px 0; gap: 15px; padding: 0 10px; }
-        .btn-top { border: none; padding: 8px 15px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
+        .btn-top { border: none; padding: 8px 15px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; }
         .btn-add { background-color: var(--accent-blue); }
-        .btn-save { background-color: var(--accent-green-active); padding: 8px 12px; font-size: 11px; }
+        
+        /* تنسيق زر الحفظ التفاعلي */
+        .btn-save { background-color: var(--accent-green-muted); padding: 8px 12px; font-size: 11px; }
+        .btn-save.needs-save { background-color: var(--accent-green-active); box-shadow: 0 0 10px rgba(34, 197, 94, 0.4); }
 
         /* Table */
         .table-wrapper { background: white; border-radius: 12px; border: 1px solid var(--border-soft); margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
@@ -149,18 +153,22 @@
         return lines.length > 0 ? lines[lines.length - 1] : 'لا توجد ملاحظات';
     }
 
-    // المنطق الجديد لتاريخ التعديل
+    // تفعيل حالة الاحتياج للحفظ (اللون الأخضر اللامع)
+    function triggerNeedsSave() {
+        document.getElementById('saveBtn').classList.add('needs-save');
+    }
+
     function markAsEdited(el) {
         const row = el.closest('tr');
         const visitDateInput = row.querySelectorAll('.readonly-input')[0];
         const editDateInput = row.querySelector('.edit-date-field');
         const today = getTodayFormatted();
 
-        // لا يتم وضع تاريخ التعديل إلا إذا كان تاريخ اليوم يختلف عن تاريخ إنشاء الزيارة
         if (visitDateInput.value !== today) {
             editDateInput.value = today;
         }
         updateTooltip(el);
+        triggerNeedsSave(); // تغيير لون الزر عند أي تعديل
     }
 
     function updateTooltip(input) {
@@ -199,7 +207,8 @@
             markAsEdited(currentActivePreview);
         }
         closeNote();
-        saveAllData();
+        // ملاحظة: لا نستدعي حفظ الكل تلقائياً هنا لنسمح لزر الحفظ بالبقاء لامعاً
+        triggerNeedsSave();
     }
 
     function closeNote() { document.getElementById('noteModal').style.display = "none"; }
@@ -242,13 +251,13 @@
             </td>
             
             <td><input type="text" class="excel-input readonly-input edit-date-field" value="${v.editDate || ''}" readonly></td>
-            <td><button style="background:none;border:none;color:red;cursor:pointer;font-weight:bold" onclick="this.closest('tr').remove(); saveAllData();">×</button></td>
+            <td><button style="background:none;border:none;color:red;cursor:pointer;font-weight:bold" onclick="this.closest('tr').remove(); triggerNeedsSave();">×</button></td>
         `;
     }
 
     function insertNewRow() { 
         renderRow({ status: 'مهتم', editDate: '' }, true); 
-        saveAllData(); 
+        triggerNeedsSave();
     }
 
     function saveAllData() {
@@ -276,10 +285,10 @@
         const saveBtn = document.getElementById('saveBtn');
         const originalText = saveBtn.innerText;
         saveBtn.innerText = "تم الحفظ ✓";
-        saveBtn.style.backgroundColor = "#16a34a";
+        saveBtn.classList.remove('needs-save'); // العودة للون المطفي
+        
         setTimeout(() => {
             saveBtn.innerText = originalText;
-            saveBtn.style.backgroundColor = "";
         }, 1500);
     }
 
@@ -291,6 +300,8 @@
             JSON.parse(saved).forEach(item => renderRow(item));
         } else {
             insertNewRow();
+            // عند التحميل لأول مرة لصفحة فارغة، نعيد الزر للمطفي لأن الإضافة تمت تلقائياً
+            document.getElementById('saveBtn').classList.remove('needs-save');
         }
     }
 
