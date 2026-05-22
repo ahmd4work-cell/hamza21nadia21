@@ -31,12 +31,33 @@
 
         .container { padding: 0 15px; }
         
-        .action-bar { display: flex; align-items: center; margin: 8px 0; gap: 10px; }
+        /* المسافات المعدلة للأزرار */
+        .action-bar { 
+            display: flex; 
+            align-items: center; 
+            margin-top: 5px; 
+            margin-bottom: 5px; 
+            gap: 10px; 
+        }
 
         .btn-top { border: none; padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; color: white; transition: 0.3s; }
         .btn-add { background-color: var(--accent-blue); }
         .btn-save-all { background-color: #cbd5e1; color: #64748b; pointer-events: none; }
         .btn-save-all.active { background-color: var(--accent-green-active); color: white; pointer-events: auto; }
+
+        /* شريط البحث المضاف */
+        .search-input {
+            width: 5%;
+            min-width: 150px; /* لضمان قابلية الرؤية */
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-family: 'Cairo';
+            font-size: 12px;
+            outline: none;
+            transition: 0.3s;
+        }
+        .search-input:focus { border-color: var(--accent-blue); box-shadow: 0 0 5px rgba(59, 130, 246, 0.2); }
 
         /* Table */
         .table-wrapper { background: white; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
@@ -53,7 +74,7 @@
         td:hover .edit-trigger { visibility: visible; }
         .edit-input { width: 85%; height: 28px; border: 1px solid var(--accent-blue); border-radius: 4px; text-align: center; font-family: 'Cairo'; display: none; outline: none; }
 
-        /* New Notes Style */
+        /* Notes Style */
         .custom-tooltip-cell { position: relative; }
         .tooltip-box {
             position: absolute; top: 100%; right: 0; background: #334155; color: #fff;
@@ -92,10 +113,11 @@
     <div class="action-bar">
         <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة عميل جديد</button>
         <button id="saveAllBtn" class="btn-top btn-save-all" onclick="saveAllData()">حفظ التغييرات</button>
+        <input type="text" id="tableSearch" class="search-input" placeholder="بحث عن عميل..." onkeyup="filterTable()">
     </div>
     
     <div class="table-wrapper">
-        <table>
+        <table id="mainTable">
             <thead>
                 <tr>
                     <th style="width: 14%;">الشركة (✎)</th>
@@ -141,7 +163,7 @@
     }
 
     function getLastNoteOnly(fullText) {
-        if (!fullText || fullText === "[]" || fullText === "") return 'إضافة ملاحظة...';
+        if (!fullText || fullText === "" || fullText === "[]") return 'إضافة ملاحظة...';
         const lines = fullText.split('\n').filter(l => l.trim() !== "" && !l.includes("🗓️") && !l.includes("---"));
         return lines.length > 0 ? lines[lines.length - 1] : 'إضافة ملاحظة...';
     }
@@ -164,6 +186,16 @@
         toggleSaveBtn(false);
     }
 
+    function filterTable() {
+        const input = document.getElementById("tableSearch");
+        const filter = input.value.toLowerCase();
+        const tr = document.getElementById("tableBody").getElementsByTagName("tr");
+        for (let i = 0; i < tr.length; i++) {
+            const rowText = tr[i].innerText.toLowerCase();
+            tr[i].style.display = rowText.includes(filter) ? "" : "none";
+        }
+    }
+
     function renderRow(v, isNew = false) {
         const tbody = document.getElementById('tableBody');
         const row = isNew ? tbody.insertRow(0) : tbody.insertRow();
@@ -171,7 +203,6 @@
         const creationDate = v.created || today;
 
         let initialNotes = v.notes || "";
-        // تحويل الصيغة القديمة إذا كانت موجودة
         if (initialNotes.startsWith('[')) {
             try {
                 const arr = JSON.parse(initialNotes);
@@ -272,14 +303,7 @@
     }
 
     function insertNewRow() { renderRow({}, true); markAsChanged(); }
-    
-    function deleteRow(btn) { 
-        if(confirm("هل أنت متأكد من حذف هذا العميل؟")) { 
-            btn.closest('tr').remove(); 
-            saveAllData(); 
-        } 
-    }
-
+    function deleteRow(btn) { if(confirm("هل أنت متأكد من حذف هذا العميل؟")) { btn.closest('tr').remove(); saveAllData(); } }
     window.onclick = function(e) { if (e.target == document.getElementById('noteModal')) closeNote(); }
 </script>
 </body>
