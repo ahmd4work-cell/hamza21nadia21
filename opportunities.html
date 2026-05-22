@@ -4,140 +4,131 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASGate - الفرص البيعية</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --nav-purple-dark: #2e1065;    
-            --header-purple-mid: #8b5cf6;  
-            --nav-active: #a78bfa; 
+            --nav-purple-dark: #2e1065;
+            --header-purple-mid: #8b5cf6;
+            --nav-active: #a78bfa;
             --bg-color: #f8fafc;
-            --table-blue-alt: #eff6ff;   
-            --accent-green-active: #22c55e;
             --accent-blue: #3b82f6;
-            --accent-red: #ef4444;
-            --border-soft: #e2e8f0;    
-            --sticker-yellow: #fff9c4;
+            --accent-green-active: #22c55e;
+            --accent-green-muted: #86a789;
+            --border-soft: #cbd5e1;
         }
+        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; font-size: 13px; }
 
-        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
-
+        /* Navbar */
         .navbar { 
-            background-color: var(--nav-purple-dark); 
-            display: flex; align-items: center; padding: 0 20px; margin: 10px; 
-            border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            position: sticky; top: 10px; z-index: 1000; height: 37px; box-sizing: border-box;
+            background-color: var(--nav-purple-dark); display: flex; align-items: center; padding: 0 20px; 
+            margin: 10px; border-radius: 15px; height: 37px; position: sticky; top: 10px; z-index: 1000;
+        }
+        .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; }
+        .navbar a.active { background-color: var(--nav-active); color: var(--nav-purple-dark); border-radius: 8px; line-height: 26px; height: 26px; }
+
+        /* Employee Bar */
+        .employee-info-bar {
+            margin: 10px 20px; height: 35px; background-color: white;
+            border: 1px solid var(--border-soft); border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            padding: 0 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .info-content { display: flex; gap: 35px; align-items: center; }
+        .info-item { font-size: 11px; color: var(--nav-purple-dark); font-weight: 700; }
+        .info-item span { color: #64748b; font-weight: 300; margin-right: 5px; }
+
+        .container { padding: 0 10px; }
+        .action-bar { display: flex; align-items: center; margin: 15px 0; gap: 15px; padding: 0 10px; }
+        .search-wrapper { flex-grow: 1; }
+        .search-input { 
+            width: 300px; padding: 6px 15px; border-radius: 20px; border: 1px solid var(--border-soft); 
+            font-family: 'Cairo'; font-size: 12px; outline: none;
         }
 
-        .navbar a { 
-            color: white; text-decoration: none; padding: 0 15px; font-weight: 700; 
-            font-size: 12px; border-radius: 6px; transition: 0.3s; line-height: 26px; 
-            height: 26px; display: inline-block;
-        }
-
-        .navbar a.active { background-color: var(--nav-active); color: var(--nav-purple-dark); }
-
-        .container { padding: 0 15px; }
-        
-        /* شريط الأدوات مع الأزرار بجانب بعضها */
-        .action-bar { 
-            display: flex; 
-            align-items: center; 
-            margin: 8px 0; 
-            gap: 10px; /* مسافة بسيطة بين الأزرار */
-        }
-
-        /* مربع البحث في المنتصف */
-        .search-wrapper { flex-grow: 1; display: flex; justify-content: center; }
-        .search-input {
-            width: 350px; padding: 6px 15px; border-radius: 20px;
-            border: 1px solid var(--border-soft); font-family: 'Cairo';
-            font-size: 13px; outline: none;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
-        }
-
-        .btn-top { border: none; padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; color: white; transition: 0.3s; white-space: nowrap; }
+        .btn-top { border: none; padding: 8px 15px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; }
         .btn-add { background-color: var(--accent-blue); }
-        .btn-save-all { background-color: #cbd5e1; color: #64748b; pointer-events: none; }
-        .btn-save-all.active { background-color: var(--accent-green-active); color: white; pointer-events: auto; }
+        .btn-save { background-color: var(--accent-green-muted); padding: 8px 12px; font-size: 11px; }
+        .btn-save.needs-save { background-color: var(--accent-green-active); box-shadow: 0 0 10px rgba(34, 197, 94, 0.4); }
 
-        .table-wrapper { background: white; border-radius: 10px; overflow: hidden; border: 1px solid var(--border-soft); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        /* Table */
+        .table-wrapper { background: white; border-radius: 12px; border: 1px solid var(--border-soft); margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th { background: var(--header-purple-mid); color: white; padding: 12px 5px; font-size: 11px; font-weight: 800; text-align: center; }
+        td { border-bottom: 1px solid var(--border-soft); text-align: center; height: 45px; padding: 2px; }
         
-        th { 
-            background-color: var(--header-purple-mid); padding: 10px 5px; 
-            color: white; font-size: 11px; font-weight: 800; 
-            border-left: 1px solid rgba(255,255,255,0.1);
+        .excel-input { width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; font-size: 11.5px; }
+        .readonly-input { color: #64748b; cursor: default; }
+
+        /* Tooltip & Notes */
+        .custom-tooltip-cell { position: relative; }
+        .tooltip-box {
+            position: absolute; top: 100%; right: 0; background: #334155; color: #fff;
+            padding: 8px 12px; border-radius: 8px; width: 200px; font-size: 11px;
+            line-height: 1.6; white-space: pre-wrap; text-align: right;
+            opacity: 0; visibility: hidden; transition: 0.2s; z-index: 9999;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); pointer-events: none; 
+        }
+        .custom-tooltip-cell:hover .tooltip-box { opacity: 1; visibility: visible; }
+
+        .notes-preview {
+            width: 95%; border: none; background: transparent; font-family: 'Cairo'; font-size: 11px;
+            text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700;
+            overflow: hidden; white-space: nowrap; text-overflow: ellipsis; display: block; margin: 0 auto;
         }
 
-        td { border-bottom: 1px solid var(--border-soft); text-align: center; height: 38px; font-size: 11px; }
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; }
+        .modal-content { 
+            background: white; padding: 15px; border-radius: 10px; 
+            width: 380px; height: 440px; display: flex; flex-direction: column; 
+        }
+        .history-log {
+            flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft);
+            border-radius: 6px; padding: 12px; margin-bottom: 10px; font-size: 12px; text-align: right; white-space: pre-wrap;
+        }
+        .note-area { height: 80px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 8px; font-family: 'Cairo'; resize: none; outline: none; box-sizing: border-box; }
 
-        tr:nth-child(even) { background-color: var(--table-blue-alt); }
-        tr:nth-child(odd) { background-color: #ffffff; }
-        tr:hover { background-color: #f1f5f9; }
-
-        .excel-input { width: 100%; height: 100%; border: none; padding: 0 5px; font-family: 'Cairo'; font-size: 11px; text-align: center; outline: none; background: transparent; }
-        .notes-cell { cursor: pointer; color: #64748b; font-size: 10px; padding: 0 8px; text-align: right; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .btn-delete { border: none; background: #fee2e2; color: var(--accent-red); padding: 3px 8px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold; }
-        
-        /* Modals and Confirms */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 2000; }
-        .sticker-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 7cm; height: 12cm; background-color: var(--sticker-yellow); border-radius: 2px; box-shadow: 5px 5px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column; border-top: 20px solid #fff59d; }
-        .sticker-history { flex-grow: 1; overflow-y: auto; padding: 12px; font-size: 11px; border-bottom: 1px dashed #decb00; text-align: right; }
-        .sticker-editor { padding: 12px; height: 100px; text-align: right; }
-        .date-chip { display: inline-block; background: #fbc02d; color: #000; padding: 1px 7px; border-radius: 10px; font-weight: bold; font-size: 9px; margin-bottom: 5px; }
-        .sticker-textarea { width: 100%; border: none; background: transparent; font-family: 'Cairo'; font-size: 11px; resize: none; outline: none; height: 60px; text-align: right; }
-        .sticker-save-btn { width: 100%; border: none; padding: 7px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; background-color: #81c784; }
-        .sticker-save-btn.active { background-color: #22c55e; }
-
-        .custom-confirm { position: fixed; top: 30%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 3000; display: none; text-align: center; border: 2px solid var(--nav-purple-dark); min-width: 250px; }
-        .confirm-btns { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
-        .btn-yes { background: var(--accent-green-active); color: white; border: none; padding: 8px 25px; border-radius: 5px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
-        .btn-no { background: var(--accent-red); color: white; border: none; padding: 8px 25px; border-radius: 5px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
+        /* Column Widths */
+        .col-comp { width: 14%; } .col-mgr { width: 10%; } .col-mob { width: 10%; }
+        .col-serv { width: 10%; } .col-status { width: 8%; } .col-date { width: 9%; }
+        .col-notes { width: 15%; } .col-edit { width: 9%; } .col-del { width: 5%; }
     </style>
 </head>
 <body onload="loadSavedData()">
-
-<div id="confirmBox" class="custom-confirm">
-    <p id="confirmMsg" style="font-weight: bold;"></p>
-    <div class="confirm-btns">
-        <button class="btn-yes" id="confirmBtn">نعم</button>
-        <button class="btn-no" onclick="closeConfirm()">لا</button>
-    </div>
-</div>
 
 <nav class="navbar">
     <a href="index.html">الرئيسية</a>
     <a href="visits.html">الزيارات</a>
     <a href="opportunities.html" class="active">الفرص البيعية</a>
-    <a href="customers.html">العملاء</a>
-    <a href="sales.html">المبيعات</a>
+    <a href="#">العملاء</a>
+    <a href="#">المبيعات</a>
 </nav>
+
+<div class="employee-info-bar">
+    <div class="info-content">
+        <div class="info-item">الموظف: <span>محمد المنصور</span></div>
+        <div class="info-item">القسم: <span>الفرص البيعية</span></div>
+        <div class="info-item">المشروع: <span>ASGate</span></div>
+    </div>
+</div>
 
 <div class="container">
     <div class="action-bar">
         <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة فرصة</button>
-        <button id="saveAllBtn" class="btn-top btn-save-all" onclick="saveAllData()">حفظ التغييرات</button>
-        
+        <button id="saveBtn" class="btn-top btn-save" onclick="saveAllData()">حفظ التغييرات</button>
         <div class="search-wrapper">
-            <input type="text" id="searchInput" class="search-input" placeholder="بحث (الشركة، المسؤول، الموبايل، السجل)..." onkeyup="filterTable()">
+            <input type="text" id="searchInput" class="search-input" placeholder="بحث عن شركة أو مسؤول..." onkeyup="filterTable()">
         </div>
     </div>
-
+    
     <div class="table-wrapper">
         <table id="mainTable">
             <thead>
                 <tr>
-                    <th style="width: 14%;">الشركة</th>
-                    <th>المسؤول</th>
-                    <th style="width: 12%;">الموبايل</th>
-                    <th>السجل</th>
-                    <th>الخدمة الحالية</th>
-                    <th>الخدمة المقترحة</th>
-                    <th style="width: 85px;">الحالة</th>
-                    <th style="width: 110px;">تاريخ الزيارة</th>
-                    <th style="width: 18%;">ملاحظات</th>
-                    <th style="width: 100px;">تاريخ التعديل</th>
-                    <th style="width: 70px;">إجراء</th>
+                    <th class="col-comp">الشركة</th><th class="col-mgr">المسؤول</th><th class="col-mob">الموبايل</th>
+                    <th class="col-serv">الخدمة الحالية</th><th class="col-serv">المقترحة</th>
+                    <th class="col-status">الحالة</th><th class="col-date">التاريخ</th>
+                    <th class="col-notes">آخر الملاحظات</th><th class="col-edit">تعديل</th><th class="col-del">X</th>
                 </tr>
             </thead>
             <tbody id="tableBody"></tbody>
@@ -145,211 +136,123 @@
     </div>
 </div>
 
-<div id="notesOverlay" class="modal-overlay" onclick="handleOutsideClick(event)">
-    <div class="sticker-container" onclick="event.stopPropagation()">
-        <div id="historyArea" class="sticker-history"></div>
-        <div class="sticker-editor">
-            <div id="currentDateChip" class="date-chip"></div>
-            <textarea id="stickerInput" class="sticker-textarea" placeholder="تحديث جديد..." oninput="updateStickerBtn()"></textarea>
+<div id="noteModal" class="modal">
+    <div class="modal-content">
+        <div style="font-weight: 800; color: #2e1065; margin-bottom: 10px;">سجل متابعة الفرصة</div>
+        <div id="historyLog" class="history-log"></div>
+        <textarea id="modalTextArea" class="note-area" placeholder="أدخل الملاحظة الجديدة هنا..."></textarea>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;">
+            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:Cairo;">إلغاء</button>
+            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:Cairo;">تحديث</button>
         </div>
-        <button id="saveStickerBtn" class="sticker-save-btn" onclick="confirmAndSaveNote()">حفظ التحديث</button>
     </div>
 </div>
 
 <script>
-    let isDirty = false;
-    let activeCell = null;
-    let isStickerChanged = false;
-    const statusOrder = { "مهتم": 4, "50%": 3, "20%": 2, "فقدان": 1 };
+    let currentActivePreview = null;
+    const STORAGE_KEY = 'asgate_opportunities_v21';
 
-    // نظام البحث المطور ليشمل عدة أعمدة
-    function filterTable() {
-        const query = document.getElementById('searchInput').value.toLowerCase();
-        const rows = document.querySelectorAll('#tableBody tr');
-        
-        rows.forEach(row => {
-            const cells = row.querySelectorAll('.excel-input');
-            if (cells.length >= 5) {
-                const comp = cells[0].value.toLowerCase(); // الشركة
-                const mgr  = cells[1].value.toLowerCase(); // المسؤول
-                const mob  = cells[2].value.toLowerCase(); // الموبايل
-                const cr   = cells[3].value.toLowerCase(); // السجل
-                const curr = cells[4].value.toLowerCase(); // الخدمة الحالية (العنوان)
-                
-                const isMatch = comp.includes(query) || 
-                                mgr.includes(query)  || 
-                                mob.includes(query)  || 
-                                cr.includes(query)   || 
-                                curr.includes(query);
-                
-                row.style.display = isMatch ? '' : 'none';
-            }
-        });
+    function getTodayFormatted() {
+        const d = new Date();
+        return d.getDate().toString().padStart(2, '0') + '/' + (d.getMonth() + 1).toString().padStart(2, '0') + '/' + d.getFullYear();
     }
 
-    function getTodayFormatted() { return new Date().toISOString().split('T')[0]; }
+    function triggerNeedsSave() { document.getElementById('saveBtn').classList.add('needs-save'); }
 
-    function getDisplayNote(notesJson) {
-        try {
-            const notes = JSON.parse(notesJson);
-            if (notes.length > 0) {
-                let lastNote = notes[notes.length - 1].text;
-                return lastNote.replace(/<br>/g, " ").replace(/•/g, "").substring(0, 30) + "...";
-            }
-        } catch(e) {}
-        return "إضافة ملاحظة...";
+    function markAsEdited(el) {
+        const row = el.closest('tr');
+        const editDateInput = row.querySelector('.edit-date-field');
+        editDateInput.value = getTodayFormatted();
+        triggerNeedsSave();
     }
 
-    function insertNewRow() {
-        const today = getTodayFormatted();
-        renderRow({ comp:'', mgr:'', mob:'', cr:'', curr:'', prop:'', status:'مهتم', date: today, notes: '[]', updated: '-', created: today }, true);
-        toggleSaveBtn(true);
+    function openNote(el) {
+        currentActivePreview = el;
+        const log = document.getElementById('historyLog');
+        log.innerText = el.getAttribute('data-full-notes') || "لا يوجد سجل ملاحظات.";
+        document.getElementById('modalTextArea').value = "";
+        document.getElementById('noteModal').style.display = "flex";
     }
 
-    function renderRow(v, isNew = false) {
+    function saveNote() {
+        const newText = document.getElementById('modalTextArea').value.trim();
+        if (newText !== "" && currentActivePreview) {
+            const today = getTodayFormatted();
+            let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
+            const separator = oldNotes ? "\n---\n" : "";
+            let updatedNotes = oldNotes + separator + "🗓️ " + today + ": " + newText;
+            
+            currentActivePreview.setAttribute('data-full-notes', updatedNotes);
+            currentActivePreview.innerText = newText.substring(0, 20) + "...";
+            markAsEdited(currentActivePreview);
+        }
+        closeNote();
+    }
+
+    function closeNote() { document.getElementById('noteModal').style.display = "none"; }
+
+    function renderRow(v = {}, prepend = false) {
         const tbody = document.getElementById('tableBody');
-        const row = tbody.insertRow(isNew ? 0 : -1);
-        row.setAttribute('data-created', v.created || v.date);
+        const row = prepend ? tbody.insertRow(0) : tbody.insertRow();
+        const today = getTodayFormatted();
+
         row.innerHTML = `
-            <td><input type="text" class="excel-input" value="${v.comp}" oninput="markAsChanged(this)"></td>
-            <td><input type="text" class="excel-input" value="${v.mgr}" oninput="markAsChanged(this)"></td>
-            <td><input type="text" class="excel-input" value="${v.mob}" oninput="markAsChanged(this)"></td>
-            <td><input type="text" class="excel-input" value="${v.cr}" oninput="markAsChanged(this)"></td>
-            <td><input type="text" class="excel-input" value="${v.curr}" oninput="markAsChanged(this)"></td>
-            <td><input type="text" class="excel-input" value="${v.prop}" oninput="markAsChanged(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.comp || ''}" oninput="markAsEdited(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.mgr || ''}" oninput="markAsEdited(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.mob || ''}" oninput="markAsEdited(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.curr || ''}" oninput="markAsEdited(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.prop || ''}" oninput="markAsEdited(this)"></td>
             <td>
-                <select class="excel-input" onchange="checkStatus(this)">
-                    <option ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option>
-                    <option ${v.status === '50%' ? 'selected' : ''}>50%</option>
-                    <option ${v.status === '20%' ? 'selected' : ''}>20%</option>
-                    <option ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option>
+                <select class="excel-input" onchange="markAsEdited(this)">
+                    <option value="مهتم" ${v.status==='مهتم'?'selected':''}>مهتم</option>
+                    <option value="50%" ${v.status==='50%'?'selected':''}>50%</option>
+                    <option value="20%" ${v.status==='20%'?'selected':''}>20%</option>
+                    <option value="فقدان" ${v.status==='فقدان'?'selected':''}>فقدان</option>
                 </select>
             </td>
-            <td><input type="date" class="excel-input" value="${v.date}" oninput="markAsChanged(this)"></td>
-            <td class="notes-cell" data-notes='${v.notes || "[]"}' onclick="openSticker(this)">${getDisplayNote(v.notes || "[]")}</td>
-            <td class="updated-at" style="color:#64748b; font-weight:bold;">${v.updated}</td>
-            <td><button class="btn-delete" onclick="deleteRow(this)">حذف</button></td>
+            <td><input type="text" class="excel-input readonly-input" value="${v.date || today}" readonly></td>
+            <td class="custom-tooltip-cell">
+                <div class="notes-preview" onclick="openNote(this)" data-full-notes="${v.notes || ''}">${v.notes ? 'عرض السجل' : 'إضافة +'}</div>
+                <div class="tooltip-box">${v.notes || 'لا توجد ملاحظات'}</div>
+            </td>
+            <td><input type="text" class="excel-input readonly-input edit-date-field" value="${v.editDate || ''}" readonly></td>
+            <td><button style="color:red; cursor:pointer; border:none; background:none; font-weight:bold" onclick="if(confirm('حذف؟')){this.closest('tr').remove(); triggerNeedsSave();}">×</button></td>
         `;
     }
 
-    function markAsChanged(el) {
-        toggleSaveBtn(true);
-        const row = el.closest('tr');
-        if (row.getAttribute('data-created') !== getTodayFormatted()) {
-            row.setAttribute('data-pending-update', new Date().toLocaleDateString('en-GB'));
-        }
-    }
+    function insertNewRow() { renderRow({}, true); triggerNeedsSave(); }
 
-    function toggleSaveBtn(active) {
-        isDirty = active;
-        const btn = document.getElementById('saveAllBtn');
-        if(active) btn.classList.add('active'); else btn.classList.remove('active');
+    function saveAllData() {
+        const data = [];
+        document.querySelectorAll('#tableBody tr').forEach(row => {
+            const ins = row.querySelectorAll('input, select');
+            const notes = row.querySelector('.notes-preview').getAttribute('data-full-notes');
+            data.push({
+                comp: ins[0].value, mgr: ins[1].value, mob: ins[2].value,
+                curr: ins[3].value, prop: ins[4].value, status: ins[5].value,
+                date: ins[6].value, notes: notes, editDate: ins[7].value
+            });
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        const btn = document.getElementById('saveBtn');
+        btn.innerText = "تم الحفظ ✓";
+        btn.classList.remove('needs-save');
+        setTimeout(() => btn.innerText = "حفظ التغييرات", 1500);
     }
 
     function loadSavedData() {
-        const saved = localStorage.getItem('asgate_opportunities_data');
-        if (saved) {
-            let data = JSON.parse(saved);
-            data.sort((a, b) => (statusOrder[b.status] || 0) - (statusOrder[a.status] || 0));
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
-            data.forEach(item => renderRow(item));
-        }
-        toggleSaveBtn(false);
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) JSON.parse(saved).forEach(item => renderRow(item));
+        else insertNewRow();
     }
 
-    function saveAllData() {
-        const rows = document.querySelectorAll('#tableBody tr');
-        const allData = [];
-        rows.forEach(row => {
-            const ins = row.querySelectorAll('.excel-input');
-            let updatedAt = row.querySelector('.updated-at').innerText;
-            if (row.getAttribute('data-pending-update')) updatedAt = row.getAttribute('data-pending-update');
-            allData.push({
-                comp: ins[0].value, mgr: ins[1].value, mob: ins[2].value,
-                cr: ins[3].value, curr: ins[4].value, prop: ins[5].value,
-                status: row.querySelector('select').value, date: ins[6].value, 
-                notes: row.querySelector('.notes-cell').getAttribute('data-notes'),
-                updated: updatedAt, created: row.getAttribute('data-created')
-            });
+    function filterTable() {
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        document.querySelectorAll('#tableBody tr').forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(q) ? '' : 'none';
         });
-        localStorage.setItem('asgate_opportunities_data', JSON.stringify(allData));
-        loadSavedData();
     }
-
-    function checkStatus(el) {
-        markAsChanged(el);
-        if (['50%', '20%', 'فقدان'].includes(el.value)) {
-            showConfirm("هل ترغب بنقل الفرصة إلى صفحة الزيارات؟", () => transferToVisits(el.closest('tr')));
-        }
-    }
-
-    function transferToVisits(row) {
-        const ins = row.querySelectorAll('.excel-input');
-        const rowData = {
-            comp: ins[0].value, mgr: ins[1].value, mob: ins[2].value,
-            cr: ins[3].value, curr: ins[4].value, prop: ins[5].value,
-            status: row.querySelector('select').value, date: ins[6].value,
-            notes: row.querySelector('.notes-cell').getAttribute('data-notes') || "[]",
-            updated: new Date().toLocaleDateString('en-GB'),
-            created: row.getAttribute('data-created')
-        };
-        let visitsData = JSON.parse(localStorage.getItem('asgate_visits_data') || '[]');
-        visitsData.push(rowData);
-        localStorage.setItem('asgate_visits_data', JSON.stringify(visitsData));
-        row.remove();
-        saveAllData();
-    }
-
-    function openSticker(cell) {
-        activeCell = cell; isStickerChanged = false;
-        const notes = JSON.parse(cell.getAttribute('data-notes') || "[]");
-        let hHtml = "";
-        notes.forEach((n, idx) => {
-            hHtml += `<div style="margin-bottom:8px;"><strong>${n.date}</strong><br>${n.text}</div>`;
-            if(idx < notes.length - 1) hHtml += '<hr style="border:0; border-top:1px solid #decb00">';
-        });
-        document.getElementById('historyArea').innerHTML = hHtml;
-        const now = new Date();
-        const days = ['الأحد', 'الأثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-        document.getElementById('currentDateChip').innerText = `${days[now.getDay()]} ${now.toLocaleDateString('en-GB')}`;
-        document.getElementById('stickerInput').value = '';
-        document.getElementById('saveStickerBtn').classList.remove('active');
-        document.getElementById('notesOverlay').style.display = 'block';
-    }
-
-    function updateStickerBtn() {
-        isStickerChanged = document.getElementById('stickerInput').value.trim() !== "";
-        document.getElementById('saveStickerBtn').classList.toggle('active', isStickerChanged);
-    }
-
-    function confirmAndSaveNote() {
-        const text = document.getElementById('stickerInput').value.trim();
-        if (text) {
-            let notes = JSON.parse(activeCell.getAttribute('data-notes') || "[]");
-            const todayStr = document.getElementById('currentDateChip').innerText;
-            notes.push({ date: todayStr, text: text });
-            activeCell.setAttribute('data-notes', JSON.stringify(notes));
-            activeCell.innerText = getDisplayNote(JSON.stringify(notes));
-            toggleSaveBtn(true);
-        }
-        document.getElementById('notesOverlay').style.display = 'none';
-        closeConfirm();
-    }
-
-    function handleOutsideClick(e) {
-        if (isStickerChanged) showConfirm("هل تريد حفظ الملاحظات؟", confirmAndSaveNote);
-        else document.getElementById('notesOverlay').style.display = 'none';
-    }
-
-    function showConfirm(msg, action) {
-        document.getElementById('confirmMsg').innerText = msg;
-        document.getElementById('confirmBox').style.display = 'block';
-        document.getElementById('confirmBtn').onclick = () => { action(); closeConfirm(); };
-    }
-
-    function closeConfirm() { document.getElementById('confirmBox').style.display = 'none'; }
-    function deleteRow(btn) { if(confirm("حذف هذه الفرصة؟")) { btn.closest('tr').remove(); saveAllData(); } }
 </script>
 </body>
 </html>
