@@ -223,6 +223,16 @@
 
     function closeNote() { document.getElementById('noteModal').style.display = "none"; }
 
+    // وظيفة جديدة لتأكيد الحذف
+    function confirmDelete(btn) {
+        const row = btn.closest('tr');
+        const companyName = row.cells[0].querySelector('input').value || "هذا الصف";
+        if (confirm(`هل أنت متأكد من حذف زيارة شركة (${companyName})؟`)) {
+            row.remove();
+            triggerNeedsSave();
+        }
+    }
+
     function renderRow(v = {}, prepend = false) {
         const tbody = document.getElementById('tableBody');
         const row = prepend ? tbody.insertRow(0) : tbody.insertRow();
@@ -247,7 +257,7 @@
             <td><input type="text" class="excel-input readonly-input" value="${v.visitDate || today}" readonly></td>
             <td class="custom-tooltip-cell"><div class="notes-preview" onclick="openNote(this)" data-full-notes="${v.notes || ''}">${getLastNoteOnly(v.notes)}</div><div class="tooltip-box">${v.notes || 'لا توجد ملاحظات'}</div></td>
             <td><input type="text" class="excel-input readonly-input edit-date-field" value="${v.editDate || ''}" readonly></td>
-            <td><button style="background:none;border:none;color:red;cursor:pointer;font-weight:bold" onclick="this.closest('tr').remove(); triggerNeedsSave();">×</button></td>
+            <td><button style="background:none;border:none;color:red;cursor:pointer;font-weight:bold" onclick="confirmDelete(this)">×</button></td>
         `;
     }
 
