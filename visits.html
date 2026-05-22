@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASGate - سجل الزيارات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --nav-purple-dark: #2e1065;
@@ -15,49 +16,40 @@
             --accent-green-muted: #86a789;  /* الأخضر المطفي */
             --border-soft: #cbd5e1;
         }
-        body { 
-            background-color: var(--bg-color); 
-            font-family: 'Calibri', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            margin: 0; 
-            font-size: 14px; /* تم رفع الحجم قليلاً ليتناسب مع طبيعة خط كالبري */
-        }
+        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; font-size: 13px; }
 
         /* Navbar */
         .navbar { 
             background-color: var(--nav-purple-dark); display: flex; align-items: center; padding: 0 20px; 
             margin: 10px; border-radius: 15px; height: 37px; position: sticky; top: 10px; z-index: 1000;
         }
-        .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: bold; font-size: 13px; }
+        .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; }
         .navbar a.active { background-color: var(--nav-active); color: var(--nav-purple-dark); border-radius: 8px; line-height: 26px; height: 26px; }
 
         .container { padding: 0 10px; }
         .action-bar { display: flex; align-items: center; margin: 15px 0; gap: 15px; padding: 0 10px; }
-        .btn-top { border: none; padding: 8px 15px; border-radius: 8px; font-family: 'Calibri', sans-serif; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; }
+        .btn-top { border: none; padding: 8px 15px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; }
         .btn-add { background-color: var(--accent-blue); }
         
         /* تنسيق زر الحفظ التفاعلي */
-        .btn-save { background-color: var(--accent-green-muted); padding: 8px 12px; font-size: 12px; }
+        .btn-save { background-color: var(--accent-green-muted); padding: 8px 12px; font-size: 11px; }
         .btn-save.needs-save { background-color: var(--accent-green-active); box-shadow: 0 0 10px rgba(34, 197, 94, 0.4); }
 
         /* Table */
         .table-wrapper { background: white; border-radius: 12px; border: 1px solid var(--border-soft); margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th { background: var(--header-purple-mid); color: white; padding: 12px 5px; font-size: 12px; font-weight: bold; text-align: center; position: relative; z-index: 10; }
+        th { background: var(--header-purple-mid); color: white; padding: 12px 5px; font-size: 11px; font-weight: 800; text-align: center; position: relative; z-index: 10; }
         td { border-bottom: 1px solid var(--border-soft); text-align: center; height: 45px; padding: 2px; position: relative; }
         
-        .excel-input { 
-            width: 95%; border: none; text-align: center; 
-            font-family: 'Calibri', sans-serif; outline: none; 
-            background: transparent; font-size: 13px; position: relative; z-index: 5; 
-        }
+        .excel-input { width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; font-size: 11.5px; position: relative; z-index: 5; }
         .readonly-input { color: #64748b; cursor: default; }
 
         /* Tooltip System */
         .custom-tooltip-cell { position: relative; }
         .tooltip-box {
             position: absolute; top: 100%; right: 0; background: #334155; color: #fff;
-            padding: 8px 12px; border-radius: 8px; width: 200px; font-size: 12px;
-            line-height: 1.4; white-space: pre-wrap; text-align: right;
+            padding: 8px 12px; border-radius: 8px; width: 200px; font-size: 11px;
+            line-height: 1.6; white-space: pre-wrap; text-align: right;
             opacity: 0; visibility: hidden; transition: 0.2s; z-index: 9999;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             pointer-events: none; 
@@ -65,9 +57,8 @@
         .custom-tooltip-cell:hover .tooltip-box { opacity: 1; visibility: visible; }
 
         .notes-preview {
-            width: 95%; border: none; background: transparent; 
-            font-family: 'Calibri', sans-serif; font-size: 12px;
-            text-align: center; cursor: pointer; color: #3b82f6; font-weight: bold;
+            width: 95%; border: none; background: transparent; font-family: 'Cairo'; font-size: 11px;
+            text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700;
             overflow: hidden; white-space: nowrap; text-overflow: ellipsis; display: block; margin: 0 auto;
             position: relative; z-index: 5;
         }
@@ -78,18 +69,18 @@
             background: white; padding: 15px; border-radius: 10px; 
             width: 380px; height: 440px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
         }
-        .modal-header { font-weight: bold; color: #2e1065; margin-bottom: 10px; font-size: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .modal-header { font-weight: 800; color: #2e1065; margin-bottom: 10px; font-size: 14px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
         
         .history-log {
             flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft);
-            border-radius: 6px; padding: 12px; margin-bottom: 10px; font-size: 13px; color: #1e293b;
-            text-align: right; line-height: 1.6; white-space: pre-wrap;
+            border-radius: 6px; padding: 12px; margin-bottom: 10px; font-size: 12px; color: #1e293b;
+            text-align: right; line-height: 1.8; white-space: pre-wrap;
         }
 
         .note-area { 
             height: 80px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 6px; 
-            padding: 8px; font-family: 'Calibri', sans-serif; resize: none; outline: none; box-sizing: border-box;
-            background-color: #fff; font-size: 14px;
+            padding: 8px; font-family: 'Cairo'; resize: none; outline: none; box-sizing: border-box;
+            background-color: #fff; font-size: 13px;
         }
         .modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
 
@@ -136,8 +127,8 @@
         <div id="historyLog" class="history-log"></div>
         <textarea id="modalTextArea" class="note-area" placeholder="أدخل الملاحظة الجديدة هنا..."></textarea>
         <div class="modal-footer">
-            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:Calibri;">إلغاء</button>
-            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:Calibri;">إضافة ملاحظة</button>
+            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:Cairo;">إلغاء</button>
+            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:Cairo;">إضافة ملاحظة</button>
         </div>
     </div>
 </div>
