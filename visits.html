@@ -10,49 +10,64 @@
             --nav-purple-dark: #2e1065;
             --header-purple-mid: #8b5cf6;
             --nav-active: #a78bfa;
-            --bg-color: #f8fafc;
+            --bg-color: #f4f7f9; /* توحيد مع الرئيسية */
+            --white: #ffffff;
             --accent-blue: #3b82f6;
-            --accent-green-active: #22c55e; /* الأخضر اللامع */
-            --accent-green-muted: #86a789;  /* الأخضر المطفي */
-            --border-soft: #cbd5e1;
+            --accent-green-active: #22c55e; 
+            --accent-green-muted: #86a789;  
+            --border-soft: #e2e8f0; /* توحيد مع الرئيسية */
         }
-        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; font-size: 13px; }
+        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; font-size: 13px; font-weight: 300; }
 
-        /* Navbar */
+        /* Navbar - متطابق تماماً مع الرئيسية */
         .navbar { 
             background-color: var(--nav-purple-dark); display: flex; align-items: center; padding: 0 20px; 
             margin: 10px; border-radius: 15px; height: 37px; position: sticky; top: 10px; z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); box-sizing: border-box;
         }
-        .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; }
-        .navbar a.active { background-color: var(--nav-active); color: var(--nav-purple-dark); border-radius: 8px; line-height: 26px; height: 26px; }
+        .navbar a { 
+            color: white; text-decoration: none; padding: 0 15px; font-weight: 700; 
+            font-size: 12px; border-radius: 8px; transition: 0.3s; line-height: 26px; height: 26px; display: inline-block;
+        }
+        .navbar a.active { background-color: var(--nav-active); color: var(--nav-purple-dark); }
+        .navbar a:hover:not(.active) { background-color: rgba(167, 139, 250, 0.3); }
+
+        /* شريط معلومات الموظف الموحد */
+        .employee-info-bar {
+            margin: 10px 20px; height: 35px; background-color: var(--white);
+            border: 1px solid var(--border-soft); border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            padding: 0 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .info-content { display: flex; gap: 35px; align-items: center; }
+        .info-item { font-size: 11px; color: var(--nav-purple-dark); font-weight: 700; }
+        .info-item span { color: #64748b; font-weight: 300; margin-right: 5px; }
 
         .container { padding: 0 10px; }
         .action-bar { display: flex; align-items: center; margin: 15px 0; gap: 15px; padding: 0 10px; }
         .btn-top { border: none; padding: 8px 15px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; }
         .btn-add { background-color: var(--accent-blue); }
         
-        /* تنسيق زر الحفظ التفاعلي */
         .btn-save { background-color: var(--accent-green-muted); padding: 8px 12px; font-size: 11px; }
         .btn-save.needs-save { background-color: var(--accent-green-active); box-shadow: 0 0 10px rgba(34, 197, 94, 0.4); }
 
         /* Table */
-        .table-wrapper { background: white; border-radius: 12px; border: 1px solid var(--border-soft); margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .table-wrapper { background: white; border-radius: 12px; border: 1px solid var(--border-soft); margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden; }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th { background: var(--header-purple-mid); color: white; padding: 12px 5px; font-size: 11px; font-weight: 800; text-align: center; position: relative; z-index: 10; }
-        td { border-bottom: 1px solid var(--border-soft); text-align: center; height: 45px; padding: 2px; position: relative; }
+        th { background: var(--header-purple-mid); color: white; padding: 12px 5px; font-size: 11px; font-weight: 800; text-align: center; }
+        td { border-bottom: 1px solid var(--border-soft); text-align: center; height: 45px; padding: 2px; }
         
-        .excel-input { width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; font-size: 11.5px; position: relative; z-index: 5; }
+        .excel-input { width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; font-size: 11.5px; }
         .readonly-input { color: #64748b; cursor: default; }
 
-        /* Tooltip System */
+        /* Tooltip */
         .custom-tooltip-cell { position: relative; }
         .tooltip-box {
             position: absolute; top: 100%; right: 0; background: #334155; color: #fff;
             padding: 8px 12px; border-radius: 8px; width: 200px; font-size: 11px;
             line-height: 1.6; white-space: pre-wrap; text-align: right;
             opacity: 0; visibility: hidden; transition: 0.2s; z-index: 9999;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            pointer-events: none; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); pointer-events: none; 
         }
         .custom-tooltip-cell:hover .tooltip-box { opacity: 1; visibility: visible; }
 
@@ -60,30 +75,15 @@
             width: 95%; border: none; background: transparent; font-family: 'Cairo'; font-size: 11px;
             text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700;
             overflow: hidden; white-space: nowrap; text-overflow: ellipsis; display: block; margin: 0 auto;
-            position: relative; z-index: 5;
         }
 
         /* Modal */
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; }
-        .modal-content { 
-            background: white; padding: 15px; border-radius: 10px; 
-            width: 380px; height: 440px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
-        }
-        .modal-header { font-weight: 800; color: #2e1065; margin-bottom: 10px; font-size: 14px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .modal-content { background: white; padding: 15px; border-radius: 10px; width: 380px; height: 440px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .modal-header { font-weight: 800; color: var(--nav-purple-dark); margin-bottom: 10px; font-size: 14px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 6px; padding: 12px; margin-bottom: 10px; font-size: 12px; color: #1e293b; text-align: right; line-height: 1.8; white-space: pre-wrap; }
+        .note-area { height: 80px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 8px; font-family: 'Cairo'; resize: none; outline: none; box-sizing: border-box; font-size: 13px; }
         
-        .history-log {
-            flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft);
-            border-radius: 6px; padding: 12px; margin-bottom: 10px; font-size: 12px; color: #1e293b;
-            text-align: right; line-height: 1.8; white-space: pre-wrap;
-        }
-
-        .note-area { 
-            height: 80px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 6px; 
-            padding: 8px; font-family: 'Cairo'; resize: none; outline: none; box-sizing: border-box;
-            background-color: #fff; font-size: 13px;
-        }
-        .modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
-
         .col-company { width: 12%; } .col-manager { width: 8%; } .col-mobile { width: 8%; } .col-email { width: 8%; }
         .col-record { width: 8%; } .col-current-service { width: 10%; } .col-proposed-service { width: 10%; }
         .col-status { width: 6%; } .col-date { width: 8%; } .col-notes { width: 10%; }
@@ -95,10 +95,18 @@
 <nav class="navbar">
     <a href="index.html">الرئيسية</a>
     <a href="visits.html" class="active">الزيارات</a>
-    <a href="#">الفرص البيعية</a>
-    <a href="#">العملاء</a>
-    <a href="#">المبيعات</a>
+    <a href="opportunities.html">الفرص البيعية</a>
+    <a href="customers.html">العملاء</a>
+    <a href="sales.html">المبيعات</a>
 </nav>
+
+<div class="employee-info-bar">
+    <div class="info-content">
+        <div class="info-item">الموظف: <span>محمد المنصور</span></div>
+        <div class="info-item">الرقم: <span>ASG-2026</span></div>
+        <div class="info-item">المشروع: <span>ASGate</span></div>
+    </div>
+</div>
 
 <div class="container">
     <div class="action-bar">
@@ -135,6 +143,7 @@
 
 <script>
     let currentActivePreview = null;
+    const STORAGE_KEY = 'asgate_visits_final_v21';
 
     function getTodayFormatted() {
         const d = new Date();
@@ -148,9 +157,9 @@
     }
 
     function getLastNoteOnly(fullText) {
-        if (!fullText) return 'لا توجد ملاحظات';
+        if (!fullText) return 'إضافة ملاحظة +';
         const lines = fullText.split('\n').filter(l => l.trim() !== "" && !l.includes("🗓️") && !l.includes("---"));
-        return lines.length > 0 ? lines[lines.length - 1] : 'لا توجد ملاحظات';
+        return lines.length > 0 ? lines[lines.length - 1] : 'إضافة ملاحظة +';
     }
 
     function triggerNeedsSave() {
@@ -202,11 +211,9 @@
             currentActivePreview.setAttribute('data-full-notes', updatedNotes);
             currentActivePreview.innerText = getLastNoteOnly(updatedNotes);
             currentActivePreview.parentElement.querySelector('.tooltip-box').innerText = updatedNotes;
-            
             markAsEdited(currentActivePreview);
         }
         closeNote();
-        triggerNeedsSave();
     }
 
     function closeNote() { document.getElementById('noteModal').style.display = "none"; }
@@ -222,17 +229,14 @@
             <td><input type="text" class="excel-input" value="${v.mob || ''}" oninput="markAsEdited(this)"></td>
             <td><input type="text" class="excel-input" value="${v.email || ''}" oninput="markAsEdited(this)"></td>
             <td><input type="text" class="excel-input" value="${v.record || ''}" oninput="markAsEdited(this)"></td>
-            
             <td class="custom-tooltip-cell">
                 <input type="text" class="excel-input" value="${v.curServ || ''}" oninput="markAsEdited(this)">
                 <div class="tooltip-box">${v.curServ || ''}</div>
             </td>
-            
             <td class="custom-tooltip-cell">
                 <input type="text" class="excel-input" value="${v.propServ || ''}" oninput="markAsEdited(this)">
                 <div class="tooltip-box">${v.propServ || ''}</div>
             </td>
-            
             <td>
                 <select class="excel-input" onchange="markAsEdited(this)">
                     <option value="مهتم" ${v.status==='مهتم'?'selected':''}>مهتم</option>
@@ -242,14 +246,12 @@
                 </select>
             </td>
             <td><input type="text" class="excel-input readonly-input" value="${v.visitDate || today}" readonly></td>
-            
             <td class="custom-tooltip-cell">
                 <div class="notes-preview" onclick="openNote(this)" data-full-notes="${v.notes || ''}">${getLastNoteOnly(v.notes)}</div>
                 <div class="tooltip-box">${v.notes || 'لا توجد ملاحظات'}</div>
             </td>
-            
             <td><input type="text" class="excel-input readonly-input edit-date-field" value="${v.editDate || ''}" readonly></td>
-            <td><button style="background:none;border:none;color:red;cursor:pointer;font-weight:bold" onclick="this.closest('tr').remove(); triggerNeedsSave();">×</button></td>
+            <td><button style="background:none;border:none;color:red;cursor:pointer;font-weight:bold" onclick="if(confirm('حذف الزيارة؟')){this.closest('tr').remove(); triggerNeedsSave();}">×</button></td>
         `;
     }
 
@@ -272,34 +274,20 @@
             }
         });
         
-        data.sort((a, b) => {
-            const dateA = a.visitDate.split('/').reverse().join('');
-            const dateB = b.visitDate.split('/').reverse().join('');
-            return dateB.localeCompare(dateA);
-        });
-
-        localStorage.setItem('asgate_visits_final_v21', JSON.stringify(data));
-        
-        const saveBtn = document.getElementById('saveBtn');
-        const originalText = saveBtn.innerText;
-        saveBtn.innerText = "تم الحفظ ✓";
-        saveBtn.classList.remove('needs-save');
-        
-        setTimeout(() => {
-            saveBtn.innerText = originalText;
-        }, 1500);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        const btn = document.getElementById('saveBtn');
+        btn.innerText = "تم الحفظ ✓";
+        btn.classList.remove('needs-save');
+        setTimeout(() => btn.innerText = "حفظ البيانات", 1500);
     }
 
     function loadSavedData() {
-        const saved = localStorage.getItem('asgate_visits_final_v21');
-        const tableBody = document.getElementById('tableBody');
-        tableBody.innerHTML = '';
-        if (saved) {
-            JSON.parse(saved).forEach(item => renderRow(item));
-        } else {
-            insertNewRow();
-            document.getElementById('saveBtn').classList.remove('needs-save');
-        }
+        const saved = localStorage.getItem(STORAGE_KEY);
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+        if (saved) JSON.parse(saved).forEach(item => renderRow(item));
+        else insertNewRow();
+        document.getElementById('saveBtn').classList.remove('needs-save');
     }
 
     window.onclick = function(e) { if (e.target == document.getElementById('noteModal')) closeNote(); }
