@@ -178,7 +178,7 @@
             currentActivePreview.parentElement.querySelector('.tooltip-box').innerText = updatedNotes;
         }
         closeNote();
-        saveAllData(); // حفظ تلقائي عند إضافة ملاحظة
+        saveAllData();
     }
 
     function closeNote() { document.getElementById('noteModal').style.display = "none"; }
@@ -207,9 +207,10 @@
             
             <td>
                 <select class="excel-input">
-                    <option value="جديد" ${v.status==='جديد'?'selected':''}>جديد</option>
                     <option value="مهتم" ${v.status==='مهتم'?'selected':''}>مهتم</option>
-                    <option value="مغلق" ${v.status==='مغلق'?'selected':''}>مغلق</option>
+                    <option value="50%" ${v.status==='50%'?'selected':''}>50%</option>
+                    <option value="20%" ${v.status==='20%'?'selected':''}>20%</option>
+                    <option value="فقدان" ${v.status==='فقدان'?'selected':''}>فقدان</option>
                 </select>
             </td>
             <td><input type="text" class="excel-input" value="${v.visitDate || today}"></td>
@@ -224,11 +225,10 @@
         `;
     }
 
-    function insertNewRow() { renderRow({ status: 'جديد' }); }
+    function insertNewRow() { renderRow({ status: 'مهتم' }); }
 
     function saveAllData() {
         const data = [];
-        const today = new Date().toLocaleDateString('en-GB');
         document.querySelectorAll('#tableBody tr').forEach(row => {
             const inputs = row.querySelectorAll('input, select');
             const noteDiv = row.querySelector('.notes-preview');
@@ -242,7 +242,6 @@
         });
         localStorage.setItem('asgate_visits_final_v19', JSON.stringify(data));
         
-        // لمحة بصرية لتأكيد الحفظ بدون رسالة
         const saveBtn = document.getElementById('saveBtn');
         const originalText = saveBtn.innerText;
         saveBtn.innerText = "تم الحفظ ✓";
