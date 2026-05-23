@@ -52,9 +52,21 @@
         .editable { cursor: text; outline: none; transition: 0.2s; }
         .editable:focus { background-color: #fff; box-shadow: inset 0 0 0 2px var(--accent-blue); border-radius: 4px; }
 
+        /* تنسيق القائمة المنسدلة داخل الجدول */
+        .status-select {
+            font-family: 'Cairo';
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: #fff;
+            outline: none;
+            cursor: pointer;
+            width: 90%;
+        }
+
         .order-link { color: var(--accent-blue); text-decoration: none; font-weight: 800; border-bottom: 1px dashed var(--accent-blue); cursor: pointer; }
-        .status-badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; }
-        .badge-new { background: #dcfce7; color: #166534; }
 
         .modal-overlay { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
@@ -99,9 +111,9 @@
                     <th style="width: 15%;">الشركة</th>
                     <th style="width: 10%;">السجل الرئيسي</th>
                     <th style="width: 10%;">السجل الفرعي</th>
-                    <th style="width: 8%;">الحالة</th>
-                    <th style="width: 7%;">مكتمل</th>
-                    <th style="width: 7%;">معلق</th>
+                    <th style="width: 10%;">الحالة</th>
+                    <th style="width: 6%;">مكتمل</th>
+                    <th style="width: 6%;">معلق</th>
                     <th style="width: 9%;">ملاحظات</th>
                 </tr>
             </thead>
@@ -160,6 +172,7 @@
         document.getElementById('mComp').value = comp;
         document.getElementById('mCr').value = cr;
         document.getElementById('mCrSub').value = crSub;
+        document.getElementById('mSearchField').value = comp;
         document.getElementById('mResults').style.display = 'none';
     }
 
@@ -170,7 +183,7 @@
         const data = {
             id: "ORD-" + Math.floor(1000 + Math.random() * 8999),
             type: document.getElementById('mType').value || '-',
-            date: dateStr, // التاريخ المسجل وقت الإنشاء
+            date: dateStr,
             comp: document.getElementById('mComp').value,
             cr: document.getElementById('mCr').value,
             crSub: document.getElementById('mCrSub').value,
@@ -186,6 +199,11 @@
     function renderTableRow(obj) {
         const tbody = document.getElementById('salesBody');
         const row = tbody.insertRow(0);
+        
+        // الحالات المطلوبة بالترتيب
+        const statusOptions = ["مكتمل", "معلق", "مرتجع", "جاهز", "جديد", "فقدان"];
+        let optionsHtml = statusOptions.map(opt => `<option value="${opt}" ${obj.status === opt ? 'selected' : ''}>${opt}</option>`).join('');
+
         row.innerHTML = `
             <td><a href="order-details.html?id=${obj.id}" class="order-link">#${obj.id}</a></td>
             <td class="editable" contenteditable="true" oninput="markAsChanged()">${obj.type}</td>
@@ -193,7 +211,11 @@
             <td>${obj.comp}</td>
             <td>${obj.cr}</td>
             <td>${obj.crSub}</td>
-            <td><span class="status-badge badge-new">${obj.status}</span></td>
+            <td>
+                <select class="status-select" onchange="markAsChanged()">
+                    ${optionsHtml}
+                </select>
+            </td>
             <td>-</td><td>-</td>
             <td class="editable" contenteditable="true" oninput="markAsChanged()" style="color:#64748b;">${obj.notes}</td>
         `;
@@ -208,7 +230,7 @@
             comp: r.cells[3].innerText,
             cr: r.cells[4].innerText,
             crSub: r.cells[5].innerText,
-            status: r.cells[6].innerText,
+            status: r.cells[6].querySelector('select').value, // جلب القيمة من القائمة المنسدلة
             notes: r.cells[9].innerText
         }));
         localStorage.setItem('asgate_sales_db', JSON.stringify(salesData));
