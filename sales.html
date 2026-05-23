@@ -46,19 +46,26 @@
         .table-wrapper { background: var(--white); border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         th { background-color: var(--header-green); padding: 12px 5px; color: var(--white); font-size: 11px; font-weight: 800; text-align: center; }
-        td { border-bottom: 1px solid #f1f5f9; text-align: center; padding: 5px; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); vertical-align: middle; }
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); position: relative; }
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
         
-        .editable { cursor: text; outline: none; }
-        .editable:focus { background-color: #fff; box-shadow: inset 0 0 0 1px var(--accent-blue); border-radius: 4px; }
+        .editable { cursor: text; outline: none; transition: 0.2s; }
+        .editable:focus { background-color: #fff; box-shadow: inset 0 0 0 2px var(--accent-blue); border-radius: 4px; }
 
-        /* تنسيق الملاحظات (نمط صفحة الزيارات) */
-        .note-area {
-            width: 95%; height: 32px; padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 6px;
-            font-family: 'Cairo'; font-size: 10px; resize: none; overflow-y: hidden; 
-            transition: all 0.2s; background: #fcfcfc; color: #475569; line-height: 1.4;
+        /* تنسيق الملاحظات بنمط الزيارات */
+        .notes-preview {
+            width: 95%; border: none; background: transparent; font-family: 'Cairo'; font-size: 11px;
+            text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700;
+            overflow: hidden; white-space: nowrap; text-overflow: ellipsis; display: block; margin: 0 auto;
         }
-        .note-area:focus { background: white; border-color: var(--accent-blue); box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1); outline: none; }
+        .tooltip-box {
+            position: absolute; bottom: 100%; right: 0; background: #334155; color: #fff;
+            padding: 8px 12px; border-radius: 8px; width: 200px; font-size: 11px;
+            line-height: 1.6; white-space: pre-wrap; text-align: right;
+            opacity: 0; visibility: hidden; transition: 0.2s; z-index: 9999;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); pointer-events: none;
+        }
+        td:hover .tooltip-box { opacity: 1; visibility: visible; }
 
         .status-select {
             font-family: 'Cairo'; font-size: 10px; font-weight: 800; padding: 4px; border-radius: 6px;
@@ -67,20 +74,21 @@
 
         .order-link { color: var(--accent-blue); text-decoration: none; font-weight: 800; border-bottom: 1px dashed var(--accent-blue); cursor: pointer; }
 
-        .modal-overlay { 
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(15, 23, 42, 0.4); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(2px);
-        }
-        .modal-card { background: white; width: 25%; min-width: 320px; border-radius: 12px; padding: 20px; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15); }
-        .modal-header { font-weight: 800; color: var(--nav-bg); font-size: 15px; margin-bottom: 15px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; text-align: center; }
+        /* المودال الخاص بالملاحظات */
+        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 15px; border-radius: 12px; width: 380px; height: 440px; display: flex; flex-direction: column; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-header { font-weight: 800; color: var(--nav-bg); margin-bottom: 10px; text-align: right; font-size: 14px; }
+        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 6px; padding: 12px; margin-bottom: 10px; font-size: 12px; text-align: right; white-space: pre-wrap; color: #475569; }
+        .note-area { height: 80px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 8px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
+
+        /* مودال إنشاء طلب جديد */
+        .order-modal-card { background: white; width: 25%; min-width: 320px; border-radius: 12px; padding: 20px; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15); }
         .form-group { margin-bottom: 12px; position: relative; }
         .form-group label { display: block; font-weight: 700; font-size: 11px; color: #64748b; margin-bottom: 4px; }
         .form-group input { width: 100%; padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Cairo'; font-size: 12px; box-sizing: border-box; outline: none; }
         .modal-results { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #cbd5e1; z-index: 2100; border-radius: 6px; max-height: 140px; overflow-y: auto; display: none; }
         .modal-results div { padding: 8px 10px; font-size: 11px; cursor: pointer; border-bottom: 1px solid #f8fafc; text-align: right; }
         .modal-results div:hover { background: #eff6ff; }
-        .modal-footer { display: flex; gap: 8px; margin-top: 20px; }
-        .btn-modal { flex: 1; padding: 10px; border-radius: 6px; font-family: 'Cairo'; font-weight: 700; cursor: pointer; border: none; font-size: 12px; }
     </style>
 </head>
 <body onload="loadSalesFromStorage()">
@@ -121,8 +129,20 @@
     </div>
 </div>
 
-<div id="orderModal" class="modal-overlay">
-    <div class="modal-card">
+<div id="noteModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">سجل متابعة الطلب</div>
+        <div id="historyLog" class="history-log"></div>
+        <textarea id="modalTextArea" class="note-area" placeholder="أدخل الملاحظة الجديدة هنا..."></textarea>
+        <div style="display:flex; justify-content: flex-end; gap:5px; margin-top:10px;">
+            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px;">إلغاء</button>
+            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px;">إضافة ملاحظة</button>
+        </div>
+    </div>
+</div>
+
+<div id="orderModal" class="modal">
+    <div class="order-modal-card">
         <div class="modal-header">إنشاء طلب جديد</div>
         <div class="form-group">
             <label>البحث بالاسم أو السجل</label>
@@ -133,21 +153,23 @@
         <div class="form-group"><label>السجل الرئيسي</label><input type="text" id="mCr" readonly style="background:#f1f5f9"></div>
         <div class="form-group"><label>السجل الفرعي</label><input type="text" id="mCrSub" readonly style="background:#f1f5f9"></div>
         <div class="form-group"><label>وصف الطلب</label><input type="text" id="mType"></div>
-        <div class="modal-footer">
-            <button class="btn-modal btn-cancel" style="background:#f1f5f9" onclick="closeOrderModal()">إلغاء</button>
-            <button class="btn-modal btn-confirm" style="background:var(--nav-bg); color:white;" onclick="addOrderRow()">إضافة للجدول</button>
+        <div style="display:flex; gap:8px; margin-top:20px;">
+            <button onclick="closeOrderModal()" style="flex:1; padding:10px; background:#f1f5f9; border:none; border-radius:6px; cursor:pointer; font-family:Cairo;">إلغاء</button>
+            <button onclick="addOrderRow()" style="flex:1; padding:10px; background:var(--nav-bg); color:white; border:none; border-radius:6px; cursor:pointer; font-family:Cairo;">إضافة للجدول</button>
         </div>
     </div>
 </div>
 
 <script>
-    function markAsChanged() {
-        document.getElementById('saveBtn').classList.add('active');
+    let currentActivePreview = null;
+
+    function getTodayFormatted() {
+        const d = new Date();
+        return d.getDate().toString().padStart(2, '0') + '/' + (d.getMonth() + 1).toString().padStart(2, '0') + '/' + d.getFullYear();
     }
 
-    function markAsSaved() {
-        document.getElementById('saveBtn').classList.remove('active');
-    }
+    function markAsChanged() { document.getElementById('saveBtn').classList.add('active'); }
+    function markAsSaved() { document.getElementById('saveBtn').classList.remove('active'); }
 
     function openOrderModal() { document.getElementById('orderModal').style.display = 'flex'; }
     function closeOrderModal() { 
@@ -176,13 +198,10 @@
     }
 
     function addOrderRow() {
-        const today = new Date();
-        const dateStr = today.getFullYear() + '/' + (today.getMonth() + 1) + '/' + today.getDate();
-        
         const data = {
             id: "ORD-" + Math.floor(1000 + Math.random() * 8999),
             type: document.getElementById('mType').value || '-',
-            date: dateStr,
+            date: getTodayFormatted(),
             comp: document.getElementById('mComp').value,
             cr: document.getElementById('mCr').value,
             crSub: document.getElementById('mCrSub').value,
@@ -195,36 +214,58 @@
         closeOrderModal();
     }
 
+    function getLastNoteOnly(fullText) {
+        if (!fullText) return 'إضافة ملاحظة...';
+        const lines = fullText.split('\n').filter(l => l.trim() !== "" && !l.includes("🗓️") && !l.includes("---"));
+        return lines.length > 0 ? lines[lines.length - 1] : 'إضافة ملاحظة...';
+    }
+
     function renderTableRow(obj) {
         const tbody = document.getElementById('salesBody');
         const row = tbody.insertRow(0);
-        
         const statusOptions = ["مكتمل", "معلق", "مرتجع", "جاهز", "جديد", "فقدان"];
         let optionsHtml = statusOptions.map(opt => `<option value="${opt}" ${obj.status === opt ? 'selected' : ''}>${opt}</option>`).join('');
 
         row.innerHTML = `
             <td><a href="order-details.html?id=${obj.id}" class="order-link">#${obj.id}</a></td>
             <td class="editable" contenteditable="true" oninput="markAsChanged()">${obj.type}</td>
-            <td style="color:#64748b; font-weight:normal;">${obj.date}</td>
+            <td style="color:#64748b;">${obj.date}</td>
             <td>${obj.comp}</td>
             <td>${obj.cr}</td>
             <td>${obj.crSub}</td>
-            <td>
-                <select class="status-select" onchange="markAsChanged()">
-                    ${optionsHtml}
-                </select>
-            </td>
+            <td><select class="status-select" onchange="markAsChanged()">${optionsHtml}</select></td>
             <td>-</td><td>-</td>
             <td>
-                <textarea class="note-area" oninput="autoExpand(this); markAsChanged()" placeholder="ملاحظات...">${obj.notes || ''}</textarea>
+                <div class="notes-preview" onclick="openNote(this)" data-full-notes="${obj.notes || ''}">${getLastNoteOnly(obj.notes)}</div>
+                <div class="tooltip-box">${obj.notes || 'لا توجد ملاحظات'}</div>
             </td>
         `;
     }
 
-    function autoExpand(textarea) {
-        textarea.style.height = '32px';
-        textarea.style.height = textarea.scrollHeight + 'px';
+    function openNote(el) {
+        currentActivePreview = el;
+        const log = document.getElementById('historyLog');
+        log.innerText = el.getAttribute('data-full-notes') || "لا توجد ملاحظات سابقة.";
+        document.getElementById('modalTextArea').value = "";
+        document.getElementById('noteModal').style.display = "flex";
+        setTimeout(() => { document.getElementById('modalTextArea').focus(); log.scrollTop = log.scrollHeight; }, 50);
     }
+
+    function saveNote() {
+        const newText = document.getElementById('modalTextArea').value.trim();
+        if (newText !== "" && currentActivePreview) {
+            const todayStr = "🗓️ " + getTodayFormatted();
+            let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
+            let updatedNotes = oldNotes + (oldNotes ? "\n--------------------\n" : "") + todayStr + "\n" + newText;
+            currentActivePreview.setAttribute('data-full-notes', updatedNotes);
+            currentActivePreview.innerText = getLastNoteOnly(updatedNotes);
+            currentActivePreview.parentElement.querySelector('.tooltip-box').innerText = updatedNotes;
+            markAsChanged();
+        }
+        closeNote();
+    }
+
+    function closeNote() { document.getElementById('noteModal').style.display = "none"; }
 
     function triggerSave() {
         const rows = document.querySelectorAll('#salesBody tr');
@@ -236,7 +277,7 @@
             cr: r.cells[4].innerText,
             crSub: r.cells[5].innerText,
             status: r.cells[6].querySelector('select').value,
-            notes: r.cells[9].querySelector('textarea').value
+            notes: r.cells[9].querySelector('.notes-preview').getAttribute('data-full-notes')
         }));
         localStorage.setItem('asgate_sales_db', JSON.stringify(salesData));
         markAsSaved();
@@ -255,7 +296,10 @@
         });
     }
 
-    window.onclick = (e) => { if (e.target == document.getElementById('orderModal')) closeOrderModal(); }
+    window.onclick = (e) => { 
+        if (e.target == document.getElementById('noteModal')) closeNote(); 
+        if (e.target == document.getElementById('orderModal')) closeOrderModal(); 
+    }
 </script>
 </body>
 </html>
