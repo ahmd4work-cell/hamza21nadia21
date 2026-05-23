@@ -6,166 +6,121 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --header-green: #15803d; /* اللون الأخضر الذي طلبت */
+            --nav-bg: #2e1065;
+            --header-purple: #8b5cf6;
             --bg-color: #f4f7f9;
             --white: #ffffff;
             --border-color: #cbd5e1;
-            --text-dark: #1e293b;
-            --nav-bg: #2e1065;
+            --accent-blue: #3b82f6;
+            --zebra-blue: #eff6ff;
         }
 
-        body { 
-            background-color: var(--bg-color); 
-            font-family: 'Cairo', sans-serif; 
-            margin: 0; 
-            padding: 20px; 
-            color: var(--text-dark);
+        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
+
+        /* شريط علوي بسيط للعودة */
+        .top-nav { 
+            background: var(--nav-bg); padding: 10px 20px; 
+            display: flex; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .back-btn { 
+            color: white; text-decoration: none; font-size: 13px; font-weight: bold; 
+            display: flex; align-items: center; gap: 8px;
         }
 
-        .container { max-width: 1000px; margin: 0 auto; }
+        .container { padding: 20px; }
 
-        /* شريط العناوين باللون الأخضر */
-        .header-card {
-            background: var(--header-green); 
-            color: white; 
-            padding: 25px; 
-            border-radius: 15px;
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 25px;
-            box-shadow: 0 4px 15px rgba(21, 128, 61, 0.2);
+        /* منطقة البيانات الأساسية (الصف العلوي) */
+        .order-header-info { 
+            background: white; padding: 15px 25px; border-radius: 12px; 
+            border: 1px solid var(--border-color); display: flex; 
+            flex-wrap: wrap; gap: 20px; justify-content: space-between; 
+            margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
+        .info-item { display: flex; flex-direction: column; gap: 4px; min-width: 120px; }
+        .info-label { font-size: 10px; color: #64748b; font-weight: 800; }
+        .info-value { font-size: 13px; color: var(--nav-bg); font-weight: 800; }
 
-        .back-btn {
-            background: rgba(255,255,255,0.2); 
-            color: white; 
-            text-decoration: none;
-            padding: 10px 20px; 
-            border-radius: 10px; 
-            font-size: 14px; 
-            font-weight: bold; 
-            transition: 0.3s;
-            border: 1px solid rgba(255,255,255,0.3);
+        /* منطقة الأزرار */
+        .action-bar { margin-bottom: 12px; }
+        .btn-add-product { 
+            background: var(--accent-blue); color: white; border: none; 
+            padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; 
+            font-weight: bold; cursor: pointer; font-size: 12px; transition: 0.3s;
         }
-        .back-btn:hover { background: rgba(255,255,255,0.4); }
+        .btn-add-product:hover { background: #1d4ed8; }
 
-        /* تنسيق البطاقات والمعلومات */
-        .details-grid {
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
-            gap: 20px;
+        /* جدول المنتجات */
+        .table-wrapper { 
+            background: white; border-radius: 10px; overflow: hidden; 
+            border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th { 
+            background-color: var(--header-purple); padding: 10px 5px; 
+            color: white; font-size: 11px; font-weight: 800; 
+            border-left: 1px solid rgba(255,255,255,0.1); text-align: center;
+        }
+        td { 
+            border-bottom: 1px solid #f1f5f9; text-align: center; 
+            height: 38px; font-size: 11px; font-weight: 600; color: #1e293b;
+        }
+        tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
 
-        .card {
-            background: var(--white); 
-            border-radius: 15px; 
-            padding: 25px;
-            border: 1px solid var(--border-color); 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-        }
-
-        .card-title {
-            font-weight: 800; 
-            color: var(--header-green); 
-            border-bottom: 2px solid #f1f5f9;
-            padding-bottom: 12px; 
-            margin-bottom: 20px; 
-            font-size: 16px;
-        }
-
-        .info-row { 
-            display: flex; 
-            justify-content: space-between; 
-            margin-bottom: 15px; 
-            font-size: 14px; 
-            padding-bottom: 8px;
-            border-bottom: 1px dashed #f1f5f9;
-        }
-        .info-label { color: #64748b; font-weight: 600; }
-        .info-value { color: var(--text-dark); font-weight: 800; }
-
-        /* صندوق الملاحظات */
-        .notes-container { grid-column: 1 / -1; }
-        .notes-box {
-            background: #f8fafc; 
-            border-right: 5px solid var(--header-green);
-            padding: 20px; 
-            border-radius: 0 12px 12px 0; 
-            white-space: pre-wrap;
-            font-size: 14px; 
-            line-height: 1.8; 
-            color: #334155;
-            min-height: 150px;
-        }
-
-        .status-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            background: #dcfce7;
-            color: #166534;
-            font-weight: 800;
-        }
+        .badge-active { background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 4px; font-size: 10px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header-card">
-        <div>
-            <h2 style="margin:0; font-size: 22px;">تفاصيل طلب المبيعات</h2>
-            <span id="displayOrderID" style="opacity: 0.9; font-size: 15px; font-weight: 700;">#جاري التحميل...</span>
-        </div>
-        <a href="sales.html" class="back-btn">⬅ العودة للمبيعات</a>
+    <div class="top-nav">
+        <a href="sales.html" class="back-btn"><span>🔙</span> العودة لصفحة المبيعات</a>
     </div>
 
-    <div class="details-grid">
-        <div class="card">
-            <div class="card-title">👤 بيانات العميل</div>
-            <div class="info-row"><span class="info-label">اسم الشركة:</span> <span id="compName" class="info-value">-</span></div>
-            <div class="info-row"><span class="info-label">السجل الرئيسي:</span> <span id="crMain" class="info-value">-</span></div>
-            <div class="info-row"><span class="info-label">السجل الفرعي:</span> <span id="crSub" class="info-value">-</span></div>
+    <div class="container">
+        <div class="order-header-info">
+            <div class="info-item"><span class="info-label">رقم الطلب</span><span class="info-value" id="orderId">#ORD-7701</span></div>
+            <div class="info-item"><span class="info-label">الشركة</span><span class="info-value">شركة الحلول الذكية</span></div>
+            <div class="info-item"><span class="info-label">السجل</span><span class="info-value">1010203040</span></div>
+            <div class="info-item"><span class="info-label">نوع الطلب</span><span class="info-value">توريد أجهزة</span></div>
+            <div class="info-item"><span class="info-label">حالة الطلب</span><span class="info-value">مكتمل</span></div>
+            <div class="info-item"><span class="info-label">قيمة الطلب</span><span class="info-value">25,400.00 ر.س</span></div>
         </div>
 
-        <div class="card">
-            <div class="card-title">📋 تفاصيل الطلب</div>
-            <div class="info-row"><span class="info-label">وصف الطلب:</span> <span id="orderType" class="info-value">-</span></div>
-            <div class="info-row"><span class="info-label">تاريخ الإنشاء:</span> <span id="orderDate" class="info-value">-</span></div>
-            <div class="info-row"><span class="info-label">حالة الطلب:</span> <span id="orderStatus" class="status-badge">-</span></div>
+        <div class="action-bar">
+            <button class="btn-add-product" onclick="alert('فتح نافذة إضافة منتج')">+ إضافة منتج</button>
         </div>
 
-        <div class="card notes-container">
-            <div class="card-title">💬 سجل الملاحظات</div>
-            <div id="orderNotes" class="notes-box">لا توجد ملاحظات مسجلة.</div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">نوع الطلب</th>
+                        <th style="width: 25%;">اسم الطلب</th>
+                        <th style="width: 10%;">العدد</th>
+                        <th style="width: 12%;">الاشتراك</th>
+                        <th style="width: 12%;">الحالة</th>
+                        <th style="width: 16%;">ملاحظة</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>خدمة سحابية</td>
+                        <td>نظام CRM برو</td>
+                        <td>5</td>
+                        <td>سنوي</td>
+                        <td><span class="badge-active">نشط</span></td>
+                        <td style="color:#64748b; font-style:italic;">لا يوجد</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
-</div>
 
-<script>
-    function loadOrderDetails() {
+    <script>
+        // كود بسيط لاستخراج رقم الطلب من الرابط وعرضه
         const urlParams = new URLSearchParams(window.location.search);
-        const orderId = urlParams.get('id');
-
-        if (!orderId) return;
-
-        document.getElementById('displayOrderID').innerText = "رقم الطلب: #" + orderId;
-
-        const salesData = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
-        const order = salesData.find(item => item.id == orderId || "#" + item.id == orderId);
-
-        if (order) {
-            document.getElementById('compName').innerText = order.comp || '-';
-            document.getElementById('crMain').innerText = order.cr || '-';
-            document.getElementById('crSub').innerText = order.crSub || '-';
-            document.getElementById('orderType').innerText = order.type || '-';
-            document.getElementById('orderDate').innerText = order.date || '-';
-            document.getElementById('orderStatus').innerText = order.status || '-';
-            if (order.notes) document.getElementById('orderNotes').innerText = order.notes;
-        }
-    }
-    window.onload = loadOrderDetails;
-</script>
+        const id = urlParams.get('id');
+        if(id) document.getElementById('orderId').innerText = '#ORD-' + id;
+    </script>
 
 </body>
 </html>
