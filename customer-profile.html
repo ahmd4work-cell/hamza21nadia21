@@ -32,7 +32,7 @@
             position: relative;
         }
 
-        /* زر الرجوع في منطقة الـ 10% الفارغة */
+        /* زر الرجوع */
         .back-container {
             position: absolute;
             right: -7%;
@@ -56,15 +56,9 @@
         .row-wrapper { display: flex; align-items: center; justify-content: space-between; width: 100%; }
         .section-label { font-size: 12px; color: var(--nav-purple-dark); font-weight: 800; min-width: 110px; }
 
-        /* تحسين توزيع البيانات لتستوعب 5 حقول */
         .data-row-inline { 
-            display: flex; 
-            flex-grow: 1; 
-            justify-content: flex-start; 
-            align-items: center; 
-            gap: 25px; 
-            margin-right: 15px;
-            flex-wrap: wrap;
+            display: flex; flex-grow: 1; justify-content: flex-start; align-items: center; 
+            gap: 25px; margin-right: 15px; flex-wrap: wrap;
         }
         
         .info-item { display: flex; align-items: center; gap: 6px; font-size: 11px; }
@@ -152,15 +146,16 @@
     <div class="control-strip">
         <button class="action-btn btn-green" onclick="alert('فتح نموذج طلب جديد')">🛒 طلب جديد</button>
         <button class="action-btn btn-yellow" onclick="alert('فتح نموذج زيارة جديدة')">🚗 زيارة جديدة</button>
+        
         <div class="tabs-wrapper">
-            <button class="tab-btn active" id="btn-v" onclick="openTab('v-history')">سجل الزيارات</button>
-            <button class="tab-btn" id="btn-o" onclick="openTab('o-history')">سجل الطلبات</button>
-            <button class="tab-btn" onclick="openTab('attachments')">المرفقات</button>
+            <button class="tab-btn active" id="btn-o" onclick="openTab('o-history')">سجل الطلبات</button>
+            <button class="tab-btn" id="btn-a" onclick="openTab('attachments')">المرفقات</button>
+            <button class="tab-btn" id="btn-v" onclick="openTab('v-history')">سجل الزيارات</button>
         </div>
     </div>
 
     <div class="content-area" id="display-frame">
-        <b id="frame-title" style="font-size:12px; color:var(--nav-purple-dark); display:block; margin-bottom:10px;">📅 سجل الزيارات</b>
+        <b id="frame-title" style="font-size:12px; color:var(--nav-purple-dark); display:block; margin-bottom:10px;">🛒 سجل الطلبات</b>
         <div id="table-content"></div>
     </div>
 </div>
@@ -184,14 +179,13 @@
             document.getElementById('c-name').innerText = client.comp;
             document.getElementById('c-cr').innerText = client.cr || '0000000';
             document.getElementById('c-addr').innerText = client.address || 'غير محدد';
-            
-            // جلب البيانات الجديدة من الـ LocalStorage إذا كانت موجودة
             document.getElementById('c-source').innerText = client.source || 'نظام داخلي';
             document.getElementById('c-owner').innerText = client.owner || 'غير محدد';
-            
             document.getElementById('m-name').innerText = client.mgr || '-';
             document.getElementById('m-mob').innerText = client.mob || '-';
-            openTab('v-history');
+            
+            // فتح سجل الطلبات افتراضياً عند التحميل
+            openTab('o-history');
         }
     }
 
@@ -200,7 +194,15 @@
         const content = document.getElementById('table-content');
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         
-        if(tab === 'v-history') {
+        if(tab === 'o-history') {
+            document.getElementById('btn-o').classList.add('active');
+            title.innerText = "🛒 سجل طلبات العميل";
+            content.innerHTML = `<p style="text-align:center; color:#94a3b8; font-size:11px; margin-top:20px;">لا توجد طلبات سابقة مسجلة.</p>`;
+        } else if(tab === 'attachments') {
+            document.getElementById('btn-a').classList.add('active');
+            title.innerText = "📁 المرفقات والملفات";
+            content.innerHTML = `<p style="text-align:center; color:#94a3b8; font-size:11px; margin-top:20px;">لا توجد ملفات مرفقة.</p>`;
+        } else if(tab === 'v-history') {
             document.getElementById('btn-v').classList.add('active');
             title.innerText = "📅 سجل الزيارات الميدانية";
             const visits = JSON.parse(localStorage.getItem('asgate_visits_final_v21') || '[]').filter(v => v.comp === clientName);
@@ -208,14 +210,7 @@
                 <table>
                     <thead><tr><th>التاريخ</th><th>الحالة</th><th>الملاحظات</th></tr></thead>
                     <tbody>${visits.map(v => `<tr><td>${v.visitDate}</td><td>${v.status || 'مكتملة'}</td><td>${v.notes || '-'}</td></tr>`).join('')}</tbody>
-                </table>` : `<p style="text-align:center; color:#94a3b8; font-size:11px; margin-top:20px;">لا توجد سجلات حالياً.</p>`;
-        } else if(tab === 'o-history') {
-            document.getElementById('btn-o').classList.add('active');
-            title.innerText = "🛒 سجل طلبات العميل";
-            content.innerHTML = `<p style="text-align:center; color:#94a3b8; font-size:11px; margin-top:20px;">لا توجد طلبات سابقة مسجلة.</p>`;
-        } else {
-            title.innerText = "📁 المرفقات";
-            content.innerHTML = `<p style="text-align:center; color:#94a3b8; font-size:11px; margin-top:20px;">لا توجد ملفات مرفقة.</p>`;
+                </table>` : `<p style="text-align:center; color:#94a3b8; font-size:11px; margin-top:20px;">لا توجد سجلات زيارات حالياً.</p>`;
         }
     }
 </script>
