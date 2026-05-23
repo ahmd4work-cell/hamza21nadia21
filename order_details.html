@@ -7,7 +7,7 @@
     <style>
         :root {
             --nav-bg: #2e1065;
-            --header-purple: #8b5cf6;
+            --header-green: #15803d; /* تم تغيير اللون للأخضر المعتمد */
             --bg-color: #f4f7f9;
             --white: #ffffff;
             --border-color: #cbd5e1;
@@ -29,19 +29,21 @@
 
         .container { padding: 20px; }
 
-        /* منطقة البيانات الأساسية (الصف العلوي) */
+        /* منطقة البيانات الأساسية بمسافات 7% */
         .order-header-info { 
             background: white; padding: 15px 25px; border-radius: 12px; 
             border: 1px solid var(--border-color); display: flex; 
             flex-wrap: wrap; gap: 20px; justify-content: space-between; 
-            margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin: 0 7% 20px 7%; /* تم ضبط الهوامش لتبدأ وتنتهي عند 7% */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
+        
         .info-item { display: flex; flex-direction: column; gap: 4px; min-width: 120px; }
         .info-label { font-size: 10px; color: #64748b; font-weight: 800; }
         .info-value { font-size: 13px; color: var(--nav-bg); font-weight: 800; }
 
         /* منطقة الأزرار */
-        .action-bar { margin-bottom: 12px; }
+        .action-bar { margin: 0 7% 12px 7%; } /* محاذاة الأزرار مع المربع العلوي */
         .btn-add-product { 
             background: var(--accent-blue); color: white; border: none; 
             padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; 
@@ -49,14 +51,15 @@
         }
         .btn-add-product:hover { background: #1d4ed8; }
 
-        /* جدول المنتجات */
+        /* جدول المنتجات بمسافة 7% */
         .table-wrapper { 
             background: white; border-radius: 10px; overflow: hidden; 
             border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin: 0 7%; /* محاذاة الجدول مع المربع العلوي */
         }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         th { 
-            background-color: var(--header-purple); padding: 10px 5px; 
+            background-color: var(--header-green); padding: 10px 5px; 
             color: white; font-size: 11px; font-weight: 800; 
             border-left: 1px solid rgba(255,255,255,0.1); text-align: center;
         }
@@ -119,7 +122,7 @@
         // كود بسيط لاستخراج رقم الطلب من الرابط وعرضه
         const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get('id');
-        if(id) document.getElementById('orderId').innerText = '#ORD-' + id;
+        if(id) document.getElementById('orderId').innerText = '#' + id;
     </script>
 
 </body>
