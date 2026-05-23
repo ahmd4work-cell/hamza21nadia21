@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تفاصيل الطلب | ASGate</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --nav-bg: #2e1065;
+            --header-green: #15803d;
+            --bg-color: #f4f7f9;
+            --white: #ffffff;
+            --border-color: #cbd5e1;
+        }
+        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { background: var(--nav-bg); color: white; padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .back-btn { background: rgba(255,255,255,0.2); color: white; text-decoration: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; }
+        .card { background: white; border-radius: 12px; padding: 20px; margin-top: 20px; border: 1px solid var(--border-color); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+        .label { color: #64748b; font-weight: 700; }
+        .val { color: #1e293b; font-weight: 800; }
+        .notes-area { background: #f8fafc; padding: 15px; border-radius: 8px; margin-top: 15px; white-space: pre-wrap; line-height: 1.6; border-right: 4px solid var(--nav-bg); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h2 id="orderTitle">تفاصيل الطلب</h2>
+        <a href="sales.html" class="back-btn">العودة للمبيعات</a>
+    </div>
+
+    <div class="card">
+        <h3 style="color: var(--nav-bg); border-bottom: 2px solid #eee; padding-bottom: 10px;">بيانات العميل</h3>
+        <div class="info-row"><span class="label">الشركة:</span> <span id="comp" class="val">-</span></div>
+        <div class="info-row"><span class="label">السجل الرئيسي:</span> <span id="cr" class="val">-</span></div>
+        <div class="info-row"><span class="label">السجل الفرعي:</span> <span id="crsub" class="val">-</span></div>
+    </div>
+
+    <div class="card">
+        <h3 style="color: var(--nav-bg); border-bottom: 2px solid #eee; padding-bottom: 10px;">بيانات الطلب</h3>
+        <div class="info-row"><span class="label">الوصف:</span> <span id="type" class="val">-</span></div>
+        <div class="info-row"><span class="label">التاريخ:</span> <span id="date" class="val">-</span></div>
+        <div class="info-row"><span class="label">الحالة:</span> <span id="status" class="val">-</span></div>
+    </div>
+
+    <div class="card">
+        <h3 style="color: var(--nav-bg); border-bottom: 2px solid #eee; padding-bottom: 10px;">سجل الملاحظات</h3>
+        <div id="notes" class="notes-area">لا توجد ملاحظات.</div>
+    </div>
+</div>
+
+<script>
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('id');
+        if (!orderId) return;
+
+        document.getElementById('orderTitle').innerText = "طلب رقم #" + orderId;
+
+        const salesData = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
+        const order = salesData.find(o => o.id == orderId);
+
+        if (order) {
+            document.getElementById('comp').innerText = order.comp;
+            document.getElementById('cr').innerText = order.cr;
+            document.getElementById('crsub').innerText = order.crSub;
+            document.getElementById('type').innerText = order.type;
+            document.getElementById('date').innerText = order.date;
+            document.getElementById('status').innerText = order.status;
+            document.getElementById('notes').innerText = order.notes || "لا توجد ملاحظات.";
+        }
+    }
+</script>
+
+</body>
+</html>
