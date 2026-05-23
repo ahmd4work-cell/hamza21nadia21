@@ -26,21 +26,9 @@
         .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; border-radius: 8px; transition: 0.3s; line-height: 26px; height: 26px; display: inline-block; }
         .navbar a.active-link { background-color: var(--nav-active); color: var(--nav-purple-dark); }
 
-        /* مسار التنقل Breadcrumb */
-        .breadcrumb {
-            margin: 15px 10% 5px 10%;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .breadcrumb a { text-decoration: none; color: var(--purple-mid); font-weight: bold; }
-        .breadcrumb .sep { color: #cbd5e1; font-weight: bold; }
-        .breadcrumb .current { color: #64748b; font-weight: 800; }
-
         /* حاوية البيانات الأساسية بمسافة 10% */
         .profile-wrapper {
-            margin: 10px 10%; 
+            margin: 20px 10%; 
             position: relative;
         }
 
@@ -59,17 +47,27 @@
         .back-btn:hover { background: var(--danger-red); color: white; }
 
         .compact-section { 
-            background: var(--white); border-radius: 8px; padding: 8px 20px; 
+            background: var(--white); border-radius: 8px; padding: 12px 20px; 
             box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 8px;
             border-right: 4px solid var(--purple-mid);
             display: flex; flex-direction: column;
         }
 
         .row-wrapper { display: flex; align-items: center; justify-content: space-between; width: 100%; }
-        .section-label { font-size: 12px; color: var(--nav-purple-dark); font-weight: 800; min-width: 130px; }
+        .section-label { font-size: 12px; color: var(--nav-purple-dark); font-weight: 800; min-width: 110px; }
 
-        .data-row-inline { display: flex; flex-grow: 1; justify-content: space-between; align-items: center; margin-right: 10px; }
-        .info-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+        /* تحسين توزيع البيانات لتستوعب 5 حقول */
+        .data-row-inline { 
+            display: flex; 
+            flex-grow: 1; 
+            justify-content: flex-start; 
+            align-items: center; 
+            gap: 25px; 
+            margin-right: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .info-item { display: flex; align-items: center; gap: 6px; font-size: 11px; }
         .info-item label { color: #94a3b8; font-weight: bold; white-space: nowrap; }
         .info-item span { color: #1e293b; font-weight: 700; }
 
@@ -119,12 +117,6 @@
     <a href="sales.html">المبيعات</a>
 </nav>
 
-<div class="breadcrumb">
-    <a href="customers.html">قائمة العملاء</a>
-    <span class="sep">/</span>
-    <span class="current" id="breadcrumb-name">تحميل...</span>
-</div>
-
 <div class="profile-wrapper">
     <div class="back-container">
         <button class="back-btn" onclick="goBackAndFocus()">رجوع</button>
@@ -137,6 +129,8 @@
                 <div class="info-item"><label>الشركة:</label><span id="c-name">-</span></div>
                 <div class="info-item"><label>السجل:</label><span id="c-cr">-</span></div>
                 <div class="info-item"><label>العنوان:</label><span id="c-addr">-</span></div>
+                <div class="info-item"><label>منشأ العميل:</label><span id="c-source">-</span></div>
+                <div class="info-item"><label>مالك العميل:</label><span id="c-owner">-</span></div>
             </div>
         </div>
     </div>
@@ -187,10 +181,14 @@
 
         if(client) {
             document.title = `${client.comp} | ملف العميل`;
-            document.getElementById('breadcrumb-name').innerText = client.comp;
             document.getElementById('c-name').innerText = client.comp;
             document.getElementById('c-cr').innerText = client.cr || '0000000';
             document.getElementById('c-addr').innerText = client.address || 'غير محدد';
+            
+            // جلب البيانات الجديدة من الـ LocalStorage إذا كانت موجودة
+            document.getElementById('c-source').innerText = client.source || 'نظام داخلي';
+            document.getElementById('c-owner').innerText = client.owner || 'غير محدد';
+            
             document.getElementById('m-name').innerText = client.mgr || '-';
             document.getElementById('m-mob').innerText = client.mob || '-';
             openTab('v-history');
