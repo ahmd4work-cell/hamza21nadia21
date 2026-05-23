@@ -7,7 +7,7 @@
     <style>
         :root {
             --nav-bg: #2e1065;
-            --header-green: #15803d; /* اللون الأخضر الغامق الجديد */
+            --header-green: #15803d;
             --nav-active: #a78bfa;
             --bg-color: #f4f7f9;
             --white: #ffffff;
@@ -48,6 +48,11 @@
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); }
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
         
+        /* Editable Cells Style */
+        .editable { cursor: text; outline: none; transition: 0.2s; }
+        .editable:hover { background-color: #fdfae6; box-shadow: inset 0 0 4px rgba(0,0,0,0.05); }
+        .editable:focus { background-color: #fff; border: 1px solid var(--accent-blue); }
+
         .order-link { color: var(--accent-blue); text-decoration: none; font-weight: 800; border-bottom: 1px dashed var(--accent-blue); }
         .status-badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; }
         .badge-new { background: #dcfce7; color: #166534; }
@@ -234,24 +239,48 @@
         const row = tbody.insertRow(0);
         const orderId = Math.floor(1000 + Math.random() * 8999);
 
-        // الترتيب المحدث للأعمدة
+        // وصف الطلب (الخلية 1) والملاحظات (الخلية 8) قابلة للتعديل contenteditable="true"
         row.innerHTML = `
             <td><a href="order-details.html?id=${orderId}" class="order-link">#ORD-${orderId}</a></td>
-            <td>${type || '-'}</td>
+            <td class="editable" contenteditable="true">${type || '-'}</td>
             <td>${comp}</td>
             <td>${cr}</td>
             <td>${crSub}</td>
             <td><span class="status-badge ${status === 'جديد' ? 'badge-new' : ''}">${status}</span></td>
             <td>-</td>
             <td>-</td>
-            <td style="color:#94a3b8; font-style:italic;">لا توجد ملاحظات..</td>
+            <td class="editable" contenteditable="true" style="color:#64748b; font-style:italic;">اكتب ملاحظة..</td>
         `;
 
         closeOrderModal();
     }
 
+    // وظيفة حفظ صامتة بدون نافذة تأكيد
     function saveTableData() {
-        alert("تم حفظ جميع التغييرات بنجاح!");
+        const rows = document.querySelectorAll('#salesBody tr');
+        const dataToSave = [];
+        
+        rows.forEach(row => {
+            const cells = row.cells;
+            dataToSave.push({
+                orderId: cells[0].innerText,
+                desc: cells[1].innerText,
+                comp: cells[2].innerText,
+                cr: cells[3].innerText,
+                crSub: cells[4].innerText,
+                status: cells[5].innerText,
+                notes: cells[8].innerText
+            });
+        });
+
+        // حفظ في LocalStorage كمثال
+        localStorage.setItem('asgate_sales_orders', JSON.stringify(dataToSave));
+        
+        // إشارة بصرية بسيطة (اختياري: تغيير لون الزر للحظة)
+        const btn = document.querySelector('.btn-save');
+        const originalText = btn.innerText;
+        btn.innerText = "تم الحفظ ✓";
+        setTimeout(() => btn.innerText = originalText, 1500);
     }
 
     function filterSalesTable() {
