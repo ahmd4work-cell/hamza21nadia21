@@ -38,9 +38,7 @@
         .btn-top { border: none; padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; color: white; transition: 0.3s; }
         .btn-add { background-color: var(--accent-blue); }
         
-        /* زر الحفظ الافتراضي (مطفأ) */
         .btn-save { background-color: var(--btn-disabled); cursor: default; opacity: 0.6; pointer-events: none; }
-        /* زر الحفظ المضيء (مفعل) */
         .btn-save.active { background-color: var(--accent-green); cursor: pointer; opacity: 1; pointer-events: auto; box-shadow: 0 0 12px rgba(34, 197, 94, 0.5); }
 
         .search-box { padding: 0 15px; border: 1px solid var(--border-color); border-radius: 8px; width: 300px; height: 32px; font-family: 'Cairo'; font-size: 11px; outline: none; }
@@ -54,11 +52,10 @@
         .editable { cursor: text; outline: none; transition: 0.2s; }
         .editable:focus { background-color: #fff; box-shadow: inset 0 0 0 2px var(--accent-blue); border-radius: 4px; }
 
-        .order-link { color: var(--accent-blue); text-decoration: none; font-weight: 800; border-bottom: 1px dashed var(--accent-blue); }
+        .order-link { color: var(--accent-blue); text-decoration: none; font-weight: 800; border-bottom: 1px dashed var(--accent-blue); cursor: pointer; }
         .status-badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; }
         .badge-new { background: #dcfce7; color: #166534; }
 
-        /* Modal 25% */
         .modal-overlay { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(15, 23, 42, 0.4); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(2px);
@@ -97,14 +94,15 @@
             <thead>
                 <tr>
                     <th style="width: 10%;">رقم الطلب</th>
-                    <th style="width: 14%;">وصف الطلب</th>
-                    <th style="width: 16%;">الشركة</th>
-                    <th style="width: 11%;">السجل الرئيسي</th>
-                    <th style="width: 11%;">السجل الفرعي</th>
-                    <th style="width: 9%;">الحالة</th>
-                    <th style="width: 9%;">مكتمل</th>
-                    <th style="width: 9%;">معلق</th>
-                    <th style="width: 11%;">ملاحظات</th>
+                    <th style="width: 13%;">وصف الطلب</th>
+                    <th style="width: 11%;">تاريخ الإنشاء</th>
+                    <th style="width: 15%;">الشركة</th>
+                    <th style="width: 10%;">السجل الرئيسي</th>
+                    <th style="width: 10%;">السجل الفرعي</th>
+                    <th style="width: 8%;">الحالة</th>
+                    <th style="width: 7%;">مكتمل</th>
+                    <th style="width: 7%;">معلق</th>
+                    <th style="width: 9%;">ملاحظات</th>
                 </tr>
             </thead>
             <tbody id="salesBody"></tbody>
@@ -132,16 +130,12 @@
 </div>
 
 <script>
-    // تفعيل زر الحفظ (يصبح أخضر مضيئاً)
     function markAsChanged() {
-        const btn = document.getElementById('saveBtn');
-        btn.classList.add('active');
+        document.getElementById('saveBtn').classList.add('active');
     }
 
-    // تعطيل زر الحفظ (يعود مطفأً)
     function markAsSaved() {
-        const btn = document.getElementById('saveBtn');
-        btn.classList.remove('active');
+        document.getElementById('saveBtn').classList.remove('active');
     }
 
     function openOrderModal() { document.getElementById('orderModal').style.display = 'flex'; }
@@ -170,9 +164,13 @@
     }
 
     function addOrderRow() {
+        const today = new Date();
+        const dateStr = today.getFullYear() + '/' + (today.getMonth() + 1) + '/' + today.getDate();
+        
         const data = {
-            id: "#ORD-" + Math.floor(1000 + Math.random() * 8999),
+            id: "ORD-" + Math.floor(1000 + Math.random() * 8999),
             type: document.getElementById('mType').value || '-',
+            date: dateStr, // التاريخ المسجل وقت الإنشاء
             comp: document.getElementById('mComp').value,
             cr: document.getElementById('mCr').value,
             crSub: document.getElementById('mCrSub').value,
@@ -181,7 +179,7 @@
         };
         if (!data.comp) return alert("اختر شركة أولاً");
         renderTableRow(data);
-        markAsChanged(); // تفعيل الزر فور الإضافة
+        markAsChanged();
         closeOrderModal();
     }
 
@@ -189,8 +187,9 @@
         const tbody = document.getElementById('salesBody');
         const row = tbody.insertRow(0);
         row.innerHTML = `
-            <td><a href="#" class="order-link">${obj.id}</a></td>
+            <td><a href="order-details.html?id=${obj.id}" class="order-link">#${obj.id}</a></td>
             <td class="editable" contenteditable="true" oninput="markAsChanged()">${obj.type}</td>
+            <td style="color:#64748b; font-weight:normal;">${obj.date}</td>
             <td>${obj.comp}</td>
             <td>${obj.cr}</td>
             <td>${obj.crSub}</td>
@@ -203,21 +202,21 @@
     function triggerSave() {
         const rows = document.querySelectorAll('#salesBody tr');
         const salesData = Array.from(rows).map(r => ({
-            id: r.cells[0].innerText,
+            id: r.cells[0].innerText.replace('#', ''),
             type: r.cells[1].innerText,
-            comp: r.cells[2].innerText,
-            cr: r.cells[3].innerText,
-            crSub: r.cells[4].innerText,
-            status: r.cells[5].innerText,
-            notes: r.cells[8].innerText
+            date: r.cells[2].innerText,
+            comp: r.cells[3].innerText,
+            cr: r.cells[4].innerText,
+            crSub: r.cells[5].innerText,
+            status: r.cells[6].innerText,
+            notes: r.cells[9].innerText
         }));
         localStorage.setItem('asgate_sales_db', JSON.stringify(salesData));
-        markAsSaved(); // إطفاء الزر بعد الحفظ
+        markAsSaved();
     }
 
     function loadSalesFromStorage() {
         const saved = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
-        // نعكس المصفوفة لنحافظ على ترتيب الإضافة (الأحدث أولاً)
         saved.reverse().forEach(item => renderTableRow(item));
         markAsSaved();
     }
