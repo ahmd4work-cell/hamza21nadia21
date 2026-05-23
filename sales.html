@@ -46,10 +46,10 @@
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); position: relative; }
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
         
-        /* رابط رقم الطلب */
-        .order-link { color: var(--accent-blue); text-decoration: none; font-weight: 800; border-bottom: 1px dashed var(--accent-blue); cursor: pointer; }
+        /* تنسيق رابط الطلب لتجنب خطأ 404 */
+        .order-link { color: var(--accent-blue); text-decoration: none; font-weight: 800; border-bottom: 1px dashed var(--accent-blue); cursor: help; }
 
-        /* تنسيق الملاحظة التي تشبه الدردشة */
+        /* "الملاحظة التي تشبه الدردشة" */
         .notes-preview {
             width: 95%; border: none; background: transparent; font-family: 'Cairo'; font-size: 11px;
             text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700;
@@ -64,7 +64,6 @@
         }
         td:hover .tooltip-box { opacity: 1; visibility: visible; }
 
-        /* المودال */
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 20px; border-radius: 15px; width: 450px; height: 550px; display: flex; flex-direction: column; }
         .history-log { flex-grow: 1; overflow-y: auto; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; margin-bottom: 15px; font-size: 12px; text-align: right; white-space: pre-wrap; }
@@ -86,7 +85,7 @@
     <div class="action-bar">
         <button class="btn-top btn-add" onclick="openOrderModal()">+ إنشاء طلب مبيعات جديد</button>
         <button id="saveBtn" class="btn-top btn-save" onclick="triggerSave()">حفظ التغييرات</button>
-        <input type="text" class="search-box" style="padding:0 15px; border:1px solid #cbd5e1; border-radius:8px; width:250px; height:32px; font-family:Cairo; font-size:11px;" id="globalSearch" placeholder="🔍 بحث..." onkeyup="filterSalesTable()">
+        <input type="text" class="search-box" style="padding:0 15px; border:1px solid #cbd5e1; border-radius:8px; width:250px; height:32px; font-family:Cairo; font-size:11px;" id="globalSearch" placeholder="🔍 بحث في الجدول..." onkeyup="filterSalesTable()">
     </div>
     
     <div class="table-wrapper">
@@ -112,19 +111,19 @@
 
 <div id="noteModal" class="modal">
     <div class="modal-content">
-        <div style="font-weight: 800; color: var(--nav-bg); margin-bottom: 12px; text-align: right; font-size: 15px; border-bottom: 2px solid #f1f5f9; padding-bottom: 5px;">سجل ملاحظات الدردشة</div>
+        <div style="font-weight: 800; color: var(--nav-bg); margin-bottom: 12px; text-align: right; font-size: 15px; border-bottom: 2px solid #f1f5f9; padding-bottom: 5px;">سجل ملاحظات الدردشة الجماعية</div>
         <div id="historyLog" class="history-log"></div>
-        <textarea id="modalTextArea" class="note-area" placeholder="اكتب ملاحظتك هنا..."></textarea>
+        <textarea id="modalTextArea" class="note-area" placeholder="اكتب ملاحظتك هنا ليراها الجميع..."></textarea>
         <div style="display:flex; justify-content: flex-end; gap:8px; margin-top:15px;">
             <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:10px 20px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px;">إغلاق</button>
-            <button onclick="saveNote()" style="background:var(--accent-green); border:none; color:white; padding:10px 20px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px; font-weight:bold;">إرسال</button>
+            <button onclick="saveNote()" style="background:var(--accent-green); border:none; color:white; padding:10px 20px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px; font-weight:bold;">إرسال الملاحظة</button>
         </div>
     </div>
 </div>
 
 <script>
     let currentActivePreview = null;
-    const currentUser = "أحمد"; 
+    const currentUser = "أحمد"; // صاحب الصفحة
 
     function getDateTime() {
         const d = new Date();
@@ -147,8 +146,9 @@
         const statusOptions = ["جديد", "مكتمل", "معلق", "فقدان"];
         let optionsHtml = statusOptions.map(opt => `<option value="${opt}" ${obj.status === opt ? 'selected' : ''}>${opt}</option>`).join('');
 
+        // تم تغيير الرابط إلى javascript:void(0) لمنع خطأ 404 عند الضغط عليه
         row.innerHTML = `
-            <td><a href="order_details.html?id=${obj.id}" class="order-link">#${obj.id}</a></td>
+            <td><a href="javascript:void(0)" class="order-link">#${obj.id}</a></td>
             <td contenteditable="true" oninput="markAsChanged()">${obj.type}</td>
             <td style="color:#64748b;">${obj.date}</td>
             <td>${obj.comp}</td>
@@ -166,7 +166,7 @@
     function openNote(el) {
         currentActivePreview = el;
         const log = document.getElementById('historyLog');
-        log.innerText = el.getAttribute('data-full-notes') || "لا توجد ملاحظات سابقة.";
+        log.innerText = el.getAttribute('data-full-notes') || "ابدأ الدردشة حول هذا الطلب...";
         document.getElementById('modalTextArea').value = "";
         document.getElementById('noteModal').style.display = "flex";
         setTimeout(() => { document.getElementById('modalTextArea').focus(); log.scrollTop = log.scrollHeight; }, 50);
@@ -176,8 +176,11 @@
         const newText = document.getElementById('modalTextArea').value.trim();
         if (newText !== "" && currentActivePreview) {
             const dt = getDateTime();
+            // التنسيق: 👤 الاسم  🗓️ اليوم التاريخ الوقت
             const header = `👤 ${currentUser}  🗓️ اليوم ${dt.date} ${dt.time}`;
             let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
+            
+            // في "الملاحظة التي تشبه الدردشة" يتم الإدراج دائماً بتوثيق جديد حتى لو في نفس اليوم
             let updatedNotes = oldNotes + (oldNotes ? "\n--------------------\n" : "") + header + "\n" + newText;
 
             currentActivePreview.setAttribute('data-full-notes', updatedNotes);
@@ -204,7 +207,7 @@
         }));
         localStorage.setItem('asgate_sales_db', JSON.stringify(salesData));
         document.getElementById('saveBtn').classList.remove('active');
-        alert("تم الحفظ بنجاح!");
+        alert("تم حفظ الملاحظات والبيانات بنجاح!");
     }
 
     function loadSalesFromStorage() {
@@ -219,7 +222,9 @@
         });
     }
 
-    window.onclick = (e) => { if (e.target == document.getElementById('noteModal')) closeNote(); }
+    window.onclick = (e) => { 
+        if (e.target == document.getElementById('noteModal')) closeNote(); 
+    }
 </script>
 </body>
 </html>
