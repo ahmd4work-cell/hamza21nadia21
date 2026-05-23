@@ -162,15 +162,14 @@
 <script>
     let currentActivePreview = null;
 
-    // دالة جلب اليوم والتاريخ مع تنسيق "الموظف" ومسافات واسعة
     function getNoteHeader() {
         const d = new Date();
         const days = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
         const dayName = days[d.getDay()];
         const dateStr = d.getDate().toString().padStart(2, '0') + '/' + (d.getMonth() + 1).toString().padStart(2, '0') + '/' + d.getFullYear();
         
-        // استخدام مسافات ممتدة لجمالية التنسيق (اسم الموظف ثابت حالياً)
-        return `الموظف: (اسم الموظف)           ${dayName}           ${dateStr}`;
+        // الرأس بلون أصفر وتقارب المسافات مع خط عريض
+        return `رأس: (اسم الموظف)    ${dayName}    ${dateStr}`;
     }
 
     function markAsChanged() { document.getElementById('saveBtn').classList.add('active'); }
@@ -231,8 +230,7 @@
 
     function getLastNoteOnly(fullText) {
         if (!fullText) return 'إضافة ملاحظة...';
-        // تعديل منطق الفلترة لاستثناء الرأس الجديد عند العرض السريع
-        const lines = fullText.split('\n').filter(l => l.trim() !== "" && !l.includes("الموظف:") && !l.includes("---"));
+        const lines = fullText.split('\n').filter(l => l.trim() !== "" && !l.includes("رأس:") && !l.includes("---"));
         return lines.length > 0 ? lines[lines.length - 1] : 'إضافة ملاحظة...';
     }
 
@@ -258,19 +256,41 @@
         `;
     }
 
+    // تعديل عرض السجل ليظهر الرأس بلون أصفر واليوم والتاريخ بخط عريض
+    function updateHistoryLogDisplay(notes) {
+        const log = document.getElementById('historyLog');
+        if (!notes) { log.innerText = "لا توجد ملاحظات سابقة."; return; }
+
+        // تحويل النص إلى HTML ملون لتطبيق الرأس الأصفر والخط العريض
+        let htmlContent = notes.split('\n').map(line => {
+            if (line.startsWith("رأس:")) {
+                return `<span style="color: #eab308; font-weight: 800;">${line}</span>`;
+            } else if (line.includes("--------------------")) {
+                return `<hr style="border:0; border-top:1px solid #cbd5e1; margin:10px 0;">`;
+            }
+            return line;
+        }).join('<br>');
+
+        log.innerHTML = htmlContent;
+    }
+
     function openNote(el) {
         currentActivePreview = el;
-        const log = document.getElementById('historyLog');
-        log.innerText = el.getAttribute('data-full-notes') || "لا توجد ملاحظات سابقة.";
+        const notes = el.getAttribute('data-full-notes') || "";
+        updateHistoryLogDisplay(notes);
         document.getElementById('modalTextArea').value = "";
         document.getElementById('noteModal').style.display = "flex";
-        setTimeout(() => { document.getElementById('modalTextArea').focus(); log.scrollTop = log.scrollHeight; }, 50);
+        setTimeout(() => { 
+            document.getElementById('modalTextArea').focus(); 
+            const log = document.getElementById('historyLog');
+            log.scrollTop = log.scrollHeight; 
+        }, 50);
     }
 
     function saveNote() {
         const newText = document.getElementById('modalTextArea').value.trim();
         if (newText !== "" && currentActivePreview) {
-            const headerStr = getNoteHeader(); // استدعاء الرأس الجديد
+            const headerStr = getNoteHeader();
             let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
             let updatedNotes = oldNotes + (oldNotes ? "\n--------------------\n" : "") + headerStr + "\n" + newText;
             
