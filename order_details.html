@@ -19,7 +19,7 @@
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
 
-        /* شريط التنقل العلوي (نفس تصميم صفحة المبيعات) */
+        /* شريط التنقل العلوي */
         .navbar { 
             background-color: var(--nav-bg); display: flex; align-items: center; padding: 0 20px; 
             margin: 10px; border-radius: 12px; height: 37px; position: sticky; top: 10px; z-index: 1000;
@@ -33,28 +33,45 @@
 
         .container { padding: 10px 20px 20px 20px; }
 
-        /* منطقة البيانات الأساسية بمسافات 7% */
+        /* حاوية تضم زر العودة والمربع معاً للحفاظ على المحاذاة الجانبية 7% */
+        .header-section-wrapper {
+            margin: 20px 7% 20px 7%;
+            display: flex;
+            align-items: center;
+            gap: 15px; /* المسافة بين زر العودة والمربع */
+        }
+
+        /* زر العودة خارج المربع */
+        .btn-back-outside {
+            text-decoration: none;
+            background: var(--white);
+            color: var(--nav-bg);
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 800;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: 0.2s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-back-outside:hover { background: #f8fafc; border-color: var(--nav-bg); }
+
+        /* المربع الأبيض للبيانات الأساسية */
         .order-header-info { 
             background: white; padding: 15px 25px; border-radius: 12px; 
             border: 1px solid var(--border-color); display: flex; 
+            flex-grow: 1; /* ليأخذ باقي المساحة المتاحة */
             flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: center;
-            margin: 20px 7% 20px 7%; 
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            position: relative;
         }
         
         .info-item { display: flex; flex-direction: column; gap: 4px; min-width: 100px; }
         .info-label { font-size: 10px; color: #64748b; font-weight: 800; }
         .info-value { font-size: 13px; color: var(--nav-bg); font-weight: 800; }
-
-        /* زر الرجوع بجانب رقم الطلب */
-        .back-link-wrapper { display: flex; align-items: center; gap: 12px; }
-        .btn-back-inline {
-            text-decoration: none; background: #f1f5f9; color: var(--nav-bg);
-            padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800;
-            border: 1px solid var(--border-color); transition: 0.2s;
-        }
-        .btn-back-inline:hover { background: #e2e8f0; }
 
         /* منطقة الأزرار */
         .action-bar { margin: 0 7% 12px 7%; }
@@ -97,20 +114,21 @@
     </nav>
 
     <div class="container">
-        <div class="order-header-info">
-            <div class="back-link-wrapper">
-                <a href="sales.html" class="btn-back-inline">🔙 عودة</a>
+        
+        <div class="header-section-wrapper">
+            <a href="sales.html" class="btn-back-outside">🔙 عودة</a>
+
+            <div class="order-header-info">
                 <div class="info-item">
                     <span class="info-label">رقم الطلب</span>
                     <span class="info-value" id="orderId">#ORD-0000</span>
                 </div>
+                <div class="info-item"><span class="info-label">الشركة</span><span class="info-value">شركة الحلول الذكية</span></div>
+                <div class="info-item"><span class="info-label">السجل</span><span class="info-value">1010203040</span></div>
+                <div class="info-item"><span class="info-label">نوع الطلب</span><span class="info-value">توريد أجهزة</span></div>
+                <div class="info-item"><span class="info-label">حالة الطلب</span><span class="info-value">مكتمل</span></div>
+                <div class="info-item"><span class="info-label">قيمة الطلب</span><span class="info-value">25,400.00 ر.س</span></div>
             </div>
-            
-            <div class="info-item"><span class="info-label">الشركة</span><span class="info-value">شركة الحلول الذكية</span></div>
-            <div class="info-item"><span class="info-label">السجل</span><span class="info-value">1010203040</span></div>
-            <div class="info-item"><span class="info-label">نوع الطلب</span><span class="info-value">توريد أجهزة</span></div>
-            <div class="info-item"><span class="info-label">حالة الطلب</span><span class="info-value">مكتمل</span></div>
-            <div class="info-item"><span class="info-label">قيمة الطلب</span><span class="info-value">25,400.00 ر.س</span></div>
         </div>
 
         <div class="action-bar">
