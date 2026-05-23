@@ -290,8 +290,7 @@
             notes: r.cells[9].querySelector('.notes-preview').getAttribute('data-full-notes')
         }));
         localStorage.setItem('asgate_sales_db', JSON.stringify(salesData));
-        markAsSaved();
-        alert("تم حفظ التغييرات بنجاح");
+        markAsSaved(); // يتم إطفاء زر الحفظ فقط دون رسالة تنبيه
     }
 
     function loadSalesFromStorage() {
