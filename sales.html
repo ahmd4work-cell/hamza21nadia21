@@ -15,10 +15,12 @@
             --border-color: #cbd5e1;
             --accent-blue: #3b82f6;
             --accent-green: #22c55e;
+            --text-dark: #1e293b;
         }
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
 
+        /* Navbar */
         .navbar { 
             background-color: var(--nav-bg); display: flex; align-items: center; padding: 0 20px; 
             margin: 10px; border-radius: 12px; height: 37px; position: sticky; top: 10px; z-index: 1000;
@@ -35,29 +37,55 @@
 
         .btn-top { border: none; padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; color: white; transition: 0.3s; }
         .btn-add { background-color: var(--accent-blue); }
-        .btn-save { background-color: #cbd5e1; color: #64748b; }
-        .btn-save.dirty { background-color: var(--accent-green); color: white; cursor: pointer; }
+        .btn-save { background-color: var(--accent-green); }
 
         .search-box { padding: 0 15px; border: 1px solid var(--border-color); border-radius: 8px; width: 300px; height: 32px; font-family: 'Cairo'; font-size: 11px; outline: none; }
 
-        .table-wrapper { background: var(--white); border-radius: 10px; overflow: visible; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        /* Table Style */
+        .table-wrapper { background: var(--white); border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th { background-color: var(--header-purple); padding: 10px 5px; color: var(--white); font-size: 11px; font-weight: 800; border-left: 1px solid rgba(255,255,255,0.1); text-align: center; }
-        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 38px; font-size: 11px; font-weight: 600; position: relative; }
+        th { background-color: var(--header-purple); padding: 12px 5px; color: var(--white); font-size: 11px; font-weight: 800; text-align: center; }
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); }
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
         
-        .order-link { color: var(--accent-blue); text-decoration: none; font-weight: 800; }
-        
-        .excel-input { width: 90%; border: none; background: transparent; text-align: center; font-family: 'Cairo'; font-size: 11px; outline: none; }
-        .excel-input:focus { border-bottom: 1px solid var(--accent-blue); }
+        .order-link { color: var(--accent-blue); text-decoration: none; font-weight: 800; border-bottom: 1px dashed var(--accent-blue); }
+        .status-badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; }
+        .badge-new { background: #dcfce7; color: #166534; }
 
-        .search-cell-input { width: 90%; border: 1px solid var(--accent-blue); border-radius: 4px; padding: 4px; font-family: 'Cairo'; font-size: 11px; text-align: center; outline: none; }
-        .results-list { 
-            position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; 
-            z-index: 2000; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-height: 150px; overflow-y: auto; list-style: none; padding: 0; margin: 0; 
+        /* Modal Style (المربع الاحترافي) */
+        .modal-overlay { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(15, 23, 42, 0.6); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(4px);
         }
-        .results-list li { padding: 8px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 10px; transition: 0.2s; text-align: right; color: #333; }
-        .results-list li:hover { background: #f0f7ff; color: var(--accent-blue); }
+        .modal-card { 
+            background: white; width: 400px; border-radius: 16px; padding: 25px; 
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .modal-header { font-weight: 800; color: var(--nav-bg); font-size: 18px; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
+        
+        .form-group { margin-bottom: 15px; position: relative; }
+        .form-group label { display: block; font-weight: 700; font-size: 12px; color: #64748b; margin-bottom: 5px; }
+        .form-group input, .form-group select { 
+            width: 100%; padding: 10px; border: 1.5px solid var(--border-color); border-radius: 8px; 
+            font-family: 'Cairo'; font-size: 13px; box-sizing: border-box; outline: none; transition: 0.2s;
+        }
+        .form-group input:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        
+        .modal-footer { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-modal { flex: 1; padding: 10px; border-radius: 8px; font-family: 'Cairo'; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; }
+        .btn-confirm { background: var(--nav-bg); color: white; }
+        .btn-cancel { background: #e2e8f0; color: #475569; }
+
+        /* Search Results in Modal */
+        .modal-results { 
+            position: absolute; top: 100%; left: 0; right: 0; background: white; 
+            border: 1px solid #ddd; z-index: 2001; border-radius: 8px; box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+            max-height: 120px; overflow-y: auto; display: none; margin-top: 2px;
+        }
+        .modal-results div { padding: 8px 12px; font-size: 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; }
+        .modal-results div:hover { background: #f8fafc; color: var(--accent-blue); }
     </style>
 </head>
 <body>
@@ -72,23 +100,21 @@
 
 <div class="container">
     <div class="action-bar">
-        <button class="btn-top btn-add" onclick="createNewOrderRow()">+ إنشاء طلب مبيعات</button>
-        <button id="saveBtn" class="btn-top btn-save" onclick="saveAllSales()">حفظ التغييرات</button>
-        <input type="text" class="search-box" id="globalSearch" placeholder="🔍 ابحث بالشركة، رقم الطلب..." onkeyup="filterSalesTable()">
+        <button class="btn-top btn-add" onclick="openOrderModal()">+ إنشاء طلب مبيعات جديد</button>
+        <input type="text" class="search-box" id="globalSearch" placeholder="🔍 بحث في الجدول..." onkeyup="filterSalesTable()">
     </div>
     
     <div class="table-wrapper">
         <table id="salesTable">
             <thead>
                 <tr>
-                    <th style="width: 10%;">رقم الطلب</th>
-                    <th style="width: 15%;">الشركة</th>
-                    <th style="width: 11%;">السجل الرئيسي</th>
-                    <th style="width: 11%;">السجل الفرعي</th>
-                    <th style="width: 11%;">نوع الطلب</th>
-                    <th style="width: 10%;">حالة الطلب</th>
-                    <th style="width: 11%;">قيمة الطلب</th>
-                    <th style="width: 21%;">ملاحظات</th>
+                    <th style="width: 12%;">رقم الطلب</th>
+                    <th style="width: 18%;">الشركة</th>
+                    <th style="width: 12%;">السجل الرئيسي</th>
+                    <th style="width: 12%;">السجل الفرعي</th>
+                    <th style="width: 14%;">نوع الطلب</th>
+                    <th style="width: 10%;">الحالة</th>
+                    <th style="width: 22%;">ملاحظات</th>
                 </tr>
             </thead>
             <tbody id="salesBody">
@@ -97,62 +123,75 @@
     </div>
 </div>
 
+<div id="orderModal" class="modal-overlay">
+    <div class="modal-card">
+        <div class="modal-header">📦 إنشاء طلب مبيعات جديد</div>
+        
+        <div class="form-group">
+            <label>اسم الشركة</label>
+            <input type="text" id="mComp" placeholder="ابحث عن اسم الشركة..." onkeyup="searchCustomerModal(this)">
+            <div id="mResults" class="modal-results"></div>
+        </div>
+
+        <div class="form-group">
+            <label>السجل الرئيسي</label>
+            <input type="text" id="mCr" placeholder="سيتم التعبئة تلقائياً" readonly style="background: #f8fafc;">
+        </div>
+
+        <div class="form-group">
+            <label>السجل الفرعي</label>
+            <input type="text" id="mCrSub" placeholder="سيتم التعبئة تلقائياً" readonly style="background: #f8fafc;">
+        </div>
+
+        <div class="form-group">
+            <label>نوع الطلب</label>
+            <input type="text" id="mType" placeholder="مثال: توريد، صيانة، برمجة...">
+        </div>
+
+        <div class="form-group">
+            <label>حالة الطلب</label>
+            <select id="mStatus">
+                <option value="جديد" selected>جديد ✨</option>
+                <option value="قيد المعالجة">قيد المعالجة</option>
+                <option value="مكتمل">مكتمل</option>
+            </select>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-modal btn-cancel" onclick="closeOrderModal()">إلغاء</button>
+            <button class="btn-modal btn-confirm" onclick="confirmAddOrder()">حفظ الطلب</button>
+        </div>
+    </div>
+</div>
+
 <script>
-    function markAsDirty() {
-        const btn = document.getElementById('saveBtn');
-        btn.classList.add('dirty');
+    function openOrderModal() {
+        document.getElementById('orderModal').style.display = 'flex';
+        document.getElementById('mComp').focus();
     }
 
-    // إنشاء صف جديد (وضع البحث)
-    function createNewOrderRow() {
-        const tbody = document.getElementById('salesBody');
-        const row = tbody.insertRow(0);
-        row.dataset.state = "new";
-        const orderNum = Math.floor(1000 + Math.random() * 9000);
-
-        row.innerHTML = `
-            <td class="order-id">#ORD-${orderNum}</td>
-            <td style="position:relative;">
-                <input type="text" class="search-cell-input" placeholder="بحث بالشركة..." onkeyup="searchCustomer(this, 'comp')">
-                <div class="results-list" style="display:none;"></div>
-            </td>
-            <td style="position:relative;">
-                <input type="text" class="search-cell-input" placeholder="السجل الرئيسي..." onkeyup="searchCustomer(this, 'cr')">
-                <div class="results-list" style="display:none;"></div>
-            </td>
-            <td style="position:relative;">
-                <input type="text" class="search-cell-input" placeholder="السجل الفرعي..." onkeyup="searchCustomer(this, 'cr_sub')">
-                <div class="results-list" style="display:none;"></div>
-            </td>
-            <td><input type="text" class="excel-input" disabled placeholder="-"></td>
-            <td>جديد</td>
-            <td><input type="text" class="excel-input" disabled placeholder="-"></td>
-            <td><input type="text" class="excel-input" disabled placeholder="-"></td>
-        `;
+    function closeOrderModal() {
+        document.getElementById('orderModal').style.display = 'none';
+        // مسح الحقول عند الإغلاق
+        ['mComp', 'mCr', 'mCrSub', 'mType'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('mStatus').value = 'جديد';
     }
 
-    // وظيفة البحث
-    function searchCustomer(input, field) {
+    // البحث داخل المودال
+    function searchCustomerModal(input) {
         const query = input.value.toLowerCase();
-        const resultsDiv = input.nextElementSibling;
+        const resultsDiv = document.getElementById('mResults');
         const customers = JSON.parse(localStorage.getItem('asgate_customers_data') || '[]');
         
-        if (query.length < 1) {
-            resultsDiv.style.display = 'none';
-            return;
-        }
+        if (query.length < 1) { resultsDiv.style.display = 'none'; return; }
 
-        const filtered = customers.filter(c => 
-            (c.comp && c.comp.toLowerCase().includes(query)) || 
-            (c.cr && c.cr.includes(query)) || 
-            (c.cr_sub && c.cr_sub.includes(query))
-        );
+        const filtered = customers.filter(c => c.comp.toLowerCase().includes(query));
 
         if (filtered.length > 0) {
             resultsDiv.innerHTML = filtered.map(c => `
-                <li onclick="selectCustomer(this, '${c.comp}', '${c.cr || '-'}', '${c.cr_sub || '-'}')">
-                    ${c.comp} | سجل: ${c.cr || '-'}
-                </li>
+                <div onclick="fillModalFields('${c.comp}', '${c.cr || '-'}', '${c.cr_sub || '-'}')">
+                    ${c.comp}
+                </div>
             `).join('');
             resultsDiv.style.display = 'block';
         } else {
@@ -160,50 +199,38 @@
         }
     }
 
-    // اختيار العميل وفتح الحقول للتعديل
-    function selectCustomer(li, name, cr, cr_sub) {
-        const row = li.closest('tr');
-        const inputs = row.querySelectorAll('input');
-        
-        inputs[0].value = name;     // الشركة
-        inputs[1].value = cr;       // السجل الرئيسي
-        inputs[2].value = cr_sub;   // السجل الفرعي
-        
-        // فتح بقية الحقول للإدخال
-        inputs[3].disabled = false; // نوع الطلب
-        inputs[3].placeholder = "أدخل النوع...";
-        inputs[4].disabled = false; // القيمة
-        inputs[4].placeholder = "0.00";
-        inputs[5].disabled = false; // الملاحظات
-        inputs[5].placeholder = "أضف ملاحظة...";
-
-        document.querySelectorAll('.results-list').forEach(d => d.style.display = 'none');
-        markAsDirty();
+    function fillModalFields(comp, cr, crSub) {
+        document.getElementById('mComp').value = comp;
+        document.getElementById('mCr').value = cr;
+        document.getElementById('mCrSub').value = crSub;
+        document.getElementById('mResults').style.display = 'none';
     }
 
-    // حفظ البيانات وتحويل الصف لوضع التعديل الدائم
-    function saveAllSales() {
-        const rows = document.querySelectorAll('#salesBody tr');
-        rows.forEach(row => {
-            if(row.dataset.state === "new") {
-                const inputs = row.querySelectorAll('input');
-                // استبدال مربعات البحث بنصوص عادية قابلة للتعديل (Excel style)
-                row.innerHTML = `
-                    <td><a href="#" class="order-link">${row.querySelector('.order-id').innerText}</a></td>
-                    <td><input type="text" class="excel-input" value="${inputs[0].value}" oninput="markAsDirty()"></td>
-                    <td><input type="text" class="excel-input" value="${inputs[1].value}" oninput="markAsDirty()"></td>
-                    <td><input type="text" class="excel-input" value="${inputs[2].value}" oninput="markAsDirty()"></td>
-                    <td><input type="text" class="excel-input" value="${inputs[3].value}" oninput="markAsDirty()"></td>
-                    <td><span class="status-badge" style="background:#fef9c3; color:#854d0e;">قيد المعالجة</span></td>
-                    <td><input type="text" class="excel-input" value="${inputs[4].value}" oninput="markAsDirty()"></td>
-                    <td><input type="text" class="excel-input" value="${inputs[5].value}" oninput="markAsDirty()"></td>
-                `;
-                row.dataset.state = "saved";
-            }
-        });
-        
-        document.getElementById('saveBtn').classList.remove('dirty');
-        alert("تم حفظ الطلبات بنجاح، يمكنك الآن تعديل أي حقل مباشرة.");
+    // تأكيد الإضافة وإدراج الصف
+    function confirmAddOrder() {
+        const comp = document.getElementById('mComp').value;
+        const cr = document.getElementById('mCr').value;
+        const crSub = document.getElementById('mCrSub').value;
+        const type = document.getElementById('mType').value;
+        const status = document.getElementById('mStatus').value;
+
+        if (!comp) { alert("يرجى اختيار شركة أولاً"); return; }
+
+        const tbody = document.getElementById('salesBody');
+        const row = tbody.insertRow(0);
+        const orderId = Math.floor(1000 + Math.random() * 8999);
+
+        row.innerHTML = `
+            <td><a href="order-details.html?id=${orderId}" class="order-link">#ORD-${orderId}</a></td>
+            <td>${comp}</td>
+            <td>${cr}</td>
+            <td>${crSub}</td>
+            <td>${type || '-'}</td>
+            <td><span class="status-badge ${status === 'جديد' ? 'badge-new' : ''}">${status}</span></td>
+            <td style="color:#94a3b8; font-style:italic;">لا توجد ملاحظات..</td>
+        `;
+
+        closeOrderModal();
     }
 
     function filterSalesTable() {
@@ -214,11 +241,10 @@
         }
     }
 
-    window.onclick = function(e) {
-        if (!e.target.classList.contains('search-cell-input')) {
-            document.querySelectorAll('.results-list').forEach(d => d.style.display = 'none');
-        }
-    };
+    // إغلاق النتائج عند الضغط خارجها
+    window.onclick = function(event) {
+        if (event.target == document.getElementById('orderModal')) closeOrderModal();
+    }
 </script>
 </body>
 </html>
