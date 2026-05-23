@@ -37,7 +37,6 @@
 
         .btn-top { border: none; padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; color: white; transition: 0.3s; }
         .btn-add { background-color: var(--accent-blue); }
-        .btn-save { background-color: var(--accent-green); }
 
         .search-box { padding: 0 15px; border: 1px solid var(--border-color); border-radius: 8px; width: 300px; height: 32px; font-family: 'Cairo'; font-size: 11px; outline: none; }
 
@@ -52,13 +51,13 @@
         .status-badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; }
         .badge-new { background: #dcfce7; color: #166534; }
 
-        /* Modal Style (المربع الاحترافي) */
+        /* Modal Style */
         .modal-overlay { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(15, 23, 42, 0.6); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(4px);
         }
         .modal-card { 
-            background: white; width: 400px; border-radius: 16px; padding: 25px; 
+            background: white; width: 420px; border-radius: 16px; padding: 25px; 
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); animation: slideIn 0.3s ease-out;
         }
         @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -73,8 +72,11 @@
         }
         .form-group input:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
         
+        /* Search Hint inside Modal */
+        .search-hint { font-size: 10px; color: var(--accent-blue); margin-bottom: 5px; font-weight: bold; }
+
         .modal-footer { display: flex; gap: 10px; margin-top: 20px; }
-        .btn-modal { flex: 1; padding: 10px; border-radius: 8px; font-family: 'Cairo'; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; }
+        .btn-modal { flex: 1; padding: 12px; border-radius: 8px; font-family: 'Cairo'; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; }
         .btn-confirm { background: var(--nav-bg); color: white; }
         .btn-cancel { background: #e2e8f0; color: #475569; }
 
@@ -82,10 +84,11 @@
         .modal-results { 
             position: absolute; top: 100%; left: 0; right: 0; background: white; 
             border: 1px solid #ddd; z-index: 2001; border-radius: 8px; box-shadow: 0 10px 15px rgba(0,0,0,0.1);
-            max-height: 120px; overflow-y: auto; display: none; margin-top: 2px;
+            max-height: 150px; overflow-y: auto; display: none; margin-top: 2px;
         }
-        .modal-results div { padding: 8px 12px; font-size: 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; }
-        .modal-results div:hover { background: #f8fafc; color: var(--accent-blue); }
+        .modal-results div { padding: 10px 12px; font-size: 11px; cursor: pointer; border-bottom: 1px solid #f1f5f9; line-height: 1.4; }
+        .modal-results div:hover { background: #f0f7ff; color: var(--accent-blue); }
+        .modal-results b { color: var(--nav-bg); }
     </style>
 </head>
 <body>
@@ -128,24 +131,30 @@
         <div class="modal-header">📦 إنشاء طلب مبيعات جديد</div>
         
         <div class="form-group">
-            <label>اسم الشركة</label>
-            <input type="text" id="mComp" placeholder="ابحث عن اسم الشركة..." onkeyup="searchCustomerModal(this)">
+            <label>البحث عن عميل</label>
+            <div class="search-hint">يمكنك البحث باسم الشركة أو رقم السجل</div>
+            <input type="text" id="mSearchField" placeholder="ابحث هنا..." onkeyup="searchCustomerGlobalModal(this)">
             <div id="mResults" class="modal-results"></div>
         </div>
 
         <div class="form-group">
+            <label>اسم الشركة</label>
+            <input type="text" id="mComp" readonly style="background: #f8fafc;" placeholder="-">
+        </div>
+
+        <div class="form-group">
             <label>السجل الرئيسي</label>
-            <input type="text" id="mCr" placeholder="سيتم التعبئة تلقائياً" readonly style="background: #f8fafc;">
+            <input type="text" id="mCr" readonly style="background: #f8fafc;" placeholder="-">
         </div>
 
         <div class="form-group">
             <label>السجل الفرعي</label>
-            <input type="text" id="mCrSub" placeholder="سيتم التعبئة تلقائياً" readonly style="background: #f8fafc;">
+            <input type="text" id="mCrSub" readonly style="background: #f8fafc;" placeholder="-">
         </div>
 
         <div class="form-group">
             <label>نوع الطلب</label>
-            <input type="text" id="mType" placeholder="مثال: توريد، صيانة، برمجة...">
+            <input type="text" id="mType" placeholder="مثال: توريد أجهزة...">
         </div>
 
         <div class="form-group">
@@ -167,30 +176,36 @@
 <script>
     function openOrderModal() {
         document.getElementById('orderModal').style.display = 'flex';
-        document.getElementById('mComp').focus();
+        document.getElementById('mSearchField').focus();
     }
 
     function closeOrderModal() {
         document.getElementById('orderModal').style.display = 'none';
-        // مسح الحقول عند الإغلاق
-        ['mComp', 'mCr', 'mCrSub', 'mType'].forEach(id => document.getElementById(id).value = '');
+        ['mSearchField', 'mComp', 'mCr', 'mCrSub', 'mType'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('mStatus').value = 'جديد';
+        document.getElementById('mResults').style.display = 'none';
     }
 
-    // البحث داخل المودال
-    function searchCustomerModal(input) {
+    // نظام البحث الشامل (شركة / سجل رئيسي / سجل فرعي)
+    function searchCustomerGlobalModal(input) {
         const query = input.value.toLowerCase();
         const resultsDiv = document.getElementById('mResults');
         const customers = JSON.parse(localStorage.getItem('asgate_customers_data') || '[]');
         
         if (query.length < 1) { resultsDiv.style.display = 'none'; return; }
 
-        const filtered = customers.filter(c => c.comp.toLowerCase().includes(query));
+        // البحث في كافة الحقول
+        const filtered = customers.filter(c => 
+            (c.comp && c.comp.toLowerCase().includes(query)) || 
+            (c.cr && c.cr.toString().includes(query)) || 
+            (c.cr_sub && c.cr_sub.toString().includes(query))
+        );
 
         if (filtered.length > 0) {
             resultsDiv.innerHTML = filtered.map(c => `
                 <div onclick="fillModalFields('${c.comp}', '${c.cr || '-'}', '${c.cr_sub || '-'}')">
-                    ${c.comp}
+                    <b>${c.comp}</b><br>
+                    <small style="color:#64748b;">رئيسي: ${c.cr || '-'} | فرعي: ${c.cr_sub || '-'}</small>
                 </div>
             `).join('');
             resultsDiv.style.display = 'block';
@@ -203,10 +218,10 @@
         document.getElementById('mComp').value = comp;
         document.getElementById('mCr').value = cr;
         document.getElementById('mCrSub').value = crSub;
+        document.getElementById('mSearchField').value = comp; // تعيين النص المختار في خانة البحث
         document.getElementById('mResults').style.display = 'none';
     }
 
-    // تأكيد الإضافة وإدراج الصف
     function confirmAddOrder() {
         const comp = document.getElementById('mComp').value;
         const cr = document.getElementById('mCr').value;
@@ -214,7 +229,7 @@
         const type = document.getElementById('mType').value;
         const status = document.getElementById('mStatus').value;
 
-        if (!comp) { alert("يرجى اختيار شركة أولاً"); return; }
+        if (!comp || comp === "-") { alert("يرجى البحث واختيار شركة أولاً"); return; }
 
         const tbody = document.getElementById('salesBody');
         const row = tbody.insertRow(0);
@@ -241,7 +256,6 @@
         }
     }
 
-    // إغلاق النتائج عند الضغط خارجها
     window.onclick = function(event) {
         if (event.target == document.getElementById('orderModal')) closeOrderModal();
     }
