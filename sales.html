@@ -21,7 +21,6 @@
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
 
-        /* Navbar */
         .navbar { 
             background-color: var(--nav-bg); display: flex; align-items: center; padding: 0 20px; 
             margin: 10px; border-radius: 12px; height: 37px; position: sticky; top: 10px; z-index: 1000;
@@ -39,28 +38,27 @@
         .btn-top { border: none; padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; color: white; transition: 0.3s; }
         .btn-add { background-color: var(--accent-blue); }
         
-        /* زر الحفظ المطفأ */
-        .btn-save { background-color: var(--btn-disabled); cursor: not-allowed; opacity: 0.6; pointer-events: none; }
-        /* زر الحفظ المضيء عند التغيير */
-        .btn-save.active { background-color: var(--accent-green); cursor: pointer; opacity: 1; pointer-events: auto; box-shadow: 0 0 10px rgba(34, 197, 94, 0.4); }
+        /* زر الحفظ الافتراضي (مطفأ) */
+        .btn-save { background-color: var(--btn-disabled); cursor: default; opacity: 0.6; pointer-events: none; }
+        /* زر الحفظ المضيء (مفعل) */
+        .btn-save.active { background-color: var(--accent-green); cursor: pointer; opacity: 1; pointer-events: auto; box-shadow: 0 0 12px rgba(34, 197, 94, 0.5); }
 
         .search-box { padding: 0 15px; border: 1px solid var(--border-color); border-radius: 8px; width: 300px; height: 32px; font-family: 'Cairo'; font-size: 11px; outline: none; }
 
-        /* Table Style */
         .table-wrapper { background: var(--white); border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         th { background-color: var(--header-green); padding: 12px 5px; color: var(--white); font-size: 11px; font-weight: 800; text-align: center; }
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); }
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
         
-        .editable { cursor: text; outline: none; }
-        .editable:focus { background-color: #fdfae6; box-shadow: inset 0 0 0 1px var(--accent-blue); }
+        .editable { cursor: text; outline: none; transition: 0.2s; }
+        .editable:focus { background-color: #fff; box-shadow: inset 0 0 0 2px var(--accent-blue); border-radius: 4px; }
 
         .order-link { color: var(--accent-blue); text-decoration: none; font-weight: 800; border-bottom: 1px dashed var(--accent-blue); }
         .status-badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; }
         .badge-new { background: #dcfce7; color: #166534; }
 
-        /* Modal Style */
+        /* Modal 25% */
         .modal-overlay { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(15, 23, 42, 0.4); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(2px);
@@ -69,17 +67,15 @@
         .modal-header { font-weight: 800; color: var(--nav-bg); font-size: 15px; margin-bottom: 15px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; text-align: center; }
         .form-group { margin-bottom: 12px; position: relative; }
         .form-group label { display: block; font-weight: 700; font-size: 11px; color: #64748b; margin-bottom: 4px; }
-        .form-group input, .form-group select { width: 100%; padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Cairo'; font-size: 12px; box-sizing: border-box; outline: none; }
-        .modal-results { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #cbd5e1; z-index: 2100; border-radius: 6px; max-height: 140px; overflow-y: auto; display: none; margin-top: 2px; }
+        .form-group input { width: 100%; padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Cairo'; font-size: 12px; box-sizing: border-box; outline: none; }
+        .modal-results { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #cbd5e1; z-index: 2100; border-radius: 6px; max-height: 140px; overflow-y: auto; display: none; }
         .modal-results div { padding: 8px 10px; font-size: 11px; cursor: pointer; border-bottom: 1px solid #f8fafc; text-align: right; }
         .modal-results div:hover { background: #eff6ff; }
         .modal-footer { display: flex; gap: 8px; margin-top: 20px; }
         .btn-modal { flex: 1; padding: 10px; border-radius: 6px; font-family: 'Cairo'; font-weight: 700; cursor: pointer; border: none; font-size: 12px; }
-        .btn-confirm { background: var(--nav-bg); color: white; }
-        .btn-cancel { background: #f1f5f9; color: #475569; }
     </style>
 </head>
-<body onload="loadSavedOrders()">
+<body onload="loadSalesFromStorage()">
 
 <nav class="navbar">
     <a href="index.html">الرئيسية</a>
@@ -92,7 +88,7 @@
 <div class="container">
     <div class="action-bar">
         <button class="btn-top btn-add" onclick="openOrderModal()">+ إنشاء طلب مبيعات جديد</button>
-        <button id="saveBtn" class="btn-top btn-save" onclick="saveTableData()">حفظ التغييرات</button>
+        <button id="saveBtn" class="btn-top btn-save" onclick="triggerSave()">حفظ التغييرات</button>
         <input type="text" class="search-box" id="globalSearch" placeholder="🔍 بحث في الجدول..." onkeyup="filterSalesTable()">
     </div>
     
@@ -120,122 +116,117 @@
     <div class="modal-card">
         <div class="modal-header">إنشاء طلب جديد</div>
         <div class="form-group">
-            <label>البحث بالشركة أو رقم السجل</label>
-            <input type="text" id="mSearchField" placeholder="ادخل الاسم أو السجل هنا..." onkeyup="searchCustomerGlobalModal(this)" autocomplete="off">
+            <label>البحث بالاسم أو السجل</label>
+            <input type="text" id="mSearchField" onkeyup="searchCustomerInModal(this)" placeholder="بحث..." autocomplete="off">
             <div id="mResults" class="modal-results"></div>
         </div>
-        <div class="form-group"><label>اسم الشركة</label><input type="text" id="mComp" readonly style="background: #f8fafc;"></div>
-        <div class="form-group"><label>السجل الرئيسي</label><input type="text" id="mCr" readonly style="background: #f8fafc;"></div>
-        <div class="form-group"><label>السجل الفرعي</label><input type="text" id="mCrSub" readonly style="background: #f8fafc;"></div>
+        <div class="form-group"><label>اسم الشركة</label><input type="text" id="mComp" readonly style="background:#f1f5f9"></div>
+        <div class="form-group"><label>السجل الرئيسي</label><input type="text" id="mCr" readonly style="background:#f1f5f9"></div>
+        <div class="form-group"><label>السجل الفرعي</label><input type="text" id="mCrSub" readonly style="background:#f1f5f9"></div>
         <div class="form-group"><label>وصف الطلب</label><input type="text" id="mType"></div>
-        <div class="form-group">
-            <label>حالة الطلب</label>
-            <select id="mStatus"><option value="جديد">جديد ✨</option><option value="قيد المعالجة">قيد المعالجة</option><option value="مكتمل">مكتمل</option></select>
-        </div>
         <div class="modal-footer">
-            <button class="btn-modal btn-cancel" onclick="closeOrderModal()">إلغاء</button>
-            <button class="btn-modal btn-confirm" onclick="confirmAddOrder()">حفظ الطلب</button>
+            <button class="btn-modal btn-cancel" style="background:#f1f5f9" onclick="closeOrderModal()">إلغاء</button>
+            <button class="btn-modal btn-confirm" style="background:var(--nav-bg); color:white;" onclick="addOrderRow()">إضافة للجدول</button>
         </div>
     </div>
 </div>
 
 <script>
-    // تفعيل زر الحفظ عند أي تعديل
-    function enableSave() {
+    // تفعيل زر الحفظ (يصبح أخضر مضيئاً)
+    function markAsChanged() {
         const btn = document.getElementById('saveBtn');
         btn.classList.add('active');
     }
 
-    function disableSave() {
+    // تعطيل زر الحفظ (يعود مطفأً)
+    function markAsSaved() {
         const btn = document.getElementById('saveBtn');
         btn.classList.remove('active');
     }
 
     function openOrderModal() { document.getElementById('orderModal').style.display = 'flex'; }
-
-    function closeOrderModal() {
+    function closeOrderModal() { 
         document.getElementById('orderModal').style.display = 'none';
         ['mSearchField', 'mComp', 'mCr', 'mCrSub', 'mType'].forEach(id => document.getElementById(id).value = '');
-        document.getElementById('mResults').style.display = 'none';
     }
 
-    function searchCustomerGlobalModal(input) {
-        const query = input.value.trim().toLowerCase();
-        const resultsDiv = document.getElementById('mResults');
+    function searchCustomerInModal(el) {
+        const query = el.value.toLowerCase();
+        const resDiv = document.getElementById('mResults');
         const customers = JSON.parse(localStorage.getItem('asgate_customers_data') || '[]');
-        if (query.length < 1) { resultsDiv.style.display = 'none'; return; }
+        if (query.length < 1) { resDiv.style.display='none'; return; }
         const filtered = customers.filter(c => String(c.comp + c.cr + c.cr_sub).toLowerCase().includes(query));
         if (filtered.length > 0) {
-            resultsDiv.innerHTML = filtered.map(c => `<div onclick="fillFields('${c.comp}', '${c.cr}', '${c.cr_sub}')"><b>${c.comp}</b><small>${c.cr} | ${c.cr_sub}</small></div>`).join('');
-            resultsDiv.style.display = 'block';
-        } else { resultsDiv.style.display = 'none'; }
+            resDiv.innerHTML = filtered.map(c => `<div onclick="selectCustomer('${c.comp}','${c.cr}','${c.cr_sub}')">${c.comp}</div>`).join('');
+            resDiv.style.display = 'block';
+        } else { resDiv.style.display = 'none'; }
     }
 
-    function fillFields(comp, cr, crSub) {
+    function selectCustomer(comp, cr, crSub) {
         document.getElementById('mComp').value = comp;
         document.getElementById('mCr').value = cr;
         document.getElementById('mCrSub').value = crSub;
-        document.getElementById('mSearchField').value = comp;
         document.getElementById('mResults').style.display = 'none';
     }
 
-    function confirmAddOrder() {
+    function addOrderRow() {
         const data = {
             id: "#ORD-" + Math.floor(1000 + Math.random() * 8999),
             type: document.getElementById('mType').value || '-',
             comp: document.getElementById('mComp').value,
             cr: document.getElementById('mCr').value,
             crSub: document.getElementById('mCrSub').value,
-            status: document.getElementById('mStatus').value,
+            status: "جديد",
             notes: "اكتب ملاحظة.."
         };
-        if (!data.comp) return alert("اختر شركة");
-        renderRow(data);
-        enableSave();
+        if (!data.comp) return alert("اختر شركة أولاً");
+        renderTableRow(data);
+        markAsChanged(); // تفعيل الزر فور الإضافة
         closeOrderModal();
     }
 
-    function renderRow(obj) {
+    function renderTableRow(obj) {
         const tbody = document.getElementById('salesBody');
         const row = tbody.insertRow(0);
         row.innerHTML = `
             <td><a href="#" class="order-link">${obj.id}</a></td>
-            <td class="editable" contenteditable="true" oninput="enableSave()">${obj.type}</td>
+            <td class="editable" contenteditable="true" oninput="markAsChanged()">${obj.type}</td>
             <td>${obj.comp}</td>
             <td>${obj.cr}</td>
             <td>${obj.crSub}</td>
-            <td><span class="status-badge ${obj.status === 'جديد' ? 'badge-new' : ''}">${obj.status}</span></td>
+            <td><span class="status-badge badge-new">${obj.status}</span></td>
             <td>-</td><td>-</td>
-            <td class="editable" contenteditable="true" oninput="enableSave()" style="color:#64748b;">${obj.notes}</td>
+            <td class="editable" contenteditable="true" oninput="markAsChanged()" style="color:#64748b;">${obj.notes}</td>
         `;
     }
 
-    function saveTableData() {
+    function triggerSave() {
         const rows = document.querySelectorAll('#salesBody tr');
-        const allOrders = Array.from(rows).map(row => ({
-            id: row.cells[0].innerText,
-            type: row.cells[1].innerText,
-            comp: row.cells[2].innerText,
-            cr: row.cells[3].innerText,
-            crSub: row.cells[4].innerText,
-            status: row.cells[5].innerText,
-            notes: row.cells[8].innerText
+        const salesData = Array.from(rows).map(r => ({
+            id: r.cells[0].innerText,
+            type: r.cells[1].innerText,
+            comp: r.cells[2].innerText,
+            cr: r.cells[3].innerText,
+            crSub: r.cells[4].innerText,
+            status: r.cells[5].innerText,
+            notes: r.cells[8].innerText
         }));
-        localStorage.setItem('asgate_sales_persistent', JSON.stringify(allOrders));
-        disableSave();
+        localStorage.setItem('asgate_sales_db', JSON.stringify(salesData));
+        markAsSaved(); // إطفاء الزر بعد الحفظ
     }
 
-    function loadSavedOrders() {
-        const saved = JSON.parse(localStorage.getItem('asgate_sales_persistent') || '[]');
-        // نعكس المصفوفة عند الرندر لأننا نستخدم insertRow(0)
-        saved.reverse().forEach(order => renderRow(order));
-        disableSave();
+    function loadSalesFromStorage() {
+        const saved = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
+        // نعكس المصفوفة لنحافظ على ترتيب الإضافة (الأحدث أولاً)
+        saved.reverse().forEach(item => renderTableRow(item));
+        markAsSaved();
     }
 
     function filterSalesTable() {
-        const query = document.getElementById('globalSearch').value.toLowerCase();
-        const rows = document.querySelectorAll('#salesBody tr');
-        rows.forEach(r => r.style.display = r.innerText.toLowerCase().includes(query) ? "" : "none");
+        const q = document.getElementById('globalSearch').value.toLowerCase();
+        document.querySelectorAll('#salesBody tr').forEach(r => {
+            r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none";
+        });
     }
 
     window.onclick = (e) => { if (e.target == document.getElementById('orderModal')) closeOrderModal(); }
