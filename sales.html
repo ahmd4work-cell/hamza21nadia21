@@ -49,9 +49,6 @@
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); position: relative; }
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
         
-        .editable { cursor: text; outline: none; transition: 0.2s; }
-        .editable:focus { background-color: #fff; box-shadow: inset 0 0 0 2px var(--accent-blue); border-radius: 4px; }
-
         .notes-preview {
             width: 95%; border: none; background: transparent; font-family: 'Cairo'; font-size: 11px;
             text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700;
@@ -59,7 +56,7 @@
         }
         .tooltip-box {
             position: absolute; bottom: 100%; right: 0; background: #334155; color: #fff;
-            padding: 8px 12px; border-radius: 8px; width: 220px; font-size: 11px;
+            padding: 8px 12px; border-radius: 8px; width: 240px; font-size: 11px;
             line-height: 1.6; white-space: pre-wrap; text-align: right;
             opacity: 0; visibility: hidden; transition: 0.2s; z-index: 9999;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3); pointer-events: none;
@@ -70,8 +67,6 @@
             font-family: 'Cairo'; font-size: 10px; font-weight: 800; padding: 4px; border-radius: 6px;
             border: 1px solid var(--border-color); background: #fff; cursor: pointer; width: 90%;
         }
-
-        .order-link { color: var(--accent-blue); text-decoration: none; font-weight: 800; border-bottom: 1px dashed var(--accent-blue); cursor: pointer; }
 
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 15px; border-radius: 12px; width: 400px; height: 480px; display: flex; flex-direction: column; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
@@ -120,7 +115,7 @@
 
 <div id="noteModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header">سجل متابعة الطلب</div>
+        <div class="modal-header">سجل متابعة الطلب والمهام</div>
         <div id="historyLog" class="history-log"></div>
         <textarea id="modalTextArea" class="note-area" placeholder="أدخل الملاحظة الجديدة هنا..."></textarea>
         <div style="display:flex; justify-content: flex-end; gap:5px; margin-top:10px;">
@@ -142,6 +137,8 @@
 
 <script>
     let currentActivePreview = null;
+    // يمكنك لاحقاً ربط هذا المتغير باسم المستخدم المسجل فعلياً
+    const employeeName = "أحمد"; 
 
     function getTodayFormatted() {
         const d = new Date();
@@ -161,12 +158,12 @@
         if (query.length < 1) { resDiv.style.display='none'; return; }
         const filtered = customers.filter(c => c.comp.toLowerCase().includes(query));
         if (filtered.length > 0) {
-            resDiv.innerHTML = filtered.map(c => `<div style="padding:8px; cursor:pointer; border-bottom:1px solid #eee;" onclick="selectCustomer('${c.comp}','${c.cr}','${c.cr_sub}')">${c.comp}</div>`).join('');
+            resDiv.innerHTML = filtered.map(c => `<div style="padding:8px; cursor:pointer; border-bottom:1px solid #eee;" onclick="selectCustomer('${c.comp}')">${c.comp}</div>`).join('');
             resDiv.style.display = 'block';
         } else { resDiv.style.display = 'none'; }
     }
 
-    function selectCustomer(comp, cr, crSub) {
+    function selectCustomer(comp) {
         document.getElementById('mComp').value = comp;
         document.getElementById('mResults').style.display = 'none';
     }
@@ -179,6 +176,7 @@
             comp: document.getElementById('mComp').value,
             cr: "-", crSub: "-", status: "جديد", notes: ""
         };
+        if(!data.comp) return alert("يرجى اختيار شركة");
         renderTableRow(data);
         markAsChanged();
         closeOrderModal();
@@ -186,7 +184,7 @@
 
     function getLastNoteOnly(fullText) {
         if (!fullText) return 'إضافة ملاحظة...';
-        const lines = fullText.split('\n').filter(l => l.trim() !== "" && !l.includes("🗓️") && !l.includes("---"));
+        const lines = fullText.split('\n').filter(l => l.trim() !== "" && !l.includes("🗓️") && !l.includes("👤") && !l.includes("---"));
         return lines.length > 0 ? lines[lines.length - 1] : 'إضافة ملاحظة...';
     }
 
@@ -198,7 +196,7 @@
 
         row.innerHTML = `
             <td>#${obj.id}</td>
-            <td class="editable" contenteditable="true" oninput="markAsChanged()">${obj.type}</td>
+            <td contenteditable="true" oninput="markAsChanged()">${obj.type}</td>
             <td style="color:#64748b;">${obj.date}</td>
             <td>${obj.comp}</td>
             <td>${obj.cr || '-'}</td>
@@ -224,17 +222,16 @@
     function saveNote() {
         const newText = document.getElementById('modalTextArea').value.trim();
         if (newText !== "" && currentActivePreview) {
-            const todayStr = "🗓️ " + getTodayFormatted();
+            const todayDate = getTodayFormatted();
+            const headerStr = `🗓️ ${todayDate} | 👤 ${employeeName}`;
             let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
             let updatedNotes = "";
 
-            // فحص ذكي: هل التاريخ موجود بالفعل في آخر السجل؟
-            if (oldNotes.includes(todayStr)) {
-                // إذا كان التاريخ موجوداً، أضف النص في سطر جديد فقط
+            // فحص إذا كان نفس التاريخ والموظف موجودين في آخر إدخال لتجنب التكرار
+            if (oldNotes.includes(headerStr)) {
                 updatedNotes = oldNotes + "\n" + newText;
             } else {
-                // إذا كان يوماً جديداً، أضف الفاصل والتاريخ الجديد
-                updatedNotes = oldNotes + (oldNotes ? "\n--------------------\n" : "") + todayStr + "\n" + newText;
+                updatedNotes = oldNotes + (oldNotes ? "\n--------------------\n" : "") + headerStr + "\n" + newText;
             }
 
             currentActivePreview.setAttribute('data-full-notes', updatedNotes);
@@ -261,6 +258,7 @@
         }));
         localStorage.setItem('asgate_sales_db', JSON.stringify(salesData));
         markAsSaved();
+        alert("تم حفظ التغييرات بنجاح");
     }
 
     function loadSalesFromStorage() {
