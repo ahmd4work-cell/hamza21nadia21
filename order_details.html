@@ -33,15 +33,15 @@
 
         .container { padding: 10px 20px 20px 20px; }
 
-        /* حاوية تضم زر العودة والمربع معاً للحفاظ على المحاذاة الجانبية 7% */
+        /* حاوية تضم زر العودة والمربع معاً */
         .header-section-wrapper {
             margin: 20px 7% 20px 7%;
             display: flex;
             align-items: center;
-            gap: 15px; /* المسافة بين زر العودة والمربع */
+            gap: 15px;
         }
 
-        /* زر العودة خارج المربع */
+        /* زر العودة بحواف حمراء غامقة */
         .btn-back-outside {
             text-decoration: none;
             background: var(--white);
@@ -50,7 +50,7 @@
             border-radius: 10px;
             font-size: 12px;
             font-weight: 800;
-            border: 1px solid var(--border-color);
+            border: 2px solid #991b1b; /* حواف باللون الأحمر الغامق */
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             transition: 0.2s;
             white-space: nowrap;
@@ -58,15 +58,17 @@
             align-items: center;
             gap: 5px;
         }
-        .btn-back-outside:hover { background: #f8fafc; border-color: var(--nav-bg); }
+        .btn-back-outside:hover { background: #fef2f2; border-color: #7f1d1d; }
 
-        /* المربع الأبيض للبيانات الأساسية */
+        /* المربع الأبيض مع زيادة الارتفاع */
         .order-header-info { 
-            background: white; padding: 15px 25px; border-radius: 12px; 
+            background: white; padding: 25px 25px; /* زيادة التعبئة الداخلية لزيادة الارتفاع */
+            border-radius: 12px; 
             border: 1px solid var(--border-color); display: flex; 
-            flex-grow: 1; /* ليأخذ باقي المساحة المتاحة */
+            flex-grow: 1;
             flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: center;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            min-height: 60px; /* تحديد حد أدنى للارتفاع لضمان التناسق */
         }
         
         .info-item { display: flex; flex-direction: column; gap: 4px; min-width: 100px; }
@@ -82,7 +84,7 @@
         }
         .btn-add-product:hover { background: #1d4ed8; }
 
-        /* جدول المنتجات بمسافة 7% */
+        /* جدول المنتجات */
         .table-wrapper { 
             background: white; border-radius: 10px; overflow: hidden; 
             border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05);
