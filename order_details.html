@@ -6,13 +6,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --nav-bg: #2e1065;
-            --header-green: #15803d;
+            --header-green: #15803d; /* اللون الأخضر الذي طلبت */
             --bg-color: #f4f7f9;
             --white: #ffffff;
             --border-color: #cbd5e1;
             --text-dark: #1e293b;
-            --accent-blue: #3b82f6;
+            --nav-bg: #2e1065;
         }
 
         body { 
@@ -25,9 +24,9 @@
 
         .container { max-width: 1000px; margin: 0 auto; }
 
-        /* الهيدر العلوي */
+        /* شريط العناوين باللون الأخضر */
         .header-card {
-            background: var(--nav-bg); 
+            background: var(--header-green); 
             color: white; 
             padding: 25px; 
             border-radius: 15px;
@@ -35,11 +34,11 @@
             justify-content: space-between; 
             align-items: center; 
             margin-bottom: 25px;
-            box-shadow: 0 4px 15px rgba(46, 16, 101, 0.2);
+            box-shadow: 0 4px 15px rgba(21, 128, 61, 0.2);
         }
 
         .back-btn {
-            background: rgba(255,255,255,0.15); 
+            background: rgba(255,255,255,0.2); 
             color: white; 
             text-decoration: none;
             padding: 10px 20px; 
@@ -49,9 +48,9 @@
             transition: 0.3s;
             border: 1px solid rgba(255,255,255,0.3);
         }
-        .back-btn:hover { background: rgba(255,255,255,0.3); }
+        .back-btn:hover { background: rgba(255,255,255,0.4); }
 
-        /* شبكة المعلومات */
+        /* تنسيق البطاقات والمعلومات */
         .details-grid {
             display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
@@ -68,13 +67,10 @@
 
         .card-title {
             font-weight: 800; 
-            color: var(--nav-bg); 
+            color: var(--header-green); 
             border-bottom: 2px solid #f1f5f9;
             padding-bottom: 12px; 
             margin-bottom: 20px; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px;
             font-size: 16px;
         }
 
@@ -89,14 +85,11 @@
         .info-label { color: #64748b; font-weight: 600; }
         .info-value { color: var(--text-dark); font-weight: 800; }
 
-        /* منطقة الملاحظات (الدردشة) */
-        .notes-container {
-            grid-column: 1 / -1;
-        }
-
+        /* صندوق الملاحظات */
+        .notes-container { grid-column: 1 / -1; }
         .notes-box {
             background: #f8fafc; 
-            border-right: 5px solid var(--nav-bg);
+            border-right: 5px solid var(--header-green);
             padding: 20px; 
             border-radius: 0 12px 12px 0; 
             white-space: pre-wrap;
@@ -104,15 +97,15 @@
             line-height: 1.8; 
             color: #334155;
             min-height: 150px;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
         }
 
         .status-badge {
             padding: 4px 12px;
             border-radius: 20px;
             font-size: 12px;
-            background: #e2e8f0;
-            color: #475569;
+            background: #dcfce7;
+            color: #166534;
+            font-weight: 800;
         }
     </style>
 </head>
@@ -121,10 +114,10 @@
 <div class="container">
     <div class="header-card">
         <div>
-            <h2 style="margin:0; font-size: 22px; letter-spacing: 0.5px;">تفاصيل طلب المبيعات</h2>
+            <h2 style="margin:0; font-size: 22px;">تفاصيل طلب المبيعات</h2>
             <span id="displayOrderID" style="opacity: 0.9; font-size: 15px; font-weight: 700;">#جاري التحميل...</span>
         </div>
-        <a href="sales.html" class="back-btn">⬅ العودة لجدول المبيعات</a>
+        <a href="sales.html" class="back-btn">⬅ العودة للمبيعات</a>
     </div>
 
     <div class="details-grid">
@@ -143,29 +136,22 @@
         </div>
 
         <div class="card notes-container">
-            <div class="card-title">💬 سجل ملاحظات المتابعة (الدردشة)</div>
-            <div id="orderNotes" class="notes-box">لا توجد ملاحظات مسجلة لهذا الطلب حتى الآن.</div>
+            <div class="card-title">💬 سجل الملاحظات</div>
+            <div id="orderNotes" class="notes-box">لا توجد ملاحظات مسجلة.</div>
         </div>
     </div>
 </div>
 
 <script>
     function loadOrderDetails() {
-        // 1. استخراج رقم الطلب من الرابط
         const urlParams = new URLSearchParams(window.location.search);
         const orderId = urlParams.get('id');
 
-        if (!orderId) {
-            alert("خطأ: لم يتم التعرف على رقم الطلب في الرابط.");
-            return;
-        }
+        if (!orderId) return;
 
-        document.getElementById('displayOrderID').innerText = "رقم الطلب: " + orderId;
+        document.getElementById('displayOrderID').innerText = "رقم الطلب: #" + orderId;
 
-        // 2. جلب البيانات من LocalStorage
         const salesData = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
-        
-        // 3. البحث عن الطلب (مطابقة دقيقة للـ ID)
         const order = salesData.find(item => item.id == orderId || "#" + item.id == orderId);
 
         if (order) {
@@ -175,17 +161,9 @@
             document.getElementById('orderType').innerText = order.type || '-';
             document.getElementById('orderDate').innerText = order.date || '-';
             document.getElementById('orderStatus').innerText = order.status || '-';
-            
-            // عرض الملاحظات إذا وجدت
-            if (order.notes && order.notes.trim() !== "") {
-                document.getElementById('orderNotes').innerText = order.notes;
-            }
-        } else {
-            document.getElementById('orderNotes').innerHTML = "<span style='color:red;'>⚠️ تنبيه: لم يتم العثور على بيانات الطلب. تأكد من ضغط زر 'حفظ التغييرات' في صفحة المبيعات.</span>";
+            if (order.notes) document.getElementById('orderNotes').innerText = order.notes;
         }
     }
-
-    // التنفيذ عند تحميل الصفحة
     window.onload = loadOrderDetails;
 </script>
 
