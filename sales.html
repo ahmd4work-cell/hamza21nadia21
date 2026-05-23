@@ -46,24 +46,23 @@
         .table-wrapper { background: var(--white); border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         th { background-color: var(--header-green); padding: 12px 5px; color: var(--white); font-size: 11px; font-weight: 800; text-align: center; }
-        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); }
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; padding: 5px; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); vertical-align: middle; }
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
         
-        .editable { cursor: text; outline: none; transition: 0.2s; }
-        .editable:focus { background-color: #fff; box-shadow: inset 0 0 0 2px var(--accent-blue); border-radius: 4px; }
+        .editable { cursor: text; outline: none; }
+        .editable:focus { background-color: #fff; box-shadow: inset 0 0 0 1px var(--accent-blue); border-radius: 4px; }
 
-        /* تنسيق القائمة المنسدلة داخل الجدول */
+        /* تنسيق الملاحظات (نمط صفحة الزيارات) */
+        .note-area {
+            width: 95%; height: 32px; padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 6px;
+            font-family: 'Cairo'; font-size: 10px; resize: none; overflow-y: hidden; 
+            transition: all 0.2s; background: #fcfcfc; color: #475569; line-height: 1.4;
+        }
+        .note-area:focus { background: white; border-color: var(--accent-blue); box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1); outline: none; }
+
         .status-select {
-            font-family: 'Cairo';
-            font-size: 10px;
-            font-weight: 800;
-            padding: 4px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            background: #fff;
-            outline: none;
-            cursor: pointer;
-            width: 90%;
+            font-family: 'Cairo'; font-size: 10px; font-weight: 800; padding: 4px; border-radius: 6px;
+            border: 1px solid var(--border-color); background: #fff; cursor: pointer; width: 90%;
         }
 
         .order-link { color: var(--accent-blue); text-decoration: none; font-weight: 800; border-bottom: 1px dashed var(--accent-blue); cursor: pointer; }
@@ -188,7 +187,7 @@
             cr: document.getElementById('mCr').value,
             crSub: document.getElementById('mCrSub').value,
             status: "جديد",
-            notes: "اكتب ملاحظة.."
+            notes: ""
         };
         if (!data.comp) return alert("اختر شركة أولاً");
         renderTableRow(data);
@@ -200,7 +199,6 @@
         const tbody = document.getElementById('salesBody');
         const row = tbody.insertRow(0);
         
-        // الحالات المطلوبة بالترتيب
         const statusOptions = ["مكتمل", "معلق", "مرتجع", "جاهز", "جديد", "فقدان"];
         let optionsHtml = statusOptions.map(opt => `<option value="${opt}" ${obj.status === opt ? 'selected' : ''}>${opt}</option>`).join('');
 
@@ -217,8 +215,15 @@
                 </select>
             </td>
             <td>-</td><td>-</td>
-            <td class="editable" contenteditable="true" oninput="markAsChanged()" style="color:#64748b;">${obj.notes}</td>
+            <td>
+                <textarea class="note-area" oninput="autoExpand(this); markAsChanged()" placeholder="ملاحظات...">${obj.notes || ''}</textarea>
+            </td>
         `;
+    }
+
+    function autoExpand(textarea) {
+        textarea.style.height = '32px';
+        textarea.style.height = textarea.scrollHeight + 'px';
     }
 
     function triggerSave() {
@@ -230,8 +235,8 @@
             comp: r.cells[3].innerText,
             cr: r.cells[4].innerText,
             crSub: r.cells[5].innerText,
-            status: r.cells[6].querySelector('select').value, // جلب القيمة من القائمة المنسدلة
-            notes: r.cells[9].innerText
+            status: r.cells[6].querySelector('select').value,
+            notes: r.cells[9].querySelector('textarea').value
         }));
         localStorage.setItem('asgate_sales_db', JSON.stringify(salesData));
         markAsSaved();
