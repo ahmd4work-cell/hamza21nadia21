@@ -26,10 +26,15 @@
         .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; border-radius: 8px; transition: 0.3s; line-height: 26px; height: 26px; display: inline-block; }
         .navbar a.active-link { background-color: var(--nav-active); color: var(--nav-purple-dark); }
 
-        /* حاوية البيانات العلوية (بمسافة 10%) */
-        .profile-header-wrapper {
-            margin: 20px 10%; 
+        /* حاوية بيانات المنشأة (بمسافة 10%) */
+        .company-header-wrapper {
+            margin: 20px 10% 8px 10%; 
             position: relative;
+        }
+
+        /* حاوية المسؤول المباشر (بمسافة 15%) */
+        .manager-header-wrapper {
+            margin: 0 15% 20px 15%;
         }
 
         .back-container {
@@ -47,7 +52,7 @@
 
         .compact-section { 
             background: var(--white); border-radius: 8px; padding: 12px 20px; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             border-right: 4px solid var(--purple-mid);
             display: flex; flex-direction: column;
         }
@@ -117,7 +122,7 @@
     <a href="sales.html">المبيعات</a>
 </nav>
 
-<div class="profile-header-wrapper">
+<div class="company-header-wrapper">
     <div class="back-container">
         <button class="back-btn" onclick="goBackAndFocus()">رجوع</button>
     </div>
@@ -134,7 +139,9 @@
             </div>
         </div>
     </div>
+</div>
 
+<div class="manager-header-wrapper">
     <div class="compact-section">
         <div class="row-wrapper">
             <div class="section-label">👤 المسؤول المباشر:</div>
