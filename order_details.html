@@ -57,7 +57,7 @@
             display: flex;
             align-items: center;
             gap: 5px;
-            height: 40px; /* موازنة الارتفاع مع المربع الجديد */
+            height: 40px;
             box-sizing: border-box;
         }
         .btn-back-outside:hover { background: #fef2f2; border-color: #7f1d1d; }
@@ -65,7 +65,7 @@
         /* المربع الأبيض بارتفاع 70 بيكسل */
         .order-header-info { 
             background: white; 
-            padding: 0 25px; /* إزالة الـ Padding الرأسي للتحكم الدقيق بالارتفاع */
+            padding: 0 25px;
             border-radius: 12px; 
             border: 1px solid var(--border-color); 
             display: flex; 
@@ -75,7 +75,7 @@
             justify-content: space-between; 
             align-items: center;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            height: 70px; /* تحديد الارتفاع المطلوب */
+            height: 70px;
             box-sizing: border-box;
         }
         
@@ -83,30 +83,48 @@
         .info-label { font-size: 10px; color: #64748b; font-weight: 800; }
         .info-value { font-size: 13px; color: var(--nav-bg); font-weight: 800; }
 
-        /* منطقة الأزرار */
-        .action-bar { margin: 0 7% 12px 7%; }
+        /* مربع "تفاصيل الطلب" في المنتصف */
+        .section-title-box {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0 15px 0;
+        }
+        .title-badge {
+            background: var(--nav-bg);
+            color: white;
+            padding: 8px 40px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 800;
+            box-shadow: 0 4px 10px rgba(46, 16, 101, 0.2);
+            border: 2px solid var(--nav-active);
+        }
+
+        /* منطقة الأزرار - عرض كامل */
+        .action-bar { margin: 0 0 12px 0; display: flex; justify-content: flex-start; }
         .btn-add-product { 
             background: var(--accent-blue); color: white; border: none; 
-            padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; 
+            padding: 8px 25px; border-radius: 8px; font-family: 'Cairo'; 
             font-weight: bold; cursor: pointer; font-size: 12px; transition: 0.3s;
+            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
         }
-        .btn-add-product:hover { background: #1d4ed8; }
+        .btn-add-product:hover { background: #1d4ed8; transform: translateY(-1px); }
 
-        /* جدول المنتجات */
+        /* جدول المنتجات - عرض كامل الصفحة */
         .table-wrapper { 
             background: white; border-radius: 10px; overflow: hidden; 
             border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            margin: 0 7%;
+            margin: 0; /* إلغاء الـ 7% هنا ليصبح بعرض كامل */
         }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         th { 
-            background-color: var(--header-green); padding: 10px 5px; 
+            background-color: var(--header-green); padding: 12px 5px; 
             color: white; font-size: 11px; font-weight: 800; 
             border-left: 1px solid rgba(255,255,255,0.1); text-align: center;
         }
         td { 
             border-bottom: 1px solid #f1f5f9; text-align: center; 
-            height: 38px; font-size: 11px; font-weight: 600; color: var(--text-dark);
+            height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark);
         }
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
 
@@ -139,6 +157,10 @@
                 <div class="info-item"><span class="info-label">حالة الطلب</span><span class="info-value">مكتمل</span></div>
                 <div class="info-item"><span class="info-label">قيمة الطلب</span><span class="info-value">25,400.00 ر.س</span></div>
             </div>
+        </div>
+
+        <div class="section-title-box">
+            <div class="title-badge">تفاصيل الطلب</div>
         </div>
 
         <div class="action-bar">
