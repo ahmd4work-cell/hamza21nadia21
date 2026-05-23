@@ -72,12 +72,21 @@
         }
 
         .order-link { color: var(--accent-blue); text-decoration: none; font-weight: 800; border-bottom: 1px dashed var(--accent-blue); cursor: pointer; }
+        .order-link:hover { color: var(--nav-bg); border-bottom-style: solid; }
 
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; }
-        .modal-content { background: white; padding: 15px; border-radius: 12px; width: 400px; height: 480px; display: flex; flex-direction: column; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-content { background: white; padding: 15px; border-radius: 12px; width: 380px; height: 440px; display: flex; flex-direction: column; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .modal-header { font-weight: 800; color: var(--nav-bg); margin-bottom: 10px; text-align: right; font-size: 14px; }
-        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; margin-bottom: 10px; font-size: 12px; text-align: right; white-space: pre-wrap; color: #475569; }
-        .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 8px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
+        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px; margin-bottom: 10px; font-size: 12px; text-align: right; white-space: pre-wrap; color: #475569; }
+        .note-area { height: 80px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 8px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
+
+        .order-modal-card { background: white; width: 25%; min-width: 320px; border-radius: 12px; padding: 20px; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15); }
+        .form-group { margin-bottom: 12px; position: relative; }
+        .form-group label { display: block; font-weight: 700; font-size: 11px; color: #64748b; margin-bottom: 4px; }
+        .form-group input { width: 100%; padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Cairo'; font-size: 12px; box-sizing: border-box; outline: none; }
+        .modal-results { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #cbd5e1; z-index: 2100; border-radius: 6px; max-height: 140px; overflow-y: auto; display: none; }
+        .modal-results div { padding: 8px 10px; font-size: 11px; cursor: pointer; border-bottom: 1px solid #f8fafc; text-align: right; }
+        .modal-results div:hover { background: #eff6ff; }
     </style>
 </head>
 <body onload="loadSalesFromStorage()">
@@ -125,49 +134,68 @@
         <textarea id="modalTextArea" class="note-area" placeholder="أدخل الملاحظة الجديدة هنا..."></textarea>
         <div style="display:flex; justify-content: flex-end; gap:5px; margin-top:10px;">
             <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px;">إلغاء</button>
-            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px;">إضافة ملاحظة</button>
+            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px; font-weight:bold;">إضافة ملاحظة</button>
         </div>
     </div>
 </div>
 
 <div id="orderModal" class="modal">
-    <div style="background: white; width: 25%; min-width: 320px; border-radius: 12px; padding: 20px;">
+    <div class="order-modal-card">
         <div class="modal-header">إنشاء طلب جديد</div>
-        <div style="margin-bottom: 12px;"><label style="display:block; font-size:11px; font-weight:700;">البحث بالاسم</label><input type="text" id="mSearchField" onkeyup="searchCustomerInModal(this)" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-family:Cairo;" placeholder="بحث..." autocomplete="off"><div id="mResults" style="display:none; position:absolute; background:white; border:1px solid #cbd5e1; width:280px; z-index:2100; max-height:100px; overflow-y:auto;"></div></div>
-        <div style="margin-bottom: 12px;"><label style="display:block; font-size:11px; font-weight:700;">الشركة</label><input type="text" id="mComp" readonly style="width:100%; padding:8px; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; font-family:Cairo;"></div>
-        <div style="margin-bottom: 12px;"><label style="display:block; font-size:11px; font-weight:700;">وصف الطلب</label><input type="text" id="mType" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-family:Cairo;"></div>
-        <div style="display:flex; gap:8px; margin-top:20px;"><button onclick="closeOrderModal()" style="flex:1; padding:10px; background:#f1f5f9; border:none; border-radius:6px; font-family:Cairo;">إلغاء</button><button onclick="addOrderRow()" style="flex:1; padding:10px; background:var(--nav-bg); color:white; border:none; border-radius:6px; font-family:Cairo;">إضافة</button></div>
+        <div class="form-group">
+            <label>البحث بالاسم أو السجل</label>
+            <input type="text" id="mSearchField" onkeyup="searchCustomerInModal(this)" placeholder="بحث..." autocomplete="off">
+            <div id="mResults" class="modal-results"></div>
+        </div>
+        <div class="form-group"><label>اسم الشركة</label><input type="text" id="mComp" readonly style="background:#f1f5f9"></div>
+        <div class="form-group"><label>السجل الرئيسي</label><input type="text" id="mCr" readonly style="background:#f1f5f9"></div>
+        <div class="form-group"><label>السجل الفرعي</label><input type="text" id="mCrSub" readonly style="background:#f1f5f9"></div>
+        <div class="form-group"><label>وصف الطلب</label><input type="text" id="mType"></div>
+        <div style="display:flex; gap:8px; margin-top:20px;">
+            <button onclick="closeOrderModal()" style="flex:1; padding:10px; background:#f1f5f9; border:none; border-radius:6px; cursor:pointer; font-family:Cairo;">إلغاء</button>
+            <button onclick="addOrderRow()" style="flex:1; padding:10px; background:var(--nav-bg); color:white; border:none; border-radius:6px; cursor:pointer; font-family:Cairo;">إضافة للجدول</button>
+        </div>
     </div>
 </div>
 
 <script>
     let currentActivePreview = null;
 
-    function getTodayFormatted() {
+    // وظيفة لجلب التاريخ مع اسم اليوم بالعربي
+    function getFullDateWithDay() {
         const d = new Date();
-        return d.getDate().toString().padStart(2, '0') + '/' + (d.getMonth() + 1).toString().padStart(2, '0') + '/' + d.getFullYear();
+        const days = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+        const dayName = days[d.getDay()];
+        const dateStr = d.getDate().toString().padStart(2, '0') + '/' + (d.getMonth() + 1).toString().padStart(2, '0') + '/' + d.getFullYear();
+        return `${dayName} ${dateStr}`;
     }
 
     function markAsChanged() { document.getElementById('saveBtn').classList.add('active'); }
     function markAsSaved() { document.getElementById('saveBtn').classList.remove('active'); }
 
     function openOrderModal() { document.getElementById('orderModal').style.display = 'flex'; }
-    function closeOrderModal() { document.getElementById('orderModal').style.display = 'none'; }
+    function closeOrderModal() { 
+        document.getElementById('orderModal').style.display = 'none';
+        ['mSearchField', 'mComp', 'mCr', 'mCrSub', 'mType'].forEach(id => document.getElementById(id).value = '');
+    }
 
     function searchCustomerInModal(el) {
         const query = el.value.toLowerCase();
         const resDiv = document.getElementById('mResults');
         const customers = JSON.parse(localStorage.getItem('asgate_customers_data') || '[]');
         if (query.length < 1) { resDiv.style.display='none'; return; }
-        const filtered = customers.filter(c => c.comp.toLowerCase().includes(query));
+        const filtered = customers.filter(c => String(c.comp + c.cr + c.cr_sub).toLowerCase().includes(query));
         if (filtered.length > 0) {
-            resDiv.innerHTML = filtered.map(c => `<div style="padding:8px; cursor:pointer; border-bottom:1px solid #eee;" onclick="selectCustomer('${c.comp}','${c.cr}','${c.cr_sub}')">${c.comp}</div>`).join('');
+            resDiv.innerHTML = filtered.map(c => `<div onclick="selectCustomer('${c.comp}','${c.cr}','${c.cr_sub}')">${c.comp}</div>`).join('');
             resDiv.style.display = 'block';
         } else { resDiv.style.display = 'none'; }
     }
 
     function selectCustomer(comp, cr, crSub) {
         document.getElementById('mComp').value = comp;
+        document.getElementById('mCr').value = cr;
+        document.getElementById('mCrSub').value = crSub;
+        document.getElementById('mSearchField').value = comp;
         document.getElementById('mResults').style.display = 'none';
     }
 
@@ -175,10 +203,14 @@
         const data = {
             id: "ORD-" + Math.floor(1000 + Math.random() * 8999),
             type: document.getElementById('mType').value || '-',
-            date: getTodayFormatted(),
+            date: getFullDateWithDay().split(' ')[1], // نأخذ التاريخ فقط للعمود
             comp: document.getElementById('mComp').value,
-            cr: "-", crSub: "-", status: "جديد", notes: ""
+            cr: document.getElementById('mCr').value,
+            crSub: document.getElementById('mCrSub').value,
+            status: "جديد",
+            notes: ""
         };
+        if (!data.comp) return alert("اختر شركة أولاً");
         renderTableRow(data);
         markAsChanged();
         closeOrderModal();
@@ -196,13 +228,14 @@
         const statusOptions = ["مكتمل", "معلق", "مرتجع", "جاهز", "جديد", "فقدان"];
         let optionsHtml = statusOptions.map(opt => `<option value="${opt}" ${obj.status === opt ? 'selected' : ''}>${opt}</option>`).join('');
 
+        // تصحيح الرابط هنا إلى order_details.html
         row.innerHTML = `
-            <td>#${obj.id}</td>
+            <td><a href="order_details.html?id=${obj.id}" class="order-link">#${obj.id}</a></td>
             <td class="editable" contenteditable="true" oninput="markAsChanged()">${obj.type}</td>
             <td style="color:#64748b;">${obj.date}</td>
             <td>${obj.comp}</td>
-            <td>${obj.cr || '-'}</td>
-            <td>${obj.crSub || '-'}</td>
+            <td>${obj.cr}</td>
+            <td>${obj.crSub}</td>
             <td><select class="status-select" onchange="markAsChanged()">${optionsHtml}</select></td>
             <td>-</td><td>-</td>
             <td>
@@ -224,19 +257,10 @@
     function saveNote() {
         const newText = document.getElementById('modalTextArea').value.trim();
         if (newText !== "" && currentActivePreview) {
-            const todayStr = "🗓️ " + getTodayFormatted();
+            const todayStr = "🗓️ " + getFullDateWithDay(); // سيظهر مثل: السبت 23/05/2026
             let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
-            let updatedNotes = "";
-
-            // فحص ذكي: هل التاريخ موجود بالفعل في آخر السجل؟
-            if (oldNotes.includes(todayStr)) {
-                // إذا كان التاريخ موجوداً، أضف النص في سطر جديد فقط
-                updatedNotes = oldNotes + "\n" + newText;
-            } else {
-                // إذا كان يوماً جديداً، أضف الفاصل والتاريخ الجديد
-                updatedNotes = oldNotes + (oldNotes ? "\n--------------------\n" : "") + todayStr + "\n" + newText;
-            }
-
+            let updatedNotes = oldNotes + (oldNotes ? "\n--------------------\n" : "") + todayStr + "\n" + newText;
+            
             currentActivePreview.setAttribute('data-full-notes', updatedNotes);
             currentActivePreview.innerText = getLastNoteOnly(updatedNotes);
             currentActivePreview.parentElement.querySelector('.tooltip-box').innerText = updatedNotes;
@@ -261,6 +285,7 @@
         }));
         localStorage.setItem('asgate_sales_db', JSON.stringify(salesData));
         markAsSaved();
+        alert("تم حفظ التغييرات بنجاح");
     }
 
     function loadSalesFromStorage() {
