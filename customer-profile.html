@@ -7,61 +7,57 @@
     <style>
         :root { 
             --nav-purple-dark: #2e1065; 
-            --purple-mid: #8b5cf6; /* البنفسجي المتوسط */
+            --purple-mid: #8b5cf6; 
             --nav-active: #a78bfa; 
             --bg: #f4f7f9; 
             --white: #ffffff;
             --order-green: #22c55e;
             --visit-yellow: #eab308;
-            --danger-red: #ef4444; /* اللون الأحمر للرجوع */
+            --danger-red: #ef4444; 
         }
         body { background-color: var(--bg); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
         
-        /* شريط التنقل العلوي - بنفسج وسط */
         .navbar { 
-            background-color: var(--purple-mid); 
-            display: flex; 
-            align-items: center; 
-            padding: 0 20px; 
-            margin: 10px; 
-            border-radius: 12px; 
-            height: 37px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 10px;
-            z-index: 1000;
-            box-sizing: border-box;
+            background-color: var(--purple-mid); display: flex; align-items: center; padding: 0 20px; 
+            margin: 10px; border-radius: 12px; height: 37px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: sticky; top: 10px; z-index: 1000; box-sizing: border-box;
         }
-        .navbar a { 
-            color: white; 
-            text-decoration: none; 
-            padding: 0 15px; 
-            font-weight: 700; 
-            font-size: 12px; 
-            border-radius: 8px; 
-            transition: 0.3s; 
-            line-height: 26px; 
-            height: 26px; 
-            display: inline-block;
+        .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; border-radius: 8px; transition: 0.3s; line-height: 26px; height: 26px; display: inline-block; }
+
+        /* حاوية البيانات الأساسية لضبط المسافات 15% */
+        .profile-wrapper {
+            margin: 10px 15%; /* ترك 15% يمين ويسار */
+            position: relative;
         }
-        .navbar a:hover { background-color: rgba(255,255,255,0.2); }
 
-        .container { padding: 5px 15px; max-width: 100%; margin: auto; }
+        /* زر الرجوع في منطقة الـ 15% الفارغة */
+        .back-container {
+            position: absolute;
+            right: -6%; /* وضعه في منطقة الفراغ الأيمن */
+            top: 5px;
+            width: 5%;
+        }
 
-        /* الأقسام المدمجة */
+        .back-btn {
+            background: white; color: var(--danger-red); border: 1.5px solid var(--danger-red);
+            height: 37px; width: 100%; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; 
+            font-weight: 800; font-size: 11px; display: flex; align-items: center; justify-content: center; transition: 0.3s;
+        }
+        .back-btn:hover { background: var(--danger-red); color: white; }
+
         .compact-section { 
             background: var(--white); border-radius: 8px; padding: 8px 20px; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 8px;
             border-right: 4px solid var(--purple-mid);
             display: flex; flex-direction: column;
         }
 
         .row-wrapper { display: flex; align-items: center; justify-content: space-between; width: 100%; }
-        .section-label { font-size: 12px; color: var(--nav-purple-dark); font-weight: 800; min-width: 120px; }
+        .section-label { font-size: 12px; color: var(--nav-purple-dark); font-weight: 800; min-width: 130px; }
 
         .data-row-inline { 
             display: flex; flex-grow: 1; justify-content: space-between; 
-            align-items: center; margin-right: 20px;
+            align-items: center; margin-right: 10px;
         }
         
         .info-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
@@ -71,11 +67,11 @@
         .add-mgr-btn {
             background: #f1f5f9; color: var(--nav-purple-dark); font-size: 10px; font-weight: bold; 
             padding: 2px 12px; border-radius: 4px; cursor: pointer; border: 1px solid #e2e8f0;
-            display: inline-block; transition: 0.2s; margin-top: 5px;
+            display: inline-block; transition: 0.2s; margin-top: 5px; width: fit-content;
         }
 
-        /* شريط التحكم والتبويبات */
-        .control-strip { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        /* شريط التبويبات */
+        .control-strip { display: flex; align-items: center; gap: 8px; margin-top: 15px; margin-bottom: 8px; }
 
         .tabs-wrapper { 
             display: flex; background: var(--purple-mid); padding: 2px; 
@@ -87,28 +83,6 @@
             font-size: 11px; border-radius: 6px; transition: 0.2s;
         }
         .tab-btn.active { background: white; color: var(--purple-mid); }
-
-        /* زر الرجوع المطور بحواف حمراء */
-        .back-btn {
-            background: white; 
-            color: var(--danger-red); 
-            border: 1.5px solid var(--danger-red);
-            height: 32px; 
-            padding: 0 15px; 
-            border-radius: 8px; 
-            cursor: pointer;
-            font-family: 'Cairo'; 
-            font-weight: 800; 
-            font-size: 11px;
-            display: flex; 
-            align-items: center; 
-            gap: 6px; 
-            transition: 0.3s;
-        }
-        .back-btn:hover { 
-            background: var(--danger-red); 
-            color: white; 
-        }
 
         .action-btn {
             border: none; border-radius: 8px; padding: 0 15px; 
@@ -137,7 +111,11 @@
     <a href="sales.html">المبيعات</a>
 </nav>
 
-<div class="container">
+<div class="profile-wrapper">
+    <div class="back-container">
+        <button class="back-btn" onclick="goBackAndFocus()">رجوع</button>
+    </div>
+
     <div class="compact-section">
         <div class="row-wrapper">
             <div class="section-label">🏢 بيانات المنشأة:</div>
@@ -164,10 +142,6 @@
     </div>
 
     <div class="control-strip">
-        <button class="back-btn" onclick="goBackAndFocus()">
-            <span>→</span> رجوع للعملاء
-        </button>
-
         <button class="action-btn btn-green" onclick="alert('فتح نموذج طلب جديد')">🛒 طلب جديد</button>
         <button class="action-btn btn-yellow" onclick="alert('فتح نموذج زيارة جديدة')">🚗 زيارة جديدة</button>
         
@@ -188,11 +162,8 @@
     const urlParams = new URLSearchParams(window.location.search);
     const clientName = urlParams.get('name');
 
-    // وظيفة الرجوع مع حفظ الموقع
     function goBackAndFocus() {
-        if(clientName) {
-            sessionStorage.setItem('last_viewed_client', clientName);
-        }
+        if(clientName) sessionStorage.setItem('last_viewed_client', clientName);
         window.location.href = 'customers.html';
     }
 
@@ -219,11 +190,11 @@
         if(tab === 'v-history') {
             document.getElementById('btn-v').classList.add('active');
             title.innerText = "📅 سجل الزيارات الميدانية";
-            const visits = JSON.parse(localStorage.getItem('asgate_visits_data') || '[]').filter(v => v.comp === clientName);
+            const visits = JSON.parse(localStorage.getItem('asgate_visits_final_v21') || '[]').filter(v => v.comp === clientName);
             content.innerHTML = visits.length > 0 ? `
                 <table>
-                    <thead><tr><th>التاريخ</th><th>النوع</th><th>الملاحظات</th></tr></thead>
-                    <tbody>${visits.map(v => `<tr><td>${v.date}</td><td>ميدانية</td><td>${v.notes || '-'}</td></tr>`).join('')}</tbody>
+                    <thead><tr><th>التاريخ</th><th>الحالة</th><th>الملاحظات</th></tr></thead>
+                    <tbody>${visits.map(v => `<tr><td>${v.visitDate}</td><td>${v.status || 'مكتملة'}</td><td>${v.notes || '-'}</td></tr>`).join('')}</tbody>
                 </table>` : `<p style="text-align:center; color:#94a3b8; font-size:11px; margin-top:20px;">لا توجد سجلات حالياً.</p>`;
         } else if(tab === 'o-history') {
             document.getElementById('btn-o').classList.add('active');
