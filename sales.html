@@ -74,14 +74,20 @@
         .order-link { color: var(--accent-blue); text-decoration: none; font-weight: 800; border-bottom: 1px dashed var(--accent-blue); cursor: pointer; }
         .order-link:hover { color: var(--nav-bg); border-bottom-style: solid; }
 
-        /* Modals */
-        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; }
+        .modal { display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 15px; border-radius: 12px; width: 380px; height: 440px; display: flex; flex-direction: column; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .modal-header { font-weight: 800; color: var(--nav-bg); margin-bottom: 10px; text-align: right; font-size: 14px; }
+        
+        .order-modal-card { background: white; width: 350px; border-radius: 12px; padding: 20px; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); position: relative; z-index: 10001; }
+        .form-group { margin-bottom: 12px; position: relative; text-align: right; }
+        .form-group label { display: block; font-weight: 700; font-size: 11px; color: #64748b; margin-bottom: 4px; }
+        .form-group input { width: 100%; padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Cairo'; font-size: 12px; box-sizing: border-box; outline: none; }
+        .modal-results { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #cbd5e1; z-index: 10005; border-radius: 6px; max-height: 140px; overflow-y: auto; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .modal-results div { padding: 8px 10px; font-size: 11px; cursor: pointer; border-bottom: 1px solid #f8fafc; text-align: right; }
+        .modal-results div:hover { background: #eff6ff; }
+        
         .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px; margin-bottom: 10px; font-size: 12px; text-align: right; white-space: pre-wrap; color: #475569; }
         .note-area { height: 80px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 8px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
-
-        .order-modal-card { background: white; width: 25%; min-width: 320px; border-radius: 12px; padding: 20px; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15); }
     </style>
 </head>
 <body onload="loadSalesFromStorage()">
@@ -128,4 +134,184 @@
         <div id="historyLog" class="history-log"></div>
         <textarea id="modalTextArea" class="note-area" placeholder="أدخل الملاحظة الجديدة هنا..."></textarea>
         <div style="display:flex; justify-content: flex-end; gap:5px; margin-top:10px;">
-            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:Cairo;
+            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px;">إلغاء</button>
+            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px; font-weight:bold;">إضافة ملاحظة</button>
+        </div>
+    </div>
+</div>
+
+<div id="orderModal" class="modal">
+    <div class="order-modal-card">
+        <div class="modal-header">إنشاء طلب جديد</div>
+        <div class="form-group">
+            <label>البحث بالاسم أو السجل</label>
+            <input type="text" id="mSearchField" onkeyup="searchCustomerInModal(this)" placeholder="بحث عن عميل..." autocomplete="off">
+            <div id="mResults" class="modal-results"></div>
+        </div>
+        <div class="form-group"><label>اسم الشركة</label><input type="text" id="mComp" readonly style="background:#f1f5f9"></div>
+        <div class="form-group"><label>السجل الرئيسي</label><input type="text" id="mCr" readonly style="background:#f1f5f9"></div>
+        <div class="form-group"><label>السجل الفرعي</label><input type="text" id="mCrSub" readonly style="background:#f1f5f9"></div>
+        <div class="form-group"><label>وصف الطلب</label><input type="text" id="mType" placeholder="مثال: توريد أجهزة"></div>
+        <div style="display:flex; gap:8px; margin-top:20px;">
+            <button onclick="closeOrderModal()" style="flex:1; padding:10px; background:#f1f5f9; border:none; border-radius:6px; cursor:pointer; font-family:Cairo; font-weight:bold;">إلغاء</button>
+            <button onclick="addOrderRow()" style="flex:1; padding:10px; background:var(--nav-bg); color:white; border:none; border-radius:6px; cursor:pointer; font-family:Cairo; font-weight:bold;">إضافة للجدول</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentActivePreview = null;
+
+    function getFullDateWithDay() {
+        const d = new Date();
+        const days = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+        return `${days[d.getDay()]} ${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+    }
+
+    function markAsChanged() { document.getElementById('saveBtn').classList.add('active'); }
+    function markAsSaved() { document.getElementById('saveBtn').classList.remove('active'); }
+
+    function openOrderModal() { 
+        document.getElementById('orderModal').style.display = 'flex'; 
+    }
+
+    function closeOrderModal() { 
+        document.getElementById('orderModal').style.display = 'none';
+        ['mSearchField', 'mComp', 'mCr', 'mCrSub', 'mType'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.value = '';
+        });
+        document.getElementById('mResults').style.display = 'none';
+    }
+
+    function searchCustomerInModal(el) {
+        const query = el.value.toLowerCase();
+        const resDiv = document.getElementById('mResults');
+        const customers = JSON.parse(localStorage.getItem('asgate_customers_data') || '[]');
+        if (query.length < 1) { resDiv.style.display='none'; return; }
+        const filtered = customers.filter(c => String(c.comp + c.cr + c.cr_sub).toLowerCase().includes(query));
+        if (filtered.length > 0) {
+            resDiv.innerHTML = filtered.map(c => `<div onclick="selectCustomer('${c.comp.replace(/'/g, "\\'")}','${c.cr}','${c.cr_sub}')">${c.comp}</div>`).join('');
+            resDiv.style.display = 'block';
+        } else { resDiv.style.display = 'none'; }
+    }
+
+    function selectCustomer(comp, cr, crSub) {
+        document.getElementById('mComp').value = comp;
+        document.getElementById('mCr').value = cr;
+        document.getElementById('mCrSub').value = crSub;
+        document.getElementById('mSearchField').value = comp;
+        document.getElementById('mResults').style.display = 'none';
+    }
+
+    function addOrderRow() {
+        const comp = document.getElementById('mComp').value;
+        if (!comp) return alert("يرجى اختيار شركة أولاً");
+        
+        const data = {
+            id: Math.floor(1000 + Math.random() * 8999),
+            type: document.getElementById('mType').value || '-',
+            date: new Date().toLocaleDateString('en-GB'),
+            comp: comp,
+            cr: document.getElementById('mCr').value,
+            crSub: document.getElementById('mCrSub').value,
+            status: "جديد",
+            notes: ""
+        };
+        
+        renderTableRow(data);
+        markAsChanged();
+        closeOrderModal();
+    }
+
+    function getLastNoteOnly(fullText) {
+        if (!fullText) return 'إضافة ملاحظة...';
+        const lines = fullText.split('\n').filter(l => l.trim() !== "" && !l.includes("🗓️") && !l.includes("---"));
+        return lines.length > 0 ? lines[lines.length - 1] : 'إضافة ملاحظة...';
+    }
+
+    function renderTableRow(obj) {
+        const tbody = document.getElementById('salesBody');
+        const row = tbody.insertRow(0);
+        const statusOptions = ["مكتمل", "معلق", "مرتجع", "جاهز", "جديد", "فقدان"];
+        let optionsHtml = statusOptions.map(opt => `<option value="${opt}" ${obj.status === opt ? 'selected' : ''}>${opt}</option>`).join('');
+
+        row.innerHTML = `
+            <td><a href="order_details.html?id=${obj.id}" class="order-link">#${obj.id}</a></td>
+            <td class="editable" contenteditable="true" oninput="markAsChanged()">${obj.type}</td>
+            <td style="color:#64748b;">${obj.date}</td>
+            <td>${obj.comp}</td>
+            <td>${obj.cr}</td>
+            <td>${obj.crSub}</td>
+            <td><select class="status-select" onchange="markAsChanged()">${optionsHtml}</select></td>
+            <td>-</td><td>-</td>
+            <td>
+                <div class="notes-preview" onclick="openNote(this)" data-full-notes="${obj.notes || ''}">${getLastNoteOnly(obj.notes)}</div>
+                <div class="tooltip-box">${obj.notes || 'لا توجد ملاحظات'}</div>
+            </td>
+        `;
+    }
+
+    function openNote(el) {
+        currentActivePreview = el;
+        const log = document.getElementById('historyLog');
+        log.innerText = el.getAttribute('data-full-notes') || "لا توجد ملاحظات سابقة.";
+        document.getElementById('modalTextArea').value = "";
+        document.getElementById('noteModal').style.display = "flex";
+        setTimeout(() => { document.getElementById('modalTextArea').focus(); log.scrollTop = log.scrollHeight; }, 50);
+    }
+
+    function saveNote() {
+        const newText = document.getElementById('modalTextArea').value.trim();
+        if (newText !== "" && currentActivePreview) {
+            const todayStr = "🗓️ " + getFullDateWithDay();
+            let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
+            let updatedNotes = oldNotes + (oldNotes ? "\n--------------------\n" : "") + todayStr + "\n" + newText;
+            currentActivePreview.setAttribute('data-full-notes', updatedNotes);
+            currentActivePreview.innerText = getLastNoteOnly(updatedNotes);
+            currentActivePreview.parentElement.querySelector('.tooltip-box').innerText = updatedNotes;
+            markAsChanged();
+        }
+        closeNote();
+    }
+
+    function closeNote() { document.getElementById('noteModal').style.display = "none"; }
+
+    function triggerSave() {
+        const rows = document.querySelectorAll('#salesBody tr');
+        const salesData = Array.from(rows).map(r => ({
+            id: r.cells[0].innerText.replace('#', ''),
+            type: r.cells[1].innerText,
+            date: r.cells[2].innerText,
+            comp: r.cells[3].innerText,
+            cr: r.cells[4].innerText,
+            crSub: r.cells[5].innerText,
+            status: r.cells[6].querySelector('select').value,
+            notes: r.cells[9].querySelector('.notes-preview').getAttribute('data-full-notes')
+        }));
+        localStorage.setItem('asgate_sales_db', JSON.stringify(salesData));
+        markAsSaved();
+        alert("تم حفظ التغييرات بنجاح");
+    }
+
+    function loadSalesFromStorage() {
+        const saved = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
+        document.getElementById('salesBody').innerHTML = "";
+        saved.reverse().forEach(item => renderTableRow(item));
+        markAsSaved();
+    }
+
+    function filterSalesTable() {
+        const q = document.getElementById('globalSearch').value.toLowerCase();
+        document.querySelectorAll('#salesBody tr').forEach(r => {
+            r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none";
+        });
+    }
+
+    window.onclick = (e) => { 
+        if (e.target == document.getElementById('noteModal')) closeNote(); 
+        if (e.target == document.getElementById('orderModal')) closeOrderModal(); 
+    }
+</script>
+</body>
+</html>
