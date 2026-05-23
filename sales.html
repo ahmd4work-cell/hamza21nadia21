@@ -162,10 +162,15 @@
 <script>
     let currentActivePreview = null;
 
-    function getFullDateWithDay() {
+    // دالة جلب اليوم والتاريخ مع تنسيق "الموظف" ومسافات واسعة
+    function getNoteHeader() {
         const d = new Date();
         const days = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
-        return `${days[d.getDay()]} ${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+        const dayName = days[d.getDay()];
+        const dateStr = d.getDate().toString().padStart(2, '0') + '/' + (d.getMonth() + 1).toString().padStart(2, '0') + '/' + d.getFullYear();
+        
+        // استخدام مسافات ممتدة لجمالية التنسيق (اسم الموظف ثابت حالياً)
+        return `الموظف: (اسم الموظف)           ${dayName}           ${dateStr}`;
     }
 
     function markAsChanged() { document.getElementById('saveBtn').classList.add('active'); }
@@ -226,7 +231,8 @@
 
     function getLastNoteOnly(fullText) {
         if (!fullText) return 'إضافة ملاحظة...';
-        const lines = fullText.split('\n').filter(l => l.trim() !== "" && !l.includes("🗓️") && !l.includes("---"));
+        // تعديل منطق الفلترة لاستثناء الرأس الجديد عند العرض السريع
+        const lines = fullText.split('\n').filter(l => l.trim() !== "" && !l.includes("الموظف:") && !l.includes("---"));
         return lines.length > 0 ? lines[lines.length - 1] : 'إضافة ملاحظة...';
     }
 
@@ -264,9 +270,10 @@
     function saveNote() {
         const newText = document.getElementById('modalTextArea').value.trim();
         if (newText !== "" && currentActivePreview) {
-            const todayStr = "🗓️ " + getFullDateWithDay();
+            const headerStr = getNoteHeader(); // استدعاء الرأس الجديد
             let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
-            let updatedNotes = oldNotes + (oldNotes ? "\n--------------------\n" : "") + todayStr + "\n" + newText;
+            let updatedNotes = oldNotes + (oldNotes ? "\n--------------------\n" : "") + headerStr + "\n" + newText;
+            
             currentActivePreview.setAttribute('data-full-notes', updatedNotes);
             currentActivePreview.innerText = getLastNoteOnly(updatedNotes);
             currentActivePreview.parentElement.querySelector('.tooltip-box').innerText = updatedNotes;
@@ -290,7 +297,7 @@
             notes: r.cells[9].querySelector('.notes-preview').getAttribute('data-full-notes')
         }));
         localStorage.setItem('asgate_sales_db', JSON.stringify(salesData));
-        markAsSaved(); // يتم إطفاء زر الحفظ فقط دون رسالة تنبيه
+        markAsSaved();
     }
 
     function loadSalesFromStorage() {
