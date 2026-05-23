@@ -79,6 +79,14 @@
         .info-label { font-size: 10px; color: #64748b; font-weight: 800; }
         .info-value { font-size: 13px; color: var(--nav-bg); font-weight: 800; }
 
+        /* تمييز مربع تفاصيل الطلب بحواف خضراء */
+        .info-item-highlight {
+            border: 2px solid var(--header-green);
+            padding: 5px 15px;
+            border-radius: 8px;
+            background-color: #f0fdf4;
+        }
+
         .section-title-box {
             display: flex;
             justify-content: center;
@@ -144,22 +152,27 @@
                     <span class="info-label">رقم الطلب</span>
                     <span class="info-value" id="orderId">#0000</span>
                 </div>
+
+                <div class="info-item info-item-highlight">
+                    <span class="info-label" style="color: var(--header-green);">تفاصيل الطلب</span>
+                    <span class="info-value" id="orderType">-</span>
+                </div>
+
                 <div class="info-item">
                     <span class="info-label">الشركة</span>
                     <span class="info-value" id="orderComp">-</span>
                 </div>
+
                 <div class="info-item">
                     <span class="info-label">السجل</span>
                     <span class="info-value" id="orderCr">-</span>
                 </div>
-                <div class="info-item">
-                    <span class="info-label">نوع الطلب</span>
-                    <span class="info-value" id="orderType">-</span>
-                </div>
+
                 <div class="info-item">
                     <span class="info-label">حالة الطلب</span>
                     <span class="info-value" id="orderStatus">-</span>
                 </div>
+
                 <div class="info-item">
                     <span class="info-label">قيمة الطلب</span>
                     <span class="info-value">0.00 ر.س</span>
@@ -198,20 +211,15 @@
 
     <script>
         function loadOrderDetails() {
-            // 1. استخراج ID الطلب من الرابط
             const urlParams = new URLSearchParams(window.location.search);
             const orderId = urlParams.get('id');
 
             if (!orderId) return;
 
-            // 2. جلب بيانات المبيعات من localStorage
             const salesData = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
-
-            // 3. البحث عن الطلب المطابق للـ ID
             const order = salesData.find(item => String(item.id) === String(orderId));
 
             if (order) {
-                // 4. تعبئة البيانات في المربعات العلوية
                 document.getElementById('orderId').innerText = '#' + order.id;
                 document.getElementById('orderComp').innerText = order.comp;
                 document.getElementById('orderCr').innerText = order.cr;
