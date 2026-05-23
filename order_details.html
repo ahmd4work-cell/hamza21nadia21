@@ -50,28 +50,36 @@
             border-radius: 10px;
             font-size: 12px;
             font-weight: 800;
-            border: 2px solid #991b1b; /* حواف باللون الأحمر الغامق */
+            border: 2px solid #991b1b;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             transition: 0.2s;
             white-space: nowrap;
             display: flex;
             align-items: center;
             gap: 5px;
+            height: 40px; /* موازنة الارتفاع مع المربع الجديد */
+            box-sizing: border-box;
         }
         .btn-back-outside:hover { background: #fef2f2; border-color: #7f1d1d; }
 
-        /* المربع الأبيض مع زيادة الارتفاع */
+        /* المربع الأبيض بارتفاع 70 بيكسل */
         .order-header-info { 
-            background: white; padding: 25px 25px; /* زيادة التعبئة الداخلية لزيادة الارتفاع */
+            background: white; 
+            padding: 0 25px; /* إزالة الـ Padding الرأسي للتحكم الدقيق بالارتفاع */
             border-radius: 12px; 
-            border: 1px solid var(--border-color); display: flex; 
+            border: 1px solid var(--border-color); 
+            display: flex; 
             flex-grow: 1;
-            flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; 
+            gap: 20px; 
+            justify-content: space-between; 
+            align-items: center;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            min-height: 60px; /* تحديد حد أدنى للارتفاع لضمان التناسق */
+            height: 70px; /* تحديد الارتفاع المطلوب */
+            box-sizing: border-box;
         }
         
-        .info-item { display: flex; flex-direction: column; gap: 4px; min-width: 100px; }
+        .info-item { display: flex; flex-direction: column; gap: 2px; min-width: 100px; }
         .info-label { font-size: 10px; color: #64748b; font-weight: 800; }
         .info-value { font-size: 13px; color: var(--nav-bg); font-weight: 800; }
 
