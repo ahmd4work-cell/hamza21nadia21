@@ -26,13 +26,12 @@
         .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; border-radius: 8px; transition: 0.3s; line-height: 26px; height: 26px; display: inline-block; }
         .navbar a.active-link { background-color: var(--nav-active); color: var(--nav-purple-dark); }
 
-        /* حاوية البيانات الأساسية بمسافة 10% */
-        .profile-wrapper {
+        /* حاوية البيانات العلوية (بمسافة 10%) */
+        .profile-header-wrapper {
             margin: 20px 10%; 
             position: relative;
         }
 
-        /* زر الرجوع */
         .back-container {
             position: absolute;
             right: -7%;
@@ -71,7 +70,14 @@
             display: inline-block; transition: 0.2s; margin-top: 5px; width: fit-content;
         }
 
-        .control-strip { display: flex; align-items: center; gap: 8px; margin-top: 15px; margin-bottom: 8px; }
+        /* حاوية الجزء السفلي (بعرض كامل) */
+        .full-width-container {
+            width: 100%;
+            padding: 10px 20px;
+            box-sizing: border-box;
+        }
+
+        .control-strip { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 
         .tabs-wrapper { 
             display: flex; background: var(--purple-mid); padding: 2px; 
@@ -94,7 +100,7 @@
 
         .content-area { 
             background: white; border-radius: 10px; padding: 12px; 
-            min-height: 200px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            min-height: 250px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         table { width: 100%; border-collapse: collapse; font-size: 11px; }
         th { text-align: right; color: #64748b; padding: 8px; border-bottom: 2px solid #eee; }
@@ -111,7 +117,7 @@
     <a href="sales.html">المبيعات</a>
 </nav>
 
-<div class="profile-wrapper">
+<div class="profile-header-wrapper">
     <div class="back-container">
         <button class="back-btn" onclick="goBackAndFocus()">رجوع</button>
     </div>
@@ -142,7 +148,9 @@
             <div class="add-mgr-btn" onclick="alert('إضافة مسؤول جديد')">✚ إضافة مسؤول آخر</div>
         </div>
     </div>
+</div>
 
+<div class="full-width-container">
     <div class="control-strip">
         <button class="action-btn btn-green" onclick="alert('فتح نموذج طلب جديد')">🛒 طلب جديد</button>
         <button class="action-btn btn-yellow" onclick="alert('فتح نموذج زيارة جديدة')">🚗 زيارة جديدة</button>
@@ -183,8 +191,6 @@
             document.getElementById('c-owner').innerText = client.owner || 'غير محدد';
             document.getElementById('m-name').innerText = client.mgr || '-';
             document.getElementById('m-mob').innerText = client.mob || '-';
-            
-            // فتح سجل الطلبات افتراضياً عند التحميل
             openTab('o-history');
         }
     }
