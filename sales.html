@@ -51,13 +51,13 @@
         .status-badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; }
         .badge-new { background: #dcfce7; color: #166534; }
 
-        /* Modal Style - Compact 25% Width */
+        /* Modal Style - Compact 25% */
         .modal-overlay { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(15, 23, 42, 0.4); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(2px);
         }
         .modal-card { 
-            background: white; width: 25%; min-width: 320px; /* لضمان عدم صغره جداً في الجوال */
+            background: white; width: 25%; min-width: 320px; 
             border-radius: 12px; padding: 20px; 
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15); animation: zoomIn 0.2s ease-out;
         }
@@ -76,9 +76,9 @@
         .modal-results { 
             position: absolute; top: 100%; left: 0; right: 0; background: white; 
             border: 1px solid #cbd5e1; z-index: 2100; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            max-height: 120px; overflow-y: auto; display: none; margin-top: 2px;
+            max-height: 140px; overflow-y: auto; display: none; margin-top: 2px;
         }
-        .modal-results div { padding: 8px 10px; font-size: 11px; cursor: pointer; border-bottom: 1px solid #f8fafc; text-align: right; }
+        .modal-results div { padding: 8px 10px; font-size: 11px; cursor: pointer; border-bottom: 1px solid #f8fafc; text-align: right; line-height: 1.4; }
         .modal-results div:hover { background: #eff6ff; }
         .modal-results b { color: var(--nav-bg); display: block; font-size: 11px; }
 
@@ -127,8 +127,8 @@
         <div class="modal-header">إنشاء طلب جديد</div>
         
         <div class="form-group">
-            <label>البحث بالشركة أو السجل</label>
-            <input type="text" id="mSearchField" placeholder="ادخل الاسم أو رقم السجل..." onkeyup="searchCustomerGlobalModal(this)" autocomplete="off">
+            <label>البحث بالشركة أو رقم السجل</label>
+            <input type="text" id="mSearchField" placeholder="ادخل الاسم أو السجل هنا..." onkeyup="searchCustomerGlobalModal(this)" autocomplete="off">
             <div id="mResults" class="modal-results"></div>
         </div>
 
@@ -149,7 +149,7 @@
 
         <div class="form-group">
             <label>نوع الطلب</label>
-            <input type="text" id="mType" placeholder="مثال: توريد أحبار...">
+            <input type="text" id="mType" placeholder="مثال: توريد أجهزة...">
         </div>
 
         <div class="form-group">
@@ -181,19 +181,26 @@
         document.getElementById('mResults').style.display = 'none';
     }
 
-    // وظيفة البحث الشامل (الشركة + السجل الرئيسي + الفرعي)
+    // إصلاح دالة البحث لتعمل بكل الحقول بفعالية
     function searchCustomerGlobalModal(input) {
         const query = input.value.trim().toLowerCase();
         const resultsDiv = document.getElementById('mResults');
+        
+        // استدعاء بيانات العملاء
         const customers = JSON.parse(localStorage.getItem('asgate_customers_data') || '[]');
         
-        if (query.length < 1) { resultsDiv.style.display = 'none'; return; }
+        if (query.length < 1) { 
+            resultsDiv.style.display = 'none'; 
+            return; 
+        }
 
         const filtered = customers.filter(c => {
-            const name = (c.comp || "").toLowerCase();
-            const crMain = (c.cr || "").toString().toLowerCase();
-            const crSub = (c.cr_sub || "").toString().toLowerCase();
-            // هنا يتم البحث في الـ 3 حقول معاً
+            // تحويل كافة القيم لنصوص للتأكد من نجاح البحث الرقمي والحرفي
+            const name = String(c.comp || "").toLowerCase();
+            const crMain = String(c.cr || "").toLowerCase();
+            const crSub = String(c.cr_sub || "").toLowerCase();
+
+            // فحص وجود كلمة البحث في أي من الحقول الثلاثة
             return name.includes(query) || crMain.includes(query) || crSub.includes(query);
         });
 
@@ -201,12 +208,12 @@
             resultsDiv.innerHTML = filtered.map(c => `
                 <div onclick="fillModalFields('${c.comp}', '${c.cr || '-'}', '${c.cr_sub || '-'}')">
                     <b>${c.comp}</b>
-                    <span style="font-size:9px; color:#64748b;">رئيسي: ${c.cr || '-'} | فرعي: ${c.cr_sub || '-'}</span>
+                    <span style="font-size:9px; color:#64748b;">سجل: ${c.cr || '-'} | فرعي: ${c.cr_sub || '-'}</span>
                 </div>
             `).join('');
             resultsDiv.style.display = 'block';
         } else {
-            resultsDiv.innerHTML = '<div style="font-size:10px; color:#94a3b8; text-align:center;">لا توجد نتائج</div>';
+            resultsDiv.innerHTML = '<div style="font-size:10px; color:#94a3b8; text-align:center; padding:10px;">لا توجد نتائج مطابقة</div>';
             resultsDiv.style.display = 'block';
         }
     }
@@ -226,7 +233,10 @@
         const type = document.getElementById('mType').value;
         const status = document.getElementById('mStatus').value;
 
-        if (!comp || comp === "-") { alert("يرجى اختيار عميل أولاً"); return; }
+        if (!comp || comp === "-") { 
+            alert("يرجى اختيار شركة من نتائج البحث أولاً"); 
+            return; 
+        }
 
         const tbody = document.getElementById('salesBody');
         const row = tbody.insertRow(0);
