@@ -7,7 +7,7 @@
     <style>
         :root {
             --nav-bg: #2e1065;
-            --header-purple: #8b5cf6;
+            --header-green: #15803d; /* اللون الأخضر الغامق الجديد */
             --nav-active: #a78bfa;
             --bg-color: #f4f7f9;
             --white: #ffffff;
@@ -38,14 +38,13 @@
         .btn-top { border: none; padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; color: white; transition: 0.3s; }
         .btn-add { background-color: var(--accent-blue); }
         .btn-save { background-color: var(--accent-green); }
-        .btn-save:hover { opacity: 0.9; }
 
         .search-box { padding: 0 15px; border: 1px solid var(--border-color); border-radius: 8px; width: 300px; height: 32px; font-family: 'Cairo'; font-size: 11px; outline: none; }
 
         /* Table Style */
         .table-wrapper { background: var(--white); border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th { background-color: var(--header-purple); padding: 12px 5px; color: var(--white); font-size: 11px; font-weight: 800; text-align: center; }
+        th { background-color: var(--header-green); padding: 12px 5px; color: var(--white); font-size: 11px; font-weight: 800; text-align: center; }
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); }
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
         
@@ -112,12 +111,14 @@
             <thead>
                 <tr>
                     <th style="width: 10%;">رقم الطلب</th>
-                    <th style="width: 14%;">نوع الطلب</th>
-                    <th style="width: 18%;">الشركة</th>
-                    <th style="width: 12%;">السجل الرئيسي</th>
-                    <th style="width: 12%;">السجل الفرعي</th>
-                    <th style="width: 10%;">الحالة</th>
-                    <th style="width: 24%;">ملاحظات</th>
+                    <th style="width: 14%;">وصف الطلب</th>
+                    <th style="width: 16%;">الشركة</th>
+                    <th style="width: 11%;">السجل الرئيسي</th>
+                    <th style="width: 11%;">السجل الفرعي</th>
+                    <th style="width: 9%;">الحالة</th>
+                    <th style="width: 9%;">مكتمل</th>
+                    <th style="width: 9%;">معلق</th>
+                    <th style="width: 11%;">ملاحظات</th>
                 </tr>
             </thead>
             <tbody id="salesBody"></tbody>
@@ -151,8 +152,8 @@
         </div>
 
         <div class="form-group">
-            <label>نوع الطلب</label>
-            <input type="text" id="mType" placeholder="مثال: توريد أجهزة...">
+            <label>وصف الطلب</label>
+            <input type="text" id="mType" placeholder="مثال: توريد أحبار وطابعات...">
         </div>
 
         <div class="form-group">
@@ -189,10 +190,7 @@
         const resultsDiv = document.getElementById('mResults');
         const customers = JSON.parse(localStorage.getItem('asgate_customers_data') || '[]');
         
-        if (query.length < 1) { 
-            resultsDiv.style.display = 'none'; 
-            return; 
-        }
+        if (query.length < 1) { resultsDiv.style.display = 'none'; return; }
 
         const filtered = customers.filter(c => {
             const name = String(c.comp || "").toLowerCase();
@@ -210,7 +208,7 @@
             `).join('');
             resultsDiv.style.display = 'block';
         } else {
-            resultsDiv.innerHTML = '<div style="font-size:10px; color:#94a3b8; text-align:center; padding:10px;">لا توجد نتائج مطابقة</div>';
+            resultsDiv.innerHTML = '<div style="font-size:10px; color:#94a3b8; text-align:center; padding:10px;">لا يوجد نتائج</div>';
             resultsDiv.style.display = 'block';
         }
     }
@@ -230,16 +228,13 @@
         const type = document.getElementById('mType').value;
         const status = document.getElementById('mStatus').value;
 
-        if (!comp || comp === "-") { 
-            alert("يرجى اختيار شركة من نتائج البحث أولاً"); 
-            return; 
-        }
+        if (!comp || comp === "-") { alert("يرجى اختيار شركة من نتائج البحث أولاً"); return; }
 
         const tbody = document.getElementById('salesBody');
         const row = tbody.insertRow(0);
         const orderId = Math.floor(1000 + Math.random() * 8999);
 
-        // تم تعديل الترتيب هنا ليكون نوع الطلب بعد رقم الطلب مباشرة
+        // الترتيب المحدث للأعمدة
         row.innerHTML = `
             <td><a href="order-details.html?id=${orderId}" class="order-link">#ORD-${orderId}</a></td>
             <td>${type || '-'}</td>
@@ -247,6 +242,8 @@
             <td>${cr}</td>
             <td>${crSub}</td>
             <td><span class="status-badge ${status === 'جديد' ? 'badge-new' : ''}">${status}</span></td>
+            <td>-</td>
+            <td>-</td>
             <td style="color:#94a3b8; font-style:italic;">لا توجد ملاحظات..</td>
         `;
 
@@ -254,7 +251,6 @@
     }
 
     function saveTableData() {
-        // يمكن هنا إضافة كود لحفظ البيانات في LocalStorage أو إرسالها للسيرفر
         alert("تم حفظ جميع التغييرات بنجاح!");
     }
 
