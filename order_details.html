@@ -7,43 +7,57 @@
     <style>
         :root {
             --nav-bg: #2e1065;
-            --header-green: #15803d; /* تم تغيير اللون للأخضر المعتمد */
+            --header-green: #15803d;
+            --nav-active: #a78bfa;
             --bg-color: #f4f7f9;
             --white: #ffffff;
             --border-color: #cbd5e1;
             --accent-blue: #3b82f6;
             --zebra-blue: #eff6ff;
+            --text-dark: #1e293b;
         }
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
 
-        /* شريط علوي بسيط للعودة */
-        .top-nav { 
-            background: var(--nav-bg); padding: 10px 20px; 
-            display: flex; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        /* شريط التنقل العلوي (نفس تصميم صفحة المبيعات) */
+        .navbar { 
+            background-color: var(--nav-bg); display: flex; align-items: center; padding: 0 20px; 
+            margin: 10px; border-radius: 12px; height: 37px; position: sticky; top: 10px; z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); box-sizing: border-box;
         }
-        .back-btn { 
-            color: white; text-decoration: none; font-size: 13px; font-weight: bold; 
-            display: flex; align-items: center; gap: 8px;
+        .navbar a { 
+            color: var(--white); text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; 
+            border-radius: 6px; transition: 0.3s; line-height: 26px; height: 26px; display: inline-block;
         }
+        .navbar a.active { background-color: var(--nav-active); color: var(--nav-bg); }
 
-        .container { padding: 20px; }
+        .container { padding: 10px 20px 20px 20px; }
 
         /* منطقة البيانات الأساسية بمسافات 7% */
         .order-header-info { 
             background: white; padding: 15px 25px; border-radius: 12px; 
             border: 1px solid var(--border-color); display: flex; 
-            flex-wrap: wrap; gap: 20px; justify-content: space-between; 
-            margin: 0 7% 20px 7%; /* تم ضبط الهوامش لتبدأ وتنتهي عند 7% */
+            flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: center;
+            margin: 20px 7% 20px 7%; 
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            position: relative;
         }
         
-        .info-item { display: flex; flex-direction: column; gap: 4px; min-width: 120px; }
+        .info-item { display: flex; flex-direction: column; gap: 4px; min-width: 100px; }
         .info-label { font-size: 10px; color: #64748b; font-weight: 800; }
         .info-value { font-size: 13px; color: var(--nav-bg); font-weight: 800; }
 
+        /* زر الرجوع بجانب رقم الطلب */
+        .back-link-wrapper { display: flex; align-items: center; gap: 12px; }
+        .btn-back-inline {
+            text-decoration: none; background: #f1f5f9; color: var(--nav-bg);
+            padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800;
+            border: 1px solid var(--border-color); transition: 0.2s;
+        }
+        .btn-back-inline:hover { background: #e2e8f0; }
+
         /* منطقة الأزرار */
-        .action-bar { margin: 0 7% 12px 7%; } /* محاذاة الأزرار مع المربع العلوي */
+        .action-bar { margin: 0 7% 12px 7%; }
         .btn-add-product { 
             background: var(--accent-blue); color: white; border: none; 
             padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; 
@@ -55,7 +69,7 @@
         .table-wrapper { 
             background: white; border-radius: 10px; overflow: hidden; 
             border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            margin: 0 7%; /* محاذاة الجدول مع المربع العلوي */
+            margin: 0 7%;
         }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         th { 
@@ -65,7 +79,7 @@
         }
         td { 
             border-bottom: 1px solid #f1f5f9; text-align: center; 
-            height: 38px; font-size: 11px; font-weight: 600; color: #1e293b;
+            height: 38px; font-size: 11px; font-weight: 600; color: var(--text-dark);
         }
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
 
@@ -74,13 +88,24 @@
 </head>
 <body>
 
-    <div class="top-nav">
-        <a href="sales.html" class="back-btn"><span>🔙</span> العودة لصفحة المبيعات</a>
-    </div>
+    <nav class="navbar">
+        <a href="index.html">الرئيسية</a>
+        <a href="visits.html">الزيارات</a>
+        <a href="opportunities.html">الفرص البيعية</a>
+        <a href="customers.html">العملاء</a>
+        <a href="sales.html" class="active">المبيعات</a>
+    </nav>
 
     <div class="container">
         <div class="order-header-info">
-            <div class="info-item"><span class="info-label">رقم الطلب</span><span class="info-value" id="orderId">#ORD-7701</span></div>
+            <div class="back-link-wrapper">
+                <a href="sales.html" class="btn-back-inline">🔙 عودة</a>
+                <div class="info-item">
+                    <span class="info-label">رقم الطلب</span>
+                    <span class="info-value" id="orderId">#ORD-0000</span>
+                </div>
+            </div>
+            
             <div class="info-item"><span class="info-label">الشركة</span><span class="info-value">شركة الحلول الذكية</span></div>
             <div class="info-item"><span class="info-label">السجل</span><span class="info-value">1010203040</span></div>
             <div class="info-item"><span class="info-label">نوع الطلب</span><span class="info-value">توريد أجهزة</span></div>
@@ -119,7 +144,6 @@
     </div>
 
     <script>
-        // كود بسيط لاستخراج رقم الطلب من الرابط وعرضه
         const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get('id');
         if(id) document.getElementById('orderId').innerText = '#' + id;
