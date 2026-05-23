@@ -36,7 +36,7 @@
         .btn-top { border: none; padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; color: white; transition: 0.3s; }
         .btn-add { background-color: var(--accent-blue); }
         .btn-save { background-color: #cbd5e1; color: #64748b; }
-        .btn-save.dirty { background-color: var(--accent-green); color: white; }
+        .btn-save.dirty { background-color: var(--accent-green); color: white; cursor: pointer; }
 
         .search-box { padding: 0 15px; border: 1px solid var(--border-color); border-radius: 8px; width: 300px; height: 32px; font-family: 'Cairo'; font-size: 11px; outline: none; }
 
@@ -47,16 +47,16 @@
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
         
         .order-link { color: var(--accent-blue); text-decoration: none; font-weight: 800; }
-        .status-badge { padding: 3px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; }
-        .status-done { background: #dcfce7; color: #166534; }
+        
+        .excel-input { width: 90%; border: none; background: transparent; text-align: center; font-family: 'Cairo'; font-size: 11px; outline: none; }
+        .excel-input:focus { border-bottom: 1px solid var(--accent-blue); }
 
-        /* تسيق مدخلات البحث في الصف الجديد */
         .search-cell-input { width: 90%; border: 1px solid var(--accent-blue); border-radius: 4px; padding: 4px; font-family: 'Cairo'; font-size: 11px; text-align: center; outline: none; }
         .results-list { 
             position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; 
             z-index: 2000; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-height: 150px; overflow-y: auto; list-style: none; padding: 0; margin: 0; 
         }
-        .results-list li { padding: 8px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 10px; transition: 0.2s; text-align: right; }
+        .results-list li { padding: 8px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 10px; transition: 0.2s; text-align: right; color: #333; }
         .results-list li:hover { background: #f0f7ff; color: var(--accent-blue); }
     </style>
 </head>
@@ -73,7 +73,7 @@
 <div class="container">
     <div class="action-bar">
         <button class="btn-top btn-add" onclick="createNewOrderRow()">+ إنشاء طلب مبيعات</button>
-        <button id="saveBtn" class="btn-top btn-save">حفظ التغييرات</button>
+        <button id="saveBtn" class="btn-top btn-save" onclick="saveAllSales()">حفظ التغييرات</button>
         <input type="text" class="search-box" id="globalSearch" placeholder="🔍 ابحث بالشركة، رقم الطلب..." onkeyup="filterSalesTable()">
     </div>
     
@@ -92,34 +92,26 @@
                 </tr>
             </thead>
             <tbody id="salesBody">
-                <tr>
-                    <td><a href="order-details.html?id=7701" class="order-link">#ORD-7701</a></td>
-                    <td>شركة الحلول الذكية</td>
-                    <td>1010203040</td>
-                    <td>-</td>
-                    <td>توريد أجهزة</td>
-                    <td><span class="status-badge status-done">مكتمل</span></td>
-                    <td>25,400.00 ر.س</td>
-                    <td style="font-size:10px; color:#64748b; font-style:italic;">تم التسليم</td>
-                </tr>
-            </tbody>
+                </tbody>
         </table>
     </div>
 </div>
 
 <script>
     function markAsDirty() {
-        document.getElementById('saveBtn').classList.add('dirty');
+        const btn = document.getElementById('saveBtn');
+        btn.classList.add('dirty');
     }
 
-    // وظيفة إنشاء صف جديد مع ميزة البحث
+    // إنشاء صف جديد (وضع البحث)
     function createNewOrderRow() {
         const tbody = document.getElementById('salesBody');
         const row = tbody.insertRow(0);
+        row.dataset.state = "new";
         const orderNum = Math.floor(1000 + Math.random() * 9000);
 
         row.innerHTML = `
-            <td>#ORD-${orderNum}</td>
+            <td class="order-id">#ORD-${orderNum}</td>
             <td style="position:relative;">
                 <input type="text" class="search-cell-input" placeholder="بحث بالشركة..." onkeyup="searchCustomer(this, 'comp')">
                 <div class="results-list" style="display:none;"></div>
@@ -132,15 +124,14 @@
                 <input type="text" class="search-cell-input" placeholder="السجل الفرعي..." onkeyup="searchCustomer(this, 'cr_sub')">
                 <div class="results-list" style="display:none;"></div>
             </td>
-            <td><input type="text" class="search-cell-input" placeholder="نوع الطلب..." oninput="markAsDirty()"></td>
-            <td>-</td>
-            <td><input type="text" class="search-cell-input" placeholder="القيمة..." oninput="markAsDirty()"></td>
-            <td><input type="text" class="search-cell-input" placeholder="ملاحظات..." oninput="markAsDirty()"></td>
+            <td><input type="text" class="excel-input" disabled placeholder="-"></td>
+            <td>جديد</td>
+            <td><input type="text" class="excel-input" disabled placeholder="-"></td>
+            <td><input type="text" class="excel-input" disabled placeholder="-"></td>
         `;
-        markAsDirty();
     }
 
-    // وظيفة البحث في قاعدة بيانات العملاء
+    // وظيفة البحث
     function searchCustomer(input, field) {
         const query = input.value.toLowerCase();
         const resultsDiv = input.nextElementSibling;
@@ -169,17 +160,50 @@
         }
     }
 
-    // اختيار العميل وتعبئة البيانات تلقائياً
+    // اختيار العميل وفتح الحقول للتعديل
     function selectCustomer(li, name, cr, cr_sub) {
         const row = li.closest('tr');
-        const inputs = row.querySelectorAll('.search-cell-input');
+        const inputs = row.querySelectorAll('input');
         
         inputs[0].value = name;     // الشركة
         inputs[1].value = cr;       // السجل الرئيسي
         inputs[2].value = cr_sub;   // السجل الفرعي
         
+        // فتح بقية الحقول للإدخال
+        inputs[3].disabled = false; // نوع الطلب
+        inputs[3].placeholder = "أدخل النوع...";
+        inputs[4].disabled = false; // القيمة
+        inputs[4].placeholder = "0.00";
+        inputs[5].disabled = false; // الملاحظات
+        inputs[5].placeholder = "أضف ملاحظة...";
+
         document.querySelectorAll('.results-list').forEach(d => d.style.display = 'none');
         markAsDirty();
+    }
+
+    // حفظ البيانات وتحويل الصف لوضع التعديل الدائم
+    function saveAllSales() {
+        const rows = document.querySelectorAll('#salesBody tr');
+        rows.forEach(row => {
+            if(row.dataset.state === "new") {
+                const inputs = row.querySelectorAll('input');
+                // استبدال مربعات البحث بنصوص عادية قابلة للتعديل (Excel style)
+                row.innerHTML = `
+                    <td><a href="#" class="order-link">${row.querySelector('.order-id').innerText}</a></td>
+                    <td><input type="text" class="excel-input" value="${inputs[0].value}" oninput="markAsDirty()"></td>
+                    <td><input type="text" class="excel-input" value="${inputs[1].value}" oninput="markAsDirty()"></td>
+                    <td><input type="text" class="excel-input" value="${inputs[2].value}" oninput="markAsDirty()"></td>
+                    <td><input type="text" class="excel-input" value="${inputs[3].value}" oninput="markAsDirty()"></td>
+                    <td><span class="status-badge" style="background:#fef9c3; color:#854d0e;">قيد المعالجة</span></td>
+                    <td><input type="text" class="excel-input" value="${inputs[4].value}" oninput="markAsDirty()"></td>
+                    <td><input type="text" class="excel-input" value="${inputs[5].value}" oninput="markAsDirty()"></td>
+                `;
+                row.dataset.state = "saved";
+            }
+        });
+        
+        document.getElementById('saveBtn').classList.remove('dirty');
+        alert("تم حفظ الطلبات بنجاح، يمكنك الآن تعديل أي حقل مباشرة.");
     }
 
     function filterSalesTable() {
@@ -190,7 +214,6 @@
         }
     }
 
-    // إغلاق قوائم البحث عند الضغط خارجها
     window.onclick = function(e) {
         if (!e.target.classList.contains('search-cell-input')) {
             document.querySelectorAll('.results-list').forEach(d => d.style.display = 'none');
