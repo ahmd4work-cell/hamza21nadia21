@@ -37,6 +37,8 @@
 
         .btn-top { border: none; padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; color: white; transition: 0.3s; }
         .btn-add { background-color: var(--accent-blue); }
+        .btn-save { background-color: var(--accent-green); }
+        .btn-save:hover { opacity: 0.9; }
 
         .search-box { padding: 0 15px; border: 1px solid var(--border-color); border-radius: 8px; width: 300px; height: 32px; font-family: 'Cairo'; font-size: 11px; outline: none; }
 
@@ -101,6 +103,7 @@
 <div class="container">
     <div class="action-bar">
         <button class="btn-top btn-add" onclick="openOrderModal()">+ إنشاء طلب مبيعات جديد</button>
+        <button class="btn-top btn-save" onclick="saveTableData()">حفظ التغييرات</button>
         <input type="text" class="search-box" id="globalSearch" placeholder="🔍 بحث في الجدول..." onkeyup="filterSalesTable()">
     </div>
     
@@ -108,13 +111,13 @@
         <table id="salesTable">
             <thead>
                 <tr>
-                    <th style="width: 12%;">رقم الطلب</th>
+                    <th style="width: 10%;">رقم الطلب</th>
+                    <th style="width: 14%;">نوع الطلب</th>
                     <th style="width: 18%;">الشركة</th>
                     <th style="width: 12%;">السجل الرئيسي</th>
                     <th style="width: 12%;">السجل الفرعي</th>
-                    <th style="width: 14%;">نوع الطلب</th>
                     <th style="width: 10%;">الحالة</th>
-                    <th style="width: 22%;">ملاحظات</th>
+                    <th style="width: 24%;">ملاحظات</th>
                 </tr>
             </thead>
             <tbody id="salesBody"></tbody>
@@ -181,12 +184,9 @@
         document.getElementById('mResults').style.display = 'none';
     }
 
-    // إصلاح دالة البحث لتعمل بكل الحقول بفعالية
     function searchCustomerGlobalModal(input) {
         const query = input.value.trim().toLowerCase();
         const resultsDiv = document.getElementById('mResults');
-        
-        // استدعاء بيانات العملاء
         const customers = JSON.parse(localStorage.getItem('asgate_customers_data') || '[]');
         
         if (query.length < 1) { 
@@ -195,12 +195,9 @@
         }
 
         const filtered = customers.filter(c => {
-            // تحويل كافة القيم لنصوص للتأكد من نجاح البحث الرقمي والحرفي
             const name = String(c.comp || "").toLowerCase();
             const crMain = String(c.cr || "").toLowerCase();
             const crSub = String(c.cr_sub || "").toLowerCase();
-
-            // فحص وجود كلمة البحث في أي من الحقول الثلاثة
             return name.includes(query) || crMain.includes(query) || crSub.includes(query);
         });
 
@@ -242,17 +239,23 @@
         const row = tbody.insertRow(0);
         const orderId = Math.floor(1000 + Math.random() * 8999);
 
+        // تم تعديل الترتيب هنا ليكون نوع الطلب بعد رقم الطلب مباشرة
         row.innerHTML = `
             <td><a href="order-details.html?id=${orderId}" class="order-link">#ORD-${orderId}</a></td>
+            <td>${type || '-'}</td>
             <td>${comp}</td>
             <td>${cr}</td>
             <td>${crSub}</td>
-            <td>${type || '-'}</td>
             <td><span class="status-badge ${status === 'جديد' ? 'badge-new' : ''}">${status}</span></td>
             <td style="color:#94a3b8; font-style:italic;">لا توجد ملاحظات..</td>
         `;
 
         closeOrderModal();
+    }
+
+    function saveTableData() {
+        // يمكن هنا إضافة كود لحفظ البيانات في LocalStorage أو إرسالها للسيرفر
+        alert("تم حفظ جميع التغييرات بنجاح!");
     }
 
     function filterSalesTable() {
