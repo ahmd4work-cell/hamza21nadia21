@@ -112,7 +112,7 @@
             <thead>
                 <tr>
                     <th style="width: 10%;">رقم الطلب</th>
-                    <th style="width: 13%;">وصف الطلب</th>
+                    <th style="width: 13%;">اسم الطلب</th>
                     <th style="width: 11%;">تاريخ الإنشاء</th>
                     <th style="width: 15%;">الشركة</th>
                     <th style="width: 10%;">السجل الرئيسي</th>
@@ -151,7 +151,7 @@
         <div class="form-group"><label>اسم الشركة</label><input type="text" id="mComp" readonly style="background:#f1f5f9"></div>
         <div class="form-group"><label>السجل الرئيسي</label><input type="text" id="mCr" readonly style="background:#f1f5f9"></div>
         <div class="form-group"><label>السجل الفرعي</label><input type="text" id="mCrSub" readonly style="background:#f1f5f9"></div>
-        <div class="form-group"><label>وصف الطلب</label><input type="text" id="mType" placeholder="مثال: توريد أجهزة"></div>
+        <div class="form-group"><label>اسم الطلب</label><input type="text" id="mType" placeholder="مثال: توريد أجهزة"></div>
         <div style="display:flex; gap:8px; margin-top:20px;">
             <button onclick="closeOrderModal()" style="flex:1; padding:10px; background:#f1f5f9; border:none; border-radius:6px; cursor:pointer; font-family:Cairo; font-weight:bold;">إلغاء</button>
             <button onclick="addOrderRow()" style="flex:1; padding:10px; background:var(--nav-bg); color:white; border:none; border-radius:6px; cursor:pointer; font-family:Cairo; font-weight:bold;">إضافة للجدول</button>
@@ -167,8 +167,6 @@
         const days = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
         const dayName = days[d.getDay()];
         const dateStr = d.getDate().toString().padStart(2, '0') + '/' + (d.getMonth() + 1).toString().padStart(2, '0') + '/' + d.getFullYear();
-        
-        // استخدام أيقونة الشخص (👤) والتقويم (🗓️) مع مسافات بسيطة
         return `👤 (اسم الموظف)    🗓️ ${dayName}    ${dateStr}`;
     }
 
@@ -230,7 +228,6 @@
 
     function getLastNoteOnly(fullText) {
         if (!fullText) return 'إضافة ملاحظة...';
-        // تصفية السطور لعرض آخر نص فعلي للملاحظة
         const lines = fullText.split('\n').filter(l => l.trim() !== "" && !l.includes("👤") && !l.includes("🗓️"));
         return lines.length > 0 ? lines[lines.length - 1] : 'إضافة ملاحظة...';
     }
@@ -262,7 +259,6 @@
         if (!notes) { log.innerText = "لا توجد ملاحظات سابقة."; return; }
 
         let htmlContent = notes.split('\n').map(line => {
-            // تلوين الرأس بالأصفر مع الحفاظ على التنسيق العادي (بدون عريض) وبدون سطر فاصل
             if (line.includes("👤")) {
                 return `<div style="color: #eab308; margin-top: 8px;">${line}</div>`;
             }
@@ -290,7 +286,6 @@
         if (newText !== "" && currentActivePreview) {
             const headerStr = getNoteHeader();
             let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
-            // إضافة مسافة سطر بدلاً من السطر الفاصل المنقط
             let updatedNotes = oldNotes + (oldNotes ? "\n" : "") + headerStr + "\n" + newText;
             
             currentActivePreview.setAttribute('data-full-notes', updatedNotes);
