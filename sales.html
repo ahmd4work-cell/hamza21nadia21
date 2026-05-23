@@ -51,44 +51,46 @@
         .status-badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; }
         .badge-new { background: #dcfce7; color: #166534; }
 
-        /* Modal Style */
+        /* Updated Modal Style (Increased Size) */
         .modal-overlay { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(15, 23, 42, 0.6); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(4px);
         }
         .modal-card { 
-            background: white; width: 420px; border-radius: 16px; padding: 25px; 
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); animation: slideIn 0.3s ease-out;
+            background: white; width: 500px; /* زيادة العرض */
+            border-radius: 20px; padding: 30px; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); animation: slideIn 0.3s ease-out;
         }
         @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         
-        .modal-header { font-weight: 800; color: var(--nav-bg); font-size: 18px; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
+        .modal-header { font-weight: 800; color: var(--nav-bg); font-size: 20px; margin-bottom: 25px; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px; text-align: center; }
         
-        .form-group { margin-bottom: 15px; position: relative; }
-        .form-group label { display: block; font-weight: 700; font-size: 12px; color: #64748b; margin-bottom: 5px; }
+        .form-group { margin-bottom: 18px; position: relative; }
+        .form-group label { display: block; font-weight: 700; font-size: 13px; color: #475569; margin-bottom: 8px; }
         .form-group input, .form-group select { 
-            width: 100%; padding: 10px; border: 1.5px solid var(--border-color); border-radius: 8px; 
-            font-family: 'Cairo'; font-size: 13px; box-sizing: border-box; outline: none; transition: 0.2s;
+            width: 100%; padding: 12px; border: 1.5px solid var(--border-color); border-radius: 10px; 
+            font-family: 'Cairo'; font-size: 14px; box-sizing: border-box; outline: none; transition: 0.2s;
         }
         .form-group input:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
         
-        /* Search Hint inside Modal */
-        .search-hint { font-size: 10px; color: var(--accent-blue); margin-bottom: 5px; font-weight: bold; }
+        .search-hint { font-size: 11px; color: var(--accent-blue); margin-bottom: 6px; font-weight: bold; }
 
-        .modal-footer { display: flex; gap: 10px; margin-top: 20px; }
-        .btn-modal { flex: 1; padding: 12px; border-radius: 8px; font-family: 'Cairo'; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; }
+        .modal-footer { display: flex; gap: 15px; margin-top: 25px; }
+        .btn-modal { flex: 1; padding: 14px; border-radius: 10px; font-family: 'Cairo'; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; font-size: 14px; }
         .btn-confirm { background: var(--nav-bg); color: white; }
-        .btn-cancel { background: #e2e8f0; color: #475569; }
+        .btn-confirm:hover { background: #1e0b42; }
+        .btn-cancel { background: #f1f5f9; color: #475569; }
 
-        /* Search Results in Modal */
+        /* Improved Search Results in Modal */
         .modal-results { 
             position: absolute; top: 100%; left: 0; right: 0; background: white; 
-            border: 1px solid #ddd; z-index: 2001; border-radius: 8px; box-shadow: 0 10px 15px rgba(0,0,0,0.1);
-            max-height: 150px; overflow-y: auto; display: none; margin-top: 2px;
+            border: 1px solid #cbd5e1; z-index: 2001; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-height: 200px; overflow-y: auto; display: none; margin-top: 5px;
         }
-        .modal-results div { padding: 10px 12px; font-size: 11px; cursor: pointer; border-bottom: 1px solid #f1f5f9; line-height: 1.4; }
+        .modal-results div { padding: 12px 15px; font-size: 12px; cursor: pointer; border-bottom: 1px solid #f1f5f9; line-height: 1.5; text-align: right; }
         .modal-results div:hover { background: #f0f7ff; color: var(--accent-blue); }
-        .modal-results b { color: var(--nav-bg); }
+        .modal-results b { color: var(--nav-bg); display: block; font-size: 13px; }
+        .modal-results small { color: #64748b; display: block; margin-top: 2px; }
     </style>
 </head>
 <body>
@@ -120,8 +122,7 @@
                     <th style="width: 22%;">ملاحظات</th>
                 </tr>
             </thead>
-            <tbody id="salesBody">
-                </tbody>
+            <tbody id="salesBody"></tbody>
         </table>
     </div>
 </div>
@@ -131,30 +132,30 @@
         <div class="modal-header">📦 إنشاء طلب مبيعات جديد</div>
         
         <div class="form-group">
-            <label>البحث عن عميل</label>
-            <div class="search-hint">يمكنك البحث باسم الشركة أو رقم السجل</div>
-            <input type="text" id="mSearchField" placeholder="ابحث هنا..." onkeyup="searchCustomerGlobalModal(this)">
+            <label>البحث الشامل عن عميل</label>
+            <div class="search-hint">ابحث بالاسم، السجل الرئيسي، أو السجل الفرعي</div>
+            <input type="text" id="mSearchField" placeholder="ابدأ الكتابة للبحث..." onkeyup="searchCustomerGlobalModal(this)" autocomplete="off">
             <div id="mResults" class="modal-results"></div>
         </div>
 
         <div class="form-group">
             <label>اسم الشركة</label>
-            <input type="text" id="mComp" readonly style="background: #f8fafc;" placeholder="-">
+            <input type="text" id="mComp" readonly style="background: #f1f5f9; color: #64748b;" placeholder="-">
         </div>
 
         <div class="form-group">
             <label>السجل الرئيسي</label>
-            <input type="text" id="mCr" readonly style="background: #f8fafc;" placeholder="-">
+            <input type="text" id="mCr" readonly style="background: #f1f5f9; color: #64748b;" placeholder="-">
         </div>
 
         <div class="form-group">
             <label>السجل الفرعي</label>
-            <input type="text" id="mCrSub" readonly style="background: #f8fafc;" placeholder="-">
+            <input type="text" id="mCrSub" readonly style="background: #f1f5f9; color: #64748b;" placeholder="-">
         </div>
 
         <div class="form-group">
             <label>نوع الطلب</label>
-            <input type="text" id="mType" placeholder="مثال: توريد أجهزة...">
+            <input type="text" id="mType" placeholder="مثال: توريد أحبار وطابعات...">
         </div>
 
         <div class="form-group">
@@ -186,31 +187,33 @@
         document.getElementById('mResults').style.display = 'none';
     }
 
-    // نظام البحث الشامل (شركة / سجل رئيسي / سجل فرعي)
+    // وظيفة البحث الشامل المحدثة
     function searchCustomerGlobalModal(input) {
-        const query = input.value.toLowerCase();
+        const query = input.value.trim().toLowerCase();
         const resultsDiv = document.getElementById('mResults');
         const customers = JSON.parse(localStorage.getItem('asgate_customers_data') || '[]');
         
         if (query.length < 1) { resultsDiv.style.display = 'none'; return; }
 
-        // البحث في كافة الحقول
-        const filtered = customers.filter(c => 
-            (c.comp && c.comp.toLowerCase().includes(query)) || 
-            (c.cr && c.cr.toString().includes(query)) || 
-            (c.cr_sub && c.cr_sub.toString().includes(query))
-        );
+        // تصفية النتائج بناءً على الشركة أو السجل الرئيسي أو الفرعي
+        const filtered = customers.filter(c => {
+            const comp = (c.comp || "").toLowerCase();
+            const cr = (c.cr || "").toString().toLowerCase();
+            const cr_sub = (c.cr_sub || "").toString().toLowerCase();
+            return comp.includes(query) || cr.includes(query) || cr_sub.includes(query);
+        });
 
         if (filtered.length > 0) {
             resultsDiv.innerHTML = filtered.map(c => `
                 <div onclick="fillModalFields('${c.comp}', '${c.cr || '-'}', '${c.cr_sub || '-'}')">
-                    <b>${c.comp}</b><br>
-                    <small style="color:#64748b;">رئيسي: ${c.cr || '-'} | فرعي: ${c.cr_sub || '-'}</small>
+                    <b>${c.comp}</b>
+                    <small>السجل الرئيسي: ${c.cr || '-'} | السجل الفرعي: ${c.cr_sub || '-'}</small>
                 </div>
             `).join('');
             resultsDiv.style.display = 'block';
         } else {
-            resultsDiv.style.display = 'none';
+            resultsDiv.innerHTML = '<div style="color: #94a3b8; text-align: center;">لا توجد نتائج مطابقة</div>';
+            resultsDiv.style.display = 'block';
         }
     }
 
@@ -218,7 +221,7 @@
         document.getElementById('mComp').value = comp;
         document.getElementById('mCr').value = cr;
         document.getElementById('mCrSub').value = crSub;
-        document.getElementById('mSearchField').value = comp; // تعيين النص المختار في خانة البحث
+        document.getElementById('mSearchField').value = comp;
         document.getElementById('mResults').style.display = 'none';
     }
 
@@ -229,7 +232,7 @@
         const type = document.getElementById('mType').value;
         const status = document.getElementById('mStatus').value;
 
-        if (!comp || comp === "-") { alert("يرجى البحث واختيار شركة أولاً"); return; }
+        if (!comp || comp === "-") { alert("يرجى اختيار عميل من نتائج البحث"); return; }
 
         const tbody = document.getElementById('salesBody');
         const row = tbody.insertRow(0);
