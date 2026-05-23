@@ -31,26 +31,33 @@
         .navbar a.active { background-color: var(--nav-active); color: var(--nav-bg); }
 
         .container { padding: 0 15px; }
-
         .action-bar { display: flex; align-items: center; margin: 12px 0; gap: 10px; }
 
         .btn-top { border: none; padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; color: white; transition: 0.3s; }
         .btn-add { background-color: var(--accent-blue); }
-        /* زر الحفظ الرمادي الذي يتحول للأخضر */
         .btn-save { background-color: #cbd5e1; color: #64748b; }
         .btn-save.dirty { background-color: var(--accent-green); color: white; }
 
         .search-box { padding: 0 15px; border: 1px solid var(--border-color); border-radius: 8px; width: 300px; height: 32px; font-family: 'Cairo'; font-size: 11px; outline: none; }
 
-        .table-wrapper { background: var(--white); border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .table-wrapper { background: var(--white); border-radius: 10px; overflow: visible; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         th { background-color: var(--header-purple); padding: 10px 5px; color: var(--white); font-size: 11px; font-weight: 800; border-left: 1px solid rgba(255,255,255,0.1); text-align: center; }
-        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 38px; font-size: 11px; font-weight: 600; }
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 38px; font-size: 11px; font-weight: 600; position: relative; }
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
         
         .order-link { color: var(--accent-blue); text-decoration: none; font-weight: 800; }
         .status-badge { padding: 3px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; }
         .status-done { background: #dcfce7; color: #166534; }
+
+        /* تسيق مدخلات البحث في الصف الجديد */
+        .search-cell-input { width: 90%; border: 1px solid var(--accent-blue); border-radius: 4px; padding: 4px; font-family: 'Cairo'; font-size: 11px; text-align: center; outline: none; }
+        .results-list { 
+            position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; 
+            z-index: 2000; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-height: 150px; overflow-y: auto; list-style: none; padding: 0; margin: 0; 
+        }
+        .results-list li { padding: 8px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 10px; transition: 0.2s; text-align: right; }
+        .results-list li:hover { background: #f0f7ff; color: var(--accent-blue); }
     </style>
 </head>
 <body>
@@ -65,29 +72,31 @@
 
 <div class="container">
     <div class="action-bar">
-        <button class="btn-top btn-add">+ إنشاء طلب مبيعات</button>
+        <button class="btn-top btn-add" onclick="createNewOrderRow()">+ إنشاء طلب مبيعات</button>
         <button id="saveBtn" class="btn-top btn-save">حفظ التغييرات</button>
-        <input type="text" class="search-box" placeholder="🔍 ابحث بالشركة، رقم الطلب...">
+        <input type="text" class="search-box" id="globalSearch" placeholder="🔍 ابحث بالشركة، رقم الطلب..." onkeyup="filterSalesTable()">
     </div>
     
     <div class="table-wrapper">
-        <table>
+        <table id="salesTable">
             <thead>
                 <tr>
-                    <th style="width: 12%;">رقم الطلب</th>
-                    <th style="width: 18%;">الشركة</th>
-                    <th style="width: 12%;">السجل</th>
-                    <th style="width: 13%;">نوع الطلب</th>
-                    <th style="width: 12%;">حالة الطلب</th>
-                    <th style="width: 13%;">قيمة الطلب</th>
-                    <th style="width: 20%;">ملاحظات</th>
+                    <th style="width: 10%;">رقم الطلب</th>
+                    <th style="width: 15%;">الشركة</th>
+                    <th style="width: 11%;">السجل الرئيسي</th>
+                    <th style="width: 11%;">السجل الفرعي</th>
+                    <th style="width: 11%;">نوع الطلب</th>
+                    <th style="width: 10%;">حالة الطلب</th>
+                    <th style="width: 11%;">قيمة الطلب</th>
+                    <th style="width: 21%;">ملاحظات</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="salesBody">
                 <tr>
                     <td><a href="order-details.html?id=7701" class="order-link">#ORD-7701</a></td>
                     <td>شركة الحلول الذكية</td>
                     <td>1010203040</td>
+                    <td>-</td>
                     <td>توريد أجهزة</td>
                     <td><span class="status-badge status-done">مكتمل</span></td>
                     <td>25,400.00 ر.س</td>
@@ -99,10 +108,94 @@
 </div>
 
 <script>
-    // تغيير لون زر الحفظ عند التعديل (محاكاة)
-    document.querySelector('.search-box').addEventListener('input', function() {
+    function markAsDirty() {
         document.getElementById('saveBtn').classList.add('dirty');
-    });
+    }
+
+    // وظيفة إنشاء صف جديد مع ميزة البحث
+    function createNewOrderRow() {
+        const tbody = document.getElementById('salesBody');
+        const row = tbody.insertRow(0);
+        const orderNum = Math.floor(1000 + Math.random() * 9000);
+
+        row.innerHTML = `
+            <td>#ORD-${orderNum}</td>
+            <td style="position:relative;">
+                <input type="text" class="search-cell-input" placeholder="بحث بالشركة..." onkeyup="searchCustomer(this, 'comp')">
+                <div class="results-list" style="display:none;"></div>
+            </td>
+            <td style="position:relative;">
+                <input type="text" class="search-cell-input" placeholder="السجل الرئيسي..." onkeyup="searchCustomer(this, 'cr')">
+                <div class="results-list" style="display:none;"></div>
+            </td>
+            <td style="position:relative;">
+                <input type="text" class="search-cell-input" placeholder="السجل الفرعي..." onkeyup="searchCustomer(this, 'cr_sub')">
+                <div class="results-list" style="display:none;"></div>
+            </td>
+            <td><input type="text" class="search-cell-input" placeholder="نوع الطلب..." oninput="markAsDirty()"></td>
+            <td>-</td>
+            <td><input type="text" class="search-cell-input" placeholder="القيمة..." oninput="markAsDirty()"></td>
+            <td><input type="text" class="search-cell-input" placeholder="ملاحظات..." oninput="markAsDirty()"></td>
+        `;
+        markAsDirty();
+    }
+
+    // وظيفة البحث في قاعدة بيانات العملاء
+    function searchCustomer(input, field) {
+        const query = input.value.toLowerCase();
+        const resultsDiv = input.nextElementSibling;
+        const customers = JSON.parse(localStorage.getItem('asgate_customers_data') || '[]');
+        
+        if (query.length < 1) {
+            resultsDiv.style.display = 'none';
+            return;
+        }
+
+        const filtered = customers.filter(c => 
+            (c.comp && c.comp.toLowerCase().includes(query)) || 
+            (c.cr && c.cr.includes(query)) || 
+            (c.cr_sub && c.cr_sub.includes(query))
+        );
+
+        if (filtered.length > 0) {
+            resultsDiv.innerHTML = filtered.map(c => `
+                <li onclick="selectCustomer(this, '${c.comp}', '${c.cr || '-'}', '${c.cr_sub || '-'}')">
+                    ${c.comp} | سجل: ${c.cr || '-'}
+                </li>
+            `).join('');
+            resultsDiv.style.display = 'block';
+        } else {
+            resultsDiv.style.display = 'none';
+        }
+    }
+
+    // اختيار العميل وتعبئة البيانات تلقائياً
+    function selectCustomer(li, name, cr, cr_sub) {
+        const row = li.closest('tr');
+        const inputs = row.querySelectorAll('.search-cell-input');
+        
+        inputs[0].value = name;     // الشركة
+        inputs[1].value = cr;       // السجل الرئيسي
+        inputs[2].value = cr_sub;   // السجل الفرعي
+        
+        document.querySelectorAll('.results-list').forEach(d => d.style.display = 'none');
+        markAsDirty();
+    }
+
+    function filterSalesTable() {
+        const query = document.getElementById('globalSearch').value.toLowerCase();
+        const rows = document.getElementById('salesBody').getElementsByTagName('tr');
+        for (let row of rows) {
+            row.style.display = row.innerText.toLowerCase().includes(query) ? "" : "none";
+        }
+    }
+
+    // إغلاق قوائم البحث عند الضغط خارجها
+    window.onclick = function(e) {
+        if (!e.target.classList.contains('search-cell-input')) {
+            document.querySelectorAll('.results-list').forEach(d => d.style.display = 'none');
+        }
+    };
 </script>
 </body>
 </html>
