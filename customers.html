@@ -114,13 +114,14 @@
         <table id="mainTable">
             <thead>
                 <tr>
-                    <th style="width: 14%;">الشركة</th>
-                    <th style="width: 15%;">العنوان</th>
+                    <th style="width: 12%;">الشركة</th>
+                    <th style="width: 14%;">العنوان</th>
                     <th style="width: 10%;">المسؤول</th>
-                    <th style="width: 11%;">الموبايل</th>
+                    <th style="width: 10%;">الموبايل</th>
+                    <th style="width: 12%;">الايميل</th>
                     <th style="width: 10%;">السجل الرئيسي</th>
                     <th style="width: 10%;">السجل الفرعي</th>
-                    <th style="width: 14%;">ملاحظات</th>
+                    <th style="width: 12%;">ملاحظات</th>
                     <th style="width: 10%;">تاريخ الإنشاء</th>
                     <th style="width: 60px;">إجراء</th>
                 </tr>
@@ -215,6 +216,7 @@
             <td><input type="text" class="excel-input-standard" value="${v.address || ''}" oninput="markAsChanged()"></td>
             <td><input type="text" class="excel-input-standard" value="${v.mgr || ''}" oninput="markAsChanged()"></td>
             <td><input type="text" class="excel-input-standard" value="${v.mob || ''}" oninput="markAsChanged()"></td>
+            <td><input type="text" class="excel-input-standard" value="${v.email || ''}" oninput="markAsChanged()"></td>
             <td><input type="text" class="excel-input-standard" value="${v.cr || ''}" oninput="markAsChanged()"></td>
             <td><input type="text" class="excel-input-standard" value="${v.cr_sub || ''}" oninput="markAsChanged()"></td>
             <td class="custom-tooltip-cell">
@@ -309,8 +311,9 @@
                 address: otherInputs[0].value, 
                 mgr: otherInputs[1].value,
                 mob: otherInputs[2].value, 
-                cr: otherInputs[3].value,
-                cr_sub: otherInputs[4].value, // حفظ السجل الفرعي
+                email: otherInputs[3].value, // حفظ الايميل
+                cr: otherInputs[4].value,
+                cr_sub: otherInputs[5].value,
                 notes: noteDiv.getAttribute('data-full-notes'),
                 created: createdDate
             });
