@@ -60,76 +60,41 @@
         .btn-back-outside:hover { background: #fef2f2; border-color: #7f1d1d; }
 
         .order-header-info { 
-            background: white; 
-            padding: 0 25px;
-            border-radius: 12px; 
-            border: 1px solid var(--border-color); 
-            display: flex; 
-            flex-grow: 1;
-            flex-wrap: wrap; 
-            gap: 20px; 
-            justify-content: space-between; 
-            align-items: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            height: 70px;
-            box-sizing: border-box;
+            background: white; padding: 0 25px; border-radius: 12px; border: 1px solid var(--border-color); 
+            display: flex; flex-grow: 1; flex-wrap: wrap; gap: 20px; justify-content: space-between; 
+            align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); height: 70px; box-sizing: border-box;
         }
         
         .info-item { display: flex; flex-direction: column; gap: 2px; min-width: 100px; }
         .info-label { font-size: 10px; color: #64748b; font-weight: 800; }
         .info-value { font-size: 13px; color: var(--nav-bg); font-weight: 800; }
 
-        .info-item-highlight {
-            border: 2px solid var(--header-green);
-            padding: 5px 15px;
-            border-radius: 8px;
-            background-color: #f0fdf4;
-        }
+        .info-item-highlight { border: 2px solid var(--header-green); padding: 5px 15px; border-radius: 8px; background-color: #f0fdf4; }
 
         .action-bar { margin: 20px 0 12px 0; display: flex; justify-content: flex-start; }
         .btn-add-product { 
-            background: var(--accent-blue); color: white; border: none; 
-            padding: 8px 25px; border-radius: 8px; font-family: 'Cairo'; 
-            font-weight: bold; cursor: pointer; font-size: 12px; transition: 0.3s;
-            box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+            background: var(--accent-blue); color: white; border: none; padding: 8px 25px; 
+            border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; 
+            font-size: 12px; transition: 0.3s; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
         }
-        .btn-add-product:hover { background: #1d4ed8; transform: translateY(-1px); }
 
         .table-wrapper { 
-            background: white; border-radius: 10px; overflow-x: auto; 
-            border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            margin: 0;
+            background: white; border-radius: 10px; overflow-x: auto; border: 1px solid var(--border-color); 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin: 0;
         }
         table { width: 100%; border-collapse: collapse; min-width: 1000px; }
-        th { 
-            background-color: var(--header-green); padding: 12px 5px; 
-            color: white; font-size: 11px; font-weight: 800; 
-            border-left: 1px solid rgba(255,255,255,0.1); text-align: center;
-        }
-        td { 
-            border-bottom: 1px solid #f1f5f9; text-align: center; 
-            height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark);
-            padding: 5px;
-        }
+        th { background-color: var(--header-green); padding: 12px 5px; color: white; font-size: 11px; font-weight: 800; text-align: center; }
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); padding: 5px; }
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
 
         /* Modal Styles */
-        .modal {
-            display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center;
-        }
-        .modal-content {
-            background: white; padding: 20px; border-radius: 12px; width: 450px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            max-height: 90vh; overflow-y: auto;
-        }
-        .modal-content h3 { margin-top: 0; color: var(--nav-bg); font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 20px; border-radius: 12px; width: 450px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .form-group { margin-bottom: 12px; display: flex; flex-direction: column; gap: 5px; }
         .form-group.full-width { grid-column: span 2; }
         .form-group label { font-size: 11px; font-weight: 700; color: #64748b; }
-        .form-group input, .form-group select { 
-            padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Cairo'; font-size: 12px;
-        }
+        .form-group input, .form-group select { padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Cairo'; font-size: 12px; }
         
         .radio-group { display: flex; gap: 15px; margin-top: 5px; }
         .radio-option { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; color: var(--nav-bg); cursor: pointer; }
@@ -176,12 +141,12 @@
                         <th style="width: 14%;">تفاصيل الطلب</th>
                         <th style="width: 5%;">العدد</th>
                         <th style="width: 8%;">الاشتراك</th>
-                        <th style="width: 10%;">رقم السريال</th>
+                        <th style="width: 12%;">رقم السريال</th>
                         <th style="width: 10%;">رقم الموبايل</th>
                         <th style="width: 10%;">المستخدم</th>
                         <th style="width: 8%;">الحالة</th>
                         <th style="width: 12%;">تغيير الحالة</th>
-                        <th style="width: 15%;">ملاحظة</th>
+                        <th style="width: 13%;">ملاحظة</th>
                     </tr>
                 </thead>
                 <tbody id="productsBody">
@@ -208,7 +173,7 @@
                 </div>
 
                 <div class="form-group"><label>الاشتراك</label><input type="text" id="p_sub"></div>
-                <div class="form-group"><label>رقم السريال</label><input type="text" id="p_serial"></div>
+                <div class="form-group"><label>رقم السريال (البداية)</label><input type="text" id="p_serial"></div>
                 <div class="form-group"><label>رقم الموبايل</label><input type="text" id="p_mobile"></div>
                 <div class="form-group"><label>المستخدم</label><input type="text" id="p_user"></div>
                 
@@ -253,7 +218,7 @@
         function closeModal() { document.getElementById('productModal').style.display = 'none'; }
 
         function saveProduct() {
-            const data = {
+            const baseData = {
                 type: document.getElementById('p_type').value,
                 name: document.getElementById('p_name').value,
                 qty: parseInt(document.getElementById('p_qty').value) || 1,
@@ -268,16 +233,37 @@
 
             const insertMode = document.querySelector('input[name="insert_mode"]:checked').value;
 
-            if(!data.type || !data.name) { alert("يرجى ملء البيانات الأساسية"); return; }
+            if(!baseData.type || !baseData.name) { alert("يرجى ملء البيانات الأساسية"); return; }
 
             let productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             if (!productsDb[currentOrderId]) productsDb[currentOrderId] = [];
 
             if (insertMode === 'single') {
-                productsDb[currentOrderId].push(data);
+                productsDb[currentOrderId].push(baseData);
             } else {
-                for (let i = 0; i < data.qty; i++) {
-                    productsDb[currentOrderId].push({ ...data, qty: 1 });
+                // منطق التسلسل التلقائي للسريال
+                let startSerial = baseData.serial;
+                
+                for (let i = 0; i < baseData.qty; i++) {
+                    let currentSerial = '';
+                    
+                    if (startSerial && !isNaN(startSerial)) {
+                        // إذا كان السريال عبارة عن أرقام فقط، نقوم بزيادته
+                        // نستخدم BigInt للأرقام الطويلة جداً لضمان الدقة
+                        try {
+                            currentSerial = (BigInt(startSerial) + BigInt(i)).toString();
+                        } catch(e) {
+                            currentSerial = startSerial; // في حال وجود حروف
+                        }
+                    } else {
+                        currentSerial = startSerial;
+                    }
+
+                    productsDb[currentOrderId].push({ 
+                        ...baseData, 
+                        qty: 1, 
+                        serial: currentSerial 
+                    });
                 }
             }
 
@@ -310,7 +296,7 @@
                     <td>${p.name || ''}</td>
                     <td>${p.qty || ''}</td>
                     <td>${p.sub || ''}</td>
-                    <td>${p.serial || ''}</td>
+                    <td style="font-family: monospace; font-size: 10px;">${p.serial || ''}</td>
                     <td>${p.mobile || ''}</td>
                     <td>${p.user || ''}</td>
                     <td><span class="status-badge">${p.status}</span></td>
