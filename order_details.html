@@ -112,7 +112,24 @@
         }
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
 
-        .badge-active { background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 4px; font-size: 10px; }
+        /* Styles for Modal */
+        .modal {
+            display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center;
+        }
+        .modal-content {
+            background: white; padding: 20px; border-radius: 12px; width: 400px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .modal-content h3 { margin-top: 0; color: var(--nav-bg); font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .form-group { margin-bottom: 10px; display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 11px; font-weight: 700; color: #64748b; }
+        .form-group input, .form-group select { 
+            padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Cairo'; font-size: 12px;
+        }
+        .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-save { background: var(--header-green); color: white; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; flex: 1; font-family: 'Cairo'; font-weight: bold; }
+        .btn-cancel { background: #94a3b8; color: white; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; flex: 1; font-family: 'Cairo'; font-weight: bold; }
+
     </style>
 </head>
 <body onload="loadOrderDetails()">
@@ -126,45 +143,20 @@
     </nav>
 
     <div class="container">
-        
         <div class="header-section-wrapper">
             <a href="sales.html" class="btn-back-outside">🔙 عودة</a>
-
             <div class="order-header-info">
-                <div class="info-item">
-                    <span class="info-label">رقم الطلب</span>
-                    <span class="info-value" id="orderId">#0000</span>
-                </div>
-
-                <div class="info-item info-item-highlight">
-                    <span class="info-label" style="color: var(--header-green);">اسم الطلب</span>
-                    <span class="info-value" id="orderType">-</span>
-                </div>
-
-                <div class="info-item">
-                    <span class="info-label">الشركة</span>
-                    <span class="info-value" id="orderComp">-</span>
-                </div>
-
-                <div class="info-item">
-                    <span class="info-label">السجل</span>
-                    <span class="info-value" id="orderCr">-</span>
-                </div>
-
-                <div class="info-item">
-                    <span class="info-label">حالة الطلب</span>
-                    <span class="info-value" id="orderStatus">-</span>
-                </div>
-
-                <div class="info-item">
-                    <span class="info-label">قيمة الطلب</span>
-                    <span class="info-value">0.00 ر.س</span>
-                </div>
+                <div class="info-item"><span class="info-label">رقم الطلب</span><span class="info-value" id="orderId">#0000</span></div>
+                <div class="info-item info-item-highlight"><span class="info-label" style="color: var(--header-green);">اسم الطلب</span><span class="info-value" id="orderType">-</span></div>
+                <div class="info-item"><span class="info-label">الشركة</span><span class="info-value" id="orderComp">-</span></div>
+                <div class="info-item"><span class="info-label">السجل</span><span class="info-value" id="orderCr">-</span></div>
+                <div class="info-item"><span class="info-label">حالة الطلب</span><span class="info-value" id="orderStatus">-</span></div>
+                <div class="info-item"><span class="info-label">قيمة الطلب</span><span class="info-value">0.00 ر.س</span></div>
             </div>
         </div>
 
         <div class="action-bar">
-            <button class="btn-add-product" onclick="alert('فتح نافذة إضافة منتج')">+ إضافة منتج</button>
+            <button class="btn-add-product" onclick="openModal()">+ إضافة منتج</button>
         </div>
 
         <div class="table-wrapper">
@@ -172,7 +164,7 @@
                 <thead>
                     <tr>
                         <th style="width: 12%;">نوع الطلب</th>
-                        <th style="width: 20%;">تفاصيل الطلب</th>
+                        <th style="width: 20%;">اسم الطلب</th>
                         <th style="width: 8%;">العدد</th>
                         <th style="width: 12%;">الاشتراك</th>
                         <th style="width: 12%;">الحالة</th>
@@ -181,11 +173,47 @@
                     </tr>
                 </thead>
                 <tbody id="productsBody">
-                    <tr>
-                        <td colspan="7" style="color:#94a3b8;">يرجى إضافة منتجات لهذا الطلب</td>
-                    </tr>
+                    <tr><td colspan="7" style="color:#94a3b8;">يرجى إضافة منتجات لهذا الطلب</td></tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <h3>إضافة منتج جديد</h3>
+            <div class="form-group">
+                <label>نوع الطلب</label>
+                <input type="text" id="p_type" placeholder="مثلاً: خدمة">
+            </div>
+            <div class="form-group">
+                <label>اسم الطلب</label>
+                <input type="text" id="p_name" placeholder="اسم المنتج/الخدمة">
+            </div>
+            <div class="form-group">
+                <label>العدد</label>
+                <input type="number" id="p_qty" value="1">
+            </div>
+            <div class="form-group">
+                <label>الاشتراك</label>
+                <input type="text" id="p_sub" placeholder="مثلاً: سنوي">
+            </div>
+            <div class="form-group">
+                <label>الحالة</label>
+                <select id="p_status">
+                    <option>نشط</option>
+                    <option>قيد المعالجة</option>
+                    <option>ملغي</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>ملاحظة</label>
+                <input type="text" id="p_note">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-save" onclick="saveProduct()">حفظ</button>
+                <button class="btn-cancel" onclick="closeModal()">إلغاء</button>
+            </div>
         </div>
     </div>
 
@@ -193,7 +221,6 @@
         function loadOrderDetails() {
             const urlParams = new URLSearchParams(window.location.search);
             const orderId = urlParams.get('id');
-
             if (!orderId) return;
 
             const salesData = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
@@ -205,11 +232,43 @@
                 document.getElementById('orderCr').innerText = order.cr;
                 document.getElementById('orderType').innerText = order.type;
                 document.getElementById('orderStatus').innerText = order.status;
-            } else {
-                alert("تعذر العثور على بيانات هذا الطلب");
             }
         }
-    </script>
 
+        function openModal() { document.getElementById('productModal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('productModal').style.display = 'none'; }
+
+        function saveProduct() {
+            const type = document.getElementById('p_type').value;
+            const name = document.getElementById('p_name').value;
+            const qty = document.getElementById('p_qty').value;
+            const sub = document.getElementById('p_sub').value;
+            const status = document.getElementById('p_status').value;
+            const note = document.getElementById('p_note').value;
+            const date = new Date().toLocaleDateString('en-GB'); // التاريخ الحالي
+
+            if(!type || !name) { alert("يرجى ملء البيانات الأساسية"); return; }
+
+            const tbody = document.getElementById('productsBody');
+            if (tbody.rows[0].cells.length === 1) tbody.innerHTML = ''; // مسح رسالة "لا يوجد منتجات"
+
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td>${type}</td>
+                <td>${name}</td>
+                <td>${qty}</td>
+                <td>${sub}</td>
+                <td><span class="badge-active">${status}</span></td>
+                <td>${date}</td>
+                <td>${note}</td>
+            `;
+
+            closeModal();
+            // تفريغ الحقول بعد الحفظ
+            document.getElementById('p_type').value = '';
+            document.getElementById('p_name').value = '';
+            document.getElementById('p_note').value = '';
+        }
+    </script>
 </body>
 </html>
