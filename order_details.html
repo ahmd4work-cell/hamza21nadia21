@@ -72,7 +72,7 @@
             background: white; border-radius: 10px; overflow-x: auto; border: 1px solid var(--border-color); 
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
-        table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1200px; }
         th { background-color: var(--header-green); padding: 12px 5px; color: white; font-size: 11px; font-weight: 800; text-align: center; }
         
         td { 
@@ -101,6 +101,8 @@
         .status-select {
             font-family: 'Cairo'; font-size: 10px; font-weight: 700; padding: 2px; border-radius: 4px; border: 1px solid var(--border-color);
         }
+
+        .total-col { color: var(--header-green); font-weight: 800; }
 
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 20px; border-radius: 12px; width: 480px; max-height: 90vh; overflow-y: auto; }
@@ -149,20 +151,20 @@
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 8%;">نوع الطلب</th>
-                        <th style="width: 14%;">تفاصيل الطلب</th>
-                        <th style="width: 5%;">العدد</th>
-                        <th style="width: 8%;">الاشتراك</th>
-                        <th style="width: 12%;">رقم السريال</th>
-                        <th style="width: 10%;">رقم الموبايل</th>
-                        <th style="width: 10%;">المستخدم</th>
-                        <th style="width: 10%;">الحالة</th>
-                        <th style="width: 10%;">تاريخ التغيير</th>
-                        <th style="width: 13%;">ملاحظة</th>
+                        <th style="width: 7%;">نوع الطلب</th>
+                        <th style="width: 12%;">تفاصيل الطلب</th>
+                        <th style="width: 4%;">العدد</th>
+                        <th style="width: 6%;">الاشتراك</th>
+                        <th style="width: 7%;">الاجمالي</th> <th style="width: 10%;">رقم السريال</th>
+                        <th style="width: 9%;">رقم الموبايل</th>
+                        <th style="width: 9%;">المستخدم</th>
+                        <th style="width: 9%;">الحالة</th>
+                        <th style="width: 9%;">تاريخ التغيير</th>
+                        <th style="width: 11%;">ملاحظة</th>
                     </tr>
                 </thead>
                 <tbody id="productsBody">
-                    <tr><td colspan="10" style="color:#94a3b8;">يرجى إضافة منتجات لهذا الطلب</td></tr>
+                    <tr><td colspan="11" style="color:#94a3b8;">يرجى إضافة منتجات لهذا الطلب</td></tr>
                 </tbody>
             </table>
         </div>
@@ -175,7 +177,7 @@
                 <div class="form-group"><label>نوع الطلب</label><input type="text" id="p_type"></div>
                 <div class="form-group"><label>تفاصيل الطلب</label><input type="text" id="p_name"></div>
                 <div class="form-group"><label>العدد</label><input type="number" id="p_qty" value="1" min="1"></div>
-                <div class="form-group"><label>الاشتراك</label><input type="text" id="p_sub"></div>
+                <div class="form-group"><label>الاشتراك (رقم)</label><input type="text" id="p_sub"></div>
                 <div class="form-group full-width">
                     <div class="radio-group">
                         <label class="radio-option"><input type="radio" name="insert_mode" value="single" checked> إدراج في صف 1</label>
@@ -264,28 +266,35 @@
             const tbody = document.getElementById('productsBody');
             
             if (products.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" style="color:#94a3b8;">يرجى إضافة منتجات لهذا الطلب</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="11" style="color:#94a3b8;">يرجى إضافة منتجات لهذا الطلب</td></tr>';
                 return;
             }
 
-            tbody.innerHTML = products.map((p, index) => `
-                <tr>
-                    <td>${p.type}</td>
-                    <td>${p.name}</td>
-                    <td>${p.qty}</td>
-                    <td>${p.sub}</td>
-                    <td class="editable-cell" contenteditable="true" onpaste="handlePaste(event, ${index}, 'serial')" onblur="updateField(${index}, 'serial', this.innerText)">${p.serial || ''}</td>
-                    <td class="editable-cell" contenteditable="true" onpaste="handlePaste(event, ${index}, 'mobile')" onblur="updateField(${index}, 'mobile', this.innerText)">${p.mobile || ''}</td>
-                    <td class="editable-cell" contenteditable="true" onpaste="handlePaste(event, ${index}, 'user')" onblur="updateField(${index}, 'user', this.innerText)">${p.user || ''}</td>
-                    <td>
-                        <select class="status-select" onchange="updateField(${index}, 'status', this.value)">
-                            ${statusList.map(s => `<option ${p.status === s ? 'selected' : ''}>${s}</option>`).join('')}
-                        </select>
-                    </td>
-                    <td style="font-size: 10px; color: #64748b;">${p.date}</td>
-                    <td class="note-cell" contenteditable="true" onblur="updateField(${index}, 'note', this.innerText)">${p.note}</td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = products.map((p, index) => {
+                // حساب الاجمالي: تنظيف قيمة الاشتراك من أي نصوص وضربها في العدد
+                const subValue = parseFloat(String(p.sub).replace(/[^\d.]/g, '')) || 0;
+                const total = (p.qty * subValue).toFixed(2);
+
+                return `
+                    <tr>
+                        <td>${p.type}</td>
+                        <td>${p.name}</td>
+                        <td>${p.qty}</td>
+                        <td>${p.sub}</td>
+                        <td class="total-col">${total}</td>
+                        <td class="editable-cell" contenteditable="true" onpaste="handlePaste(event, ${index}, 'serial')" onblur="updateField(${index}, 'serial', this.innerText)">${p.serial || ''}</td>
+                        <td class="editable-cell" contenteditable="true" onpaste="handlePaste(event, ${index}, 'mobile')" onblur="updateField(${index}, 'mobile', this.innerText)">${p.mobile || ''}</td>
+                        <td class="editable-cell" contenteditable="true" onpaste="handlePaste(event, ${index}, 'user')" onblur="updateField(${index}, 'user', this.innerText)">${p.user || ''}</td>
+                        <td>
+                            <select class="status-select" onchange="updateField(${index}, 'status', this.value)">
+                                ${statusList.map(s => `<option ${p.status === s ? 'selected' : ''}>${s}</option>`).join('')}
+                            </select>
+                        </td>
+                        <td style="font-size: 10px; color: #64748b;">${p.date}</td>
+                        <td class="note-cell" contenteditable="true" onblur="updateField(${index}, 'note', this.innerText)">${p.note}</td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         function updateField(index, field, value) {
