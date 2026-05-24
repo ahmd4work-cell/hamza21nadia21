@@ -76,16 +76,22 @@
         th { background-color: var(--header-green); padding: 12px 5px; color: white; font-size: 11px; font-weight: 800; text-align: center; }
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); padding: 5px; }
         
-        /* تعديل المربعات لتكون مخططة فقط بدون لون داخلي */
+        /* التخطيط المنقط فقط للأعمدة الثلاثة المطلوبة */
         .editable-cell {
-            background-color: transparent; /* إزالة اللون */
-            border: 1px dashed #94a3b8 !important; /* تخطيط رمادي منقط */
+            background-color: transparent;
+            border: 1px dashed #94a3b8 !important;
             cursor: cell;
             outline: none;
         }
         .editable-cell:focus { 
-            border: 1px solid var(--accent-blue) !important; /* تغيير التخطيط عند الضغط */
+            border: 1px solid var(--accent-blue) !important;
             background-color: #f8fafc;
+        }
+
+        /* عمود الملاحظة بدون تخطيط */
+        .note-cell {
+            outline: none;
+            cursor: text;
         }
 
         .status-select {
@@ -245,7 +251,7 @@
             localStorage.setItem('asgate_products_db', JSON.stringify(productsDb));
             renderProducts();
             closeModal();
-            // Clear fields after save
+            // Clear fields
             ['p_type', 'p_name', 'p_sub', 'p_serial', 'p_mobile', 'p_user', 'p_note'].forEach(id => document.getElementById(id).value = '');
             document.getElementById('p_qty').value = '1';
         }
@@ -275,7 +281,7 @@
                         </select>
                     </td>
                     <td style="font-size: 10px; color: #64748b;">${p.date}</td>
-                    <td class="editable-cell" contenteditable="true" onblur="updateField(${index}, 'note', this.innerText)">${p.note}</td>
+                    <td class="note-cell" contenteditable="true" onblur="updateField(${index}, 'note', this.innerText)">${p.note}</td>
                 </tr>
             `).join('');
         }
