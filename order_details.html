@@ -96,11 +96,11 @@
         .btn-add-product:hover { background: #1d4ed8; transform: translateY(-1px); }
 
         .table-wrapper { 
-            background: white; border-radius: 10px; overflow: hidden; 
+            background: white; border-radius: 10px; overflow-x: auto; 
             border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             margin: 0;
         }
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
         th { 
             background-color: var(--header-green); padding: 12px 5px; 
             color: white; font-size: 11px; font-weight: 800; 
@@ -109,6 +109,7 @@
         td { 
             border-bottom: 1px solid #f1f5f9; text-align: center; 
             height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark);
+            padding: 5px;
         }
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
 
@@ -118,19 +119,20 @@
             background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center;
         }
         .modal-content {
-            background: white; padding: 20px; border-radius: 12px; width: 420px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            background: white; padding: 20px; border-radius: 12px; width: 450px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            max-height: 90vh; overflow-y: auto;
         }
         .modal-content h3 { margin-top: 0; color: var(--nav-bg); font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .form-group { margin-bottom: 12px; display: flex; flex-direction: column; gap: 5px; }
+        .form-group.full-width { grid-column: span 2; }
         .form-group label { font-size: 11px; font-weight: 700; color: #64748b; }
         .form-group input, .form-group select { 
             padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Cairo'; font-size: 12px;
         }
         
-        /* Radio Options Style */
         .radio-group { display: flex; gap: 15px; margin-top: 5px; }
-        .radio-option { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; color: var(--nav-bg); cursor: pointer; }
-        .radio-option input { cursor: pointer; width: 14px; height: 14px; margin: 0; }
+        .radio-option { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; color: var(--nav-bg); cursor: pointer; }
 
         .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
         .btn-save { background: var(--header-green); color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; flex: 1; font-family: 'Cairo'; font-weight: bold; }
@@ -170,17 +172,20 @@
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 12%;">نوع الطلب</th>
-                        <th style="width: 20%;">تفاصيل الطلب</th>
-                        <th style="width: 8%;">العدد</th>
-                        <th style="width: 12%;">الاشتراك</th>
-                        <th style="width: 12%;">الحالة</th>
-                        <th style="width: 15%;">تاريخ تغيير الحالة</th>
-                        <th style="width: 21%;">ملاحظة</th>
+                        <th style="width: 8%;">نوع الطلب</th>
+                        <th style="width: 14%;">تفاصيل الطلب</th>
+                        <th style="width: 5%;">العدد</th>
+                        <th style="width: 8%;">الاشتراك</th>
+                        <th style="width: 10%;">رقم السريال</th>
+                        <th style="width: 10%;">رقم الموبايل</th>
+                        <th style="width: 10%;">المستخدم</th>
+                        <th style="width: 8%;">الحالة</th>
+                        <th style="width: 12%;">تغيير الحالة</th>
+                        <th style="width: 15%;">ملاحظة</th>
                     </tr>
                 </thead>
                 <tbody id="productsBody">
-                    <tr><td colspan="7" style="color:#94a3b8;">يرجى إضافة منتجات لهذا الطلب</td></tr>
+                    <tr><td colspan="10" style="color:#94a3b8;">يرجى إضافة منتجات لهذا الطلب</td></tr>
                 </tbody>
             </table>
         </div>
@@ -189,31 +194,33 @@
     <div id="productModal" class="modal">
         <div class="modal-content">
             <h3>إضافة منتج جديد</h3>
-            <div class="form-group"><label>نوع الطلب</label><input type="text" id="p_type"></div>
-            <div class="form-group"><label>تفاصيل الطلب</label><input type="text" id="p_name"></div>
-            
-            <div class="form-group">
-                <label>العدد</label>
-                <input type="number" id="p_qty" value="1" min="1">
-                <div class="radio-group">
-                    <label class="radio-option">
-                        <input type="radio" name="insert_mode" value="single" checked> إدراج العدد في صف 1
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="insert_mode" value="multi"> إدراج العدد في صفوف متعددة
-                    </label>
+            <div class="form-grid">
+                <div class="form-group"><label>نوع الطلب</label><input type="text" id="p_type"></div>
+                <div class="form-group"><label>تفاصيل الطلب</label><input type="text" id="p_name"></div>
+                
+                <div class="form-group full-width">
+                    <label>العدد</label>
+                    <input type="number" id="p_qty" value="1" min="1">
+                    <div class="radio-group">
+                        <label class="radio-option"><input type="radio" name="insert_mode" value="single" checked> إدراج العدد في صف 1</label>
+                        <label class="radio-option"><input type="radio" name="insert_mode" value="multi"> إدراج العدد في صفوف متعددة</label>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group"><label>الاشتراك</label><input type="text" id="p_sub"></div>
-            <div class="form-group">
-                <label>الحالة</label>
-                <select id="p_status">
-                    <option>مكتمل</option><option>تم التوثيق</option><option>توثيق</option>
-                    <option>مرتجع</option><option>جاهز</option><option>فقدان</option>
-                </select>
+                <div class="form-group"><label>الاشتراك</label><input type="text" id="p_sub"></div>
+                <div class="form-group"><label>رقم السريال</label><input type="text" id="p_serial"></div>
+                <div class="form-group"><label>رقم الموبايل</label><input type="text" id="p_mobile"></div>
+                <div class="form-group"><label>المستخدم</label><input type="text" id="p_user"></div>
+                
+                <div class="form-group">
+                    <label>الحالة</label>
+                    <select id="p_status">
+                        <option>مكتمل</option><option>تم التوثيق</option><option>توثيق</option>
+                        <option>مرتجع</option><option>جاهز</option><option>فقدان</option>
+                    </select>
+                </div>
+                <div class="form-group full-width"><label>ملاحظة</label><input type="text" id="p_note"></div>
             </div>
-            <div class="form-group"><label>ملاحظة</label><input type="text" id="p_note"></div>
             <div class="modal-actions">
                 <button class="btn-save" onclick="saveProduct()">حفظ</button>
                 <button class="btn-cancel" onclick="closeModal()">إلغاء</button>
@@ -246,41 +253,45 @@
         function closeModal() { document.getElementById('productModal').style.display = 'none'; }
 
         function saveProduct() {
-            const type = document.getElementById('p_type').value;
-            const name = document.getElementById('p_name').value;
-            const qty = parseInt(document.getElementById('p_qty').value) || 1;
-            const sub = document.getElementById('p_sub').value;
-            const status = document.getElementById('p_status').value;
-            const note = document.getElementById('p_note').value;
-            const date = new Date().toLocaleDateString('en-GB');
-            
+            const data = {
+                type: document.getElementById('p_type').value,
+                name: document.getElementById('p_name').value,
+                qty: parseInt(document.getElementById('p_qty').value) || 1,
+                sub: document.getElementById('p_sub').value,
+                serial: document.getElementById('p_serial').value,
+                mobile: document.getElementById('p_mobile').value,
+                user: document.getElementById('p_user').value,
+                status: document.getElementById('p_status').value,
+                note: document.getElementById('p_note').value,
+                date: new Date().toLocaleDateString('en-GB')
+            };
+
             const insertMode = document.querySelector('input[name="insert_mode"]:checked').value;
 
-            if(!type || !name) { alert("يرجى ملء البيانات الأساسية"); return; }
+            if(!data.type || !data.name) { alert("يرجى ملء البيانات الأساسية"); return; }
 
             let productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             if (!productsDb[currentOrderId]) productsDb[currentOrderId] = [];
 
             if (insertMode === 'single') {
-                // إضافة صف واحد بالكمية الإجمالية
-                productsDb[currentOrderId].push({ type, name, qty, sub, status, note, date });
+                productsDb[currentOrderId].push(data);
             } else {
-                // إضافة صفوف متعددة، كل صف كميته 1
-                for (let i = 0; i < qty; i++) {
-                    productsDb[currentOrderId].push({ type, name, qty: 1, sub, status, note, date });
+                for (let i = 0; i < data.qty; i++) {
+                    productsDb[currentOrderId].push({ ...data, qty: 1 });
                 }
             }
 
             localStorage.setItem('asgate_products_db', JSON.stringify(productsDb));
             renderProducts();
             closeModal();
-            
-            // إعادة ضبط الحقول
-            document.getElementById('p_type').value = '';
-            document.getElementById('p_name').value = '';
+            clearFields();
+        }
+
+        function clearFields() {
+            ['p_type', 'p_name', 'p_sub', 'p_serial', 'p_mobile', 'p_user', 'p_note'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
             document.getElementById('p_qty').value = '1';
-            document.getElementById('p_sub').value = '';
-            document.getElementById('p_note').value = '';
         }
 
         function renderProducts() {
@@ -289,19 +300,22 @@
             const tbody = document.getElementById('productsBody');
             
             if (products.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="color:#94a3b8;">يرجى إضافة منتجات لهذا الطلب</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10" style="color:#94a3b8;">يرجى إضافة منتجات لهذا الطلب</td></tr>';
                 return;
             }
 
             tbody.innerHTML = products.map(p => `
                 <tr>
-                    <td>${p.type}</td>
-                    <td>${p.name}</td>
-                    <td>${p.qty}</td>
-                    <td>${p.sub}</td>
+                    <td>${p.type || ''}</td>
+                    <td>${p.name || ''}</td>
+                    <td>${p.qty || ''}</td>
+                    <td>${p.sub || ''}</td>
+                    <td>${p.serial || ''}</td>
+                    <td>${p.mobile || ''}</td>
+                    <td>${p.user || ''}</td>
                     <td><span class="status-badge">${p.status}</span></td>
                     <td>${p.date}</td>
-                    <td>${p.note}</td>
+                    <td>${p.note || ''}</td>
                 </tr>
             `).join('');
         }
