@@ -54,6 +54,14 @@
         .info-label { font-size: 10px; color: #64748b; font-weight: 800; }
         .info-value { font-size: 13px; color: var(--nav-bg); font-weight: 800; }
 
+        /* تنسيق اسم الطلب داخل المربع */
+        .info-item-highlight {
+            border: 2px solid var(--header-green);
+            padding: 5px 15px;
+            border-radius: 8px;
+            background-color: #f0fdf4;
+        }
+
         .action-bar { margin: 20px 0 12px 0; }
         .btn-add-product { 
             background: var(--accent-blue); color: white; border: none; padding: 8px 25px; 
@@ -69,13 +77,11 @@
         th { background-color: var(--header-green); padding: 12px 5px; color: white; font-size: 11px; font-weight: 800; text-align: center; }
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); padding: 5px; }
         
-        /* قابلية التعديل */
         .editable-cell {
-            background-color: #fffbeb; /* لون خفيف لتمييز الحقول القابلة للصق */
+            background-color: #fffbeb;
             border: 1px dashed #fbbf24 !important;
             cursor: cell;
             outline: none;
-            transition: 0.2s;
         }
         .editable-cell:focus { background-color: #fef3c7; border: 1px solid #d97706 !important; }
 
@@ -108,7 +114,12 @@
             <a href="sales.html" class="btn-back-outside">🔙 عودة</a>
             <div class="order-header-info">
                 <div class="info-item"><span class="info-label">رقم الطلب</span><span class="info-value" id="orderId">#0000</span></div>
-                <div class="info-item info-item-highlight"><span class="info-label">اسم الطلب</span><span class="info-value" id="orderType">-</span></div>
+                
+                <div class="info-item info-item-highlight">
+                    <span class="info-label" style="color: var(--header-green);">اسم الطلب</span>
+                    <span class="info-value" id="orderType">-</span>
+                </div>
+
                 <div class="info-item"><span class="info-label">الشركة</span><span class="info-value" id="orderComp">-</span></div>
                 <div class="info-item"><span class="info-label">السجل</span><span class="info-value" id="orderCr">-</span></div>
                 <div class="info-item"><span class="info-label">حالة الطلب</span><span class="info-value" id="orderStatus">-</span></div>
@@ -269,7 +280,6 @@
             `).join('');
         }
 
-        // وظيفة التحديث عند الكتابة اليدوية
         function updateField(index, field, value) {
             let productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             if (productsDb[currentOrderId] && productsDb[currentOrderId][index]) {
@@ -278,11 +288,10 @@
             }
         }
 
-        // وظيفة اللصق الذكي من إكسل
         function handlePaste(event, startIndex, field) {
             event.preventDefault();
             const pasteData = (event.clipboardData || window.clipboardData).getData('text');
-            const rows = pasteData.split(/\r\n|\n|\r/); // تقسيم البيانات المنسوخة لأسطر
+            const rows = pasteData.split(/\r\n|\n|\r/);
             
             let productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             let products = productsDb[currentOrderId] || [];
@@ -296,7 +305,7 @@
 
             productsDb[currentOrderId] = products;
             localStorage.setItem('asgate_products_db', JSON.stringify(productsDb));
-            renderProducts(); // إعادة الرسم لتحديث البيانات
+            renderProducts();
         }
     </script>
 </body>
