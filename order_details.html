@@ -15,6 +15,7 @@
             --accent-blue: #3b82f6;
             --zebra-blue: #eff6ff;
             --text-dark: #1e293b;
+            --edit-bg: #fffbeb;
         }
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
@@ -54,7 +55,6 @@
         .info-label { font-size: 10px; color: #64748b; font-weight: 800; }
         .info-value { font-size: 13px; color: var(--nav-bg); font-weight: 800; }
 
-        /* تنسيق اسم الطلب داخل المربع */
         .info-item-highlight {
             border: 2px solid var(--header-green);
             padding: 5px 15px;
@@ -78,15 +78,20 @@
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); padding: 5px; }
         
         .editable-cell {
-            background-color: #fffbeb;
+            background-color: var(--edit-bg);
             border: 1px dashed #fbbf24 !important;
             cursor: cell;
             outline: none;
         }
         .editable-cell:focus { background-color: #fef3c7; border: 1px solid #d97706 !important; }
 
+        .status-select {
+            font-family: 'Cairo'; font-size: 10px; font-weight: 700; padding: 3px; border-radius: 4px; border: 1px solid var(--border-color);
+        }
+
+        /* Modal Styles */
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
-        .modal-content { background: white; padding: 20px; border-radius: 12px; width: 450px; max-height: 90vh; overflow-y: auto; }
+        .modal-content { background: white; padding: 20px; border-radius: 12px; width: 480px; max-height: 90vh; overflow-y: auto; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .form-group { margin-bottom: 12px; display: flex; flex-direction: column; gap: 5px; }
         .form-group.full-width { grid-column: span 2; }
@@ -96,7 +101,9 @@
         .radio-group { display: flex; gap: 15px; margin-top: 5px; }
         .radio-option { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; }
 
-        .status-badge { background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-save { background: var(--header-green); color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; flex: 1; font-family: 'Cairo'; font-weight: bold; }
+        .btn-cancel { background: #94a3b8; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; flex: 1; font-family: 'Cairo'; font-weight: bold; }
     </style>
 </head>
 <body onload="loadOrderDetails()">
@@ -114,12 +121,7 @@
             <a href="sales.html" class="btn-back-outside">🔙 عودة</a>
             <div class="order-header-info">
                 <div class="info-item"><span class="info-label">رقم الطلب</span><span class="info-value" id="orderId">#0000</span></div>
-                
-                <div class="info-item info-item-highlight">
-                    <span class="info-label" style="color: var(--header-green);">اسم الطلب</span>
-                    <span class="info-value" id="orderType">-</span>
-                </div>
-
+                <div class="info-item info-item-highlight"><span class="info-label">اسم الطلب</span><span class="info-value" id="orderType">-</span></div>
                 <div class="info-item"><span class="info-label">الشركة</span><span class="info-value" id="orderComp">-</span></div>
                 <div class="info-item"><span class="info-label">السجل</span><span class="info-value" id="orderCr">-</span></div>
                 <div class="info-item"><span class="info-label">حالة الطلب</span><span class="info-value" id="orderStatus">-</span></div>
@@ -129,7 +131,6 @@
 
         <div class="action-bar">
             <button class="btn-add-product" onclick="openModal()">+ إضافة منتج</button>
-            <small style="margin-right: 15px; color: #64748b;">* يمكنك نسخ عمود من إكسل ولصقه في الحقول الملونة مباشرة</small>
         </div>
 
         <div class="table-wrapper">
@@ -140,11 +141,11 @@
                         <th style="width: 14%;">تفاصيل الطلب</th>
                         <th style="width: 5%;">العدد</th>
                         <th style="width: 8%;">الاشتراك</th>
-                        <th style="width: 12%;">رقم السريال (قابل للصق)</th>
-                        <th style="width: 10%;">رقم الموبايل (قابل للصق)</th>
-                        <th style="width: 10%;">المستخدم (قابل للصق)</th>
-                        <th style="width: 8%;">الحالة</th>
-                        <th style="width: 12%;">تغيير الحالة</th>
+                        <th style="width: 12%;">رقم السريال</th>
+                        <th style="width: 10%;">رقم الموبايل</th>
+                        <th style="width: 10%;">المستخدم</th>
+                        <th style="width: 10%;">الحالة</th>
+                        <th style="width: 10%;">تغيير الحالة</th>
                         <th style="width: 13%;">ملاحظة</th>
                     </tr>
                 </thead>
@@ -161,23 +162,26 @@
             <div class="form-grid">
                 <div class="form-group"><label>نوع الطلب</label><input type="text" id="p_type"></div>
                 <div class="form-group"><label>تفاصيل الطلب</label><input type="text" id="p_name"></div>
+                
+                <div class="form-group"><label>العدد</label><input type="number" id="p_qty" value="1" min="1"></div>
+                <div class="form-group"><label>الاشتراك</label><input type="text" id="p_sub"></div>
+                
                 <div class="form-group full-width">
-                    <label>العدد</label>
-                    <input type="number" id="p_qty" value="1" min="1">
                     <div class="radio-group">
-                        <label class="radio-option"><input type="radio" name="insert_mode" value="single" checked> إدراج العدد في صف 1</label>
-                        <label class="radio-option"><input type="radio" name="insert_mode" value="multi"> إدراج العدد في صفوف متعددة</label>
+                        <label class="radio-option"><input type="radio" name="insert_mode" value="single" checked> إدراج في صف 1</label>
+                        <label class="radio-option"><input type="radio" name="insert_mode" value="multi"> صفوف متعددة</label>
                     </div>
                 </div>
-                <div class="form-group"><label>الاشتراك</label><input type="text" id="p_sub"></div>
+
                 <div class="form-group"><label>رقم السريال</label><input type="text" id="p_serial"></div>
                 <div class="form-group"><label>رقم الموبايل</label><input type="text" id="p_mobile"></div>
                 <div class="form-group"><label>المستخدم</label><input type="text" id="p_user"></div>
+                
                 <div class="form-group">
-                    <label>الحالة</label>
+                    <label>الحالة الافتراضية</label>
                     <select id="p_status">
-                        <option>مكتمل</option><option>تم التوثيق</option><option>توثيق</option>
-                        <option>مرتجع</option><option>جاهز</option><option>فقدان</option>
+                        <option selected>جاهز</option><option>مكتمل</option><option>تم التوثيق</option>
+                        <option>توثيق</option><option>مرتجع</option><option>فقدان</option>
                     </select>
                 </div>
                 <div class="form-group full-width"><label>ملاحظة</label><input type="text" id="p_note"></div>
@@ -191,15 +195,14 @@
 
     <script>
         let currentOrderId = '';
+        const statusList = ["جاهز", "مكتمل", "تم التوثيق", "توثيق", "مرتجع", "فقدان"];
 
         function loadOrderDetails() {
             const urlParams = new URLSearchParams(window.location.search);
             currentOrderId = urlParams.get('id');
             if (!currentOrderId) return;
-
             const salesData = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
             const order = salesData.find(item => String(item.id) === String(currentOrderId));
-
             if (order) {
                 document.getElementById('orderId').innerText = '#' + order.id;
                 document.getElementById('orderComp').innerText = order.comp;
@@ -228,8 +231,6 @@
             };
 
             const insertMode = document.querySelector('input[name="insert_mode"]:checked').value;
-            if(!baseData.type || !baseData.name) { alert("يرجى ملء البيانات الأساسية"); return; }
-
             let productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             if (!productsDb[currentOrderId]) productsDb[currentOrderId] = [];
 
@@ -242,16 +243,9 @@
                     productsDb[currentOrderId].push({ ...baseData, qty: 1, serial: currentSerial });
                 }
             }
-
             localStorage.setItem('asgate_products_db', JSON.stringify(productsDb));
             renderProducts();
             closeModal();
-            clearFields();
-        }
-
-        function clearFields() {
-            ['p_type', 'p_name', 'p_sub', 'p_serial', 'p_mobile', 'p_user', 'p_note'].forEach(id => document.getElementById(id).value = '');
-            document.getElementById('p_qty').value = '1';
         }
 
         function renderProducts() {
@@ -260,12 +254,12 @@
             const tbody = document.getElementById('productsBody');
             
             if (products.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" style="color:#94a3b8;">يرجى إضافة منتجات لهذا الطلب</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10">لا توجد منتجات</td></tr>';
                 return;
             }
 
             tbody.innerHTML = products.map((p, index) => `
-                <tr data-index="${index}">
+                <tr>
                     <td>${p.type}</td>
                     <td>${p.name}</td>
                     <td>${p.qty}</td>
@@ -273,7 +267,11 @@
                     <td class="editable-cell" contenteditable="true" onpaste="handlePaste(event, ${index}, 'serial')" onblur="updateField(${index}, 'serial', this.innerText)">${p.serial || ''}</td>
                     <td class="editable-cell" contenteditable="true" onpaste="handlePaste(event, ${index}, 'mobile')" onblur="updateField(${index}, 'mobile', this.innerText)">${p.mobile || ''}</td>
                     <td class="editable-cell" contenteditable="true" onpaste="handlePaste(event, ${index}, 'user')" onblur="updateField(${index}, 'user', this.innerText)">${p.user || ''}</td>
-                    <td><span class="status-badge">${p.status}</span></td>
+                    <td>
+                        <select class="status-select" onchange="updateField(${index}, 'status', this.value)">
+                            ${statusList.map(s => `<option ${p.status === s ? 'selected' : ''}>${s}</option>`).join('')}
+                        </select>
+                    </td>
                     <td>${p.date}</td>
                     <td>${p.note}</td>
                 </tr>
@@ -282,28 +280,20 @@
 
         function updateField(index, field, value) {
             let productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
-            if (productsDb[currentOrderId] && productsDb[currentOrderId][index]) {
-                productsDb[currentOrderId][index][field] = value.trim();
-                localStorage.setItem('asgate_products_db', JSON.stringify(productsDb));
-            }
+            productsDb[currentOrderId][index][field] = value.trim();
+            localStorage.setItem('asgate_products_db', JSON.stringify(productsDb));
         }
 
         function handlePaste(event, startIndex, field) {
             event.preventDefault();
             const pasteData = (event.clipboardData || window.clipboardData).getData('text');
             const rows = pasteData.split(/\r\n|\n|\r/);
-            
             let productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
-            let products = productsDb[currentOrderId] || [];
-
             rows.forEach((rowData, i) => {
-                let targetIndex = startIndex + i;
-                if (products[targetIndex] && rowData.trim() !== "") {
-                    products[targetIndex][field] = rowData.trim();
+                if (productsDb[currentOrderId][startIndex + i] && rowData.trim() !== "") {
+                    productsDb[currentOrderId][startIndex + i][field] = rowData.trim();
                 }
             });
-
-            productsDb[currentOrderId] = products;
             localStorage.setItem('asgate_products_db', JSON.stringify(productsDb));
             renderProducts();
         }
