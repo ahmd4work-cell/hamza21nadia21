@@ -15,7 +15,6 @@
             --accent-blue: #3b82f6;
             --text-dark: #1e293b;
             --danger-red: #dc2626;
-            --gray-light: #e2e8f0;
         }
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
@@ -47,22 +46,21 @@
 
         .table-wrapper { background: white; border-radius: 10px; overflow-x: auto; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; min-width: 1300px; }
-        th { background-color: var(--header-green); padding: 12px 5px; color: white; font-size: 11px; font-weight: 800; text-align: center; }
+        th { background-color: var(--header-green); padding: 12px 5px; color: white; font-size: 11px; font-weight: 800; text-align: center; border-left: 1px solid rgba(255,255,255,0.1); }
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); padding: 5px; }
         
-        /* تنسيق مربعات التحديد */
-        .row-checkbox { cursor: pointer; accent-color: var(--accent-blue); width: 16px; height: 16px; filter: grayscale(1); opacity: 0.4; transition: 0.2s; }
-        .row-checkbox:checked { filter: grayscale(0); opacity: 1; }
+        .row-checkbox { cursor: pointer; accent-color: var(--accent-blue); width: 16px; height: 16px; opacity: 0.5; }
+        .row-checkbox:checked { opacity: 1; }
 
-        /* قائمة الخيارات */
         .options-select { font-family: 'Cairo'; font-size: 10px; font-weight: 700; padding: 4px; border-radius: 6px; border: 1px solid var(--border-color); background: #f8fafc; cursor: pointer; width: 85px; }
-        .options-select option:disabled { color: #cbd5e1; background: #f1f5f9; }
 
         .status-select { font-family: 'Cairo'; font-size: 10px; font-weight: 700; padding: 5px; border-radius: 6px; width: 95%; cursor: pointer; border: 1px solid var(--border-color); }
         .status-complete { background-color: #22c55e !important; color: white !important; }
         .status-pending { background-color: #eab308 !important; color: #000 !important; }
 
-        /* Modal */
+        .editable-cell { background-color: transparent; border: 1px dashed #94a3b8 !important; cursor: cell; outline: none; }
+        .editable-cell:focus { border: 1px solid var(--accent-blue) !important; background-color: #f8fafc; }
+
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 20px; border-radius: 12px; width: 480px; max-height: 90vh; overflow-y: auto; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -112,12 +110,12 @@
                         <th style="width: 7%;">نوع الطلب</th>
                         <th style="width: 12%;">تفاصيل الطلب</th>
                         <th style="width: 4%;">العدد</th>
-                        <th style="width: 7%;">الاشتراك 🔍<br><select id="filter-sub" class="filter-select" onchange="applyFilters()"><option value="">الكل</option></select></th>
+                        <th style="width: 7%;">الاشتراك 🔍<br><select id="filter-sub" style="font-size: 9px;" onchange="applyFilters()"><option value="">الكل</option></select></th>
                         <th style="width: 6%;">الاجمالي</th>
                         <th style="width: 10%;">رقم السريال</th>
-                        <th style="width: 9%;">رقم الموبايل</th>
+                        <th style="width: 9%;">رقم الخدمة</th>
                         <th style="width: 9%;">المستخدم</th>
-                        <th style="width: 10%;">الحالة 🔍<br><select id="filter-status" class="filter-select" onchange="applyFilters()"><option value="">الكل</option></select></th>
+                        <th style="width: 10%;">الحالة 🔍<br><select id="filter-status" style="font-size: 9px;" onchange="applyFilters()"><option value="">الكل</option></select></th>
                         <th style="width: 9%;">تاريخ التغيير</th>
                         <th style="width: 10%;">ملاحظة</th>
                         <th style="width: 8%;">الخيارات</th>
@@ -144,7 +142,7 @@
                     </select>
                 </div>
                 <div class="form-group"><label>رقم السريال</label><input type="text" id="p_serial"></div>
-                <div class="form-group"><label>رقم الموبايل</label><input type="text" id="p_mobile"></div>
+                <div class="form-group"><label>رقم الخدمة</label><input type="text" id="p_mobile"></div>
                 <div class="form-group"><label>المستخدم</label><input type="text" id="p_user"></div>
                 <div class="form-group full-width"><label>ملاحظة</label><input type="text" id="p_note"></div>
             </div>
@@ -183,10 +181,8 @@
             tbody.innerHTML = products.map((p, index) => {
                 const subVal = parseFloat(String(p.sub).replace(/[^\d.]/g, '')) || 0;
                 let colorClass = p.status === "مكتمل" ? "status-complete" : (p.status === "توثيق" ? "status-pending" : "");
-                
-                // منع التعديل والحذف في حالات معينة
                 const isLocked = (p.status === "مكتمل" || p.status === "تم التوثيق");
-                const editAttr = isLocked ? 'disabled style="color:#cbd5e1"' : '';
+                const lockStyle = isLocked ? 'style="color:#cbd5e1; pointer-events: none;"' : '';
 
                 return `
                     <tr id="row-${index}">
@@ -195,10 +191,10 @@
                         <td>${p.name}</td>
                         <td>${p.qty}</td>
                         <td>${p.sub}</td>
-                        <td>${(p.qty * subVal).toFixed(2)}</td>
-                        <td class="${isLocked ? '' : 'editable-cell'}" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'serial', this.innerText)">${p.serial || ''}</td>
-                        <td class="${isLocked ? '' : 'editable-cell'}" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'mobile', this.innerText)">${p.mobile || ''}</td>
-                        <td class="${isLocked ? '' : 'editable-cell'}" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'user', this.innerText)">${p.user || ''}</td>
+                        <td style="color:var(--header-green); font-weight:800;">${(p.qty * subVal).toFixed(2)}</td>
+                        <td class="${isLocked ? '' : 'editable-cell'}" contenteditable="${!isLocked}" onpaste="handleQuickPaste(event, ${index}, 'serial')" onblur="updateQuickField(${index}, 'serial', this.innerText)">${p.serial || ''}</td>
+                        <td class="${isLocked ? '' : 'editable-cell'}" contenteditable="${!isLocked}" onpaste="handleQuickPaste(event, ${index}, 'mobile')" onblur="updateQuickField(${index}, 'mobile', this.innerText)">${p.mobile || ''}</td>
+                        <td class="${isLocked ? '' : 'editable-cell'}" contenteditable="${!isLocked}" onpaste="handleQuickPaste(event, ${index}, 'user')" onblur="updateQuickField(${index}, 'user', this.innerText)">${p.user || ''}</td>
                         <td>
                             <select class="status-select ${colorClass}" onchange="updateQuickField(${index}, 'status', this.value)">
                                 ${statusList.map(s => `<option value="${s}" ${p.status===s?'selected':''}>${s}</option>`).join('')}
@@ -210,8 +206,8 @@
                             <select class="options-select" onchange="handleAction(this, ${index})">
                                 <option value="" selected disabled>إجراءات</option>
                                 <option value="select">تحديد</option>
-                                <option value="edit" ${editAttr}>تعديل</option>
-                                <option value="delete" ${editAttr}>حذف</option>
+                                <option value="edit" ${isLocked ? 'disabled' : ''}>تعديل</option>
+                                <option value="delete" ${isLocked ? 'disabled' : ''}>حذف</option>
                             </select>
                         </td>
                     </tr>`;
@@ -229,7 +225,27 @@
             } else if (action === "delete") {
                 deleteRow(index);
             }
-            selectObj.value = ""; // إعادة تصفير القائمة
+            selectObj.value = "";
+        }
+
+        function handleQuickPaste(event, startIndex, field) {
+            event.preventDefault();
+            const pasteData = (event.clipboardData || window.clipboardData).getData('text');
+            const rows = pasteData.split(/\r\n|\n|\r/);
+            let productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+            
+            rows.forEach((rowData, i) => {
+                let targetIdx = startIndex + i;
+                if (productsDb[currentOrderId][targetIdx] && rowData.trim() !== "") {
+                    // التحقق من الحماية قبل اللصق
+                    const p = productsDb[currentOrderId][targetIdx];
+                    if (p.status !== "مكتمل" && p.status !== "تم التوثيق") {
+                        productsDb[currentOrderId][targetIdx][field] = rowData.trim();
+                    }
+                }
+            });
+            localStorage.setItem('asgate_products_db', JSON.stringify(productsDb));
+            renderProducts();
         }
 
         function openModal(index = null) {
@@ -240,9 +256,15 @@
                 document.getElementById('edit-index').value = index;
                 const products = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId];
                 const p = products[index];
-                ['p_type', 'p_name', 'p_qty', 'p_sub', 'p_serial', 'p_mobile', 'p_user', 'p_status', 'p_note'].forEach(id => {
-                    document.getElementById(id).value = p[id.split('_')[1]];
-                });
+                document.getElementById('p_type').value = p.type;
+                document.getElementById('p_name').value = p.name;
+                document.getElementById('p_qty').value = p.qty;
+                document.getElementById('p_sub').value = p.sub;
+                document.getElementById('p_serial').value = p.serial;
+                document.getElementById('p_mobile').value = p.mobile;
+                document.getElementById('p_user').value = p.user;
+                document.getElementById('p_status').value = p.status;
+                document.getElementById('p_note').value = p.note;
             } else {
                 document.getElementById('modalTitle').innerText = "إضافة منتج جديد";
                 document.getElementById('edit-index').value = "";
@@ -269,6 +291,7 @@
             };
 
             let productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+            if (!productsDb[currentOrderId]) productsDb[currentOrderId] = [];
             if (index !== "") productsDb[currentOrderId][index] = data;
             else productsDb[currentOrderId].push(data);
 
@@ -300,7 +323,7 @@
                 let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
                 db[currentOrderId] = db[currentOrderId].filter((p, i) => {
                     if (selected.includes(i)) {
-                        return (p.status === "مكتمل" || p.status === "تم التوثيق"); // اتركها لو كانت مقفلة
+                        return (p.status === "مكتمل" || p.status === "تم التوثيق");
                     }
                     return true;
                 });
