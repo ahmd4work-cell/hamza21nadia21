@@ -118,17 +118,23 @@
             background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center;
         }
         .modal-content {
-            background: white; padding: 20px; border-radius: 12px; width: 400px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            background: white; padding: 20px; border-radius: 12px; width: 420px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
         .modal-content h3 { margin-top: 0; color: var(--nav-bg); font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .form-group { margin-bottom: 10px; display: flex; flex-direction: column; gap: 5px; }
+        .form-group { margin-bottom: 12px; display: flex; flex-direction: column; gap: 5px; }
         .form-group label { font-size: 11px; font-weight: 700; color: #64748b; }
         .form-group input, .form-group select { 
             padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Cairo'; font-size: 12px;
         }
-        .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-save { background: var(--header-green); color: white; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; flex: 1; font-family: 'Cairo'; font-weight: bold; }
-        .btn-cancel { background: #94a3b8; color: white; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; flex: 1; font-family: 'Cairo'; font-weight: bold; }
+        
+        /* Radio Options Style */
+        .radio-group { display: flex; gap: 15px; margin-top: 5px; }
+        .radio-option { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; color: var(--nav-bg); cursor: pointer; }
+        .radio-option input { cursor: pointer; width: 14px; height: 14px; margin: 0; }
+
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-save { background: var(--header-green); color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; flex: 1; font-family: 'Cairo'; font-weight: bold; }
+        .btn-cancel { background: #94a3b8; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; flex: 1; font-family: 'Cairo'; font-weight: bold; }
 
         .status-badge { background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; }
     </style>
@@ -185,7 +191,20 @@
             <h3>إضافة منتج جديد</h3>
             <div class="form-group"><label>نوع الطلب</label><input type="text" id="p_type"></div>
             <div class="form-group"><label>تفاصيل الطلب</label><input type="text" id="p_name"></div>
-            <div class="form-group"><label>العدد</label><input type="number" id="p_qty" value="1"></div>
+            
+            <div class="form-group">
+                <label>العدد</label>
+                <input type="number" id="p_qty" value="1" min="1">
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="insert_mode" value="single" checked> إدراج العدد في صف 1
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="insert_mode" value="multi"> إدراج العدد في صفوف متعددة
+                    </label>
+                </div>
+            </div>
+
             <div class="form-group"><label>الاشتراك</label><input type="text" id="p_sub"></div>
             <div class="form-group">
                 <label>الحالة</label>
@@ -219,8 +238,6 @@
                 document.getElementById('orderCr').innerText = order.cr;
                 document.getElementById('orderType').innerText = order.type;
                 document.getElementById('orderStatus').innerText = order.status;
-                
-                // تحميل المنتجات المحفوظة لهذا الطلب فقط
                 renderProducts();
             }
         }
@@ -229,32 +246,36 @@
         function closeModal() { document.getElementById('productModal').style.display = 'none'; }
 
         function saveProduct() {
-            const product = {
-                type: document.getElementById('p_type').value,
-                name: document.getElementById('p_name').value,
-                qty: document.getElementById('p_qty').value,
-                sub: document.getElementById('p_sub').value,
-                status: document.getElementById('p_status').value,
-                note: document.getElementById('p_note').value,
-                date: new Date().toLocaleDateString('en-GB')
-            };
-
-            if(!product.type || !product.name) { alert("يرجى ملء البيانات الأساسية"); return; }
-
-            // جلب قاعدة بيانات المنتجات (أو إنشاء واحدة جديدة)
-            let productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+            const type = document.getElementById('p_type').value;
+            const name = document.getElementById('p_name').value;
+            const qty = parseInt(document.getElementById('p_qty').value) || 1;
+            const sub = document.getElementById('p_sub').value;
+            const status = document.getElementById('p_status').value;
+            const note = document.getElementById('p_note').value;
+            const date = new Date().toLocaleDateString('en-GB');
             
-            // إضافة المنتج للمصفوفة الخاصة برقم الطلب الحالي
+            const insertMode = document.querySelector('input[name="insert_mode"]:checked').value;
+
+            if(!type || !name) { alert("يرجى ملء البيانات الأساسية"); return; }
+
+            let productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             if (!productsDb[currentOrderId]) productsDb[currentOrderId] = [];
-            productsDb[currentOrderId].push(product);
 
-            // حفظ في LocalStorage
+            if (insertMode === 'single') {
+                // إضافة صف واحد بالكمية الإجمالية
+                productsDb[currentOrderId].push({ type, name, qty, sub, status, note, date });
+            } else {
+                // إضافة صفوف متعددة، كل صف كميته 1
+                for (let i = 0; i < qty; i++) {
+                    productsDb[currentOrderId].push({ type, name, qty: 1, sub, status, note, date });
+                }
+            }
+
             localStorage.setItem('asgate_products_db', JSON.stringify(productsDb));
-
             renderProducts();
             closeModal();
             
-            // مسح الحقول
+            // إعادة ضبط الحقول
             document.getElementById('p_type').value = '';
             document.getElementById('p_name').value = '';
             document.getElementById('p_qty').value = '1';
