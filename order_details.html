@@ -61,7 +61,7 @@
             background-color: #f0fdf4;
         }
 
-        .action-bar { margin: 20px 0 12px 0; }
+        .action-bar { margin: 20px 0 12px 0; display: flex; justify-content: space-between; align-items: center; }
         .btn-add-product { 
             background: var(--accent-blue); color: white; border: none; padding: 8px 25px; 
             border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; 
@@ -73,10 +73,13 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         table { width: 100%; border-collapse: collapse; min-width: 1200px; }
-        th { background-color: var(--header-green); padding: 12px 5px; color: white; font-size: 11px; font-weight: 800; text-align: center; }
-        th.sortable { cursor: pointer; position: relative; }
-        th.sortable:hover { background-color: #166534; }
+        th { background-color: var(--header-green); padding: 8px 5px; color: white; font-size: 11px; font-weight: 800; text-align: center; }
         
+        .filter-select {
+            background: #ffffff; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 4px;
+            font-size: 9px; font-family: 'Cairo'; margin-top: 4px; width: 90%; cursor: pointer;
+        }
+
         td { 
             border-bottom: 1px solid #f1f5f9; 
             text-align: center; 
@@ -98,15 +101,15 @@
             background-color: #f8fafc;
         }
 
-        .note-cell { outline: none; cursor: text; }
-
         .status-select {
-            font-family: 'Cairo'; font-size: 10px; font-weight: 700; padding: 2px; border-radius: 4px; border: 1px solid var(--border-color); width: 90%;
+            font-family: 'Cairo'; font-size: 10px; font-weight: 700; padding: 5px; border-radius: 6px; 
+            border: 1px solid var(--border-color); width: 95%; cursor: pointer; transition: 0.2s;
         }
         
-        /* ألوان الحالات */
-        .status-bg-complete { background-color: #bbf7d0 !important; } /* أخضر */
-        .status-bg-pending { background-color: #fef08a !important; }  /* أصفر */
+        /* ألوان الخلفية داخل القائمة المنسدلة (الحالة) */
+        .status-complete { background-color: #22c55e !important; color: white !important; } /* أخضر مكتمل */
+        .status-pending { background-color: #eab308 !important; color: #000 !important; }  /* أصفر توثيق */
+        .status-default { background-color: white; color: var(--text-dark); }
 
         .total-col { color: var(--header-green); font-weight: 800; }
 
@@ -118,9 +121,6 @@
         .form-group label { font-size: 11px; font-weight: 700; color: #64748b; }
         .form-group input, .form-group select { padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Cairo'; font-size: 12px; }
         
-        .radio-group { display: flex; gap: 15px; margin-top: 5px; }
-        .radio-option { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; }
-
         .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
         .btn-save { background: var(--header-green); color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; flex: 1; font-family: 'Cairo'; font-weight: bold; }
         .btn-cancel { background: #94a3b8; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; flex: 1; font-family: 'Cairo'; font-weight: bold; }
@@ -160,12 +160,18 @@
                         <th style="width: 7%;">نوع الطلب</th>
                         <th style="width: 12%;">تفاصيل الطلب</th>
                         <th style="width: 4%;">العدد</th>
-                        <th class="sortable" style="width: 6%;" onclick="sortData('sub')">الاشتراك ⇅</th>
+                        <th style="width: 7%;">
+                            الاشتراك 🔍<br>
+                            <select id="filter-sub" class="filter-select" onchange="applyFilters()"><option value="">الكل</option></select>
+                        </th>
                         <th style="width: 7%;">الاجمالي</th>
                         <th style="width: 10%;">رقم السريال</th>
                         <th style="width: 9%;">رقم الموبايل</th>
                         <th style="width: 9%;">المستخدم</th>
-                        <th class="sortable" style="width: 9%;" onclick="sortData('status')">الحالة ⇅</th>
+                        <th style="width: 10%;">
+                            الحالة 🔍<br>
+                            <select id="filter-status" class="filter-select" onchange="applyFilters()"><option value="">الكل</option></select>
+                        </th>
                         <th style="width: 9%;">تاريخ التغيير</th>
                         <th style="width: 11%;">ملاحظة</th>
                     </tr>
@@ -184,17 +190,8 @@
                 <div class="form-group"><label>نوع الطلب</label><input type="text" id="p_type"></div>
                 <div class="form-group"><label>تفاصيل الطلب</label><input type="text" id="p_name"></div>
                 <div class="form-group"><label>العدد</label><input type="number" id="p_qty" value="1" min="1"></div>
-                <div class="form-group"><label>الاشتراك (رقم)</label><input type="text" id="p_sub"></div>
+                <div class="form-group"><label>الاشتراك</label><input type="text" id="p_sub"></div>
                 <div class="form-group full-width">
-                    <div class="radio-group">
-                        <label class="radio-option"><input type="radio" name="insert_mode" value="single" checked> إدراج في صف 1</label>
-                        <label class="radio-option"><input type="radio" name="insert_mode" value="multi"> صفوف متعددة</label>
-                    </div>
-                </div>
-                <div class="form-group"><label>رقم السريال</label><input type="text" id="p_serial"></div>
-                <div class="form-group"><label>رقم الموبايل</label><input type="text" id="p_mobile"></div>
-                <div class="form-group"><label>المستخدم</label><input type="text" id="p_user"></div>
-                <div class="form-group">
                     <label>الحالة الافتراضية</label>
                     <select id="p_status">
                         <option>مكتمل</option>
@@ -205,6 +202,9 @@
                         <option>فقدان</option>
                     </select>
                 </div>
+                <div class="form-group"><label>رقم السريال</label><input type="text" id="p_serial"></div>
+                <div class="form-group"><label>رقم الموبايل</label><input type="text" id="p_mobile"></div>
+                <div class="form-group"><label>المستخدم</label><input type="text" id="p_user"></div>
                 <div class="form-group full-width"><label>ملاحظة</label><input type="text" id="p_note"></div>
             </div>
             <div class="modal-actions">
@@ -217,7 +217,6 @@
     <script>
         let currentOrderId = '';
         const statusList = ["مكتمل", "تم التوثيق", "توثيق", "جاهز", "مرتجع", "فقدان"];
-        let sortOrder = { field: '', asc: true };
 
         function loadOrderDetails() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -252,32 +251,21 @@
                 date: new Date().toLocaleDateString('en-GB')
             };
 
-            const insertMode = document.querySelector('input[name="insert_mode"]:checked').value;
             let productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             if (!productsDb[currentOrderId]) productsDb[currentOrderId] = [];
-
-            if (insertMode === 'single') {
-                productsDb[currentOrderId].push(baseData);
-            } else {
-                let startSerial = baseData.serial;
-                for (let i = 0; i < baseData.qty; i++) {
-                    let currentSerial = (startSerial && !isNaN(startSerial)) ? (BigInt(startSerial) + BigInt(i)).toString() : startSerial;
-                    productsDb[currentOrderId].push({ ...baseData, qty: 1, serial: currentSerial });
-                }
-            }
+            productsDb[currentOrderId].push(baseData);
+            
             localStorage.setItem('asgate_products_db', JSON.stringify(productsDb));
             renderProducts();
             closeModal();
-            ['p_type', 'p_name', 'p_sub', 'p_serial', 'p_mobile', 'p_user', 'p_note'].forEach(id => document.getElementById(id).value = '');
-            document.getElementById('p_qty').value = '1';
         }
 
-        function renderProducts() {
+        function renderProducts(filteredList = null) {
             const productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
-            let products = productsDb[currentOrderId] || [];
+            const products = filteredList || productsDb[currentOrderId] || [];
             const tbody = document.getElementById('productsBody');
             
-            if (products.length === 0) {
+            if (products.length === 0 && !filteredList) {
                 tbody.innerHTML = '<tr><td colspan="11" style="color:#94a3b8;">يرجى إضافة منتجات لهذا الطلب</td></tr>';
                 return;
             }
@@ -286,10 +274,9 @@
                 const subValue = parseFloat(String(p.sub).replace(/[^\d.]/g, '')) || 0;
                 const total = (p.qty * subValue).toFixed(2);
                 
-                // تحديد كلاس التلوين بناءً على الحالة
-                let statusClass = "";
-                if (p.status === "مكتمل") statusClass = "status-bg-complete";
-                else if (p.status === "توثيق") statusClass = "status-bg-pending";
+                let colorClass = "status-default";
+                if (p.status === "مكتمل") colorClass = "status-complete";
+                else if (p.status === "توثيق") colorClass = "status-pending";
 
                 return `
                     <tr>
@@ -298,12 +285,12 @@
                         <td>${p.qty}</td>
                         <td>${p.sub}</td>
                         <td class="total-col">${total}</td>
-                        <td class="editable-cell" contenteditable="true" onpaste="handlePaste(event, ${index}, 'serial')" onblur="updateField(${index}, 'serial', this.innerText)">${p.serial || ''}</td>
-                        <td class="editable-cell" contenteditable="true" onpaste="handlePaste(event, ${index}, 'mobile')" onblur="updateField(${index}, 'mobile', this.innerText)">${p.mobile || ''}</td>
-                        <td class="editable-cell" contenteditable="true" onpaste="handlePaste(event, ${index}, 'user')" onblur="updateField(${index}, 'user', this.innerText)">${p.user || ''}</td>
-                        <td class="${statusClass}">
-                            <select class="status-select" onchange="updateField(${index}, 'status', this.value)">
-                                ${statusList.map(s => `<option ${p.status === s ? 'selected' : ''}>${s}</option>`).join('')}
+                        <td class="editable-cell" contenteditable="true" onblur="updateField(${index}, 'serial', this.innerText)">${p.serial || ''}</td>
+                        <td class="editable-cell" contenteditable="true" onblur="updateField(${index}, 'mobile', this.innerText)">${p.mobile || ''}</td>
+                        <td class="editable-cell" contenteditable="true" onblur="updateField(${index}, 'user', this.innerText)">${p.user || ''}</td>
+                        <td>
+                            <select class="status-select ${colorClass}" onchange="updateField(${index}, 'status', this.value)">
+                                ${statusList.map(s => `<option value="${s}" ${p.status === s ? 'selected' : ''}>${s}</option>`).join('')}
                             </select>
                         </td>
                         <td style="font-size: 10px; color: #64748b;">${p.date}</td>
@@ -311,57 +298,49 @@
                     </tr>
                 `;
             }).join('');
+
+            if (!filteredList) updateFilterOptions();
         }
 
         function updateField(index, field, value) {
             let productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
-            if (productsDb[currentOrderId] && productsDb[currentOrderId][index]) {
+            if (productsDb[currentOrderId][index]) {
                 productsDb[currentOrderId][index][field] = value.trim();
-                if(field === 'status') {
-                    productsDb[currentOrderId][index]['date'] = new Date().toLocaleDateString('en-GB');
-                }
+                if(field === 'status') productsDb[currentOrderId][index]['date'] = new Date().toLocaleDateString('en-GB');
                 localStorage.setItem('asgate_products_db', JSON.stringify(productsDb));
-                renderProducts(); // إعادة الرندرة لتحديث الألوان أو الحسابات
+                renderProducts();
             }
         }
 
-        function sortData(field) {
-            let productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
-            let products = productsDb[currentOrderId] || [];
+        function updateFilterOptions() {
+            const productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+            const products = productsDb[currentOrderId] || [];
             
-            if (sortOrder.field === field) sortOrder.asc = !sortOrder.asc;
-            else { sortOrder.field = field; sortOrder.asc = true; }
+            const subs = [...new Set(products.map(p => p.sub))];
+            const statuses = [...new Set(products.map(p => p.status))];
 
-            products.sort((a, b) => {
-                let valA = a[field], valB = b[field];
-                if (field === 'sub') {
-                    valA = parseFloat(String(valA).replace(/[^\d.]/g, '')) || 0;
-                    valB = parseFloat(String(valB).replace(/[^\d.]/g, '')) || 0;
-                }
-                if (valA < valB) return sortOrder.asc ? -1 : 1;
-                if (valA > valB) return sortOrder.asc ? 1 : -1;
-                return 0;
-            });
+            const fillSelect = (id, items) => {
+                const sel = document.getElementById(id);
+                const currentVal = sel.value;
+                sel.innerHTML = '<option value="">الكل</option>' + items.map(i => `<option value="${i}" ${i===currentVal?'selected':''}>${i}</option>`).join('');
+            };
 
-            productsDb[currentOrderId] = products;
-            localStorage.setItem('asgate_products_db', JSON.stringify(productsDb));
-            renderProducts();
+            fillSelect('filter-sub', subs);
+            fillSelect('filter-status', statuses);
         }
 
-        function handlePaste(event, startIndex, field) {
-            event.preventDefault();
-            const pasteData = (event.clipboardData || window.clipboardData).getData('text');
-            const rows = pasteData.split(/\r\n|\n|\r/);
-            let productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+        function applyFilters() {
+            const subF = document.getElementById('filter-sub').value;
+            const statusF = document.getElementById('filter-status').value;
             
-            rows.forEach((rowData, i) => {
-                let targetIdx = startIndex + i;
-                if (productsDb[currentOrderId][targetIdx] && rowData.trim() !== "") {
-                    productsDb[currentOrderId][targetIdx][field] = rowData.trim();
-                }
+            const productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+            const allProducts = productsDb[currentOrderId] || [];
+            
+            const filtered = allProducts.filter(p => {
+                return (subF === "" || p.sub === subF) && (statusF === "" || p.status === statusF);
             });
-            localStorage.setItem('asgate_products_db', JSON.stringify(productsDb));
-            renderProducts();
+            
+            renderProducts(filtered);
         }
     </script>
 </body>
