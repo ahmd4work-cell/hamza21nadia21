@@ -130,6 +130,7 @@
         .btn-save { background: var(--header-green); color: white; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; flex: 1; font-family: 'Cairo'; font-weight: bold; }
         .btn-cancel { background: #94a3b8; color: white; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; flex: 1; font-family: 'Cairo'; font-weight: bold; }
 
+        .status-badge { background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; }
     </style>
 </head>
 <body onload="loadOrderDetails()">
@@ -164,7 +165,7 @@
                 <thead>
                     <tr>
                         <th style="width: 12%;">نوع الطلب</th>
-                        <th style="width: 20%;">اسم الطلب</th>
+                        <th style="width: 20%;">تفاصيل الطلب</th>
                         <th style="width: 8%;">العدد</th>
                         <th style="width: 12%;">الاشتراك</th>
                         <th style="width: 12%;">الحالة</th>
@@ -187,7 +188,7 @@
                 <input type="text" id="p_type" placeholder="مثلاً: خدمة">
             </div>
             <div class="form-group">
-                <label>اسم الطلب</label>
+                <label>تفاصيل الطلب</label>
                 <input type="text" id="p_name" placeholder="اسم المنتج/الخدمة">
             </div>
             <div class="form-group">
@@ -201,9 +202,12 @@
             <div class="form-group">
                 <label>الحالة</label>
                 <select id="p_status">
-                    <option>نشط</option>
-                    <option>قيد المعالجة</option>
-                    <option>ملغي</option>
+                    <option>مكتمل</option>
+                    <option>تم التوثيق</option>
+                    <option>توثيق</option>
+                    <option>مرتجع</option>
+                    <option>جاهز</option>
+                    <option>فقدان</option>
                 </select>
             </div>
             <div class="form-group">
@@ -245,12 +249,12 @@
             const sub = document.getElementById('p_sub').value;
             const status = document.getElementById('p_status').value;
             const note = document.getElementById('p_note').value;
-            const date = new Date().toLocaleDateString('en-GB'); // التاريخ الحالي
+            const date = new Date().toLocaleDateString('en-GB'); 
 
             if(!type || !name) { alert("يرجى ملء البيانات الأساسية"); return; }
 
             const tbody = document.getElementById('productsBody');
-            if (tbody.rows[0].cells.length === 1) tbody.innerHTML = ''; // مسح رسالة "لا يوجد منتجات"
+            if (tbody.rows.length > 0 && tbody.rows[0].cells.length === 1) tbody.innerHTML = ''; 
 
             const row = tbody.insertRow();
             row.innerHTML = `
@@ -258,7 +262,7 @@
                 <td>${name}</td>
                 <td>${qty}</td>
                 <td>${sub}</td>
-                <td><span class="badge-active">${status}</span></td>
+                <td><span class="status-badge">${status}</span></td>
                 <td>${date}</td>
                 <td>${note}</td>
             `;
