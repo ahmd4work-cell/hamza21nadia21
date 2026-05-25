@@ -7,57 +7,94 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --nav-bg: #2e1065;
-            --header-purple: #8b5cf6;
+            /* الألوان الجديدة الموحدة */
+            --nav-shiny-navy: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+            --header-shiny-purple: linear-gradient(180deg, #4c1d95 0%, #2e1065 100%);
+            
+            --nav-bg: #0f172a;
             --nav-active: #a78bfa;
             --bg-color: #f4f7f9;
+            --white: #ffffff;
             --zebra-blue: #eff6ff;
             --border-color: #cbd5e1;
-            --accent-green-active: #22c55e;
             --accent-blue: #3b82f6;
-            --border-soft: #cbd5e1;
+            --accent-green-active: #22c55e;
+            --text-dark: #1e293b;
         }
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; font-size: 13px; }
 
-        /* Navbar */
+        /* شريط الصفحات - كحلي لامع */
         .navbar { 
-            background-color: var(--nav-bg); display: flex; align-items: center; padding: 0 20px; 
-            margin: 10px; border-radius: 12px; height: 37px; position: sticky; top: 10px; z-index: 1000;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background: var(--nav-shiny-navy); 
+            display: flex; 
+            align-items: center; 
+            padding: 0 20px; 
+            margin: 10px; 
+            border-radius: 12px; 
+            height: 37px; 
+            position: sticky; 
+            top: 10px; 
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.1); 
+            box-sizing: border-box;
+            border: 1px solid #1e293b;
         }
-        .navbar a { color: #ffffff; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; height: 26px; line-height: 26px; display: inline-block; transition: 0.3s; }
-        .navbar a.active { background-color: var(--nav-active); color: var(--nav-bg); border-radius: 6px; }
+        .navbar a { 
+            color: var(--white); text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; 
+            border-radius: 6px; transition: 0.3s; line-height: 26px; height: 26px; display: inline-block;
+        }
+        .navbar a.active { background-color: var(--nav-active); color: #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
         .container { padding: 0 15px; }
         
-        .action-bar { display: flex; align-items: center; margin-top: 5px; margin-bottom: 5px; gap: 10px; }
+        .action-bar { display: flex; align-items: center; margin: 12px 0; gap: 10px; }
 
         .btn-top { border: none; padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; color: white; transition: 0.3s; }
         .btn-add { background-color: var(--accent-blue); }
-        .btn-save-all { background-color: #cbd5e1; color: #64748b; pointer-events: none; }
-        .btn-save-all.active { background-color: var(--accent-green-active); color: white; pointer-events: auto; }
+        .btn-save-all { background-color: #cbd5e1; color: #64748b; pointer-events: none; opacity: 0.6; }
+        .btn-save-all.active { background-color: var(--accent-green-active); color: white; pointer-events: auto; opacity: 1; box-shadow: 0 0 12px rgba(34, 197, 94, 0.5); }
 
-        .search-input { width: 5%; min-width: 150px; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-family: 'Cairo'; font-size: 12px; outline: none; }
+        .search-input { padding: 0 15px; border: 1px solid var(--border-color); border-radius: 8px; width: 300px; height: 32px; font-family: 'Cairo'; font-size: 11px; outline: none; }
 
-        /* Table */
-        .table-wrapper { background: white; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        /* الجدول */
+        .table-wrapper { background: var(--white); border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th { background-color: var(--header-purple); padding: 10px 5px; color: #ffffff; font-size: 11px; font-weight: 800; text-align: center; }
-        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; position: relative; }
+        
+        /* شريط العناوين - بنفسجي داكن لامع */
+        th { 
+            background: var(--header-shiny-purple); 
+            padding: 12px 5px; 
+            color: var(--white); 
+            font-size: 11px; 
+            font-weight: 800; 
+            text-align: center; 
+            border-bottom: 2px solid #2e1065;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        th::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 50%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            pointer-events: none;
+        }
+
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); position: relative; }
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
 
-        .excel-input-standard { width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; font-size: 11.5px; }
+        .excel-input-standard { width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; font-size: 11.5px; color: inherit; font-weight: inherit; }
         
         .company-wrapper { display: flex; align-items: center; justify-content: center; gap: 5px; }
-        .company-link { color: var(--accent-blue); text-decoration: none; font-weight: 700; }
+        .company-link { color: var(--accent-blue); text-decoration: none; font-weight: 800; border-bottom: 1px dashed var(--accent-blue); }
         .edit-input { width: 85%; height: 28px; border: 1px solid var(--accent-blue); border-radius: 4px; text-align: center; font-family: 'Cairo'; display: none; outline: none; }
 
         /* Actions Dropdown */
         .dots-btn { cursor: pointer; font-size: 18px; color: #64748b; font-weight: bold; background: none; border: none; padding: 5px 10px; }
         .dropdown-menu { 
             display: none; position: absolute; left: 10px; top: 35px; background: white; 
-            border: 1px solid var(--border-soft); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+            border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
             z-index: 100; min-width: 120px; overflow: hidden;
         }
         .dropdown-menu button { 
@@ -72,8 +109,8 @@
         /* Tooltip & Modal (Notes) */
         .custom-tooltip-cell { position: relative; }
         .tooltip-box {
-            position: absolute; top: 100%; right: 0; background: #334155; color: #fff;
-            padding: 8px 12px; border-radius: 8px; width: 200px; font-size: 11px;
+            position: absolute; bottom: 100%; right: 0; background: #334155; color: #fff;
+            padding: 8px 12px; border-radius: 8px; width: 220px; font-size: 11px;
             line-height: 1.6; white-space: pre-wrap; text-align: right;
             opacity: 0; visibility: hidden; transition: 0.2s; z-index: 9999;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3); pointer-events: none; 
@@ -85,10 +122,10 @@
             overflow: hidden; white-space: nowrap; text-overflow: ellipsis; display: block; margin: 0 auto;
         }
 
-        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; }
-        .modal-content { background: white; padding: 15px; border-radius: 10px; width: 380px; height: 440px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        .modal-header { font-weight: 800; color: #2e1065; margin-bottom: 10px; font-size: 14px; border-bottom: 1px solid #eee; padding-bottom: 5px; text-align: right; }
-        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 6px; padding: 12px; margin-bottom: 10px; font-size: 12px; color: #1e293b; text-align: right; line-height: 1.8; white-space: pre-wrap; }
+        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 15px; border-radius: 12px; width: 380px; height: 440px; display: flex; flex-direction: column; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-header { font-weight: 800; color: #2e1065; margin-bottom: 10px; font-size: 14px; text-align: right; }
+        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; margin-bottom: 10px; font-size: 12px; color: #1e293b; text-align: right; line-height: 1.8; white-space: pre-wrap; }
         .note-area { height: 80px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 8px; font-family: 'Cairo'; resize: none; outline: none; box-sizing: border-box; font-size: 13px; text-align: right; }
         .modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
     </style>
@@ -107,7 +144,7 @@
     <div class="action-bar">
         <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة عميل جديد</button>
         <button id="saveAllBtn" class="btn-top btn-save-all" onclick="saveAllData()">حفظ التغييرات</button>
-        <input type="text" id="tableSearch" class="search-input" placeholder="بحث عن عميل..." onkeyup="filterTable()">
+        <input type="text" id="tableSearch" class="search-input" placeholder="🔍 بحث عن عميل..." onkeyup="filterTable()">
     </div>
     
     <div class="table-wrapper">
@@ -137,8 +174,8 @@
         <div id="historyLog" class="history-log"></div>
         <textarea id="modalTextArea" class="note-area" placeholder="أدخل الملاحظة الجديدة هنا..."></textarea>
         <div class="modal-footer">
-            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:Cairo;">إلغاء</button>
-            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:Cairo;">إضافة ملاحظة</button>
+            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px;">إلغاء</button>
+            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px; font-weight:bold;">إضافة ملاحظة</button>
         </div>
     </div>
 </div>
@@ -311,7 +348,7 @@
                 address: otherInputs[0].value, 
                 mgr: otherInputs[1].value,
                 mob: otherInputs[2].value, 
-                email: otherInputs[3].value, // حفظ الايميل
+                email: otherInputs[3].value,
                 cr: otherInputs[4].value,
                 cr_sub: otherInputs[5].value,
                 notes: noteDiv.getAttribute('data-full-notes'),
