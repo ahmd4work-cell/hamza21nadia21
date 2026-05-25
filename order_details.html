@@ -31,14 +31,8 @@
         .container { padding: 0 20px 20px 20px; }
 
         .sticky-top-section {
-            position: sticky;
-            top: 37px; 
-            background-color: var(--bg-color);
-            z-index: 1200;
-            padding-top: 10px;
-            padding-bottom: 5px;
-            height: 137px; 
-            box-sizing: border-box;
+            position: sticky; top: 37px; background-color: var(--bg-color);
+            z-index: 1200; padding-top: 10px; padding-bottom: 5px; height: 137px; box-sizing: border-box;
         }
 
         .header-section-wrapper { margin: 0 7% 10px 7%; display: flex; align-items: center; gap: 15px; }
@@ -50,48 +44,29 @@
         .info-value { font-size: 13px; color: var(--nav-bg); font-weight: 800; }
         .info-item-highlight { border: 2px solid var(--header-green); padding: 5px 15px; border-radius: 8px; background-color: #f0fdf4; }
 
-        .action-bar { margin: 5px 0 10px 0; display: flex; justify-content: space-between; align-items: center; }
+        /* شريط الأزرار الجديد */
+        .action-bar { margin: 5px 0 10px 0; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .search-wrapper { flex-grow: 1; display: flex; justify-content: center; }
+        .search-input { width: 300px; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--border-color); font-family: 'Cairo'; font-size: 12px; outline: none; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05); }
         
         .table-wrapper { background: white; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1200px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1100px; }
         
         thead th { 
-            background-color: var(--header-green) !important; 
-            height: 40px; 
-            line-height: 40px;
-            padding: 0 5px; 
-            color: white !important; 
-            font-size: 11px; 
-            font-weight: 800; 
-            text-align: center; 
-            border-left: 1px solid rgba(255,255,255,0.1);
-            position: sticky;
-            top: 174px; 
-            z-index: 1100;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background-color: var(--header-green) !important; height: 40px; line-height: 40px;
+            padding: 0 5px; color: white !important; font-size: 11px; font-weight: 800; text-align: center; 
+            border-left: 1px solid rgba(255,255,255,0.1); position: sticky; top: 174px; z-index: 1100;
         }
         
         thead th:first-child { border-radius: 0 10px 0 0; }
         thead th:last-child { border-radius: 10px 0 0 0; border-left: none; }
         
-        .th-filter-wrap { display: inline-flex; align-items: center; justify-content: center; gap: 1px; cursor: pointer; color: white; }
-        .header-select { background: transparent; color: white !important; border: none; font-family: 'Cairo'; font-size: 11px; font-weight: 800; cursor: pointer; outline: none; -webkit-appearance: none; -moz-appearance: none; appearance: none; text-align: center; padding: 0; margin: 0; width: auto; }
-        .arrow-icon { font-size: 14px; line-height: 1; font-weight: 400; display: inline-block; margin-top: 0; margin-right: 2px; }
-
-        td { 
-            border-bottom: 1px solid #f1f5f9; 
-            text-align: center; 
-            height: 40px; 
-            line-height: 1.2;
-            font-size: 11px; 
-            font-weight: 600; 
-            color: var(--text-dark); 
-            padding: 5px; 
-        }
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 40px; font-size: 11px; font-weight: 600; color: var(--text-dark); padding: 5px; }
         
-        .btn { border: none; padding: 8px 15px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; transition: 0.3s; color: white; }
+        .btn { border: none; padding: 8px 15px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 11px; transition: 0.3s; color: white; display: flex; align-items: center; gap: 5px; }
         .btn-add { background: var(--accent-blue); }
         .btn-export { background: var(--header-green); }
+        .btn-print { background: #64748b; }
         .btn-delete-multi { background: var(--danger-red); }
 
         .status-select { font-family: 'Cairo'; font-size: 10px; font-weight: 700; padding: 5px; border-radius: 6px; width: 95%; cursor: pointer; border: 1px solid var(--border-color); }
@@ -99,28 +74,22 @@
         .status-verified { background-color: var(--soft-green) !important; color: #166534 !important; border: 1px solid #bbf7d0 !important; }
         .status-pending { background-color: #eab308 !important; color: #000 !important; }
 
-        .action-select { font-family: 'Cairo'; font-size: 18px; padding: 0; border: none; background: transparent; cursor: pointer; font-weight: bold; -webkit-appearance: none; -moz-appearance: none; appearance: none; text-align: center; width: 100%; }
-        .action-select option { font-size: 13px; font-weight: 600; color: #1e293b; background-color: white; }
+        .editable-cell { cursor: cell; outline: none; transition: background 0.2s; }
+        .editable-cell:focus { background-color: #fffbeb; box-shadow: inset 0 0 0 1px var(--accent-blue); }
+        .row-locked { background-color: #f8fafc; color: #94a3b8; pointer-events: none; }
+        .row-locked select, .row-locked input { opacity: 0.6; }
 
-        /* تم إزالة الخط المنقط من هنا لتبدو الخلايا عادية */
-        .editable-cell { cursor: cell; outline: none; }
-        
-        .activity-log-section { margin-top: 30px; background: #fff; border-radius: 12px; border: 1px solid var(--border-color); padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-        .activity-log-title { font-weight: 800; font-size: 13px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; color: var(--nav-bg); }
-        
-        .log-input-area { display: flex; gap: 10px; margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #e2e8f0; }
-        .log-input-area input[type="text"] { flex-grow: 1; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-family: 'Cairo'; font-size: 10px; outline: none; }
-        .log-input-area input[type="file"] { display: none; }
-        .btn-attach { background: #64748b; color: white; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
-        .btn-send-log { background: var(--nav-bg); color: white; padding: 8px 18px; border-radius: 8px; font-weight: 700; border: none; cursor: pointer; font-family: 'Cairo'; font-size: 10px; }
+        /* ستايل الطباعة */
+        @media print {
+            .navbar, .sticky-top-section, .btn-back-outside, .activity-log-section, .action-bar, th:first-child, td:first-child { display: none !important; }
+            .container { padding: 0; }
+            .table-wrapper { border: none; box-shadow: none; }
+            table { min-width: 100%; border: 1px solid #000; }
+            th, td { border: 1px solid #000 !important; color: #000 !important; }
+            thead th { background-color: #eee !important; color: #000 !important; position: static; }
+        }
 
-        #activityLog { max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; }
-        .log-entry { background: #fff; border: 1px solid #f1f5f9; padding: 10px; border-radius: 8px; border-right: 4px solid var(--accent-blue); position: relative; }
-        .log-text { font-size: 10px; color: var(--text-dark); font-weight: 600; line-height: 1.6; }
-        .log-attachment { margin-top: 8px; display: block; }
-        .log-attachment img { max-width: 120px; border-radius: 6px; border: 1px solid #eee; }
-        .file-link { display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; background: #f1f5f9; border-radius: 5px; text-decoration: none; color: #475569; font-size: 9px; font-weight: 700; border: 1px solid #e2e8f0; }
-
+        .activity-log-section { margin-top: 30px; background: #fff; border-radius: 12px; border: 1px solid var(--border-color); padding: 20px; }
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 20px; border-radius: 12px; width: 480px; }
     </style>
@@ -151,10 +120,16 @@
             </div>
 
             <div class="action-bar">
-                <div class="action-btns">
-                    <button class="btn btn-add" onclick="openModal()">+ إضافة منتج</button>
-                    <button class="btn btn-export" onclick="exportToExcel()">📥 تصدير Excel</button>
-                    <button class="btn btn-delete-multi" onclick="deleteSelected()">🗑️ حذف المحدد</button>
+                <button class="btn btn-add" onclick="openModal()">+ إضافة منتج</button>
+                
+                <div class="search-wrapper">
+                    <input type="text" id="liveSearch" class="search-input" placeholder="بحث بالسريال، الخدمة أو المستخدم..." onkeyup="applyFilters()">
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-export" onclick="exportToExcel()">📥 تصدير</button>
+                    <button class="btn btn-print" onclick="window.print()">🖨️ طباعة</button>
+                    <button class="btn btn-delete-multi" onclick="deleteSelected()">🗑️ حذف</button>
                 </div>
             </div>
         </div>
@@ -167,29 +142,14 @@
                         <th style="width: 10%;">نوع الطلب</th>
                         <th style="width: 14%;">تفاصيل الطلب</th>
                         <th style="width: 5%;">العدد</th>
-                        <th style="width: 10%;">
-                            <div class="th-filter-wrap">
-                                <select id="filter-sub" class="header-select" onchange="applyFilters()">
-                                    <option value="">الاشتراك</option>
-                                </select>
-                                <span class="arrow-icon">⌵</span>
-                            </div>
-                        </th>
+                        <th style="width: 10%;">الاشتراك</th>
                         <th style="width: 7%;">الاجمالي</th>
-                        <th style="width: 9%;">رقم السريال</th>
-                        <th style="width: 9%;">رقم الخدمة</th>
-                        <th style="width: 9%;">المستخدم</th>
-                        <th style="width: 8%;">
-                            <div class="th-filter-wrap">
-                                <select id="filter-status" class="header-select" onchange="applyFilters()">
-                                    <option value="">الحالة</option>
-                                </select>
-                                <span class="arrow-icon">⌵</span>
-                            </div>
-                        </th>
+                        <th style="width: 10%;">رقم السريال</th>
+                        <th style="width: 10%;">رقم الخدمة</th>
+                        <th style="width: 10%;">المستخدم</th>
+                        <th style="width: 10%;">الحالة</th>
                         <th style="width: 8%;">تاريخ التغيير</th>
-                        <th style="width: 5%;">ملاحظة</th>
-                        <th style="width: 3%;">إجراء</th>
+                        <th style="width: 13%;">ملاحظة</th>
                     </tr>
                 </thead>
                 <tbody id="productsBody"></tbody>
@@ -197,16 +157,7 @@
         </div>
 
         <div class="activity-log-section">
-            <div class="activity-log-title">📜 سجل النشاط والمرفقات</div>
-            
-            <div class="log-input-area">
-                <input type="text" id="logTextInput" placeholder="اكتب ملاحظة هنا...">
-                <label class="btn-attach" title="إرفاق ملف">
-                    📎 <input type="file" id="logFileInput" onchange="handleLogFileUpload(this)">
-                </label>
-                <button class="btn-send-log" onclick="addManualLog()">إضافة</button>
-            </div>
-
+            <div style="font-weight:800; margin-bottom:15px;">📜 سجل النشاط والمرفقات</div>
             <div id="activityLog"></div>
         </div>
     </div>
@@ -214,19 +165,14 @@
     <div id="productModal" class="modal">
         <div class="modal-content">
             <h3 id="modalTitle" style="font-size:14px; margin-bottom:15px;">إضافة منتج جديد</h3>
-            <input type="hidden" id="edit-index">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                 <input type="text" id="p_type" placeholder="نوع الطلب" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-family:'Cairo';">
                 <input type="text" id="p_name" placeholder="تفاصيل الطلب" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-family:'Cairo';">
                 <input type="number" id="p_qty" placeholder="العدد" value="1" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-family:'Cairo';">
-                <input type="text" id="p_sub" placeholder="الاشتراك (التأسيس)" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-family:'Cairo';">
+                <input type="text" id="p_sub" placeholder="الاشتراك" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-family:'Cairo';">
                 <select id="p_status" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-family:'Cairo'; grid-column: span 2;">
-                    <option>مكتمل</option><option>تم التوثيق</option><option>توثيق</option><option selected>جاهز</option><option>مرتجع</option><option>فقدان</option>
+                    <option selected>جاهز</option><option>مكتمل</option><option>تم التوثيق</option><option>توثيق</option><option>مرتجع</option>
                 </select>
-                <input type="text" id="p_serial" placeholder="رقم السريال" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-family:'Cairo';">
-                <input type="text" id="p_mobile" placeholder="رقم الخدمة" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-family:'Cairo';">
-                <input type="text" id="p_user" placeholder="المستخدم" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-family:'Cairo';">
-                <input type="text" id="p_note" placeholder="ملاحظة" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-family:'Cairo';">
             </div>
             <div style="margin-top:20px; display:flex; gap:10px;">
                 <button class="btn btn-export" style="flex:1" onclick="saveProduct()">حفظ</button>
@@ -252,70 +198,7 @@
                 document.getElementById('orderType').innerText = order.type;
                 document.getElementById('orderStatus').innerText = order.status;
                 renderProducts();
-                renderActivityLog();
             }
-        }
-
-        function getCurrentUser() {
-            const productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
-            const products = productsDb[currentOrderId] || [];
-            if(products.length > 0 && products[0].user) return products[0].user;
-            return "النظام";
-        }
-
-        function getFormattedFullDateTime() {
-            const now = new Date();
-            const days = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
-            const dayName = days[now.getDay()];
-            const dateStr = now.toLocaleDateString('en-GB');
-            const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
-            return `${dayName} ${dateStr} ${timeStr}`;
-        }
-
-        function addManualLog() {
-            const input = document.getElementById('logTextInput');
-            if(input.value.trim() === "") return;
-            addToLog(input.value.trim());
-            input.value = "";
-        }
-
-        function handleLogFileUpload(input) {
-            const file = input.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const fileData = { name: file.name, type: file.type, data: e.target.result };
-                addToLog(`تم إرفاق ملف: ${file.name}`, fileData);
-            };
-            reader.readAsDataURL(file);
-            input.value = "";
-        }
-
-        function addToLog(text, fileData = null) {
-            const user = getCurrentUser();
-            const fullDateTime = getFormattedFullDateTime();
-            let logs = JSON.parse(localStorage.getItem('asgate_activity_log') || '[]');
-            const fullEntryText = `${fullDateTime}   ${user} | ${text}`;
-            logs.unshift({ text: fullEntryText, orderId: currentOrderId, file: fileData });
-            localStorage.setItem('asgate_activity_log', JSON.stringify(logs));
-            renderActivityLog();
-        }
-
-        function renderActivityLog() {
-            const logs = JSON.parse(localStorage.getItem('asgate_activity_log') || '[]');
-            const logContainer = document.getElementById('activityLog');
-            const filteredLogs = logs.filter(l => l.orderId === currentOrderId);
-            logContainer.innerHTML = filteredLogs.map(l => {
-                let attachmentHtml = "";
-                if (l.file) {
-                    if (l.file.type.startsWith('image/')) {
-                        attachmentHtml = `<div class="log-attachment"><img src="${l.file.data}" alt="attachment"></div>`;
-                    } else {
-                        attachmentHtml = `<div class="log-attachment"><a href="${l.file.data}" download="${l.file.name}" class="file-link">📄 ${l.file.name}</a></div>`;
-                    }
-                }
-                return `<div class="log-entry"><div class="log-text">${l.text}</div>${attachmentHtml}</div>`;
-            }).join('');
         }
 
         function renderProducts(filteredList = null) {
@@ -325,143 +208,86 @@
             
             tbody.innerHTML = products.map((p, index) => {
                 const subVal = parseFloat(String(p.sub).replace(/[^\d.]/g, '')) || 0;
-                let statusClass = (p.status === "مكتمل") ? "status-complete" : (p.status === "تم التوثيق" ? "status-verified" : (p.status === "توثيق" ? "status-pending" : ""));
                 const isLocked = (p.status === "مكتمل" || p.status === "تم التوثيق");
+                let statusClass = (p.status === "مكتمل") ? "status-complete" : (p.status === "تم التوثيق" ? "status-verified" : (p.status === "توثيق" ? "status-pending" : ""));
 
                 return `
-                    <tr>
-                        <td><input type="checkbox" class="row-checkbox" data-index="${index}"></td>
-                        <td>${p.type}</td>
-                        <td>${p.name}</td>
-                        <td>${p.qty}</td>
-                        <td>${p.sub}</td>
+                    <tr class="${isLocked ? 'row-locked' : ''}">
+                        <td>${isLocked ? '' : `<input type="checkbox" class="row-checkbox" data-index="${index}">`}</td>
+                        <td class="editable-cell" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'type', this.innerText)">${p.type}</td>
+                        <td class="editable-cell" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'name', this.innerText)">${p.name}</td>
+                        <td class="editable-cell" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'qty', this.innerText)">${p.qty}</td>
+                        <td class="editable-cell" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'sub', this.innerText)">${p.sub}</td>
                         <td style="color:var(--header-green); font-weight:800;">${(p.qty * subVal).toFixed(2)}</td>
-                        <td class="${isLocked ? '' : 'editable-cell'}" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'serial', this.innerText)">${p.serial || ''}</td>
-                        <td class="${isLocked ? '' : 'editable-cell'}" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'mobile', this.innerText)">${p.mobile || ''}</td>
-                        <td class="${isLocked ? '' : 'editable-cell'}" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'user', this.innerText)">${p.user || ''}</td>
+                        <td class="editable-cell" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'serial', this.innerText)">${p.serial || ''}</td>
+                        <td class="editable-cell" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'mobile', this.innerText)">${p.mobile || ''}</td>
+                        <td class="editable-cell" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'user', this.innerText)">${p.user || ''}</td>
                         <td>
-                            <select class="status-select ${statusClass}" onchange="updateQuickField(${index}, 'status', this.value)">
+                            <select class="status-select ${statusClass}" onchange="updateQuickField(${index}, 'status', this.value)" ${isLocked ? 'disabled' : ''}>
                                 ${statusList.map(s => `<option value="${s}" ${p.status===s?'selected':''}>${s}</option>`).join('')}
                             </select>
                         </td>
                         <td style="font-size:10px">${p.date}</td>
-                        <td class="${isLocked ? '' : 'editable-cell'}" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'note', this.innerText)">${p.note}</td>
-                        <td>
-                            <select class="action-select" onchange="handleAction(this, ${index})">
-                                <option value="" selected disabled>⌵</option>
-                                <option value="edit" ${isLocked ? 'disabled' : ''}>تعديل</option>
-                                <option value="delete" ${isLocked ? 'disabled' : ''}>حذف</option>
-                            </select>
-                        </td>
+                        <td class="editable-cell" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'note', this.innerText)">${p.note || ''}</td>
                     </tr>`;
             }).join('');
-            if (!filteredList) updateFilterOptions();
         }
 
         function updateQuickField(index, field, value) {
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
-            const oldVal = db[currentOrderId][index][field];
-            if (oldVal !== value.trim()) {
-                db[currentOrderId][index][field] = value.trim();
+            let orderProducts = db[currentOrderId];
+            if (orderProducts[index][field] != value.trim()) {
+                orderProducts[index][field] = value.trim();
                 if(field === 'status') {
-                    db[currentOrderId][index].date = new Date().toLocaleDateString('en-GB');
-                    addToLog(`تغيير الحالة إلى: ${value}`);
+                    orderProducts[index].date = new Date().toLocaleDateString('en-GB');
                 }
                 localStorage.setItem('asgate_products_db', JSON.stringify(db));
                 renderProducts();
             }
         }
 
+        function applyFilters() {
+            const query = document.getElementById('liveSearch').value.toLowerCase();
+            const all = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
+            const filtered = all.filter(p => 
+                (p.serial && p.serial.toLowerCase().includes(query)) || 
+                (p.mobile && p.mobile.toLowerCase().includes(query)) || 
+                (p.user && p.user.toLowerCase().includes(query))
+            );
+            renderProducts(filtered);
+        }
+
         function saveProduct() {
-            const index = document.getElementById('edit-index').value;
             const data = {
                 type: document.getElementById('p_type').value,
                 name: document.getElementById('p_name').value,
                 qty: parseInt(document.getElementById('p_qty').value) || 1,
                 sub: document.getElementById('p_sub').value,
-                serial: document.getElementById('p_serial').value,
-                mobile: document.getElementById('p_mobile').value,
-                user: document.getElementById('p_user').value,
+                serial: '', mobile: '', user: '', note: '',
                 status: document.getElementById('p_status').value,
-                note: document.getElementById('p_note').value,
                 date: new Date().toLocaleDateString('en-GB')
             };
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             if (!db[currentOrderId]) db[currentOrderId] = [];
-            if (index !== "") {
-                db[currentOrderId][index] = data;
-                addToLog(`تعديل منتج: ${data.name}`);
-            } else {
-                db[currentOrderId].push(data);
-                addToLog(`إضافة منتج: ${data.name}`);
-            }
+            db[currentOrderId].push(data);
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
             renderProducts(); closeModal();
         }
 
-        function handleAction(s, i) {
-            if(s.value === "edit") openModal(i);
-            else if(s.value === "delete") { 
-                if(confirm("حذف؟")) { 
-                    let db = JSON.parse(localStorage.getItem('asgate_products_db')); 
-                    const pName = db[currentOrderId][i].name;
-                    db[currentOrderId].splice(i,1); 
-                    localStorage.setItem('asgate_products_db', JSON.stringify(db)); 
-                    renderProducts(); 
-                    addToLog(`حذف منتج: ${pName}`);
-                } 
-            }
-            s.value = "";
-        }
-
-        function updateFilterOptions() {
-            const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
-            const fill = (id, label, items) => {
-                const s = document.getElementById(id);
-                if(!s) return;
-                const current = s.value;
-                s.innerHTML = `<option value="">${label}</option>` + [...new Set(items)].map(i => i ? `<option value="${i}" ${i===current?'selected':''}>${i}</option>` : '').join('');
-            };
-            fill('filter-sub', 'الاشتراك', db.map(p => p.sub));
-            fill('filter-status', 'الحالة', db.map(p => p.status));
-        }
-
-        function applyFilters() {
-            const sub = document.getElementById('filter-sub').value;
-            const status = document.getElementById('filter-status').value;
-            const all = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
-            const filtered = all.filter(p => (sub === "" || p.sub === sub) && (status === "" || p.status === status));
-            renderProducts(filtered);
-        }
-
-        function openModal(index = null) {
-            document.getElementById('productModal').style.display = 'flex';
-            if (index !== null) {
-                const p = JSON.parse(localStorage.getItem('asgate_products_db'))[currentOrderId][index];
-                document.getElementById('edit-index').value = index;
-                document.getElementById('p_type').value = p.type; document.getElementById('p_name').value = p.name;
-                document.getElementById('p_qty').value = p.qty; document.getElementById('p_sub').value = p.sub;
-                document.getElementById('p_serial').value = p.serial; document.getElementById('p_mobile').value = p.mobile;
-                document.getElementById('p_user').value = p.user; document.getElementById('p_status').value = p.status;
-                document.getElementById('p_note').value = p.note; document.getElementById('modalTitle').innerText = "تعديل المنتج";
-            } else {
-                document.getElementById('edit-index').value = "";
-                document.querySelectorAll('#productModal input').forEach(i => i.value = "");
-                document.getElementById('p_qty').value = 1; document.getElementById('modalTitle').innerText = "إضافة منتج جديد";
-            }
-        }
-        function closeModal() { document.getElementById('productModal').style.display = 'none'; }
-        function toggleSelectAll(s) { document.querySelectorAll('.row-checkbox').forEach(c => c.checked = s.checked); }
         function deleteSelected() {
             const selected = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => parseInt(cb.dataset.index));
-            if(selected.length > 0 && confirm("حذف المحدد؟")) {
+            if(selected.length > 0 && confirm("هل أنت متأكد من حذف المنتجات المحددة؟")) {
                 let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
                 db[currentOrderId] = db[currentOrderId].filter((p, i) => !selected.includes(i));
                 localStorage.setItem('asgate_products_db', JSON.stringify(db));
                 renderProducts();
-                addToLog(`حذف عدة منتجات عدد (${selected.length})`);
             }
         }
+
+        function toggleSelectAll(s) { document.querySelectorAll('.row-checkbox').forEach(c => c.checked = s.checked); }
+        function openModal() { document.getElementById('productModal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('productModal').style.display = 'none'; }
+        
         function exportToExcel() {
             const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
             const ws = XLSX.utils.json_to_sheet(db);
