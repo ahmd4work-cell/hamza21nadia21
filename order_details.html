@@ -44,12 +44,11 @@
         .info-value { font-size: 13px; color: var(--nav-bg); font-weight: 800; }
         .info-item-highlight { border: 2px solid var(--header-green); padding: 5px 15px; border-radius: 8px; background-color: #f0fdf4; }
 
-        /* شريط الأزرار الجديد */
         .action-bar { margin: 5px 0 10px 0; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
         .search-wrapper { flex-grow: 1; display: flex; justify-content: center; }
         .search-input { width: 300px; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--border-color); font-family: 'Cairo'; font-size: 12px; outline: none; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05); }
         
-        .table-wrapper { background: white; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .table-wrapper { background: white; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; }
         table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1100px; }
         
         thead th { 
@@ -58,11 +57,12 @@
             border-left: 1px solid rgba(255,255,255,0.1); position: sticky; top: 174px; z-index: 1100;
         }
         
-        thead th:first-child { border-radius: 0 10px 0 0; }
-        thead th:last-child { border-radius: 10px 0 0 0; border-left: none; }
-        
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 40px; font-size: 11px; font-weight: 600; color: var(--text-dark); padding: 5px; }
         
+        /* صف الإجمالي الأسود */
+        .table-footer { background-color: #000 !important; color: #fff !important; height: 30px !important; }
+        .table-footer td { color: #fff !important; border: none; font-weight: 800; font-size: 12px; height: 30px; }
+
         .btn { border: none; padding: 8px 15px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 11px; transition: 0.3s; color: white; display: flex; align-items: center; gap: 5px; }
         .btn-add { background: var(--accent-blue); }
         .btn-export { background: var(--header-green); }
@@ -71,25 +71,18 @@
 
         .status-select { font-family: 'Cairo'; font-size: 10px; font-weight: 700; padding: 5px; border-radius: 6px; width: 95%; cursor: pointer; border: 1px solid var(--border-color); }
         .status-complete { background-color: #16a34a !important; color: white !important; }
-        .status-verified { background-color: var(--soft-green) !important; color: #166534 !important; border: 1px solid #bbf7d0 !important; }
+        .status-verified { background-color: var(--soft-green) !important; color: #166534 !important; }
         .status-pending { background-color: #eab308 !important; color: #000 !important; }
 
-        .editable-cell { cursor: cell; outline: none; transition: background 0.2s; }
-        .editable-cell:focus { background-color: #fffbeb; box-shadow: inset 0 0 0 1px var(--accent-blue); }
-        .row-locked { background-color: #f8fafc; color: #94a3b8; pointer-events: none; }
-        .row-locked select, .row-locked input { opacity: 0.6; }
+        .editable-cell { cursor: cell; outline: none; }
+        .row-locked { background-color: #f8fafc; color: #94a3b8; }
 
-        /* ستايل الطباعة */
         @media print {
-            .navbar, .sticky-top-section, .btn-back-outside, .activity-log-section, .action-bar, th:first-child, td:first-child { display: none !important; }
-            .container { padding: 0; }
-            .table-wrapper { border: none; box-shadow: none; }
+            .navbar, .sticky-top-section, .btn-back-outside, .action-bar, th:first-child, td:first-child { display: none !important; }
             table { min-width: 100%; border: 1px solid #000; }
-            th, td { border: 1px solid #000 !important; color: #000 !important; }
-            thead th { background-color: #eee !important; color: #000 !important; position: static; }
+            th, td { border: 1px solid #000 !important; }
         }
 
-        .activity-log-section { margin-top: 30px; background: #fff; border-radius: 12px; border: 1px solid var(--border-color); padding: 20px; }
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 20px; border-radius: 12px; width: 480px; }
     </style>
@@ -115,17 +108,15 @@
                     <div class="info-item"><span class="info-label">الشركة</span><span class="info-value" id="orderComp">-</span></div>
                     <div class="info-item"><span class="info-label">السجل</span><span class="info-value" id="orderCr">-</span></div>
                     <div class="info-item"><span class="info-label">حالة الطلب</span><span class="info-value" id="orderStatus">-</span></div>
-                    <div class="info-item"><span class="info-label">قيمة الطلب</span><span class="info-value">0.00 ر.س</span></div>
+                    <div class="info-item"><span class="info-label">قيمة الطلب</span><span class="info-value" id="orderTotalSum">0.00 ر.س</span></div>
                 </div>
             </div>
 
             <div class="action-bar">
                 <button class="btn btn-add" onclick="openModal()">+ إضافة منتج</button>
-                
                 <div class="search-wrapper">
                     <input type="text" id="liveSearch" class="search-input" placeholder="بحث بالسريال، الخدمة أو المستخدم..." onkeyup="applyFilters()">
                 </div>
-
                 <div style="display: flex; gap: 8px;">
                     <button class="btn btn-export" onclick="exportToExcel()">📥 تصدير</button>
                     <button class="btn btn-print" onclick="window.print()">🖨️ طباعة</button>
@@ -153,25 +144,30 @@
                     </tr>
                 </thead>
                 <tbody id="productsBody"></tbody>
+                <tfoot>
+                    <tr class="table-footer">
+                        <td id="f_count">0</td>
+                        <td colspan="2">الصفوف المحددة</td>
+                        <td id="f_qty">0</td>
+                        <td id="f_sub">0</td>
+                        <td id="f_total">0</td>
+                        <td colspan="6"></td>
+                    </tr>
+                </tfoot>
             </table>
-        </div>
-
-        <div class="activity-log-section">
-            <div style="font-weight:800; margin-bottom:15px;">📜 سجل النشاط والمرفقات</div>
-            <div id="activityLog"></div>
         </div>
     </div>
 
     <div id="productModal" class="modal">
         <div class="modal-content">
-            <h3 id="modalTitle" style="font-size:14px; margin-bottom:15px;">إضافة منتج جديد</h3>
+            <h3>إضافة منتج جديد</h3>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <input type="text" id="p_type" placeholder="نوع الطلب" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-family:'Cairo';">
-                <input type="text" id="p_name" placeholder="تفاصيل الطلب" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-family:'Cairo';">
-                <input type="number" id="p_qty" placeholder="العدد" value="1" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-family:'Cairo';">
-                <input type="text" id="p_sub" placeholder="الاشتراك" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-family:'Cairo';">
-                <select id="p_status" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-family:'Cairo'; grid-column: span 2;">
-                    <option selected>جاهز</option><option>مكتمل</option><option>تم التوثيق</option><option>توثيق</option><option>مرتجع</option>
+                <input type="text" id="p_type" placeholder="نوع الطلب" style="padding:8px; border:1px solid #ddd; border-radius:6px;">
+                <input type="text" id="p_name" placeholder="تفاصيل الطلب" style="padding:8px; border:1px solid #ddd; border-radius:6px;">
+                <input type="number" id="p_qty" placeholder="العدد" value="1" style="padding:8px; border:1px solid #ddd; border-radius:6px;">
+                <input type="text" id="p_sub" placeholder="الاشتراك" style="padding:8px; border:1px solid #ddd; border-radius:6px;">
+                <select id="p_status" style="padding:8px; border:1px solid #ddd; border-radius:6px; grid-column: span 2;">
+                    <option>جاهز</option><option>مكتمل</option><option>تم التوثيق</option>
                 </select>
             </div>
             <div style="margin-top:20px; display:flex; gap:10px;">
@@ -188,7 +184,6 @@
         function loadOrderDetails() {
             const urlParams = new URLSearchParams(window.location.search);
             currentOrderId = urlParams.get('id');
-            if (!currentOrderId) return;
             const salesData = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
             const order = salesData.find(item => String(item.id) === String(currentOrderId));
             if (order) {
@@ -209,11 +204,11 @@
             tbody.innerHTML = products.map((p, index) => {
                 const subVal = parseFloat(String(p.sub).replace(/[^\d.]/g, '')) || 0;
                 const isLocked = (p.status === "مكتمل" || p.status === "تم التوثيق");
-                let statusClass = (p.status === "مكتمل") ? "status-complete" : (p.status === "تم التوثيق" ? "status-verified" : (p.status === "توثيق" ? "status-pending" : ""));
+                let statusClass = (p.status === "مكتمل") ? "status-complete" : (p.status === "تم التوثيق" ? "status-verified" : "");
 
                 return `
                     <tr class="${isLocked ? 'row-locked' : ''}">
-                        <td>${isLocked ? '' : `<input type="checkbox" class="row-checkbox" data-index="${index}">`}</td>
+                        <td><input type="checkbox" class="row-checkbox" data-index="${index}" onchange="calculateTotals()"></td>
                         <td class="editable-cell" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'type', this.innerText)">${p.type}</td>
                         <td class="editable-cell" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'name', this.innerText)">${p.name}</td>
                         <td class="editable-cell" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'qty', this.innerText)">${p.qty}</td>
@@ -231,40 +226,57 @@
                         <td class="editable-cell" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'note', this.innerText)">${p.note || ''}</td>
                     </tr>`;
             }).join('');
+            calculateTotals();
+        }
+
+        function calculateTotals() {
+            const checkboxes = document.querySelectorAll('.row-checkbox:checked');
+            const products = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
+            
+            let count = 0, qty = 0, sub = 0, total = 0;
+
+            checkboxes.forEach(cb => {
+                const idx = cb.dataset.index;
+                const p = products[idx];
+                const sVal = parseFloat(String(p.sub).replace(/[^\d.]/g, '')) || 0;
+                
+                count++;
+                qty += parseInt(p.qty) || 0;
+                sub += sVal;
+                total += (parseInt(p.qty) || 0) * sVal;
+            });
+
+            document.getElementById('f_count').innerText = count;
+            document.getElementById('f_qty').innerText = qty;
+            document.getElementById('f_sub').innerText = sub.toFixed(2);
+            document.getElementById('f_total').innerText = total.toFixed(2);
+        }
+
+        function toggleSelectAll(s) {
+            document.querySelectorAll('.row-checkbox').forEach(c => c.checked = s.checked);
+            calculateTotals();
         }
 
         function updateQuickField(index, field, value) {
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
-            let orderProducts = db[currentOrderId];
-            if (orderProducts[index][field] != value.trim()) {
-                orderProducts[index][field] = value.trim();
-                if(field === 'status') {
-                    orderProducts[index].date = new Date().toLocaleDateString('en-GB');
-                }
-                localStorage.setItem('asgate_products_db', JSON.stringify(db));
-                renderProducts();
-            }
+            db[currentOrderId][index][field] = value.trim();
+            if(field === 'status') db[currentOrderId][index].date = new Date().toLocaleDateString('en-GB');
+            localStorage.setItem('asgate_products_db', JSON.stringify(db));
+            renderProducts();
         }
 
         function applyFilters() {
             const query = document.getElementById('liveSearch').value.toLowerCase();
             const all = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
-            const filtered = all.filter(p => 
-                (p.serial && p.serial.toLowerCase().includes(query)) || 
-                (p.mobile && p.mobile.toLowerCase().includes(query)) || 
-                (p.user && p.user.toLowerCase().includes(query))
-            );
+            const filtered = all.filter(p => (p.serial?.toLowerCase().includes(query)) || (p.mobile?.toLowerCase().includes(query)) || (p.user?.toLowerCase().includes(query)));
             renderProducts(filtered);
         }
 
         function saveProduct() {
             const data = {
-                type: document.getElementById('p_type').value,
-                name: document.getElementById('p_name').value,
-                qty: parseInt(document.getElementById('p_qty').value) || 1,
-                sub: document.getElementById('p_sub').value,
-                serial: '', mobile: '', user: '', note: '',
-                status: document.getElementById('p_status').value,
+                type: document.getElementById('p_type').value, name: document.getElementById('p_name').value,
+                qty: document.getElementById('p_qty').value, sub: document.getElementById('p_sub').value,
+                serial: '', mobile: '', user: '', note: '', status: document.getElementById('p_status').value,
                 date: new Date().toLocaleDateString('en-GB')
             };
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
@@ -276,25 +288,15 @@
 
         function deleteSelected() {
             const selected = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => parseInt(cb.dataset.index));
-            if(selected.length > 0 && confirm("هل أنت متأكد من حذف المنتجات المحددة؟")) {
+            if(selected.length > 0 && confirm("حذف المحدد؟")) {
                 let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
                 db[currentOrderId] = db[currentOrderId].filter((p, i) => !selected.includes(i));
                 localStorage.setItem('asgate_products_db', JSON.stringify(db));
                 renderProducts();
             }
         }
-
-        function toggleSelectAll(s) { document.querySelectorAll('.row-checkbox').forEach(c => c.checked = s.checked); }
         function openModal() { document.getElementById('productModal').style.display = 'flex'; }
         function closeModal() { document.getElementById('productModal').style.display = 'none'; }
-        
-        function exportToExcel() {
-            const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
-            const ws = XLSX.utils.json_to_sheet(db);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Products");
-            XLSX.writeFile(wb, `Order_${currentOrderId}.xlsx`);
-        }
     </script>
 </body>
 </html>
