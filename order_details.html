@@ -123,18 +123,17 @@
         .status-verified { background-color: var(--soft-green) !important; color: #166534 !important; border: 1px solid #bbf7d0 !important; }
         .status-pending { background-color: #eab308 !important; color: #000 !important; }
 
-        /* تعديل خاص لإخفاء سهم المتصفح الافتراضي في عمود إجراء */
         .action-select {
             font-family: 'Cairo';
-            font-size: 18px;
+            font-size: 16px; /* تم تصغير الخط درجتين من 18 إلى 16 */
             padding: 0;
             border: none;
             background: transparent;
             cursor: pointer;
             font-weight: bold;
-            -webkit-appearance: none; /* إخفاء السهم الأصلي لكروم وسفاري */
-            -moz-appearance: none;    /* إخفاء السهم الأصلي لفايرفوكس */
-            appearance: none;         /* إخفاء السهم الأصلي */
+            -webkit-appearance: none; 
+            -moz-appearance: none;    
+            appearance: none;         
             text-align: center;
             width: 100%;
         }
