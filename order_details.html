@@ -48,7 +48,7 @@
         .search-wrapper { flex-grow: 1; display: flex; justify-content: center; }
         .search-input { width: 300px; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--border-color); font-family: 'Cairo'; font-size: 12px; outline: none; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05); }
         
-        .table-wrapper { background: white; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: visible; }
+        .table-wrapper { background: white; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: visible; margin-bottom: 20px; }
         table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1100px; }
         
         thead th { 
@@ -61,6 +61,12 @@
         
         .table-footer { background-color: #000 !important; color: #fff !important; height: 30px !important; }
         .table-footer td { color: #fff !important; border: none; font-weight: 800; font-size: 12px; height: 30px; }
+
+        /* سجل النشاط */
+        .log-section { background: #fff; padding: 15px; border-radius: 10px; border: 1px solid var(--border-color); margin-top: 10px; }
+        .log-title { font-weight: 800; font-size: 13px; color: var(--nav-bg); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .log-entry { font-size: 11px; padding: 5px 0; border-bottom: 1px dashed #eee; color: #475569; }
+        .log-time { font-weight: 800; color: var(--accent-blue); margin-left: 10px; }
 
         .btn { border: none; padding: 8px 15px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 11px; transition: 0.3s; color: white; display: flex; align-items: center; gap: 5px; }
         .btn-add { background: var(--accent-blue); }
@@ -77,10 +83,7 @@
         .row-locked .editable-cell { pointer-events: none; }
 
         @media print {
-            .navbar, .sticky-top-section, .btn-back-outside, .action-bar, th:first-child, td:first-child { display: none !important; }
-            table { min-width: 100%; border: 1px solid #000; }
-            th, td { border: 1px solid #000 !important; }
-            thead th { position: static; background-color: #eee !important; color: #000 !important; }
+            .navbar, .sticky-top-section, .log-section, .btn-back-outside, .action-bar, th:first-child, td:first-child { display: none !important; }
         }
 
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
@@ -156,6 +159,11 @@
                 </tfoot>
             </table>
         </div>
+
+        <div class="log-section">
+            <div class="log-title">📋 سجل النشاط (Sajil al-Nashat)</div>
+            <div id="activityLogs"></div>
+        </div>
     </div>
 
     <div id="productModal" class="modal">
@@ -193,6 +201,7 @@
                 document.getElementById('orderType').innerText = order.type;
                 document.getElementById('orderStatus').innerText = order.status;
                 renderProducts();
+                renderLogs();
             }
         }
 
@@ -229,23 +238,43 @@
             calculateTotals();
         }
 
+        function logActivity(msg) {
+            let logs = JSON.parse(localStorage.getItem('asgate_logs') || '[]');
+            const time = new Date().toLocaleString('en-GB', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+            logs.unshift({ time, msg, orderId: currentOrderId });
+            localStorage.setItem('asgate_logs', JSON.stringify(logs.slice(0, 50)));
+            renderLogs();
+        }
+
+        function renderLogs() {
+            const logs = JSON.parse(localStorage.getItem('asgate_logs') || '[]');
+            const container = document.getElementById('activityLogs');
+            const currentLogs = logs.filter(l => l.orderId === currentOrderId);
+            container.innerHTML = currentLogs.map(l => `<div class="log-entry"><span class="log-time">[${l.time}]</span> ${l.msg}</div>`).join('');
+        }
+
         function updateQuickField(index, field, value) {
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             const currentItem = db[currentOrderId][index];
-            
-            // نظام التأكيد المشروط عند تغيير الحالة
+            const oldVal = currentItem[field];
+
             if(field === 'status' && (value === "مكتمل" || value === "تم التوثيق")) {
-                if(!confirm(`⚠️ هل أنت متأكد من تحويل الحالة إلى (${value})؟\nسيتم قفل الصف نهائياً ولن يمكنك تعديله أو حذفه لاحقاً.`)) {
-                    renderProducts(); // إعادة بناء الجدول لإلغاء الاختيار
-                    return;
+                if(!confirm(`⚠️ هل أنت متأكد؟ سيتم قفل الصف نهائياً عند اختيار (${value}).`)) {
+                    renderProducts(); return;
                 }
             }
 
-            currentItem[field] = value.trim();
-            if(field === 'status') currentItem.date = new Date().toLocaleDateString('en-GB');
-            
-            localStorage.setItem('asgate_products_db', JSON.stringify(db));
-            renderProducts();
+            if(oldVal !== value.trim()) {
+                currentItem[field] = value.trim();
+                if(field === 'status') {
+                    currentItem.date = new Date().toLocaleDateString('en-GB');
+                    logActivity(`تغيير حالة المنتج (${currentItem.name}) من [${oldVal}] إلى [${value}]`);
+                } else {
+                    logActivity(`تحديث حقل (${field}) للمنتج (${currentItem.name})`);
+                }
+                localStorage.setItem('asgate_products_db', JSON.stringify(db));
+                renderProducts();
+            }
         }
 
         function calculateTotals() {
@@ -254,8 +283,10 @@
             let count = 0, qty = 0, sub = 0, total = 0;
             checkboxes.forEach(cb => {
                 const p = products[cb.dataset.index];
-                const sVal = parseFloat(String(p.sub).replace(/[^\d.]/g, '')) || 0;
-                count++; qty += parseInt(p.qty) || 0; sub += sVal; total += (parseInt(p.qty) || 0) * sVal;
+                if(p) {
+                    const sVal = parseFloat(String(p.sub).replace(/[^\d.]/g, '')) || 0;
+                    count++; qty += parseInt(p.qty) || 0; sub += sVal; total += (parseInt(p.qty) || 0) * sVal;
+                }
             });
             document.getElementById('f_count').innerText = count;
             document.getElementById('f_qty').innerText = qty;
@@ -282,25 +313,20 @@
                 return;
             }
 
-            if(confirm("هل أنت متأكد من حذف المنتجات المحددة؟")) {
+            if(confirm("حذف المنتجات المحددة؟")) {
                 const indexesToDelete = selectedCheckboxes.map(cb => parseInt(cb.dataset.index));
                 let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
                 db[currentOrderId] = db[currentOrderId].filter((p, i) => !indexesToDelete.includes(i));
                 localStorage.setItem('asgate_products_db', JSON.stringify(db));
+                logActivity(`تم حذف عدد (${indexesToDelete.length}) من المنتجات`);
                 renderProducts();
             }
         }
 
-        function applyFilters() {
-            const query = document.getElementById('liveSearch').value.toLowerCase();
-            const all = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
-            const filtered = all.filter(p => (p.serial?.toLowerCase().includes(query)) || (p.mobile?.toLowerCase().includes(query)) || (p.user?.toLowerCase().includes(query)));
-            renderProducts(filtered);
-        }
-
         function saveProduct() {
+            const name = document.getElementById('p_name').value;
             const data = {
-                type: document.getElementById('p_type').value, name: document.getElementById('p_name').value,
+                type: document.getElementById('p_type').value, name: name,
                 qty: document.getElementById('p_qty').value, sub: document.getElementById('p_sub').value,
                 serial: '', mobile: '', user: '', note: '', status: document.getElementById('p_status').value,
                 date: new Date().toLocaleDateString('en-GB')
@@ -309,7 +335,15 @@
             if (!db[currentOrderId]) db[currentOrderId] = [];
             db[currentOrderId].push(data);
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
+            logActivity(`إضافة منتج جديد: ${name}`);
             renderProducts(); closeModal();
+        }
+
+        function applyFilters() {
+            const query = document.getElementById('liveSearch').value.toLowerCase();
+            const all = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
+            const filtered = all.filter(p => (p.serial?.toLowerCase().includes(query)) || (p.mobile?.toLowerCase().includes(query)) || (p.user?.toLowerCase().includes(query)));
+            renderProducts(filtered);
         }
 
         function openModal() { document.getElementById('productModal').style.display = 'flex'; }
