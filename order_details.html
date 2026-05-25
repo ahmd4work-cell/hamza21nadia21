@@ -20,9 +20,10 @@
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; padding: 0; line-height: 1.2; }
 
+        /* Navbar ثابتة في الأعلى */
         .navbar { 
             background-color: var(--nav-bg); display: flex; align-items: center; padding: 0 20px; 
-            margin: 0; border-radius: 0; height: 37px; position: sticky; top: 0; z-index: 1300;
+            margin: 0; border-radius: 0; height: 37px; position: sticky; top: 0; z-index: 1500;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1); box-sizing: border-box;
         }
         .navbar a { color: var(--white); text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; transition: 0.3s; line-height: 37px; height: 37px; display: inline-block; }
@@ -30,9 +31,16 @@
 
         .container { padding: 0 20px 20px 20px; }
 
+        /* القسم العلوي الثابت (معلومات الطلب + البحث) */
         .sticky-top-section {
-            position: sticky; top: 37px; background-color: var(--bg-color);
-            z-index: 1200; padding-top: 10px; padding-bottom: 5px; height: 137px; box-sizing: border-box;
+            position: sticky; 
+            top: 37px; /* تحت النبار مباشرة */
+            background-color: var(--bg-color);
+            z-index: 1400; 
+            padding-top: 10px; 
+            padding-bottom: 5px; 
+            height: 137px; 
+            box-sizing: border-box;
         }
 
         .header-section-wrapper { margin: 0 7% 10px 7%; display: flex; align-items: center; gap: 15px; }
@@ -48,13 +56,23 @@
         .search-wrapper { flex-grow: 1; display: flex; justify-content: center; }
         .search-input { width: 300px; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--border-color); font-family: 'Cairo'; font-size: 12px; outline: none; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05); }
         
-        .table-wrapper { background: white; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; }
+        .table-wrapper { background: white; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: visible; }
         table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1100px; }
         
+        /* تصحيح مكان الهيدر الأخضر ليكون ثابتاً تماماً */
         thead th { 
-            background-color: var(--header-green) !important; height: 40px; line-height: 40px;
-            padding: 0 5px; color: white !important; font-size: 11px; font-weight: 800; text-align: center; 
-            border-left: 1px solid rgba(255,255,255,0.1); position: sticky; top: 174px; z-index: 1100;
+            background-color: var(--header-green) !important; 
+            height: 40px; 
+            line-height: 40px;
+            padding: 0 5px; 
+            color: white !important; 
+            font-size: 11px; 
+            font-weight: 800; 
+            text-align: center; 
+            border-left: 1px solid rgba(255,255,255,0.1); 
+            position: sticky; 
+            top: 174px; /* 37px (navbar) + 137px (sticky-section) = 174px */
+            z-index: 1300;
         }
         
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 40px; font-size: 11px; font-weight: 600; color: var(--text-dark); padding: 5px; }
@@ -72,15 +90,16 @@
         .status-select { font-family: 'Cairo'; font-size: 10px; font-weight: 700; padding: 5px; border-radius: 6px; width: 95%; cursor: pointer; border: 1px solid var(--border-color); }
         .status-complete { background-color: #16a34a !important; color: white !important; }
         .status-verified { background-color: var(--soft-green) !important; color: #166534 !important; }
-        .status-pending { background-color: #eab308 !important; color: #000 !important; }
 
         .editable-cell { cursor: cell; outline: none; }
-        .row-locked { background-color: #f8fafc; color: #94a3b8; }
+        .row-locked { background-color: #f8fafc; color: #94a3b8; pointer-events: none; }
+        .row-locked .row-checkbox { display: none; } /* إخفاء المربع عند القفل لمنع الخطأ في الجمع */
 
         @media print {
             .navbar, .sticky-top-section, .btn-back-outside, .action-bar, th:first-child, td:first-child { display: none !important; }
             table { min-width: 100%; border: 1px solid #000; }
             th, td { border: 1px solid #000 !important; }
+            thead th { position: static; background-color: #eee !important; color: #000 !important; }
         }
 
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
@@ -147,7 +166,7 @@
                 <tfoot>
                     <tr class="table-footer">
                         <td id="f_count">0</td>
-                        <td colspan="2">الصفوف المحددة</td>
+                        <td colspan="2" style="text-align: right; padding-right: 20px;">الصفوف المحددة</td>
                         <td id="f_qty">0</td>
                         <td id="f_sub">0</td>
                         <td id="f_total">0</td>
@@ -162,11 +181,11 @@
         <div class="modal-content">
             <h3>إضافة منتج جديد</h3>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <input type="text" id="p_type" placeholder="نوع الطلب" style="padding:8px; border:1px solid #ddd; border-radius:6px;">
-                <input type="text" id="p_name" placeholder="تفاصيل الطلب" style="padding:8px; border:1px solid #ddd; border-radius:6px;">
-                <input type="number" id="p_qty" placeholder="العدد" value="1" style="padding:8px; border:1px solid #ddd; border-radius:6px;">
-                <input type="text" id="p_sub" placeholder="الاشتراك" style="padding:8px; border:1px solid #ddd; border-radius:6px;">
-                <select id="p_status" style="padding:8px; border:1px solid #ddd; border-radius:6px; grid-column: span 2;">
+                <input type="text" id="p_type" placeholder="نوع الطلب" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-family:'Cairo';">
+                <input type="text" id="p_name" placeholder="تفاصيل الطلب" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-family:'Cairo';">
+                <input type="number" id="p_qty" placeholder="العدد" value="1" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-family:'Cairo';">
+                <input type="text" id="p_sub" placeholder="الاشتراك" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-family:'Cairo';">
+                <select id="p_status" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-family:'Cairo'; grid-column: span 2;">
                     <option>جاهز</option><option>مكتمل</option><option>تم التوثيق</option>
                 </select>
             </div>
@@ -218,7 +237,7 @@
                         <td class="editable-cell" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'mobile', this.innerText)">${p.mobile || ''}</td>
                         <td class="editable-cell" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'user', this.innerText)">${p.user || ''}</td>
                         <td>
-                            <select class="status-select ${statusClass}" onchange="updateQuickField(${index}, 'status', this.value)" ${isLocked ? 'disabled' : ''}>
+                            <select class="status-select ${statusClass}" onchange="updateQuickField(${index}, 'status', this.value)" ${isLocked ? 'disabled' : ''} style="pointer-events: auto;">
                                 ${statusList.map(s => `<option value="${s}" ${p.status===s?'selected':''}>${s}</option>`).join('')}
                             </select>
                         </td>
@@ -232,20 +251,12 @@
         function calculateTotals() {
             const checkboxes = document.querySelectorAll('.row-checkbox:checked');
             const products = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
-            
             let count = 0, qty = 0, sub = 0, total = 0;
-
             checkboxes.forEach(cb => {
-                const idx = cb.dataset.index;
-                const p = products[idx];
+                const p = products[cb.dataset.index];
                 const sVal = parseFloat(String(p.sub).replace(/[^\d.]/g, '')) || 0;
-                
-                count++;
-                qty += parseInt(p.qty) || 0;
-                sub += sVal;
-                total += (parseInt(p.qty) || 0) * sVal;
+                count++; qty += parseInt(p.qty) || 0; sub += sVal; total += (parseInt(p.qty) || 0) * sVal;
             });
-
             document.getElementById('f_count').innerText = count;
             document.getElementById('f_qty').innerText = qty;
             document.getElementById('f_sub').innerText = sub.toFixed(2);
@@ -253,7 +264,9 @@
         }
 
         function toggleSelectAll(s) {
-            document.querySelectorAll('.row-checkbox').forEach(c => c.checked = s.checked);
+            document.querySelectorAll('.row-checkbox').forEach(c => {
+                if(!c.closest('tr').classList.contains('row-locked')) c.checked = s.checked;
+            });
             calculateTotals();
         }
 
@@ -297,6 +310,14 @@
         }
         function openModal() { document.getElementById('productModal').style.display = 'flex'; }
         function closeModal() { document.getElementById('productModal').style.display = 'none'; }
+        
+        function exportToExcel() {
+            const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
+            const ws = XLSX.utils.json_to_sheet(db);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Products");
+            XLSX.writeFile(wb, `Order_${currentOrderId}.xlsx`);
+        }
     </script>
 </body>
 </html>
