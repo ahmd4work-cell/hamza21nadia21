@@ -40,9 +40,12 @@
         .btn-back-outside { text-decoration: none; background: var(--white); color: var(--nav-bg); padding: 8px 15px; border-radius: 10px; font-size: 12px; font-weight: 800; border: 2px solid #991b1b; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 5px; height: 40px; box-sizing: border-box; }
 
         .order-header-info { background: white; padding: 0 25px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-grow: 1; flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); height: 70px; box-sizing: border-box; }
-        .info-item { display: flex; flex-direction: column; gap: 2px; min-width: 100px; }
+        .info-item { display: flex; flex-direction: column; gap: 2px; min-width: 90px; }
         .info-label { font-size: 10px; color: #64748b; font-weight: 800; }
         .info-value { font-size: 13px; color: var(--nav-bg); font-weight: 800; }
+        
+        /* التنسيق الاحترافي لاسم الطلب */
+        .info-item-highlight { border: 2px solid var(--header-green); padding: 5px 15px; border-radius: 8px; background-color: #f0fdf4; }
 
         .action-bar { margin: 5px 0 10px 0; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
         .search-wrapper { flex-grow: 1; display: flex; justify-content: center; }
@@ -55,7 +58,7 @@
             background-color: var(--header-green) !important; height: 37px; line-height: 37px;
             padding: 0 5px; color: white !important; font-size: 11px; font-weight: 800; text-align: center; 
             position: sticky; top: 174px; z-index: 1300; font-family: 'Cairo'; 
-            border: 0.5px solid rgba(255,255,255,0.2); overflow: hidden;
+            border: 0.5px solid rgba(255,255,255,0.2);
         }
         
         td { border: 0.5px solid var(--light-border); text-align: center; height: 37px; line-height: 37px; font-size: 13px; font-weight: 500; color: var(--text-dark); padding: 0 5px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
@@ -102,7 +105,7 @@
                 <a href="sales.html" class="btn-back-outside">عودة ➡️</a>
                 <div class="order-header-info">
                     <div class="info-item"><span class="info-label">رقم الطلب</span><span class="info-value" id="orderId">#0000</span></div>
-                    <div class="info-item"><span class="info-label">اسم الطلب</span><span class="info-value" id="orderType">-</span></div>
+                    <div class="info-item info-item-highlight"><span class="info-label">اسم الطلب</span><span class="info-value" id="orderType">-</span></div>
                     <div class="info-item"><span class="info-label">الشركة</span><span class="info-value" id="orderComp">-</span></div>
                     <div class="info-item"><span class="info-label">السجل</span><span class="info-value" id="orderCr">-</span></div>
                     <div class="info-item"><span class="info-label">حالة الطلب</span><span class="info-value" id="orderStatus">-</span></div>
@@ -127,18 +130,17 @@
             <table id="mainTable">
                 <thead>
                     <tr>
-                        <th style="width: 35px;"><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)"></th>
-                        <th style="width: 100px;">نوع الطلب</th>
-                        <th style="width: 140px;">تفاصيل الطلب</th>
-                        <th style="width: 50px;">العدد</th>
-                        <th style="width: 100px;">الاشتراك</th>
-                        <th style="width: 80px;">الاجمالي</th>
-                        <th style="width: 120px;">رقم السريال</th>
-                        <th style="width: 120px;">رقم الخدمة</th>
-                        <th style="width: 100px;">المستخدم</th>
-                        <th style="width: 110px;">الحالة</th>
-                        <th style="width: 90px;">تاريخ التغيير</th>
-                        <th style="width: 130px;">ملاحظة</th>
+                        <th style="width: 3.5%;"><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)"></th>
+                        <th style="width: 9.5%;">نوع الطلب</th>
+                        <th style="width: 14%;">تفاصيل الطلب</th>
+                        <th style="width: 5%;">العدد</th>
+                        <th style="width: 10%;">الاشتراك</th>
+                        <th style="width: 7%;">الاجمالي</th>
+                        <th style="width: 10%;">رقم السريال</th>
+                        <th style="width: 10%;">رقم الخدمة</th>
+                        <th style="width: 9%;">المستخدم</th>
+                        <th style="width: 7%;">الحالة</th> <th style="width: 8%;">تاريخ التغيير</th>
+                        <th style="width: 8%;">ملاحظة</th>
                     </tr>
                 </thead>
                 <tbody id="productsBody"></tbody>
