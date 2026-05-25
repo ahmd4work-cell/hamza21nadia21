@@ -123,6 +123,29 @@
         .status-verified { background-color: var(--soft-green) !important; color: #166534 !important; border: 1px solid #bbf7d0 !important; }
         .status-pending { background-color: #eab308 !important; color: #000 !important; }
 
+        /* تنسيق القائمة المنسدلة لعمود إجراء */
+        .action-select {
+            font-family: 'Cairo';
+            font-size: 18px;
+            padding: 0;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-weight: bold;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            text-align: center;
+            width: 100%;
+        }
+
+        .action-select option {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e293b;
+            background-color: white;
+        }
+
         .editable-cell { border: 1px dashed #94a3b8 !important; cursor: cell; outline: none; }
         
         .activity-log-section { margin-top: 30px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 15px; }
@@ -185,10 +208,10 @@
                             </div>
                         </th>
                         <th style="width: 7%;">الاجمالي</th>
-                        <th style="width: 10%;">رقم السريال</th>
-                        <th style="width: 10%;">رقم الخدمة</th>
-                        <th style="width: 10%;">المستخدم</th>
-                        <th style="width: 10%;">
+                        <th style="width: 9%;">رقم السريال</th>
+                        <th style="width: 9%;">رقم الخدمة</th>
+                        <th style="width: 9%;">المستخدم</th>
+                        <th style="width: 8%;">
                             <div class="th-filter-wrap">
                                 <select id="filter-status" class="header-select" onchange="applyFilters()">
                                     <option value="">الحالة</option>
@@ -198,6 +221,7 @@
                         </th>
                         <th style="width: 8%;">تاريخ التغيير</th>
                         <th style="width: 5%;">ملاحظة</th>
+                        <th style="width: 3%;">إجراء</th>
                     </tr>
                 </thead>
                 <tbody id="productsBody"></tbody>
@@ -287,6 +311,13 @@
                         </td>
                         <td style="font-size:10px">${p.date}</td>
                         <td contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'note', this.innerText)">${p.note}</td>
+                        <td>
+                            <select class="action-select" onchange="handleAction(this, ${index})">
+                                <option value="" selected disabled>⌵</option>
+                                <option value="edit" ${isLocked ? 'disabled' : ''}>تعديل</option>
+                                <option value="delete" ${isLocked ? 'disabled' : ''}>حذف</option>
+                            </select>
+                        </td>
                     </tr>`;
             }).join('');
             if (!filteredList) updateFilterOptions();
@@ -304,6 +335,20 @@
                 localStorage.setItem('asgate_products_db', JSON.stringify(db));
                 renderProducts();
             }
+        }
+
+        function handleAction(s, i) {
+            if(s.value === "edit") openModal(i);
+            else if(s.value === "delete") { 
+                if(confirm("هل أنت متأكد من حذف هذا المنتج؟")) { 
+                    let db = JSON.parse(localStorage.getItem('asgate_products_db')); 
+                    db[currentOrderId].splice(i,1); 
+                    localStorage.setItem('asgate_products_db', JSON.stringify(db)); 
+                    renderProducts(); 
+                    addToLog("حذف منتج من الطلب");
+                } 
+            }
+            s.value = "";
         }
 
         function updateFilterOptions() {
@@ -357,8 +402,13 @@
             };
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             if (!db[currentOrderId]) db[currentOrderId] = [];
-            if (index !== "") db[currentOrderId][index] = data;
-            else db[currentOrderId].push(data);
+            if (index !== "") {
+                db[currentOrderId][index] = data;
+                addToLog("تعديل بيانات منتج");
+            } else {
+                db[currentOrderId].push(data);
+                addToLog("إضافة منتج جديد للطلب");
+            }
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
             renderProducts(); closeModal();
         }
@@ -377,10 +427,12 @@
                 document.getElementById('p_user').value = p.user;
                 document.getElementById('p_status').value = p.status;
                 document.getElementById('p_note').value = p.note;
+                document.getElementById('modalTitle').innerText = "تعديل المنتج";
             } else {
                 document.getElementById('edit-index').value = "";
                 document.querySelectorAll('#productModal input').forEach(i => i.value = "");
                 document.getElementById('p_qty').value = 1;
+                document.getElementById('modalTitle').innerText = "إضافة منتج جديد";
             }
         }
         function closeModal() { document.getElementById('productModal').style.display = 'none'; }
@@ -392,6 +444,7 @@
                 db[currentOrderId] = db[currentOrderId].filter((p, i) => !selected.includes(i));
                 localStorage.setItem('asgate_products_db', JSON.stringify(db));
                 renderProducts();
+                addToLog("حذف مجموعة من المنتجات");
             }
         }
         function exportToExcel() {
