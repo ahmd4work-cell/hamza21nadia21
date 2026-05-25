@@ -20,10 +20,10 @@
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; padding: 0; line-height: 1.2; }
 
-        /* تثبيت النافبار */
+        /* 1. تثبيت النافبار */
         .navbar { 
             background-color: var(--nav-bg); display: flex; align-items: center; padding: 0 20px; 
-            margin: 0; border-radius: 0; height: 37px; position: sticky; top: 0; z-index: 1200;
+            margin: 0; border-radius: 0; height: 37px; position: sticky; top: 0; z-index: 1300;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1); box-sizing: border-box;
         }
         .navbar a { color: var(--white); text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; transition: 0.3s; line-height: 37px; height: 37px; display: inline-block; }
@@ -31,14 +31,16 @@
 
         .container { padding: 0 20px 20px 20px; }
 
-        /* تثبيت منطقة معلومات الطلب وزر العودة */
+        /* 2. تثبيت منطقة المعلومات والأزرار */
         .sticky-top-section {
             position: sticky;
-            top: 37px; /* بعد النافبار */
+            top: 37px; 
             background-color: var(--bg-color);
-            z-index: 1100;
+            z-index: 1200;
             padding-top: 10px;
             padding-bottom: 5px;
+            height: 137px; /* ارتفاع ثابت لضمان دقة التثبيت التالي */
+            box-sizing: border-box;
         }
 
         .header-section-wrapper { margin: 0 7% 10px 7%; display: flex; align-items: center; gap: 15px; }
@@ -50,14 +52,14 @@
         .info-value { font-size: 13px; color: var(--nav-bg); font-weight: 800; }
         .info-item-highlight { border: 2px solid var(--header-green); padding: 5px 15px; border-radius: 8px; background-color: #f0fdf4; }
 
-        .action-bar { margin: 10px 0 12px 0; display: flex; justify-content: space-between; align-items: center; }
+        .action-bar { margin: 5px 0 10px 0; display: flex; justify-content: space-between; align-items: center; }
         
         .table-wrapper { background: white; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1300px; }
         
-        /* تثبيت شريط العناوين الأخضر أسفل المعلومات */
+        /* 3. تثبيت الشريط الأخضر (thead) */
         thead th { 
-            background-color: var(--header-green); 
+            background-color: var(--header-green) !important; 
             height: 40px; 
             padding: 0 5px; 
             color: white; 
@@ -66,18 +68,17 @@
             text-align: center; 
             border-left: 1px solid rgba(255,255,255,0.1);
             position: sticky;
-            top: 122px; /* مجموع ارتفاع النافبار (37) + السكشن العلوي (85 تقريباً) */
-            z-index: 1000;
+            top: 174px; /* 37px (navbar) + 137px (top section) */
+            z-index: 1100;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
-        /* تنسيق الفلتر مع الكلمة والسهم */
         .th-filter-wrap { 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            cursor: pointer;
             position: relative;
+            height: 100%;
         }
         
         .header-select { 
@@ -92,14 +93,16 @@
             -webkit-appearance: none; 
             -moz-appearance: none;    
             appearance: none;         
-            padding-left: 15px; /* مساحة للسهم */
+            padding: 0 15px 0 5px;
+            text-align: center;
         }
-        /* إضافة سهم يدوي مدمج مع الكلمة */
+
         .th-filter-wrap::after {
             content: '▼';
             font-size: 8px;
+            color: white;
             position: absolute;
-            left: 5px;
+            left: 8px;
             pointer-events: none;
         }
 
@@ -366,14 +369,40 @@
                 document.getElementById('p_name').value = p.name;
                 document.getElementById('p_qty').value = p.qty;
                 document.getElementById('p_sub').value = p.sub;
+                document.getElementById('p_serial').value = p.serial;
+                document.getElementById('p_mobile').value = p.mobile;
+                document.getElementById('p_user').value = p.user;
                 document.getElementById('p_status').value = p.status;
+                document.getElementById('p_note').value = p.note;
             } else {
                 document.getElementById('edit-index').value = "";
+                document.querySelectorAll('#productModal input').forEach(i => i.value = "");
+                document.getElementById('p_qty').value = 1;
             }
         }
         function closeModal() { document.getElementById('productModal').style.display = 'none'; }
         function toggleSelectAll(s) { document.querySelectorAll('.row-checkbox').forEach(c => c.checked = s.checked); }
-        function exportToExcel() { /* مضافة مسبقاً */ }
+        function deleteSelected() {
+            const selected = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => parseInt(cb.dataset.index));
+            if(selected.length > 0 && confirm("حذف المحدد؟")) {
+                let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+                db[currentOrderId] = db[currentOrderId].filter((p, i) => !selected.includes(i));
+                localStorage.setItem('asgate_products_db', JSON.stringify(db));
+                renderProducts();
+            }
+        }
+        function handleAction(s, i) {
+            if(s.value === "edit") openModal(i);
+            else if(s.value === "delete") { if(confirm("حذف؟")) { let db = JSON.parse(localStorage.getItem('asgate_products_db')); db[currentOrderId].splice(i,1); localStorage.setItem('asgate_products_db', JSON.stringify(db)); renderProducts(); } }
+            s.value = "";
+        }
+        function exportToExcel() {
+            const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
+            const ws = XLSX.utils.json_to_sheet(db);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Products");
+            XLSX.writeFile(wb, `Order_${currentOrderId}.xlsx`);
+        }
     </script>
 </body>
 </html>
