@@ -48,15 +48,13 @@
         .table-wrapper { background: white; border-radius: 10px; overflow-x: auto; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; min-width: 1300px; }
         
+        /* تحديث ارتفاع الهيدر وإزالة الفلتر القديم */
         th { background-color: var(--header-green); height: 40px; padding: 0 5px; color: white; font-size: 11px; font-weight: 800; text-align: center; border-left: 1px solid rgba(255,255,255,0.1); }
         
-        /* تنسيق العنوان بدون سهم */
-        .th-filter-wrap { display: flex; align-items: center; justify-content: center; position: relative; }
-        .header-select { 
-            position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; 
-            left: 0; top: 0; font-family: 'Cairo';
-        }
-        .header-label { pointer-events: none; }
+        /* تنسيق العنوان مع السهم جنباً إلى جنب */
+        .th-filter-wrap { display: flex; align-items: center; justify-content: center; gap: 4px; }
+        .header-select { background: transparent; color: white; border: none; font-family: 'Cairo'; font-size: 11px; font-weight: 800; cursor: pointer; outline: none; }
+        .header-select option { color: black; background: white; }
 
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); padding: 5px; }
         
@@ -116,4 +114,261 @@
             <div class="action-btns">
                 <button class="btn btn-add" onclick="openModal()">+ إضافة منتج</button>
                 <button class="btn btn-export" onclick="exportToExcel()">📥 تصدير Excel</button>
-                <button class="btn btn-delete-multi" onclick="deleteSelected()">🗑️ حذف المحدد</
+                <button class="btn btn-delete-multi" onclick="deleteSelected()">🗑️ حذف المحدد</button>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table id="mainTable">
+                <thead>
+                    <tr>
+                        <th style="width: 3%;"><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)"></th>
+                        <th style="width: 7%;">نوع الطلب</th>
+                        <th style="width: 12%;">تفاصيل الطلب</th>
+                        <th style="width: 4%;">العدد</th>
+                        <th style="width: 8%;">
+                            <div class="th-filter-wrap">
+                                <span>الاشتراك</span>
+                                <select id="filter-sub" class="header-select" onchange="applyFilters()"><option value="">▼</option></select>
+                            </div>
+                        </th>
+                        <th style="width: 6%;">الاجمالي</th>
+                        <th style="width: 10%;">رقم السريال</th>
+                        <th style="width: 9%;">رقم الخدمة</th>
+                        <th style="width: 9%;">المستخدم</th>
+                        <th style="width: 11%;">
+                            <div class="th-filter-wrap">
+                                <span>الحالة</span>
+                                <select id="filter-status" class="header-select" onchange="applyFilters()"><option value="">▼</option></select>
+                            </div>
+                        </th>
+                        <th style="width: 9%;">تاريخ التغيير</th>
+                        <th style="width: 10%;">ملاحظة</th>
+                        <th style="width: 5%;">الخيارات</th>
+                    </tr>
+                </thead>
+                <tbody id="productsBody"></tbody>
+            </table>
+        </div>
+
+        <div class="activity-log-section">
+            <div class="activity-log-title">📜 سجل النشاط</div>
+            <div id="activityLog"></div>
+        </div>
+    </div>
+
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle">إضافة منتج جديد</h3>
+            <input type="hidden" id="edit-index">
+            <div class="form-grid">
+                <div class="form-group"><label>نوع الطلب</label><input type="text" id="p_type"></div>
+                <div class="form-group"><label>تفاصيل الطلب</label><input type="text" id="p_name"></div>
+                <div class="form-group"><label>العدد</label><input type="number" id="p_qty" value="1"></div>
+                <div class="form-group"><label>الاشتراك</label><input type="text" id="p_sub"></div>
+                <div class="form-group full-width"><label>الحالة</label>
+                    <select id="p_status">
+                        <option>مكتمل</option><option>تم التوثيق</option><option>توثيق</option>
+                        <option selected>جاهز</option><option>مرتجع</option><option>فقدان</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>رقم السريال</label><input type="text" id="p_serial"></div>
+                <div class="form-group"><label>رقم الخدمة</label><input type="text" id="p_mobile"></div>
+                <div class="form-group"><label>المستخدم</label><input type="text" id="p_user"></div>
+                <div class="form-group full-width"><label>ملاحظة</label><input type="text" id="p_note"></div>
+            </div>
+            <div class="modal-actions" style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn btn-export" style="flex:1" onclick="saveProduct()">حفظ</button>
+                <button class="btn btn-delete-multi" style="flex:1" onclick="closeModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentOrderId = '';
+        const statusList = ["مكتمل", "تم التوثيق", "توثيق", "جاهز", "مرتجع", "فقدان"];
+        const currentUser = "احمد";
+
+        function loadOrderDetails() {
+            const urlParams = new URLSearchParams(window.location.search);
+            currentOrderId = urlParams.get('id');
+            if (!currentOrderId) return;
+            const salesData = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
+            const order = salesData.find(item => String(item.id) === String(currentOrderId));
+            if (order) {
+                document.getElementById('orderId').innerText = '#' + order.id;
+                document.getElementById('orderComp').innerText = order.comp;
+                document.getElementById('orderCr').innerText = order.cr;
+                document.getElementById('orderType').innerText = order.type;
+                document.getElementById('orderStatus').innerText = order.status;
+                renderProducts();
+                renderActivityLog();
+            }
+        }
+
+        function renderProducts(filteredList = null) {
+            const productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+            const products = filteredList || productsDb[currentOrderId] || [];
+            const tbody = document.getElementById('productsBody');
+            
+            tbody.innerHTML = products.map((p, index) => {
+                const subVal = parseFloat(String(p.sub).replace(/[^\d.]/g, '')) || 0;
+                let statusClass = "";
+                if (p.status === "مكتمل") statusClass = "status-complete";
+                else if (p.status === "تم التوثيق") statusClass = "status-verified";
+                else if (p.status === "توثيق") statusClass = "status-pending";
+
+                const isLocked = (p.status === "مكتمل" || p.status === "تم التوثيق");
+
+                return `
+                    <tr id="row-${index}">
+                        <td><input type="checkbox" class="row-checkbox" data-index="${index}"></td>
+                        <td>${p.type}</td>
+                        <td>${p.name}</td>
+                        <td>${p.qty}</td>
+                        <td>${p.sub}</td>
+                        <td style="color:var(--header-green); font-weight:800;">${(p.qty * subVal).toFixed(2)}</td>
+                        <td class="${isLocked ? '' : 'editable-cell'}" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'serial', this.innerText)">${p.serial || ''}</td>
+                        <td class="${isLocked ? '' : 'editable-cell'}" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'mobile', this.innerText)">${p.mobile || ''}</td>
+                        <td class="${isLocked ? '' : 'editable-cell'}" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'user', this.innerText)">${p.user || ''}</td>
+                        <td>
+                            <select class="status-select ${statusClass}" onchange="updateQuickField(${index}, 'status', this.value)">
+                                ${statusList.map(s => `<option value="${s}" ${p.status===s?'selected':''}>${s}</option>`).join('')}
+                            </select>
+                        </td>
+                        <td style="font-size:10px">${p.date}</td>
+                        <td contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'note', this.innerText)">${p.note}</td>
+                        <td>
+                            <select class="options-select" onchange="handleAction(this, ${index})">
+                                <option value="" selected disabled></option>
+                                <option value="select">تحديد</option>
+                                <option value="edit" ${isLocked ? 'disabled' : ''}>تعديل</option>
+                                <option value="delete" ${isLocked ? 'disabled' : ''}>حذف</option>
+                            </select>
+                        </td>
+                    </tr>`;
+            }).join('');
+            if (!filteredList) updateFilterOptions();
+        }
+
+        function addToLog(action) {
+            let logs = JSON.parse(localStorage.getItem('asgate_activity_log') || '[]');
+            const now = new Date();
+            const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+            const entry = { text: action, date: `${days[now.getDay()]} ${now.toLocaleDateString('en-GB')}`, orderId: currentOrderId };
+            logs.unshift(entry);
+            localStorage.setItem('asgate_activity_log', JSON.stringify(logs.slice(0, 50)));
+            renderActivityLog();
+        }
+
+        function renderActivityLog() {
+            const logs = JSON.parse(localStorage.getItem('asgate_activity_log') || '[]');
+            const container = document.getElementById('activityLog');
+            container.innerHTML = logs.filter(l => l.orderId === currentOrderId).map(l => `<div class="log-entry"><span class="log-date">${l.date}</span> ${l.text}</div>`).join('');
+        }
+
+        function updateQuickField(index, field, value) {
+            let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+            const oldVal = db[currentOrderId][index][field];
+            const serviceNum = db[currentOrderId][index].mobile || "بدون رقم";
+            if (oldVal !== value.trim()) {
+                db[currentOrderId][index][field] = value.trim();
+                if(field === 'status') {
+                    db[currentOrderId][index].date = new Date().toLocaleDateString('en-GB');
+                    addToLog(`قام / ${currentUser} | تم تغيير حالة ${serviceNum} إلى ${value}`);
+                }
+                localStorage.setItem('asgate_products_db', JSON.stringify(db));
+                renderProducts();
+            }
+        }
+
+        function handleAction(selectObj, index) {
+            const action = selectObj.value;
+            if (action === "edit") openModal(index);
+            else if (action === "delete") deleteRow(index);
+            selectObj.value = ""; 
+        }
+
+        function saveProduct() {
+            const index = document.getElementById('edit-index').value;
+            const data = {
+                type: document.getElementById('p_type').value,
+                name: document.getElementById('p_name').value,
+                qty: parseInt(document.getElementById('p_qty').value) || 1,
+                sub: document.getElementById('p_sub').value,
+                serial: document.getElementById('p_serial').value,
+                mobile: document.getElementById('p_mobile').value,
+                user: document.getElementById('p_user').value,
+                status: document.getElementById('p_status').value,
+                note: document.getElementById('p_note').value,
+                date: new Date().toLocaleDateString('en-GB')
+            };
+            let productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+            if (!productsDb[currentOrderId]) productsDb[currentOrderId] = [];
+            if (index !== "") productsDb[currentOrderId][index] = data;
+            else productsDb[currentOrderId].push(data);
+            localStorage.setItem('asgate_products_db', JSON.stringify(productsDb));
+            renderProducts();
+            closeModal();
+        }
+
+        function openModal(index = null) {
+            const modal = document.getElementById('productModal');
+            modal.style.display = 'flex';
+            if (index !== null) {
+                document.getElementById('edit-index').value = index;
+                const p = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId][index];
+                document.getElementById('p_type').value = p.type;
+                document.getElementById('p_name').value = p.name;
+                document.getElementById('p_qty').value = p.qty;
+                document.getElementById('p_sub').value = p.sub;
+                document.getElementById('p_serial').value = p.serial;
+                document.getElementById('p_mobile').value = p.mobile;
+                document.getElementById('p_user').value = p.user;
+                document.getElementById('p_status').value = p.status;
+                document.getElementById('p_note').value = p.note;
+            }
+        }
+
+        function closeModal() { document.getElementById('productModal').style.display = 'none'; }
+        function toggleSelectAll(source) { document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = source.checked); }
+
+        function updateFilterOptions() {
+            const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
+            const fill = (id, items) => {
+                const s = document.getElementById(id);
+                const current = s.value;
+                s.innerHTML = '<option value="">▼</option>' + [...new Set(items)].map(i => `<option value="${i}" ${i===current?'selected':''}>${i}</option>`).join('');
+            };
+            fill('filter-sub', db.map(p => p.sub));
+            fill('filter-status', db.map(p => p.status));
+        }
+
+        function applyFilters() {
+            const sub = document.getElementById('filter-sub').value;
+            const status = document.getElementById('filter-status').value;
+            const all = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
+            const filtered = all.filter(p => (sub === "" || p.sub === sub) && (status === "" || p.status === status));
+            renderProducts(filtered);
+        }
+
+        function deleteSelected() {
+            const selected = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => parseInt(cb.dataset.index));
+            if(selected.length > 0 && confirm("حذف المحدد؟")) {
+                let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+                db[currentOrderId] = db[currentOrderId].filter((p, i) => !selected.includes(i));
+                localStorage.setItem('asgate_products_db', JSON.stringify(db));
+                renderProducts();
+            }
+        }
+
+        function exportToExcel() {
+            const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
+            const ws = XLSX.utils.json_to_sheet(db);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "المنتجات");
+            XLSX.writeFile(wb, `طلب_${currentOrderId}.xlsx`);
+        }
+    </script>
+</body>
+</html>
