@@ -53,7 +53,7 @@
         .action-bar { margin: 5px 0 10px 0; display: flex; justify-content: space-between; align-items: center; }
         
         .table-wrapper { background: white; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1400px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1200px; }
         
         thead th { 
             background-color: var(--header-green) !important; 
@@ -101,14 +101,7 @@
             min-width: 40px;
         }
 
-        .arrow-icon {
-            font-size: 12px;
-            line-height: 1;
-            font-weight: 400;
-            display: inline-block;
-            margin-top: 2px;
-        }
-
+        .arrow-icon { font-size: 12px; line-height: 1; font-weight: 400; display: inline-block; margin-top: 2px; }
         .header-select option { color: black; background: white; }
 
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); padding: 5px; }
@@ -173,18 +166,10 @@
                 <thead>
                     <tr>
                         <th style="width: 3%;"><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)"></th>
-                        <th style="width: 7%;">نوع الطلب</th>
-                        <th style="width: 11%;">تفاصيل الطلب</th>
-                        <th style="width: 4%;">العدد</th>
-                        <th style="width: 8%;">
-                            <div class="th-filter-wrap">
-                                <select id="filter-monthly" class="header-select" onchange="applyFilters()">
-                                    <option value="">اشتراك شهري</option>
-                                </select>
-                                <span class="arrow-icon">⌄</span>
-                            </div>
-                        </th>
-                        <th style="width: 8%;">
+                        <th style="width: 10%;">نوع الطلب</th>
+                        <th style="width: 14%;">تفاصيل الطلب</th>
+                        <th style="width: 5%;">العدد</th>
+                        <th style="width: 10%;">
                             <div class="th-filter-wrap">
                                 <select id="filter-sub" class="header-select" onchange="applyFilters()">
                                     <option value="">الاشتراك</option>
@@ -192,11 +177,12 @@
                                 <span class="arrow-icon">⌄</span>
                             </div>
                         </th>
-                        <th style="width: 6%;">الاجمالي</th>
+                        <th style="width: 7%;">الاجمالي</th>
                         <th style="width: 9%;">رقم السريال</th>
                         <th style="width: 9%;">رقم الخدمة</th>
                         <th style="width: 9%;">المستخدم</th>
-                        <th style="width: 8%;"> <div class="th-filter-wrap">
+                        <th style="width: 8%;">
+                            <div class="th-filter-wrap">
                                 <select id="filter-status" class="header-select" onchange="applyFilters()">
                                     <option value="">الحالة</option>
                                 </select>
@@ -204,8 +190,9 @@
                             </div>
                         </th>
                         <th style="width: 8%;">تاريخ التغيير</th>
-                        <th style="width: 8%;">ملاحظة</th>
-                        <th style="width: 3%;">إجراء</th> </tr>
+                        <th style="width: 5%;">ملاحظة</th>
+                        <th style="width: 3%;">إجراء</th>
+                    </tr>
                 </thead>
                 <tbody id="productsBody"></tbody>
             </table>
@@ -225,7 +212,6 @@
                 <input type="text" id="p_type" placeholder="نوع الطلب" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-family:'Cairo';">
                 <input type="text" id="p_name" placeholder="تفاصيل الطلب" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-family:'Cairo';">
                 <input type="number" id="p_qty" placeholder="العدد" value="1" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-family:'Cairo';">
-                <input type="text" id="p_monthly" placeholder="اشتراك شهري" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-family:'Cairo';">
                 <input type="text" id="p_sub" placeholder="الاشتراك (التأسيس)" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-family:'Cairo';">
                 <select id="p_status" style="padding:8px; border:1px solid #ddd; border-radius:6px; font-family:'Cairo'; grid-column: span 2;">
                     <option>مكتمل</option><option>تم التوثيق</option><option>توثيق</option><option selected>جاهز</option><option>مرتجع</option><option>فقدان</option>
@@ -283,7 +269,6 @@
                         <td>${p.type}</td>
                         <td>${p.name}</td>
                         <td>${p.qty}</td>
-                        <td>${p.monthly || '0'}</td>
                         <td>${p.sub}</td>
                         <td style="color:var(--header-green); font-weight:800;">${(p.qty * subVal).toFixed(2)}</td>
                         <td class="${isLocked ? '' : 'editable-cell'}" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'serial', this.innerText)">${p.serial || ''}</td>
@@ -326,21 +311,19 @@
             const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
             const fill = (id, label, items) => {
                 const s = document.getElementById(id);
+                if(!s) return;
                 const current = s.value;
                 s.innerHTML = `<option value="">${label}</option>` + [...new Set(items)].map(i => i ? `<option value="${i}" ${i===current?'selected':''}>${i}</option>` : '').join('');
             };
-            fill('filter-monthly', 'اشتراك شهري', db.map(p => p.monthly));
             fill('filter-sub', 'الاشتراك', db.map(p => p.sub));
             fill('filter-status', 'الحالة', db.map(p => p.status));
         }
 
         function applyFilters() {
-            const monthly = document.getElementById('filter-monthly').value;
             const sub = document.getElementById('filter-sub').value;
             const status = document.getElementById('filter-status').value;
             const all = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
             const filtered = all.filter(p => 
-                (monthly === "" || p.monthly === monthly) && 
                 (sub === "" || p.sub === sub) && 
                 (status === "" || p.status === status)
             );
@@ -365,7 +348,6 @@
                 type: document.getElementById('p_type').value,
                 name: document.getElementById('p_name').value,
                 qty: parseInt(document.getElementById('p_qty').value) || 1,
-                monthly: document.getElementById('p_monthly').value,
                 sub: document.getElementById('p_sub').value,
                 serial: document.getElementById('p_serial').value,
                 mobile: document.getElementById('p_mobile').value,
@@ -390,7 +372,6 @@
                 document.getElementById('p_type').value = p.type;
                 document.getElementById('p_name').value = p.name;
                 document.getElementById('p_qty').value = p.qty;
-                document.getElementById('p_monthly').value = p.monthly || '';
                 document.getElementById('p_sub').value = p.sub;
                 document.getElementById('p_serial').value = p.serial;
                 document.getElementById('p_mobile').value = p.mobile;
