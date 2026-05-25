@@ -18,19 +18,22 @@
             --soft-green: #dcfce7;
         }
 
-        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
+        /* إزالة الفراغات من جسم الصفحة */
+        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; padding: 0; line-height: 1.2; }
 
+        /* جعل شريط التنقل يبدأ من الصفر تماماً */
         .navbar { 
             background-color: var(--nav-bg); display: flex; align-items: center; padding: 0 20px; 
-            margin: 10px; border-radius: 12px; height: 37px; position: sticky; top: 10px; z-index: 1100;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); box-sizing: border-box;
+            margin: 0; border-radius: 0; height: 37px; position: sticky; top: 0; z-index: 1100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); box-sizing: border-box;
         }
-        .navbar a { color: var(--white); text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; border-radius: 6px; transition: 0.3s; line-height: 26px; height: 26px; display: inline-block; }
+        .navbar a { color: var(--white); text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; transition: 0.3s; line-height: 37px; height: 37px; display: inline-block; }
         .navbar a.active { background-color: var(--nav-active); color: var(--nav-bg); }
 
-        .container { padding: 10px 20px 20px 20px; }
+        /* تقليل المسافات العلوية للحاوية */
+        .container { padding: 5px 20px 20px 20px; }
 
-        .header-section-wrapper { margin: 20px 7% 20px 7%; display: flex; align-items: center; gap: 15px; }
+        .header-section-wrapper { margin: 10px 7% 15px 7%; display: flex; align-items: center; gap: 15px; }
         .btn-back-outside { text-decoration: none; background: var(--white); color: var(--nav-bg); padding: 8px 15px; border-radius: 10px; font-size: 12px; font-weight: 800; border: 2px solid #991b1b; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 5px; height: 40px; box-sizing: border-box; }
 
         .order-header-info { background: white; padding: 0 25px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-grow: 1; flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); height: 70px; box-sizing: border-box; }
@@ -39,7 +42,7 @@
         .info-value { font-size: 13px; color: var(--nav-bg); font-weight: 800; }
         .info-item-highlight { border: 2px solid var(--header-green); padding: 5px 15px; border-radius: 8px; background-color: #f0fdf4; }
 
-        .action-bar { margin: 20px 0 12px 0; display: flex; justify-content: space-between; align-items: center; }
+        .action-bar { margin: 10px 0 12px 0; display: flex; justify-content: space-between; align-items: center; }
         .btn { border: none; padding: 8px 15px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; transition: 0.3s; color: white; }
         .btn-add { background: var(--accent-blue); }
         .btn-export { background: var(--header-green); }
@@ -48,7 +51,7 @@
         .table-wrapper { background: white; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1300px; }
         
-        /* تثبيت شريط العناوين */
+        /* تثبيت شريط العناوين ليلتصق أسفل النافبار تماماً */
         thead th { 
             background-color: var(--header-green); 
             height: 40px; 
@@ -59,14 +62,14 @@
             text-align: center; 
             border-left: 1px solid rgba(255,255,255,0.1);
             position: sticky;
-            top: 47px; /* يتم ضبطه حسب ارتفاع النافبار ليكون أسفله مباشرة */
+            top: 37px; /* ارتفاع النافبار */
             z-index: 1000;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
         .th-filter-wrap { display: flex; align-items: center; justify-content: center; gap: 4px; height: 100%; }
         
-        /* إزالة المثلث المقلوب من الفلاتر */
+        /* إزالة المثلث المقلوب */
         .header-select { 
             background: transparent; 
             color: white; 
@@ -91,6 +94,7 @@
 
         .options-select { font-family: 'Cairo'; font-size: 11px; font-weight: 700; padding: 4px; border-radius: 6px; border: 1px solid var(--border-color); background: #f8fafc; cursor: pointer; width: 70px; }
 
+        /* تم التوثيق أخضر خافت */
         .status-select { font-family: 'Cairo'; font-size: 10px; font-weight: 700; padding: 5px; border-radius: 6px; width: 95%; cursor: pointer; border: 1px solid var(--border-color); }
         .status-complete { background-color: #16a34a !important; color: white !important; }
         .status-verified { background-color: var(--soft-green) !important; color: #166534 !important; border: 1px solid #bbf7d0 !important; }
@@ -99,6 +103,7 @@
         .editable-cell { background-color: transparent; border: 1px dashed #94a3b8 !important; cursor: cell; outline: none; }
         .editable-cell:focus { border: 1px solid var(--accent-blue) !important; background-color: #f8fafc; }
 
+        /* سجل النشاط بخط أصغر درجة */
         .activity-log-section { margin-top: 30px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 15px; }
         .activity-log-title { font-size: 12px; font-weight: 800; color: var(--nav-bg); margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
         #activityLog { max-height: 150px; overflow-y: auto; font-size: 9px; color: #64748b; line-height: 1.6; }
