@@ -20,7 +20,6 @@
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; padding: 0; line-height: 1.2; }
 
-        /* Navbar ثابتة في الأعلى */
         .navbar { 
             background-color: var(--nav-bg); display: flex; align-items: center; padding: 0 20px; 
             margin: 0; border-radius: 0; height: 37px; position: sticky; top: 0; z-index: 1500;
@@ -31,16 +30,9 @@
 
         .container { padding: 0 20px 20px 20px; }
 
-        /* القسم العلوي الثابت (معلومات الطلب + البحث) */
         .sticky-top-section {
-            position: sticky; 
-            top: 37px; /* تحت النبار مباشرة */
-            background-color: var(--bg-color);
-            z-index: 1400; 
-            padding-top: 10px; 
-            padding-bottom: 5px; 
-            height: 137px; 
-            box-sizing: border-box;
+            position: sticky; top: 37px; background-color: var(--bg-color);
+            z-index: 1400; padding-top: 10px; padding-bottom: 5px; height: 137px; box-sizing: border-box;
         }
 
         .header-section-wrapper { margin: 0 7% 10px 7%; display: flex; align-items: center; gap: 15px; }
@@ -59,25 +51,14 @@
         .table-wrapper { background: white; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: visible; }
         table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1100px; }
         
-        /* تصحيح مكان الهيدر الأخضر ليكون ثابتاً تماماً */
         thead th { 
-            background-color: var(--header-green) !important; 
-            height: 40px; 
-            line-height: 40px;
-            padding: 0 5px; 
-            color: white !important; 
-            font-size: 11px; 
-            font-weight: 800; 
-            text-align: center; 
-            border-left: 1px solid rgba(255,255,255,0.1); 
-            position: sticky; 
-            top: 174px; /* 37px (navbar) + 137px (sticky-section) = 174px */
-            z-index: 1300;
+            background-color: var(--header-green) !important; height: 40px; line-height: 40px;
+            padding: 0 5px; color: white !important; font-size: 11px; font-weight: 800; text-align: center; 
+            border-left: 1px solid rgba(255,255,255,0.1); position: sticky; top: 174px; z-index: 1300;
         }
         
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 40px; font-size: 11px; font-weight: 600; color: var(--text-dark); padding: 5px; }
         
-        /* صف الإجمالي الأسود */
         .table-footer { background-color: #000 !important; color: #fff !important; height: 30px !important; }
         .table-footer td { color: #fff !important; border: none; font-weight: 800; font-size: 12px; height: 30px; }
 
@@ -92,8 +73,8 @@
         .status-verified { background-color: var(--soft-green) !important; color: #166534 !important; }
 
         .editable-cell { cursor: cell; outline: none; }
-        .row-locked { background-color: #f8fafc; color: #94a3b8; pointer-events: none; }
-        .row-locked .row-checkbox { display: none; } /* إخفاء المربع عند القفل لمنع الخطأ في الجمع */
+        .row-locked { background-color: #f8fafc; color: #94a3b8; }
+        .row-locked .editable-cell { pointer-events: none; }
 
         @media print {
             .navbar, .sticky-top-section, .btn-back-outside, .action-bar, th:first-child, td:first-child { display: none !important; }
@@ -166,8 +147,7 @@
                 <tfoot>
                     <tr class="table-footer">
                         <td id="f_count">0</td>
-                        <td colspan="2" style="text-align: right; padding-right: 20px;">الصفوف المحددة</td>
-                        <td id="f_qty">0</td>
+                        <td colspan="2"></td> <td id="f_qty">0</td>
                         <td id="f_sub">0</td>
                         <td id="f_total">0</td>
                         <td colspan="6"></td>
@@ -226,7 +206,7 @@
                 let statusClass = (p.status === "مكتمل") ? "status-complete" : (p.status === "تم التوثيق" ? "status-verified" : "");
 
                 return `
-                    <tr class="${isLocked ? 'row-locked' : ''}">
+                    <tr class="${isLocked ? 'row-locked' : ''}" data-status="${p.status}">
                         <td><input type="checkbox" class="row-checkbox" data-index="${index}" onchange="calculateTotals()"></td>
                         <td class="editable-cell" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'type', this.innerText)">${p.type}</td>
                         <td class="editable-cell" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'name', this.innerText)">${p.name}</td>
@@ -265,7 +245,7 @@
 
         function toggleSelectAll(s) {
             document.querySelectorAll('.row-checkbox').forEach(c => {
-                if(!c.closest('tr').classList.contains('row-locked')) c.checked = s.checked;
+                c.checked = s.checked;
             });
             calculateTotals();
         }
@@ -276,6 +256,31 @@
             if(field === 'status') db[currentOrderId][index].date = new Date().toLocaleDateString('en-GB');
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
             renderProducts();
+        }
+
+        function deleteSelected() {
+            const selectedCheckboxes = Array.from(document.querySelectorAll('.row-checkbox:checked'));
+            if(selectedCheckboxes.length === 0) return;
+
+            // التحقق من وجود صفوف مكتملة أو موثقة ضمن التحديد
+            const hasLocked = selectedCheckboxes.some(cb => {
+                const row = cb.closest('tr');
+                const status = row.getAttribute('data-status');
+                return status === "مكتمل" || status === "تم التوثيق";
+            });
+
+            if(hasLocked) {
+                alert("⚠️ لا يمكن حذف الصفوف المكتملة أو الموثقة!");
+                return;
+            }
+
+            if(confirm("هل أنت متأكد من حذف المنتجات المحددة؟")) {
+                const indexesToDelete = selectedCheckboxes.map(cb => parseInt(cb.dataset.index));
+                let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+                db[currentOrderId] = db[currentOrderId].filter((p, i) => !indexesToDelete.includes(i));
+                localStorage.setItem('asgate_products_db', JSON.stringify(db));
+                renderProducts();
+            }
         }
 
         function applyFilters() {
@@ -299,15 +304,6 @@
             renderProducts(); closeModal();
         }
 
-        function deleteSelected() {
-            const selected = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => parseInt(cb.dataset.index));
-            if(selected.length > 0 && confirm("حذف المحدد؟")) {
-                let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
-                db[currentOrderId] = db[currentOrderId].filter((p, i) => !selected.includes(i));
-                localStorage.setItem('asgate_products_db', JSON.stringify(db));
-                renderProducts();
-            }
-        }
         function openModal() { document.getElementById('productModal').style.display = 'flex'; }
         function closeModal() { document.getElementById('productModal').style.display = 'none'; }
         
