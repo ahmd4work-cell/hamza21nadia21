@@ -95,23 +95,23 @@
 
         .editable-cell { border: 1px dashed #94a3b8 !important; cursor: cell; outline: none; }
         
-        /* تصميم سجل النشاط المتطور */
+        /* تصميم سجل النشاط المحدث - تصغير الخط درجتين */
         .activity-log-section { margin-top: 30px; background: #fff; border-radius: 12px; border: 1px solid var(--border-color); padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-        .activity-log-title { font-weight: 800; font-size: 16px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; color: var(--nav-bg); }
+        .activity-log-title { font-weight: 800; font-size: 14px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; color: var(--nav-bg); }
         
         .log-input-area { display: flex; gap: 10px; margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #e2e8f0; }
-        .log-input-area input[type="text"] { flex-grow: 1; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-family: 'Cairo'; font-size: 13px; outline: none; }
+        .log-input-area input[type="text"] { flex-grow: 1; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-family: 'Cairo'; font-size: 11px; outline: none; }
         .log-input-area input[type="file"] { display: none; }
         .btn-attach { background: #64748b; color: white; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; }
-        .btn-send-log { background: var(--nav-bg); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 700; border: none; cursor: pointer; font-family: 'Cairo'; }
+        .btn-send-log { background: var(--nav-bg); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 700; border: none; cursor: pointer; font-family: 'Cairo'; font-size: 11px; }
 
-        #activityLog { max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 5px; }
-        .log-entry { background: #fff; border: 1px solid #f1f5f9; padding: 12px; border-radius: 10px; border-right: 4px solid var(--accent-blue); position: relative; }
-        .log-time { font-size: 10px; color: #94a3b8; font-weight: 700; margin-bottom: 5px; }
-        .log-text { font-size: 13px; color: var(--text-dark); font-weight: 600; line-height: 1.4; }
-        .log-attachment { margin-top: 10px; display: block; }
-        .log-attachment img { max-width: 150px; border-radius: 8px; border: 1px solid #eee; }
-        .file-link { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; background: #f1f5f9; border-radius: 6px; text-decoration: none; color: #475569; font-size: 11px; font-weight: 700; border: 1px solid #e2e8f0; }
+        #activityLog { max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; }
+        .log-entry { background: #fff; border: 1px solid #f1f5f9; padding: 10px; border-radius: 8px; border-right: 4px solid var(--accent-blue); position: relative; }
+        .log-time { font-size: 10px; color: #94a3b8; font-weight: 700; margin-bottom: 3px; }
+        .log-text { font-size: 11px; color: var(--text-dark); font-weight: 600; line-height: 1.4; }
+        .log-attachment { margin-top: 8px; display: block; }
+        .log-attachment img { max-width: 120px; border-radius: 6px; border: 1px solid #eee; }
+        .file-link { display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; background: #f1f5f9; border-radius: 5px; text-decoration: none; color: #475569; font-size: 10px; font-weight: 700; border: 1px solid #e2e8f0; }
 
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 20px; border-radius: 12px; width: 480px; }
@@ -199,8 +199,7 @@
                 <button class="btn-send-log" onclick="addManualLog()">إضافة</button>
             </div>
 
-            <div id="activityLog">
-                </div>
+            <div id="activityLog"></div>
         </div>
     </div>
 
@@ -249,6 +248,83 @@
             }
         }
 
+        // الحصول على اسم المستخدم الحالي من الجدول
+        function getCurrentUser() {
+            const productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+            const products = productsDb[currentOrderId] || [];
+            if(products.length > 0 && products[0].user) return products[0].user;
+            return "النظام";
+        }
+
+        // تنسيق التاريخ واليوم
+        function getFormattedDateTime() {
+            const now = new Date();
+            const days = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+            const dayName = days[now.getDay()];
+            const dateStr = now.toLocaleDateString('en-GB'); // DD/MM/YYYY
+            return { day: dayName, date: dateStr };
+        }
+
+        function addManualLog() {
+            const input = document.getElementById('logTextInput');
+            if(input.value.trim() === "") return;
+            addToLog(input.value.trim());
+            input.value = "";
+        }
+
+        function handleLogFileUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const fileData = { name: file.name, type: file.type, data: e.target.result };
+                addToLog(`تم إرفاق ملف: ${file.name}`, fileData);
+            };
+            reader.readAsDataURL(file);
+            input.value = "";
+        }
+
+        function addToLog(text, fileData = null) {
+            const user = getCurrentUser();
+            const timeInfo = getFormattedDateTime();
+            let logs = JSON.parse(localStorage.getItem('asgate_activity_log') || '[]');
+            
+            // التنسيق المطلوب: اسم صاحب اليوزر | اليوم التاريخ تم تغيير
+            const fullText = `${user}  | ${timeInfo.day} ${timeInfo.date}  ${text}`;
+
+            logs.unshift({ 
+                text: fullText, 
+                date: new Date().toLocaleString('en-GB'), 
+                orderId: currentOrderId,
+                file: fileData 
+            });
+            localStorage.setItem('asgate_activity_log', JSON.stringify(logs));
+            renderActivityLog();
+        }
+
+        function renderActivityLog() {
+            const logs = JSON.parse(localStorage.getItem('asgate_activity_log') || '[]');
+            const logContainer = document.getElementById('activityLog');
+            const filteredLogs = logs.filter(l => l.orderId === currentOrderId);
+
+            logContainer.innerHTML = filteredLogs.map(l => {
+                let attachmentHtml = "";
+                if (l.file) {
+                    if (l.file.type.startsWith('image/')) {
+                        attachmentHtml = `<div class="log-attachment"><img src="${l.file.data}" alt="attachment"></div>`;
+                    } else {
+                        attachmentHtml = `<div class="log-attachment"><a href="${l.file.data}" download="${l.file.name}" class="file-link">📄 ${l.file.name} (تحميل)</a></div>`;
+                    }
+                }
+                return `
+                    <div class="log-entry">
+                        <div class="log-time">${l.date}</div>
+                        <div class="log-text">${l.text}</div>
+                        ${attachmentHtml}
+                    </div>`;
+            }).join('');
+        }
+
         function renderProducts(filteredList = null) {
             const productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             const products = filteredList || productsDb[currentOrderId] || [];
@@ -256,11 +332,7 @@
             
             tbody.innerHTML = products.map((p, index) => {
                 const subVal = parseFloat(String(p.sub).replace(/[^\d.]/g, '')) || 0;
-                let statusClass = "";
-                if (p.status === "مكتمل") statusClass = "status-complete";
-                else if (p.status === "تم التوثيق") statusClass = "status-verified";
-                else if (p.status === "توثيق") statusClass = "status-pending";
-
+                let statusClass = (p.status === "مكتمل") ? "status-complete" : (p.status === "تم التوثيق" ? "status-verified" : (p.status === "توثيق" ? "status-pending" : ""));
                 const isLocked = (p.status === "مكتمل" || p.status === "تم التوثيق");
 
                 return `
@@ -293,73 +365,6 @@
             if (!filteredList) updateFilterOptions();
         }
 
-        // وظائف السجل الجديدة
-        function addManualLog() {
-            const input = document.getElementById('logTextInput');
-            if(input.value.trim() === "") return;
-            addToLog(input.value.trim());
-            input.value = "";
-        }
-
-        function handleLogFileUpload(input) {
-            const file = input.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const fileData = {
-                    name: file.name,
-                    type: file.type,
-                    data: e.target.result
-                };
-                addToLog(`تم إرفاق ملف: ${file.name}`, fileData);
-            };
-            reader.readAsDataURL(file);
-            input.value = ""; // Reset
-        }
-
-        function addToLog(text, fileData = null) {
-            let logs = JSON.parse(localStorage.getItem('asgate_activity_log') || '[]');
-            logs.unshift({ 
-                text: text, 
-                date: new Date().toLocaleString('en-GB'), 
-                orderId: currentOrderId,
-                file: fileData 
-            });
-            localStorage.setItem('asgate_activity_log', JSON.stringify(logs));
-            renderActivityLog();
-        }
-
-        function renderActivityLog() {
-            const logs = JSON.parse(localStorage.getItem('asgate_activity_log') || '[]');
-            const logContainer = document.getElementById('activityLog');
-            const filteredLogs = logs.filter(l => l.orderId === currentOrderId);
-
-            logContainer.innerHTML = filteredLogs.map(l => {
-                let attachmentHtml = "";
-                if (l.file) {
-                    if (l.file.type.startsWith('image/')) {
-                        attachmentHtml = `<div class="log-attachment"><img src="${l.file.data}" alt="attachment"></div>`;
-                    } else {
-                        attachmentHtml = `
-                            <div class="log-attachment">
-                                <a href="${l.file.data}" download="${l.file.name}" class="file-link">
-                                    📄 ${l.file.name} (تحميل)
-                                </a>
-                            </div>`;
-                    }
-                }
-
-                return `
-                    <div class="log-entry">
-                        <div class="log-time">${l.date}</div>
-                        <div class="log-text">${l.text}</div>
-                        ${attachmentHtml}
-                    </div>`;
-            }).join('');
-        }
-
-        // الوظائف السابقة
         function updateQuickField(index, field, value) {
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             const oldVal = db[currentOrderId][index][field];
@@ -367,7 +372,9 @@
                 db[currentOrderId][index][field] = value.trim();
                 if(field === 'status') {
                     db[currentOrderId][index].date = new Date().toLocaleDateString('en-GB');
-                    addToLog(`تحديث الحالة: ${value}`);
+                    addToLog(`تم تغيير الحالة إلى: ${value}`);
+                } else {
+                    addToLog(`تعديل حقل ${field} إلى: ${value}`);
                 }
                 localStorage.setItem('asgate_products_db', JSON.stringify(db));
                 renderProducts();
@@ -390,10 +397,9 @@
             };
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             if (!db[currentOrderId]) db[currentOrderId] = [];
-            
             if (index !== "") {
                 db[currentOrderId][index] = data;
-                addToLog(`تعديل المنتج: ${data.name}`);
+                addToLog(`تعديل بيانات المنتج: ${data.name}`);
             } else {
                 db[currentOrderId].push(data);
                 addToLog(`إضافة منتج جديد: ${data.name}`);
@@ -411,7 +417,7 @@
                     db[currentOrderId].splice(i,1); 
                     localStorage.setItem('asgate_products_db', JSON.stringify(db)); 
                     renderProducts(); 
-                    addToLog(`حذف منتج: ${pName}`);
+                    addToLog(`تم حذف منتج: ${pName}`);
                 } 
             }
             s.value = "";
@@ -442,21 +448,15 @@
             if (index !== null) {
                 const p = JSON.parse(localStorage.getItem('asgate_products_db'))[currentOrderId][index];
                 document.getElementById('edit-index').value = index;
-                document.getElementById('p_type').value = p.type;
-                document.getElementById('p_name').value = p.name;
-                document.getElementById('p_qty').value = p.qty;
-                document.getElementById('p_sub').value = p.sub;
-                document.getElementById('p_serial').value = p.serial;
-                document.getElementById('p_mobile').value = p.mobile;
-                document.getElementById('p_user').value = p.user;
-                document.getElementById('p_status').value = p.status;
-                document.getElementById('p_note').value = p.note;
-                document.getElementById('modalTitle').innerText = "تعديل المنتج";
+                document.getElementById('p_type').value = p.type; document.getElementById('p_name').value = p.name;
+                document.getElementById('p_qty').value = p.qty; document.getElementById('p_sub').value = p.sub;
+                document.getElementById('p_serial').value = p.serial; document.getElementById('p_mobile').value = p.mobile;
+                document.getElementById('p_user').value = p.user; document.getElementById('p_status').value = p.status;
+                document.getElementById('p_note').value = p.note; document.getElementById('modalTitle').innerText = "تعديل المنتج";
             } else {
                 document.getElementById('edit-index').value = "";
                 document.querySelectorAll('#productModal input').forEach(i => i.value = "");
-                document.getElementById('p_qty').value = 1;
-                document.getElementById('modalTitle').innerText = "إضافة منتج جديد";
+                document.getElementById('p_qty').value = 1; document.getElementById('modalTitle').innerText = "إضافة منتج جديد";
             }
         }
         function closeModal() { document.getElementById('productModal').style.display = 'none'; }
@@ -468,7 +468,7 @@
                 db[currentOrderId] = db[currentOrderId].filter((p, i) => !selected.includes(i));
                 localStorage.setItem('asgate_products_db', JSON.stringify(db));
                 renderProducts();
-                addToLog(`حذف عدة منتجات (${selected.length})`);
+                addToLog(`تم حذف عدة منتجات عدد (${selected.length})`);
             }
         }
         function exportToExcel() {
