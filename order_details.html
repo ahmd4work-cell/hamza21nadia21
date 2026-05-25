@@ -95,23 +95,23 @@
 
         .editable-cell { border: 1px dashed #94a3b8 !important; cursor: cell; outline: none; }
         
-        /* تصميم سجل النشاط المحدث - تصغير الخط درجتين */
+        /* سجل النشاط - تقليل الخط درجة إضافية (الآن 10px) */
         .activity-log-section { margin-top: 30px; background: #fff; border-radius: 12px; border: 1px solid var(--border-color); padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-        .activity-log-title { font-weight: 800; font-size: 14px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; color: var(--nav-bg); }
+        .activity-log-title { font-weight: 800; font-size: 13px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; color: var(--nav-bg); }
         
         .log-input-area { display: flex; gap: 10px; margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #e2e8f0; }
-        .log-input-area input[type="text"] { flex-grow: 1; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-family: 'Cairo'; font-size: 11px; outline: none; }
+        .log-input-area input[type="text"] { flex-grow: 1; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-family: 'Cairo'; font-size: 10px; outline: none; }
         .log-input-area input[type="file"] { display: none; }
-        .btn-attach { background: #64748b; color: white; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; }
-        .btn-send-log { background: var(--nav-bg); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 700; border: none; cursor: pointer; font-family: 'Cairo'; font-size: 11px; }
+        .btn-attach { background: #64748b; color: white; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+        .btn-send-log { background: var(--nav-bg); color: white; padding: 8px 18px; border-radius: 8px; font-weight: 700; border: none; cursor: pointer; font-family: 'Cairo'; font-size: 10px; }
 
         #activityLog { max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; }
         .log-entry { background: #fff; border: 1px solid #f1f5f9; padding: 10px; border-radius: 8px; border-right: 4px solid var(--accent-blue); position: relative; }
-        .log-time { font-size: 10px; color: #94a3b8; font-weight: 700; margin-bottom: 3px; }
-        .log-text { font-size: 11px; color: var(--text-dark); font-weight: 600; line-height: 1.4; }
+        .log-time { font-size: 10px; color: #94a3b8; font-weight: 700; margin-bottom: 3px; } /* التاريخ ثابت 10px */
+        .log-text { font-size: 10px; color: var(--text-dark); font-weight: 600; line-height: 1.4; }
         .log-attachment { margin-top: 8px; display: block; }
         .log-attachment img { max-width: 120px; border-radius: 6px; border: 1px solid #eee; }
-        .file-link { display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; background: #f1f5f9; border-radius: 5px; text-decoration: none; color: #475569; font-size: 10px; font-weight: 700; border: 1px solid #e2e8f0; }
+        .file-link { display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; background: #f1f5f9; border-radius: 5px; text-decoration: none; color: #475569; font-size: 9px; font-weight: 700; border: 1px solid #e2e8f0; }
 
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 20px; border-radius: 12px; width: 480px; }
@@ -248,7 +248,6 @@
             }
         }
 
-        // الحصول على اسم المستخدم الحالي من الجدول
         function getCurrentUser() {
             const productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             const products = productsDb[currentOrderId] || [];
@@ -256,12 +255,11 @@
             return "النظام";
         }
 
-        // تنسيق التاريخ واليوم
         function getFormattedDateTime() {
             const now = new Date();
             const days = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
             const dayName = days[now.getDay()];
-            const dateStr = now.toLocaleDateString('en-GB'); // DD/MM/YYYY
+            const dateStr = now.toLocaleDateString('en-GB');
             return { day: dayName, date: dateStr };
         }
 
@@ -288,10 +286,7 @@
             const user = getCurrentUser();
             const timeInfo = getFormattedDateTime();
             let logs = JSON.parse(localStorage.getItem('asgate_activity_log') || '[]');
-            
-            // التنسيق المطلوب: اسم صاحب اليوزر | اليوم التاريخ تم تغيير
             const fullText = `${user}  | ${timeInfo.day} ${timeInfo.date}  ${text}`;
-
             logs.unshift({ 
                 text: fullText, 
                 date: new Date().toLocaleString('en-GB'), 
@@ -313,7 +308,7 @@
                     if (l.file.type.startsWith('image/')) {
                         attachmentHtml = `<div class="log-attachment"><img src="${l.file.data}" alt="attachment"></div>`;
                     } else {
-                        attachmentHtml = `<div class="log-attachment"><a href="${l.file.data}" download="${l.file.name}" class="file-link">📄 ${l.file.name} (تحميل)</a></div>`;
+                        attachmentHtml = `<div class="log-attachment"><a href="${l.file.data}" download="${l.file.name}" class="file-link">📄 ${l.file.name}</a></div>`;
                     }
                 }
                 return `
@@ -373,8 +368,6 @@
                 if(field === 'status') {
                     db[currentOrderId][index].date = new Date().toLocaleDateString('en-GB');
                     addToLog(`تم تغيير الحالة إلى: ${value}`);
-                } else {
-                    addToLog(`تعديل حقل ${field} إلى: ${value}`);
                 }
                 localStorage.setItem('asgate_products_db', JSON.stringify(db));
                 renderProducts();
