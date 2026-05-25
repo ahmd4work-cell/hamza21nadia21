@@ -20,7 +20,6 @@
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; padding: 0; line-height: 1.2; }
 
-        /* 1. تثبيت النافبار */
         .navbar { 
             background-color: var(--nav-bg); display: flex; align-items: center; padding: 0 20px; 
             margin: 0; border-radius: 0; height: 37px; position: sticky; top: 0; z-index: 1300;
@@ -31,7 +30,6 @@
 
         .container { padding: 0 20px 20px 20px; }
 
-        /* 2. تثبيت منطقة المعلومات والأزرار */
         .sticky-top-section {
             position: sticky;
             top: 37px; 
@@ -57,7 +55,6 @@
         .table-wrapper { background: white; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1400px; }
         
-        /* 3. تثبيت الشريط الأخضر مع حواف دائرية علوية فقط */
         thead th { 
             background-color: var(--header-green) !important; 
             height: 40px; 
@@ -73,7 +70,6 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
-        /* تطبيق الحواف الدائرية على أول وآخر خلية في الرأس */
         thead th:first-child { border-radius: 0 10px 0 0; }
         thead th:last-child { border-radius: 10px 0 0 0; border-left: none; }
         
@@ -129,7 +125,6 @@
 
         .editable-cell { border: 1px dashed #94a3b8 !important; cursor: cell; outline: none; }
         
-        /* سجل النشاط: تعديل حجم الخط بمقدار درجة واحدة */
         .activity-log-section { margin-top: 30px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 15px; }
         .activity-log-title { font-weight: 800; font-size: 14px; margin-bottom: 10px; }
         #activityLog { max-height: 150px; overflow-y: auto; font-size: 10px; color: #64748b; font-weight: 600; }
@@ -201,8 +196,7 @@
                         <th style="width: 9%;">رقم السريال</th>
                         <th style="width: 9%;">رقم الخدمة</th>
                         <th style="width: 9%;">المستخدم</th>
-                        <th style="width: 10%;">
-                            <div class="th-filter-wrap">
+                        <th style="width: 8%;"> <div class="th-filter-wrap">
                                 <select id="filter-status" class="header-select" onchange="applyFilters()">
                                     <option value="">الحالة</option>
                                 </select>
@@ -211,8 +205,7 @@
                         </th>
                         <th style="width: 8%;">تاريخ التغيير</th>
                         <th style="width: 8%;">ملاحظة</th>
-                        <th style="width: 5%;">الخيارات</th>
-                    </tr>
+                        <th style="width: 3%;">إجراء</th> </tr>
                 </thead>
                 <tbody id="productsBody"></tbody>
             </table>
@@ -304,8 +297,8 @@
                         <td style="font-size:10px">${p.date}</td>
                         <td contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'note', this.innerText)">${p.note}</td>
                         <td>
-                            <select onchange="handleAction(this, ${index})" style="font-family:'Cairo'; font-size:11px; padding:3px; border-radius:4px;">
-                                <option value="" selected disabled>خيارات</option>
+                            <select onchange="handleAction(this, ${index})" style="font-family:'Cairo'; font-size:14px; padding:2px; border:none; background:transparent; cursor:pointer;">
+                                <option value="" selected disabled>⌄</option>
                                 <option value="edit" ${isLocked ? 'disabled' : ''}>تعديل</option>
                                 <option value="delete" ${isLocked ? 'disabled' : ''}>حذف</option>
                             </select>
