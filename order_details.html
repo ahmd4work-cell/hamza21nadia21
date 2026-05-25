@@ -123,9 +123,10 @@
         .status-verified { background-color: var(--soft-green) !important; color: #166534 !important; border: 1px solid #bbf7d0 !important; }
         .status-pending { background-color: #eab308 !important; color: #000 !important; }
 
+        /* تنسيق عمود إجراء والقائمة المنبثقة */
         .action-select {
             font-family: 'Cairo';
-            font-size: 14px; /* تم التصغير إلى 14px */
+            font-size: 14px; 
             padding: 0;
             border: none;
             background: transparent;
@@ -136,6 +137,13 @@
             appearance: none;         
             text-align: center;
             width: 100%;
+        }
+
+        /* تصغير حجم خط الخيارات داخل القائمة المنبثقة 2 درجة إضافية */
+        .action-select option {
+            font-size: 12px; 
+            font-weight: 600;
+            color: #000;
         }
 
         .editable-cell { border: 1px dashed #94a3b8 !important; cursor: cell; outline: none; }
