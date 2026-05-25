@@ -6,8 +6,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --nav-bg: #2e1065;
-            --header-purple: #2e1065; /* تم تغيير المسمى واللون هنا */
+            /* الألوان الجديدة المطلوبة */
+            --nav-shiny-navy: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+            --header-shiny-purple: linear-gradient(180deg, #4c1d95 0%, #2e1065 100%);
+            
+            --nav-bg: #0f172a;
             --nav-active: #a78bfa;
             --bg-color: #f4f7f9;
             --white: #ffffff;
@@ -21,16 +24,27 @@
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
 
+        /* شريط الصفحات - كحلي لامع */
         .navbar { 
-            background-color: var(--nav-bg); display: flex; align-items: center; padding: 0 20px; 
-            margin: 10px; border-radius: 12px; height: 37px; position: sticky; top: 10px; z-index: 1000;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); box-sizing: border-box;
+            background: var(--nav-shiny-navy); 
+            display: flex; 
+            align-items: center; 
+            padding: 0 20px; 
+            margin: 10px; 
+            border-radius: 12px; 
+            height: 37px; 
+            position: sticky; 
+            top: 10px; 
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.1); 
+            box-sizing: border-box;
+            border: 1px solid #1e293b;
         }
         .navbar a { 
             color: var(--white); text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; 
             border-radius: 6px; transition: 0.3s; line-height: 26px; height: 26px; display: inline-block;
         }
-        .navbar a.active { background-color: var(--nav-active); color: var(--nav-bg); }
+        .navbar a.active { background-color: var(--nav-active); color: #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
         .container { padding: 0 15px; }
         .action-bar { display: flex; align-items: center; margin: 12px 0; gap: 10px; }
@@ -45,7 +59,28 @@
 
         .table-wrapper { background: var(--white); border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th { background-color: var(--header-purple); padding: 12px 5px; color: var(--white); font-size: 11px; font-weight: 800; text-align: center; }
+        
+        /* شريط العناوين - بنفسجي داكن لامع */
+        th { 
+            background: var(--header-shiny-purple); 
+            padding: 12px 5px; 
+            color: var(--white); 
+            font-size: 11px; 
+            font-weight: 800; 
+            text-align: center; 
+            border-bottom: 2px solid #2e1065;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        /* إضافة تأثير اللمعان الزجاجي على العناوين */
+        th::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 50%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            pointer-events: none;
+        }
+
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); position: relative; }
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
         
@@ -72,11 +107,11 @@
         }
 
         .order-link { color: var(--accent-blue); text-decoration: none; font-weight: 800; border-bottom: 1px dashed var(--accent-blue); cursor: pointer; }
-        .order-link:hover { color: var(--nav-bg); border-bottom-style: solid; }
+        .order-link:hover { color: #0f172a; border-bottom-style: solid; }
 
         .modal { display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 15px; border-radius: 12px; width: 380px; height: 440px; display: flex; flex-direction: column; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .modal-header { font-weight: 800; color: var(--nav-bg); margin-bottom: 10px; text-align: right; font-size: 14px; }
+        .modal-header { font-weight: 800; color: #2e1065; margin-bottom: 10px; text-align: right; font-size: 14px; }
         
         .order-modal-card { background: white; width: 350px; border-radius: 12px; padding: 20px; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); position: relative; z-index: 10001; }
         .form-group { margin-bottom: 12px; position: relative; text-align: right; }
@@ -154,7 +189,7 @@
         <div class="form-group"><label>اسم الطلب</label><input type="text" id="mType" placeholder="مثال: توريد أجهزة"></div>
         <div style="display:flex; gap:8px; margin-top:20px;">
             <button onclick="closeOrderModal()" style="flex:1; padding:10px; background:#f1f5f9; border:none; border-radius:6px; cursor:pointer; font-family:Cairo; font-weight:bold;">إلغاء</button>
-            <button onclick="addOrderRow()" style="flex:1; padding:10px; background:var(--nav-bg); color:white; border:none; border-radius:6px; cursor:pointer; font-family:Cairo; font-weight:bold;">إضافة للجدول</button>
+            <button onclick="addOrderRow()" style="flex:1; padding:10px; background:#0f172a; color:white; border:none; border-radius:6px; cursor:pointer; font-family:Cairo; font-weight:bold;">إضافة للجدول</button>
         </div>
     </div>
 </div>
@@ -173,15 +208,11 @@
     function markAsChanged() { document.getElementById('saveBtn').classList.add('active'); }
     function markAsSaved() { document.getElementById('saveBtn').classList.remove('active'); }
 
-    function openOrderModal() { 
-        document.getElementById('orderModal').style.display = 'flex'; 
-    }
-
+    function openOrderModal() { document.getElementById('orderModal').style.display = 'flex'; }
     function closeOrderModal() { 
         document.getElementById('orderModal').style.display = 'none';
         ['mSearchField', 'mComp', 'mCr', 'mCrSub', 'mType'].forEach(id => {
-            const el = document.getElementById(id);
-            if(el) el.value = '';
+            if(document.getElementById(id)) document.getElementById(id).value = '';
         });
         document.getElementById('mResults').style.display = 'none';
     }
@@ -209,7 +240,6 @@
     function addOrderRow() {
         const comp = document.getElementById('mComp').value;
         if (!comp) return alert("يرجى اختيار شركة أولاً");
-        
         const data = {
             id: Math.floor(1000 + Math.random() * 8999),
             type: document.getElementById('mType').value || '-',
@@ -220,7 +250,6 @@
             status: "جديد",
             notes: ""
         };
-        
         renderTableRow(data);
         markAsChanged();
         closeOrderModal();
@@ -237,7 +266,6 @@
         const row = tbody.insertRow(0);
         const statusOptions = ["مكتمل", "معلق", "مرتجع", "جاهز", "جديد", "فقدان"];
         let optionsHtml = statusOptions.map(opt => `<option value="${opt}" ${obj.status === opt ? 'selected' : ''}>${opt}</option>`).join('');
-
         row.innerHTML = `
             <td><a href="order_details.html?id=${obj.id}" class="order-link">#${obj.id}</a></td>
             <td class="editable" contenteditable="true" oninput="markAsChanged()">${obj.type}</td>
@@ -257,15 +285,7 @@
     function updateHistoryLogDisplay(notes) {
         const log = document.getElementById('historyLog');
         if (!notes) { log.innerText = "لا توجد ملاحظات سابقة."; return; }
-
-        let htmlContent = notes.split('\n').map(line => {
-            if (line.includes("👤")) {
-                return `<div style="color: #eab308; margin-top: 8px;">${line}</div>`;
-            }
-            return `<div>${line}</div>`;
-        }).join('');
-
-        log.innerHTML = htmlContent;
+        log.innerHTML = notes.split('\n').map(line => line.includes("👤") ? `<div style="color: #eab308; margin-top: 8px;">${line}</div>` : `<div>${line}</div>`).join('');
     }
 
     function openNote(el) {
@@ -287,7 +307,6 @@
             const headerStr = getNoteHeader();
             let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
             let updatedNotes = oldNotes + (oldNotes ? "\n" : "") + headerStr + "\n" + newText;
-            
             currentActivePreview.setAttribute('data-full-notes', updatedNotes);
             currentActivePreview.innerText = getLastNoteOnly(updatedNotes);
             currentActivePreview.parentElement.querySelector('.tooltip-box').innerText = updatedNotes;
