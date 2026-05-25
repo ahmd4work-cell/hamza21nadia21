@@ -15,7 +15,7 @@
             --accent-blue: #3b82f6;
             --text-dark: #1e293b;
             --danger-red: #dc2626;
-            --soft-green: #dcfce7; /* أخضر خافت */
+            --soft-green: #dcfce7;
         }
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
@@ -47,7 +47,15 @@
 
         .table-wrapper { background: white; border-radius: 10px; overflow-x: auto; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; min-width: 1300px; }
-        th { background-color: var(--header-green); padding: 12px 5px; color: white; font-size: 11px; font-weight: 800; text-align: center; border-left: 1px solid rgba(255,255,255,0.1); }
+        
+        /* تحديث ارتفاع الهيدر وإزالة الفلتر القديم */
+        th { background-color: var(--header-green); height: 40px; padding: 0 5px; color: white; font-size: 11px; font-weight: 800; text-align: center; border-left: 1px solid rgba(255,255,255,0.1); }
+        
+        /* تنسيق العنوان مع السهم جنباً إلى جنب */
+        .th-filter-wrap { display: flex; align-items: center; justify-content: center; gap: 4px; }
+        .header-select { background: transparent; color: white; border: none; font-family: 'Cairo'; font-size: 11px; font-weight: 800; cursor: pointer; outline: none; }
+        .header-select option { color: black; background: white; }
+
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); padding: 5px; }
         
         .row-checkbox { cursor: pointer; accent-color: var(--accent-blue); width: 16px; height: 16px; opacity: 0.5; }
@@ -57,13 +65,12 @@
 
         .status-select { font-family: 'Cairo'; font-size: 10px; font-weight: 700; padding: 5px; border-radius: 6px; width: 95%; cursor: pointer; border: 1px solid var(--border-color); }
         .status-complete { background-color: #16a34a !important; color: white !important; }
-        .status-verified { background-color: var(--soft-green) !important; color: #166534 !important; border: 1px solid #bbf7d0 !important; } /* تم التوثيق اخضر خافت */
+        .status-verified { background-color: var(--soft-green) !important; color: #166534 !important; border: 1px solid #bbf7d0 !important; }
         .status-pending { background-color: #eab308 !important; color: #000 !important; }
 
         .editable-cell { background-color: transparent; border: 1px dashed #94a3b8 !important; cursor: cell; outline: none; }
         .editable-cell:focus { border: 1px solid var(--accent-blue) !important; background-color: #f8fafc; }
 
-        /* سجل النشاط */
         .activity-log-section { margin-top: 30px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 15px; }
         .activity-log-title { font-size: 12px; font-weight: 800; color: var(--nav-bg); margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
         #activityLog { max-height: 150px; overflow-y: auto; font-size: 9px; color: #64748b; line-height: 1.6; }
@@ -119,12 +126,22 @@
                         <th style="width: 7%;">نوع الطلب</th>
                         <th style="width: 12%;">تفاصيل الطلب</th>
                         <th style="width: 4%;">العدد</th>
-                        <th style="width: 7%;">الاشتراك 🔍<br><select id="filter-sub" style="font-size: 9px;" onchange="applyFilters()"><option value="">الكل</option></select></th>
+                        <th style="width: 8%;">
+                            <div class="th-filter-wrap">
+                                <span>الاشتراك</span>
+                                <select id="filter-sub" class="header-select" onchange="applyFilters()"><option value="">▼</option></select>
+                            </div>
+                        </th>
                         <th style="width: 6%;">الاجمالي</th>
                         <th style="width: 10%;">رقم السريال</th>
                         <th style="width: 9%;">رقم الخدمة</th>
                         <th style="width: 9%;">المستخدم</th>
-                        <th style="width: 10%;">الحالة 🔍<br><select id="filter-status" style="font-size: 9px;" onchange="applyFilters()"><option value="">الكل</option></select></th>
+                        <th style="width: 11%;">
+                            <div class="th-filter-wrap">
+                                <span>الحالة</span>
+                                <select id="filter-status" class="header-select" onchange="applyFilters()"><option value="">▼</option></select>
+                            </div>
+                        </th>
                         <th style="width: 9%;">تاريخ التغيير</th>
                         <th style="width: 10%;">ملاحظة</th>
                         <th style="width: 5%;">الخيارات</th>
@@ -170,7 +187,7 @@
     <script>
         let currentOrderId = '';
         const statusList = ["مكتمل", "تم التوثيق", "توثيق", "جاهز", "مرتجع", "فقدان"];
-        const currentUser = "احمد"; // يمكن ربطه بنظام تسجيل الدخول لاحقاً
+        const currentUser = "احمد";
 
         function loadOrderDetails() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -196,8 +213,6 @@
             
             tbody.innerHTML = products.map((p, index) => {
                 const subVal = parseFloat(String(p.sub).replace(/[^\d.]/g, '')) || 0;
-                
-                // تحديد كلاس اللون للحالة
                 let statusClass = "";
                 if (p.status === "مكتمل") statusClass = "status-complete";
                 else if (p.status === "تم التوثيق") statusClass = "status-verified";
@@ -207,15 +222,15 @@
 
                 return `
                     <tr id="row-${index}">
-                        <td><input type="checkbox" class="row-checkbox" id="check-${index}" data-index="${index}"></td>
+                        <td><input type="checkbox" class="row-checkbox" data-index="${index}"></td>
                         <td>${p.type}</td>
                         <td>${p.name}</td>
                         <td>${p.qty}</td>
                         <td>${p.sub}</td>
                         <td style="color:var(--header-green); font-weight:800;">${(p.qty * subVal).toFixed(2)}</td>
-                        <td class="${isLocked ? '' : 'editable-cell'}" contenteditable="${!isLocked}" onpaste="handleQuickPaste(event, ${index}, 'serial')" onblur="updateQuickField(${index}, 'serial', this.innerText)">${p.serial || ''}</td>
-                        <td class="${isLocked ? '' : 'editable-cell'}" contenteditable="${!isLocked}" onpaste="handleQuickPaste(event, ${index}, 'mobile')" onblur="updateQuickField(${index}, 'mobile', this.innerText)">${p.mobile || ''}</td>
-                        <td class="${isLocked ? '' : 'editable-cell'}" contenteditable="${!isLocked}" onpaste="handleQuickPaste(event, ${index}, 'user')" onblur="updateQuickField(${index}, 'user', this.innerText)">${p.user || ''}</td>
+                        <td class="${isLocked ? '' : 'editable-cell'}" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'serial', this.innerText)">${p.serial || ''}</td>
+                        <td class="${isLocked ? '' : 'editable-cell'}" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'mobile', this.innerText)">${p.mobile || ''}</td>
+                        <td class="${isLocked ? '' : 'editable-cell'}" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'user', this.innerText)">${p.user || ''}</td>
                         <td>
                             <select class="status-select ${statusClass}" onchange="updateQuickField(${index}, 'status', this.value)">
                                 ${statusList.map(s => `<option value="${s}" ${p.status===s?'selected':''}>${s}</option>`).join('')}
@@ -240,37 +255,27 @@
             let logs = JSON.parse(localStorage.getItem('asgate_activity_log') || '[]');
             const now = new Date();
             const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-            const entry = {
-                text: action,
-                date: `${days[now.getDay()]} ${now.toLocaleDateString('en-GB')}`,
-                orderId: currentOrderId
-            };
-            logs.unshift(entry); // إضافة الأحدث في البداية
-            localStorage.setItem('asgate_activity_log', JSON.stringify(logs.slice(0, 50))); // حفظ آخر 50 نشاط فقط
+            const entry = { text: action, date: `${days[now.getDay()]} ${now.toLocaleDateString('en-GB')}`, orderId: currentOrderId };
+            logs.unshift(entry);
+            localStorage.setItem('asgate_activity_log', JSON.stringify(logs.slice(0, 50)));
             renderActivityLog();
         }
 
         function renderActivityLog() {
             const logs = JSON.parse(localStorage.getItem('asgate_activity_log') || '[]');
             const container = document.getElementById('activityLog');
-            container.innerHTML = logs
-                .filter(l => l.orderId === currentOrderId)
-                .map(l => `<div class="log-entry"><span class="log-date">${l.date}</span> ${l.text}</div>`)
-                .join('');
+            container.innerHTML = logs.filter(l => l.orderId === currentOrderId).map(l => `<div class="log-entry"><span class="log-date">${l.date}</span> ${l.text}</div>`).join('');
         }
 
         function updateQuickField(index, field, value) {
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             const oldVal = db[currentOrderId][index][field];
             const serviceNum = db[currentOrderId][index].mobile || "بدون رقم";
-            
             if (oldVal !== value.trim()) {
                 db[currentOrderId][index][field] = value.trim();
                 if(field === 'status') {
                     db[currentOrderId][index].date = new Date().toLocaleDateString('en-GB');
                     addToLog(`قام / ${currentUser} | تم تغيير حالة ${serviceNum} إلى ${value}`);
-                } else {
-                    addToLog(`قام / ${currentUser} | تم تحديث ${field} للخدمة ${serviceNum}`);
                 }
                 localStorage.setItem('asgate_products_db', JSON.stringify(db));
                 renderProducts();
@@ -279,40 +284,9 @@
 
         function handleAction(selectObj, index) {
             const action = selectObj.value;
-            if (action === "select") {
-                const cb = document.getElementById(`check-${index}`);
-                cb.checked = !cb.checked;
-            } else if (action === "edit") {
-                openModal(index);
-            } else if (action === "delete") {
-                deleteRow(index);
-            }
+            if (action === "edit") openModal(index);
+            else if (action === "delete") deleteRow(index);
             selectObj.value = ""; 
-        }
-
-        function openModal(index = null) {
-            const modal = document.getElementById('productModal');
-            modal.style.display = 'flex';
-            if (index !== null) {
-                document.getElementById('modalTitle').innerText = "تعديل منتج";
-                document.getElementById('edit-index').value = index;
-                const products = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId];
-                const p = products[index];
-                document.getElementById('p_type').value = p.type;
-                document.getElementById('p_name').value = p.name;
-                document.getElementById('p_qty').value = p.qty;
-                document.getElementById('p_sub').value = p.sub;
-                document.getElementById('p_serial').value = p.serial;
-                document.getElementById('p_mobile').value = p.mobile;
-                document.getElementById('p_user').value = p.user;
-                document.getElementById('p_status').value = p.status;
-                document.getElementById('p_note').value = p.note;
-            } else {
-                document.getElementById('modalTitle').innerText = "إضافة منتج جديد";
-                document.getElementById('edit-index').value = "";
-                ['p_type', 'p_name', 'p_sub', 'p_serial', 'p_mobile', 'p_user', 'p_note'].forEach(id => document.getElementById(id).value = '');
-                document.getElementById('p_qty').value = "1";
-            }
         }
 
         function saveProduct() {
@@ -329,54 +303,47 @@
                 note: document.getElementById('p_note').value,
                 date: new Date().toLocaleDateString('en-GB')
             };
-
             let productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             if (!productsDb[currentOrderId]) productsDb[currentOrderId] = [];
-            
-            if (index !== "") {
-                productsDb[currentOrderId][index] = data;
-                addToLog(`قام / ${currentUser} | تم تعديل بيانات الخدمة ${data.mobile}`);
-            } else {
-                productsDb[currentOrderId].push(data);
-                addToLog(`قام / ${currentUser} | تم إضافة خدمة جديدة برقم ${data.mobile}`);
-            }
-
+            if (index !== "") productsDb[currentOrderId][index] = data;
+            else productsDb[currentOrderId].push(data);
             localStorage.setItem('asgate_products_db', JSON.stringify(productsDb));
             renderProducts();
             closeModal();
         }
 
-        function deleteRow(index) {
-            if(confirm("هل أنت متأكد من حذف هذا المنتج؟")) {
-                let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
-                const serviceNum = db[currentOrderId][index].mobile;
-                db[currentOrderId].splice(index, 1);
-                localStorage.setItem('asgate_products_db', JSON.stringify(db));
-                addToLog(`قام / ${currentUser} | تم حذف الخدمة رقم ${serviceNum}`);
-                renderProducts();
+        function openModal(index = null) {
+            const modal = document.getElementById('productModal');
+            modal.style.display = 'flex';
+            if (index !== null) {
+                document.getElementById('edit-index').value = index;
+                const p = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId][index];
+                document.getElementById('p_type').value = p.type;
+                document.getElementById('p_name').value = p.name;
+                document.getElementById('p_qty').value = p.qty;
+                document.getElementById('p_sub').value = p.sub;
+                document.getElementById('p_serial').value = p.serial;
+                document.getElementById('p_mobile').value = p.mobile;
+                document.getElementById('p_user').value = p.user;
+                document.getElementById('p_status').value = p.status;
+                document.getElementById('p_note').value = p.note;
             }
         }
 
-        // باقي الدوال (Toggle, Filter, Excel) كما هي بدون تغيير
+        function closeModal() { document.getElementById('productModal').style.display = 'none'; }
         function toggleSelectAll(source) { document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = source.checked); }
-        function deleteSelected() { /* نفس المنطق السابق مع addToLog */ }
-        function exportToExcel() {
-            const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
-            const ws = XLSX.utils.json_to_sheet(db);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "المنتجات");
-            XLSX.writeFile(wb, `طلب_${currentOrderId}.xlsx`);
-        }
+
         function updateFilterOptions() {
             const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
             const fill = (id, items) => {
                 const s = document.getElementById(id);
-                const val = s.value;
-                s.innerHTML = '<option value="">الكل</option>' + [...new Set(items)].map(i => `<option value="${i}" ${i===val?'selected':''}>${i}</option>`).join('');
+                const current = s.value;
+                s.innerHTML = '<option value="">▼</option>' + [...new Set(items)].map(i => `<option value="${i}" ${i===current?'selected':''}>${i}</option>`).join('');
             };
             fill('filter-sub', db.map(p => p.sub));
             fill('filter-status', db.map(p => p.status));
         }
+
         function applyFilters() {
             const sub = document.getElementById('filter-sub').value;
             const status = document.getElementById('filter-status').value;
@@ -384,23 +351,23 @@
             const filtered = all.filter(p => (sub === "" || p.sub === sub) && (status === "" || p.status === status));
             renderProducts(filtered);
         }
-        function handleQuickPaste(event, startIndex, field) {
-            event.preventDefault();
-            const pasteData = (event.clipboardData || window.clipboardData).getData('text');
-            const rows = pasteData.split(/\r\n|\n|\r/);
-            let productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
-            rows.forEach((rowData, i) => {
-                let targetIdx = startIndex + i;
-                if (productsDb[currentOrderId][targetIdx] && rowData.trim() !== "") {
-                    const p = productsDb[currentOrderId][targetIdx];
-                    if (p.status !== "مكتمل" && p.status !== "تم التوثيق") {
-                        productsDb[currentOrderId][targetIdx][field] = rowData.trim();
-                    }
-                }
-            });
-            addToLog(`قام / ${currentUser} | تم لصق بيانات متعددة في عمود ${field}`);
-            localStorage.setItem('asgate_products_db', JSON.stringify(productsDb));
-            renderProducts();
+
+        function deleteSelected() {
+            const selected = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => parseInt(cb.dataset.index));
+            if(selected.length > 0 && confirm("حذف المحدد؟")) {
+                let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+                db[currentOrderId] = db[currentOrderId].filter((p, i) => !selected.includes(i));
+                localStorage.setItem('asgate_products_db', JSON.stringify(db));
+                renderProducts();
+            }
+        }
+
+        function exportToExcel() {
+            const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
+            const ws = XLSX.utils.json_to_sheet(db);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "المنتجات");
+            XLSX.writeFile(wb, `طلب_${currentOrderId}.xlsx`);
         }
     </script>
 </body>
