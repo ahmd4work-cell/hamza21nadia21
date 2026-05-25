@@ -95,7 +95,7 @@
 
         .editable-cell { border: 1px dashed #94a3b8 !important; cursor: cell; outline: none; }
         
-        /* سجل النشاط - تقليل الخط درجة إضافية (الآن 10px) */
+        /* سجل النشاط - تقليل الخط 10px */
         .activity-log-section { margin-top: 30px; background: #fff; border-radius: 12px; border: 1px solid var(--border-color); padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
         .activity-log-title { font-weight: 800; font-size: 13px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; color: var(--nav-bg); }
         
@@ -107,8 +107,7 @@
 
         #activityLog { max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; }
         .log-entry { background: #fff; border: 1px solid #f1f5f9; padding: 10px; border-radius: 8px; border-right: 4px solid var(--accent-blue); position: relative; }
-        .log-time { font-size: 10px; color: #94a3b8; font-weight: 700; margin-bottom: 3px; } /* التاريخ ثابت 10px */
-        .log-text { font-size: 10px; color: var(--text-dark); font-weight: 600; line-height: 1.4; }
+        .log-text { font-size: 10px; color: var(--text-dark); font-weight: 600; line-height: 1.6; }
         .log-attachment { margin-top: 8px; display: block; }
         .log-attachment img { max-width: 120px; border-radius: 6px; border: 1px solid #eee; }
         .file-link { display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; background: #f1f5f9; border-radius: 5px; text-decoration: none; color: #475569; font-size: 9px; font-weight: 700; border: 1px solid #e2e8f0; }
@@ -255,12 +254,16 @@
             return "النظام";
         }
 
-        function getFormattedDateTime() {
+        // تنسيق الوقت والتاريخ المطلوب
+        function getFormattedFullDateTime() {
             const now = new Date();
             const days = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
             const dayName = days[now.getDay()];
             const dateStr = now.toLocaleDateString('en-GB');
-            return { day: dayName, date: dateStr };
+            const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+            
+            // النتيجة: الاثنين 25/05/2026 11:58:10 ص
+            return `${dayName} ${dateStr} ${timeStr}`;
         }
 
         function addManualLog() {
@@ -284,12 +287,14 @@
 
         function addToLog(text, fileData = null) {
             const user = getCurrentUser();
-            const timeInfo = getFormattedDateTime();
+            const fullDateTime = getFormattedFullDateTime();
             let logs = JSON.parse(localStorage.getItem('asgate_activity_log') || '[]');
-            const fullText = `${user}  | ${timeInfo.day} ${timeInfo.date}  ${text}`;
+            
+            // التنسيق الجديد المطلوب بدقة
+            const fullEntryText = `${fullDateTime}   ${user} | ${text}`;
+
             logs.unshift({ 
-                text: fullText, 
-                date: new Date().toLocaleString('en-GB'), 
+                text: fullEntryText, 
                 orderId: currentOrderId,
                 file: fileData 
             });
@@ -313,7 +318,6 @@
                 }
                 return `
                     <div class="log-entry">
-                        <div class="log-time">${l.date}</div>
                         <div class="log-text">${l.text}</div>
                         ${attachmentHtml}
                     </div>`;
@@ -367,7 +371,7 @@
                 db[currentOrderId][index][field] = value.trim();
                 if(field === 'status') {
                     db[currentOrderId][index].date = new Date().toLocaleDateString('en-GB');
-                    addToLog(`تم تغيير الحالة إلى: ${value}`);
+                    addToLog(`تغيير الحالة إلى: ${value}`);
                 }
                 localStorage.setItem('asgate_products_db', JSON.stringify(db));
                 renderProducts();
@@ -410,7 +414,7 @@
                     db[currentOrderId].splice(i,1); 
                     localStorage.setItem('asgate_products_db', JSON.stringify(db)); 
                     renderProducts(); 
-                    addToLog(`تم حذف منتج: ${pName}`);
+                    addToLog(`حذف منتج: ${pName}`);
                 } 
             }
             s.value = "";
@@ -461,7 +465,7 @@
                 db[currentOrderId] = db[currentOrderId].filter((p, i) => !selected.includes(i));
                 localStorage.setItem('asgate_products_db', JSON.stringify(db));
                 renderProducts();
-                addToLog(`تم حذف عدة منتجات عدد (${selected.length})`);
+                addToLog(`حذف عدة منتجات عدد (${selected.length})`);
             }
         }
         function exportToExcel() {
