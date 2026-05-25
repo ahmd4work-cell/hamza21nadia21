@@ -147,7 +147,8 @@
                 <tfoot>
                     <tr class="table-footer">
                         <td id="f_count">0</td>
-                        <td colspan="2"></td> <td id="f_qty">0</td>
+                        <td colspan="2"></td>
+                        <td id="f_qty">0</td>
                         <td id="f_sub">0</td>
                         <td id="f_total">0</td>
                         <td colspan="6"></td>
@@ -228,6 +229,25 @@
             calculateTotals();
         }
 
+        function updateQuickField(index, field, value) {
+            let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+            const currentItem = db[currentOrderId][index];
+            
+            // نظام التأكيد المشروط عند تغيير الحالة
+            if(field === 'status' && (value === "مكتمل" || value === "تم التوثيق")) {
+                if(!confirm(`⚠️ هل أنت متأكد من تحويل الحالة إلى (${value})؟\nسيتم قفل الصف نهائياً ولن يمكنك تعديله أو حذفه لاحقاً.`)) {
+                    renderProducts(); // إعادة بناء الجدول لإلغاء الاختيار
+                    return;
+                }
+            }
+
+            currentItem[field] = value.trim();
+            if(field === 'status') currentItem.date = new Date().toLocaleDateString('en-GB');
+            
+            localStorage.setItem('asgate_products_db', JSON.stringify(db));
+            renderProducts();
+        }
+
         function calculateTotals() {
             const checkboxes = document.querySelectorAll('.row-checkbox:checked');
             const products = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
@@ -244,28 +264,16 @@
         }
 
         function toggleSelectAll(s) {
-            document.querySelectorAll('.row-checkbox').forEach(c => {
-                c.checked = s.checked;
-            });
+            document.querySelectorAll('.row-checkbox').forEach(c => c.checked = s.checked);
             calculateTotals();
-        }
-
-        function updateQuickField(index, field, value) {
-            let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
-            db[currentOrderId][index][field] = value.trim();
-            if(field === 'status') db[currentOrderId][index].date = new Date().toLocaleDateString('en-GB');
-            localStorage.setItem('asgate_products_db', JSON.stringify(db));
-            renderProducts();
         }
 
         function deleteSelected() {
             const selectedCheckboxes = Array.from(document.querySelectorAll('.row-checkbox:checked'));
             if(selectedCheckboxes.length === 0) return;
 
-            // التحقق من وجود صفوف مكتملة أو موثقة ضمن التحديد
             const hasLocked = selectedCheckboxes.some(cb => {
-                const row = cb.closest('tr');
-                const status = row.getAttribute('data-status');
+                const status = cb.closest('tr').getAttribute('data-status');
                 return status === "مكتمل" || status === "تم التوثيق";
             });
 
