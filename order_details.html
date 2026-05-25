@@ -54,10 +54,10 @@
 
         .action-bar { margin: 5px 0 10px 0; display: flex; justify-content: space-between; align-items: center; }
         
-        .table-wrapper { background: white; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .table-wrapper { background: white; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; }
         table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1400px; }
         
-        /* 3. تثبيت الشريط الأخضر (thead) */
+        /* 3. تثبيت الشريط الأخضر مع حواف دائرية علوية */
         thead th { 
             background-color: var(--header-green) !important; 
             height: 40px; 
@@ -72,6 +72,10 @@
             z-index: 1100;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
+
+        /* حواف دائرية لأول وآخر خلية في الهيدر */
+        thead th:first-child { border-radius: 0 10px 0 0; }
+        thead th:last-child { border-radius: 10px 0 0 0; border-left: none; }
         
         .th-filter-wrap { 
             display: inline-flex; 
@@ -124,8 +128,12 @@
         .status-pending { background-color: #eab308 !important; color: #000 !important; }
 
         .editable-cell { border: 1px dashed #94a3b8 !important; cursor: cell; outline: none; }
+        
+        /* سجل النشاط وتنسيق الخط الجديد */
         .activity-log-section { margin-top: 30px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 15px; }
-        #activityLog { max-height: 150px; overflow-y: auto; font-size: 9px; color: #64748b; }
+        .activity-log-title { font-weight: 800; margin-bottom: 10px; }
+        #activityLog { max-height: 150px; overflow-y: auto; font-size: 11px; color: #64748b; font-weight: 600; }
+        #activityLog div { padding: 3px 0; border-bottom: 1px dashed #eee; }
 
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 20px; border-radius: 12px; width: 480px; }
