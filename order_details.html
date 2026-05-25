@@ -57,7 +57,8 @@
         
         thead th { 
             background-color: var(--header-green) !important; 
-            height: 40px; 
+            height: 45px; /* تم التحديث لـ 45px */
+            line-height: 45px;
             padding: 0 5px; 
             color: white !important; 
             font-size: 11px; 
@@ -76,9 +77,17 @@
         .th-filter-wrap { display: inline-flex; align-items: center; justify-content: center; gap: 1px; cursor: pointer; color: white; }
         .header-select { background: transparent; color: white !important; border: none; font-family: 'Cairo'; font-size: 11px; font-weight: 800; cursor: pointer; outline: none; -webkit-appearance: none; -moz-appearance: none; appearance: none; text-align: center; padding: 0; margin: 0; width: auto; }
         .arrow-icon { font-size: 14px; line-height: 1; font-weight: 400; display: inline-block; margin-top: 0; margin-right: 2px; }
-        .header-select option { color: black; background: white; }
 
-        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); padding: 5px; }
+        td { 
+            border-bottom: 1px solid #f1f5f9; 
+            text-align: center; 
+            height: 45px; /* تم التحديث لـ 45px */
+            line-height: 1.2;
+            font-size: 11px; 
+            font-weight: 600; 
+            color: var(--text-dark); 
+            padding: 5px; 
+        }
         
         .btn { border: none; padding: 8px 15px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; transition: 0.3s; color: white; }
         .btn-add { background: var(--accent-blue); }
@@ -95,7 +104,6 @@
 
         .editable-cell { border: 1px dashed #94a3b8 !important; cursor: cell; outline: none; }
         
-        /* سجل النشاط - تقليل الخط 10px */
         .activity-log-section { margin-top: 30px; background: #fff; border-radius: 12px; border: 1px solid var(--border-color); padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
         .activity-log-title { font-weight: 800; font-size: 13px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; color: var(--nav-bg); }
         
@@ -254,15 +262,12 @@
             return "النظام";
         }
 
-        // تنسيق الوقت والتاريخ المطلوب
         function getFormattedFullDateTime() {
             const now = new Date();
             const days = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
             const dayName = days[now.getDay()];
             const dateStr = now.toLocaleDateString('en-GB');
             const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
-            
-            // النتيجة: الاثنين 25/05/2026 11:58:10 ص
             return `${dayName} ${dateStr} ${timeStr}`;
         }
 
@@ -289,15 +294,8 @@
             const user = getCurrentUser();
             const fullDateTime = getFormattedFullDateTime();
             let logs = JSON.parse(localStorage.getItem('asgate_activity_log') || '[]');
-            
-            // التنسيق الجديد المطلوب بدقة
             const fullEntryText = `${fullDateTime}   ${user} | ${text}`;
-
-            logs.unshift({ 
-                text: fullEntryText, 
-                orderId: currentOrderId,
-                file: fileData 
-            });
+            logs.unshift({ text: fullEntryText, orderId: currentOrderId, file: fileData });
             localStorage.setItem('asgate_activity_log', JSON.stringify(logs));
             renderActivityLog();
         }
@@ -306,7 +304,6 @@
             const logs = JSON.parse(localStorage.getItem('asgate_activity_log') || '[]');
             const logContainer = document.getElementById('activityLog');
             const filteredLogs = logs.filter(l => l.orderId === currentOrderId);
-
             logContainer.innerHTML = filteredLogs.map(l => {
                 let attachmentHtml = "";
                 if (l.file) {
@@ -316,11 +313,7 @@
                         attachmentHtml = `<div class="log-attachment"><a href="${l.file.data}" download="${l.file.name}" class="file-link">📄 ${l.file.name}</a></div>`;
                     }
                 }
-                return `
-                    <div class="log-entry">
-                        <div class="log-text">${l.text}</div>
-                        ${attachmentHtml}
-                    </div>`;
+                return `<div class="log-entry"><div class="log-text">${l.text}</div>${attachmentHtml}</div>`;
             }).join('');
         }
 
@@ -396,10 +389,10 @@
             if (!db[currentOrderId]) db[currentOrderId] = [];
             if (index !== "") {
                 db[currentOrderId][index] = data;
-                addToLog(`تعديل بيانات المنتج: ${data.name}`);
+                addToLog(`تعديل منتج: ${data.name}`);
             } else {
                 db[currentOrderId].push(data);
-                addToLog(`إضافة منتج جديد: ${data.name}`);
+                addToLog(`إضافة منتج: ${data.name}`);
             }
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
             renderProducts(); closeModal();
