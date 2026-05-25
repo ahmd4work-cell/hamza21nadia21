@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>تفاصيل الطلب | ASGate</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
-
     <style>
         :root {
             --nav-bg: #2e1065;
@@ -19,348 +18,383 @@
             --soft-green: #dcfce7;
         }
 
-        body {
-            background-color: var(--bg-color);
-            font-family: 'Cairo', sans-serif;
-            margin: 0;
-            line-height: 1.2;
-        }
+        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
 
-        .navbar {
-            background-color: var(--nav-bg);
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            margin: 10px;
-            border-radius: 12px;
-            height: 37px;
-            position: sticky;
-            top: 10px;
-            z-index: 1000;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            box-sizing: border-box;
+        .navbar { 
+            background-color: var(--nav-bg); display: flex; align-items: center; padding: 0 20px; 
+            margin: 10px; border-radius: 12px; height: 37px; position: sticky; top: 10px; z-index: 1100;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); box-sizing: border-box;
         }
+        .navbar a { color: var(--white); text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; border-radius: 6px; transition: 0.3s; line-height: 26px; height: 26px; display: inline-block; }
+        .navbar a.active { background-color: var(--nav-active); color: var(--nav-bg); }
 
-        .navbar a {
-            color: var(--white);
-            text-decoration: none;
-            padding: 0 15px;
-            font-weight: 700;
-            font-size: 12px;
-            border-radius: 6px;
-            transition: 0.3s;
-            line-height: 26px;
-            height: 26px;
-            display: inline-block;
-        }
+        .container { padding: 10px 20px 20px 20px; }
 
-        .navbar a.active {
-            background-color: var(--nav-active);
-            color: var(--nav-bg);
-        }
+        .header-section-wrapper { margin: 20px 7% 20px 7%; display: flex; align-items: center; gap: 15px; }
+        .btn-back-outside { text-decoration: none; background: var(--white); color: var(--nav-bg); padding: 8px 15px; border-radius: 10px; font-size: 12px; font-weight: 800; border: 2px solid #991b1b; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 5px; height: 40px; box-sizing: border-box; }
 
-        .container {
-            padding: 10px 20px 20px 20px;
-        }
+        .order-header-info { background: white; padding: 0 25px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-grow: 1; flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); height: 70px; box-sizing: border-box; }
+        .info-item { display: flex; flex-direction: column; gap: 2px; min-width: 100px; }
+        .info-label { font-size: 10px; color: #64748b; font-weight: 800; }
+        .info-value { font-size: 13px; color: var(--nav-bg); font-weight: 800; }
+        .info-item-highlight { border: 2px solid var(--header-green); padding: 5px 15px; border-radius: 8px; background-color: #f0fdf4; }
 
-        .header-section-wrapper {
-            margin: 20px 7% 20px 7%;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .btn-back-outside {
-            text-decoration: none;
-            background: var(--white);
-            color: var(--nav-bg);
-            padding: 8px 15px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 800;
-            border: 2px solid #991b1b;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            transition: 0.2s;
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            height: 40px;
-            box-sizing: border-box;
-        }
-
-        .order-header-info {
-            background: white;
-            padding: 0 25px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            display: flex;
-            flex-grow: 1;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            height: 70px;
-            box-sizing: border-box;
-        }
-
-        .info-item {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            min-width: 100px;
-        }
-
-        .info-label {
-            font-size: 10px;
-            color: #64748b;
-            font-weight: 800;
-        }
-
-        .info-value {
-            font-size: 13px;
-            color: var(--nav-bg);
-            font-weight: 800;
-        }
-
-        .info-item-highlight {
-            border: 2px solid var(--header-green);
-            padding: 5px 15px;
-            border-radius: 8px;
-            background-color: #f0fdf4;
-        }
-
-        .action-bar {
-            margin: 20px 0 12px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .btn {
-            border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
-            font-family: 'Cairo';
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 12px;
-            transition: 0.3s;
-            color: white;
-        }
-
+        .action-bar { margin: 20px 0 12px 0; display: flex; justify-content: space-between; align-items: center; }
+        .btn { border: none; padding: 8px 15px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; transition: 0.3s; color: white; }
         .btn-add { background: var(--accent-blue); }
         .btn-export { background: var(--header-green); }
         .btn-delete-multi { background: var(--danger-red); }
 
-        .table-wrapper {
-            background: white;
-            border-radius: 10px;
-            overflow-x: auto;
-            overflow-y: auto;
-            max-height: 75vh;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 1300px;
-        }
-
-        thead th {
-            position: sticky;
-            top: 0;
-            z-index: 20;
-            background-color: var(--header-green);
-        }
-
-        th {
-            background-color: var(--header-green);
-            height: 40px;
-            padding: 0 5px;
-            color: white;
-            font-size: 11px;
-            font-weight: 800;
-            text-align: center;
+        .table-wrapper { background: white; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1300px; }
+        
+        /* تثبيت شريط العناوين */
+        thead th { 
+            background-color: var(--header-green); 
+            height: 40px; 
+            padding: 0 5px; 
+            color: white; 
+            font-size: 11px; 
+            font-weight: 800; 
+            text-align: center; 
             border-left: 1px solid rgba(255,255,255,0.1);
+            position: sticky;
+            top: 47px; /* يتم ضبطه حسب ارتفاع النافبار ليكون أسفله مباشرة */
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-
-        .th-filter-wrap {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-        }
-
-        .header-select {
-            background: transparent;
-            color: white;
-            border: none;
-            font-family: 'Cairo';
-            font-size: 11px;
-            font-weight: 800;
-            cursor: pointer;
+        
+        .th-filter-wrap { display: flex; align-items: center; justify-content: center; gap: 4px; height: 100%; }
+        
+        /* إزالة المثلث المقلوب من الفلاتر */
+        .header-select { 
+            background: transparent; 
+            color: white; 
+            border: none; 
+            font-family: 'Cairo'; 
+            font-size: 11px; 
+            font-weight: 800; 
+            cursor: pointer; 
             outline: none;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            background-image: none;
-        }
-
-        .header-select::-ms-expand {
-            display: none;
-        }
-
-        .header-select option {
-            color: black;
-            background: white;
-        }
-
-        td {
-            border-bottom: 1px solid #f1f5f9;
+            -webkit-appearance: none; 
+            -moz-appearance: none;    
+            appearance: none;         
             text-align: center;
-            height: 45px;
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-dark);
-            padding: 5px;
+            width: 100%;
         }
+        .header-select option { color: black; background: white; }
 
-        .row-checkbox {
-            cursor: pointer;
-            accent-color: var(--accent-blue);
-            width: 16px;
-            height: 16px;
-            opacity: 0.5;
-        }
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); padding: 5px; }
+        
+        .row-checkbox { cursor: pointer; accent-color: var(--accent-blue); width: 16px; height: 16px; opacity: 0.5; }
+        .row-checkbox:checked { opacity: 1; }
 
-        .row-checkbox:checked {
-            opacity: 1;
-        }
+        .options-select { font-family: 'Cairo'; font-size: 11px; font-weight: 700; padding: 4px; border-radius: 6px; border: 1px solid var(--border-color); background: #f8fafc; cursor: pointer; width: 70px; }
 
-        .options-select {
-            font-family: 'Cairo';
-            font-size: 11px;
-            font-weight: 700;
-            padding: 4px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            background: #f8fafc;
-            cursor: pointer;
-            width: 70px;
-        }
+        .status-select { font-family: 'Cairo'; font-size: 10px; font-weight: 700; padding: 5px; border-radius: 6px; width: 95%; cursor: pointer; border: 1px solid var(--border-color); }
+        .status-complete { background-color: #16a34a !important; color: white !important; }
+        .status-verified { background-color: var(--soft-green) !important; color: #166534 !important; border: 1px solid #bbf7d0 !important; }
+        .status-pending { background-color: #eab308 !important; color: #000 !important; }
 
-        .status-select {
-            font-family: 'Cairo';
-            font-size: 10px;
-            font-weight: 700;
-            padding: 5px;
-            border-radius: 6px;
-            width: 95%;
-            cursor: pointer;
-            border: 1px solid var(--border-color);
-        }
+        .editable-cell { background-color: transparent; border: 1px dashed #94a3b8 !important; cursor: cell; outline: none; }
+        .editable-cell:focus { border: 1px solid var(--accent-blue) !important; background-color: #f8fafc; }
 
-        .status-complete {
-            background-color: #16a34a !important;
-            color: white !important;
-        }
+        .activity-log-section { margin-top: 30px; background: #fff; border-radius: 10px; border: 1px solid var(--border-color); padding: 15px; }
+        .activity-log-title { font-size: 12px; font-weight: 800; color: var(--nav-bg); margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        #activityLog { max-height: 150px; overflow-y: auto; font-size: 9px; color: #64748b; line-height: 1.6; }
+        .log-entry { padding: 2px 0; border-bottom: 1px dashed #f1f5f9; }
+        .log-date { font-weight: 700; color: #94a3b8; margin-left: 10px; }
 
-        .status-verified {
-            background-color: var(--soft-green) !important;
-            color: #166534 !important;
-            border: 1px solid #bbf7d0 !important;
-        }
-
-        .status-pending {
-            background-color: #eab308 !important;
-            color: #000 !important;
-        }
-
-        .editable-cell {
-            background-color: transparent;
-            border: 1px dashed #94a3b8 !important;
-            cursor: cell;
-            outline: none;
-        }
-
-        .editable-cell:focus {
-            border: 1px solid var(--accent-blue) !important;
-            background-color: #f8fafc;
-        }
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 20px; border-radius: 12px; width: 480px; max-height: 90vh; overflow-y: auto; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .form-group { margin-bottom: 12px; display: flex; flex-direction: column; gap: 5px; }
+        .form-group.full-width { grid-column: span 2; }
+        .form-group label { font-size: 11px; font-weight: 700; color: #64748b; }
+        .form-group input, .form-group select { padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Cairo'; font-size: 12px; }
     </style>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
 </head>
-
 <body onload="loadOrderDetails()">
 
-<nav class="navbar">
-    <a href="index.html">الرئيسية</a>
-    <a href="visits.html">الزيارات</a>
-    <a href="opportunities.html">الفرص البيعية</a>
-    <a href="customers.html">العملاء</a>
-    <a href="sales.html" class="active">المبيعات</a>
-</nav>
+    <nav class="navbar">
+        <a href="index.html">الرئيسية</a>
+        <a href="visits.html">الزيارات</a>
+        <a href="opportunities.html">الفرص البيعية</a>
+        <a href="customers.html">العملاء</a>
+        <a href="sales.html" class="active">المبيعات</a>
+    </nav>
 
-<div class="container">
+    <div class="container">
+        <div class="header-section-wrapper">
+            <a href="sales.html" class="btn-back-outside">عودة ➡️</a>
+            <div class="order-header-info">
+                <div class="info-item"><span class="info-label">رقم الطلب</span><span class="info-value" id="orderId">#0000</span></div>
+                <div class="info-item info-item-highlight"><span class="info-label">اسم الطلب</span><span class="info-value" id="orderType">-</span></div>
+                <div class="info-item"><span class="info-label">الشركة</span><span class="info-value" id="orderComp">-</span></div>
+                <div class="info-item"><span class="info-label">السجل</span><span class="info-value" id="orderCr">-</span></div>
+                <div class="info-item"><span class="info-label">حالة الطلب</span><span class="info-value" id="orderStatus">-</span></div>
+                <div class="info-item"><span class="info-label">قيمة الطلب</span><span class="info-value">0.00 ر.س</span></div>
+            </div>
+        </div>
 
-    <div class="table-wrapper">
+        <div class="action-bar">
+            <div class="action-btns">
+                <button class="btn btn-add" onclick="openModal()">+ إضافة منتج</button>
+                <button class="btn btn-export" onclick="exportToExcel()">📥 تصدير Excel</button>
+                <button class="btn btn-delete-multi" onclick="deleteSelected()">🗑️ حذف المحدد</button>
+            </div>
+        </div>
 
-        <table id="mainTable">
+        <div class="table-wrapper">
+            <table id="mainTable">
+                <thead>
+                    <tr>
+                        <th style="width: 3%;"><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)"></th>
+                        <th style="width: 7%;">نوع الطلب</th>
+                        <th style="width: 12%;">تفاصيل الطلب</th>
+                        <th style="width: 4%;">العدد</th>
+                        <th style="width: 8%;">
+                            <div class="th-filter-wrap">
+                                <select id="filter-sub" class="header-select" onchange="applyFilters()"><option value="">الاشتراك</option></select>
+                            </div>
+                        </th>
+                        <th style="width: 6%;">الاجمالي</th>
+                        <th style="width: 10%;">رقم السريال</th>
+                        <th style="width: 9%;">رقم الخدمة</th>
+                        <th style="width: 9%;">المستخدم</th>
+                        <th style="width: 11%;">
+                            <div class="th-filter-wrap">
+                                <select id="filter-status" class="header-select" onchange="applyFilters()"><option value="">الحالة</option></select>
+                            </div>
+                        </th>
+                        <th style="width: 9%;">تاريخ التغيير</th>
+                        <th style="width: 10%;">ملاحظة</th>
+                        <th style="width: 5%;">الخيارات</th>
+                    </tr>
+                </thead>
+                <tbody id="productsBody"></tbody>
+            </table>
+        </div>
 
-            <thead>
-                <tr>
-                    <th style="width: 3%;"><input type="checkbox"></th>
-
-                    <th style="width: 8%;">
-                        <div class="th-filter-wrap">
-                            <span>الحالة</span>
-                            <select class="header-select">
-                                <option value=""></option>
-                            </select>
-                        </div>
-                    </th>
-
-                    <th>اسم العميل</th>
-                    <th>الخدمة</th>
-                    <th>المندوب</th>
-                    <th>القيمة</th>
-                    <th>التاريخ</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                <tr>
-                    <td><input type="checkbox"></td>
-                    <td>جاهز</td>
-                    <td>شركة التقنية</td>
-                    <td>انترنت</td>
-                    <td>احمد</td>
-                    <td>5000</td>
-                    <td>25/05/2026</td>
-                </tr>
-
-                <tr>
-                    <td><input type="checkbox"></td>
-                    <td>مكتمل</td>
-                    <td>شركة الاتصالات</td>
-                    <td>سيرفر</td>
-                    <td>محمد</td>
-                    <td>8000</td>
-                    <td>24/05/2026</td>
-                </tr>
-
-            </tbody>
-
-        </table>
-
+        <div class="activity-log-section">
+            <div class="activity-log-title">📜 سجل النشاط</div>
+            <div id="activityLog"></div>
+        </div>
     </div>
 
-</div>
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle">إضافة منتج جديد</h3>
+            <input type="hidden" id="edit-index">
+            <div class="form-grid">
+                <div class="form-group"><label>نوع الطلب</label><input type="text" id="p_type"></div>
+                <div class="form-group"><label>تفاصيل الطلب</label><input type="text" id="p_name"></div>
+                <div class="form-group"><label>العدد</label><input type="number" id="p_qty" value="1"></div>
+                <div class="form-group"><label>الاشتراك</label><input type="text" id="p_sub"></div>
+                <div class="form-group full-width"><label>الحالة</label>
+                    <select id="p_status">
+                        <option>مكتمل</option><option>تم التوثيق</option><option>توثيق</option>
+                        <option selected>جاهز</option><option>مرتجع</option><option>فقدان</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>رقم السريال</label><input type="text" id="p_serial"></div>
+                <div class="form-group"><label>رقم الخدمة</label><input type="text" id="p_mobile"></div>
+                <div class="form-group"><label>المستخدم</label><input type="text" id="p_user"></div>
+                <div class="form-group full-width"><label>ملاحظة</label><input type="text" id="p_note"></div>
+            </div>
+            <div class="modal-actions" style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn btn-export" style="flex:1" onclick="saveProduct()">حفظ</button>
+                <button class="btn btn-delete-multi" style="flex:1" onclick="closeModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
 
+    <script>
+        let currentOrderId = '';
+        const statusList = ["مكتمل", "تم التوثيق", "توثيق", "جاهز", "مرتجع", "فقدان"];
+        const currentUser = "احمد";
+
+        function loadOrderDetails() {
+            const urlParams = new URLSearchParams(window.location.search);
+            currentOrderId = urlParams.get('id');
+            if (!currentOrderId) return;
+            const salesData = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
+            const order = salesData.find(item => String(item.id) === String(currentOrderId));
+            if (order) {
+                document.getElementById('orderId').innerText = '#' + order.id;
+                document.getElementById('orderComp').innerText = order.comp;
+                document.getElementById('orderCr').innerText = order.cr;
+                document.getElementById('orderType').innerText = order.type;
+                document.getElementById('orderStatus').innerText = order.status;
+                renderProducts();
+                renderActivityLog();
+            }
+        }
+
+        function renderProducts(filteredList = null) {
+            const productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+            const products = filteredList || productsDb[currentOrderId] || [];
+            const tbody = document.getElementById('productsBody');
+            
+            tbody.innerHTML = products.map((p, index) => {
+                const subVal = parseFloat(String(p.sub).replace(/[^\d.]/g, '')) || 0;
+                let statusClass = "";
+                if (p.status === "مكتمل") statusClass = "status-complete";
+                else if (p.status === "تم التوثيق") statusClass = "status-verified";
+                else if (p.status === "توثيق") statusClass = "status-pending";
+
+                const isLocked = (p.status === "مكتمل" || p.status === "تم التوثيق");
+
+                return `
+                    <tr id="row-${index}">
+                        <td><input type="checkbox" class="row-checkbox" data-index="${index}"></td>
+                        <td>${p.type}</td>
+                        <td>${p.name}</td>
+                        <td>${p.qty}</td>
+                        <td>${p.sub}</td>
+                        <td style="color:var(--header-green); font-weight:800;">${(p.qty * subVal).toFixed(2)}</td>
+                        <td class="${isLocked ? '' : 'editable-cell'}" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'serial', this.innerText)">${p.serial || ''}</td>
+                        <td class="${isLocked ? '' : 'editable-cell'}" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'mobile', this.innerText)">${p.mobile || ''}</td>
+                        <td class="${isLocked ? '' : 'editable-cell'}" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'user', this.innerText)">${p.user || ''}</td>
+                        <td>
+                            <select class="status-select ${statusClass}" onchange="updateQuickField(${index}, 'status', this.value)">
+                                ${statusList.map(s => `<option value="${s}" ${p.status===s?'selected':''}>${s}</option>`).join('')}
+                            </select>
+                        </td>
+                        <td style="font-size:10px">${p.date}</td>
+                        <td contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'note', this.innerText)">${p.note}</td>
+                        <td>
+                            <select class="options-select" onchange="handleAction(this, ${index})">
+                                <option value="" selected disabled></option>
+                                <option value="select">تحديد</option>
+                                <option value="edit" ${isLocked ? 'disabled' : ''}>تعديل</option>
+                                <option value="delete" ${isLocked ? 'disabled' : ''}>حذف</option>
+                            </select>
+                        </td>
+                    </tr>`;
+            }).join('');
+            if (!filteredList) updateFilterOptions();
+        }
+
+        function addToLog(action) {
+            let logs = JSON.parse(localStorage.getItem('asgate_activity_log') || '[]');
+            const now = new Date();
+            const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+            const entry = { text: action, date: `${days[now.getDay()]} ${now.toLocaleDateString('en-GB')}`, orderId: currentOrderId };
+            logs.unshift(entry);
+            localStorage.setItem('asgate_activity_log', JSON.stringify(logs.slice(0, 50)));
+            renderActivityLog();
+        }
+
+        function renderActivityLog() {
+            const logs = JSON.parse(localStorage.getItem('asgate_activity_log') || '[]');
+            const container = document.getElementById('activityLog');
+            container.innerHTML = logs.filter(l => l.orderId === currentOrderId).map(l => `<div class="log-entry"><span class="log-date">${l.date}</span> ${l.text}</div>`).join('');
+        }
+
+        function updateQuickField(index, field, value) {
+            let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+            const oldVal = db[currentOrderId][index][field];
+            const serviceNum = db[currentOrderId][index].mobile || "بدون رقم";
+            if (oldVal !== value.trim()) {
+                db[currentOrderId][index][field] = value.trim();
+                if(field === 'status') {
+                    db[currentOrderId][index].date = new Date().toLocaleDateString('en-GB');
+                    addToLog(`قام / ${currentUser} | تم تغيير حالة ${serviceNum} إلى ${value}`);
+                }
+                localStorage.setItem('asgate_products_db', JSON.stringify(db));
+                renderProducts();
+            }
+        }
+
+        function handleAction(selectObj, index) {
+            const action = selectObj.value;
+            if (action === "edit") openModal(index);
+            else if (action === "delete") deleteRow(index);
+            selectObj.value = ""; 
+        }
+
+        function saveProduct() {
+            const index = document.getElementById('edit-index').value;
+            const data = {
+                type: document.getElementById('p_type').value,
+                name: document.getElementById('p_name').value,
+                qty: parseInt(document.getElementById('p_qty').value) || 1,
+                sub: document.getElementById('p_sub').value,
+                serial: document.getElementById('p_serial').value,
+                mobile: document.getElementById('p_mobile').value,
+                user: document.getElementById('p_user').value,
+                status: document.getElementById('p_status').value,
+                note: document.getElementById('p_note').value,
+                date: new Date().toLocaleDateString('en-GB')
+            };
+            let productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+            if (!productsDb[currentOrderId]) productsDb[currentOrderId] = [];
+            if (index !== "") productsDb[currentOrderId][index] = data;
+            else productsDb[currentOrderId].push(data);
+            localStorage.setItem('asgate_products_db', JSON.stringify(productsDb));
+            renderProducts();
+            closeModal();
+        }
+
+        function openModal(index = null) {
+            const modal = document.getElementById('productModal');
+            modal.style.display = 'flex';
+            if (index !== null) {
+                document.getElementById('edit-index').value = index;
+                const p = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId][index];
+                document.getElementById('p_type').value = p.type;
+                document.getElementById('p_name').value = p.name;
+                document.getElementById('p_qty').value = p.qty;
+                document.getElementById('p_sub').value = p.sub;
+                document.getElementById('p_serial').value = p.serial;
+                document.getElementById('p_mobile').value = p.mobile;
+                document.getElementById('p_user').value = p.user;
+                document.getElementById('p_status').value = p.status;
+                document.getElementById('p_note').value = p.note;
+            }
+        }
+
+        function closeModal() { document.getElementById('productModal').style.display = 'none'; }
+        function toggleSelectAll(source) { document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = source.checked); }
+
+        function updateFilterOptions() {
+            const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
+            const fill = (id, label, items) => {
+                const s = document.getElementById(id);
+                const current = s.value;
+                s.innerHTML = `<option value="">${label}</option>` + [...new Set(items)].map(i => `<option value="${i}" ${i===current?'selected':''}>${i}</option>`).join('');
+            };
+            fill('filter-sub', 'الاشتراك', db.map(p => p.sub));
+            fill('filter-status', 'الحالة', db.map(p => p.status));
+        }
+
+        function applyFilters() {
+            const sub = document.getElementById('filter-sub').value;
+            const status = document.getElementById('filter-status').value;
+            const all = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
+            const filtered = all.filter(p => (sub === "" || p.sub === sub) && (status === "" || p.status === status));
+            renderProducts(filtered);
+        }
+
+        function deleteSelected() {
+            const selected = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => parseInt(cb.dataset.index));
+            if(selected.length > 0 && confirm("حذف المحدد؟")) {
+                let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+                db[currentOrderId] = db[currentOrderId].filter((p, i) => !selected.includes(i));
+                localStorage.setItem('asgate_products_db', JSON.stringify(db));
+                renderProducts();
+            }
+        }
+
+        function exportToExcel() {
+            const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
+            const ws = XLSX.utils.json_to_sheet(db);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "المنتجات");
+            XLSX.writeFile(wb, `طلب_${currentOrderId}.xlsx`);
+        }
+    </script>
 </body>
 </html>
