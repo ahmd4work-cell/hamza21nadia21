@@ -37,15 +37,14 @@
         }
 
         .header-section-wrapper { margin: 0 7% 10px 7%; display: flex; align-items: center; gap: 15px; }
-        
-        /* زر الرجوع بارتفاع 40 بكسل */
-        .btn-back-outside { text-decoration: none; background: var(--white); color: var(--nav-bg); padding: 0 15px; border-radius: 10px; font-size: 12px; font-weight: 800; border: 2px solid #991b1b; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 5px; height: 40px; line-height: 40px; box-sizing: border-box; }
+        .btn-back-outside { text-decoration: none; background: var(--white); color: var(--nav-bg); padding: 8px 15px; border-radius: 10px; font-size: 12px; font-weight: 800; border: 2px solid #991b1b; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 5px; height: 40px; box-sizing: border-box; }
 
         .order-header-info { background: white; padding: 0 25px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-grow: 1; flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); height: 70px; box-sizing: border-box; }
         .info-item { display: flex; flex-direction: column; gap: 2px; min-width: 90px; }
         .info-label { font-size: 10px; color: #64748b; font-weight: 800; }
         .info-value { font-size: 13px; color: var(--nav-bg); font-weight: 800; }
         
+        /* التنسيق الاحترافي لاسم الطلب */
         .info-item-highlight { border: 2px solid var(--header-green); padding: 5px 15px; border-radius: 8px; background-color: #f0fdf4; }
 
         .action-bar { margin: 5px 0 10px 0; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
@@ -72,15 +71,8 @@
         .log-entry { font-size: 12px; padding: 6px 0; border-bottom: 1px solid #f8fafc; color: #334155; }
         .log-user { color: var(--accent-blue); font-weight: 800; }
 
-        /* الأزرار العامة */
-        .btn { border: none; padding: 0 15px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 11px; color: white; display: flex; align-items: center; justify-content: center; gap: 5px; box-sizing: border-box; }
-        
-        /* تخصيص أزرار التحكم بارتفاع 25 بكسل */
-        .btn-export, .btn-print, .btn-delete-multi { height: 25px; font-size: 10px; }
-        
-        /* زر الإضافة يبقى بارتفاعه الطبيعي أو حسب الحاجة (تركته بوضع الافتراضي) */
-        .btn-add { background: var(--accent-blue); height: 32px; }
-        
+        .btn { border: none; padding: 8px 15px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 11px; color: white; display: flex; align-items: center; gap: 5px; }
+        .btn-add { background: var(--accent-blue); }
         .btn-export { background: var(--header-green); }
         .btn-print { background: #64748b; }
         .btn-delete-multi { background: var(--danger-red); }
@@ -126,7 +118,7 @@
                 <div class="search-wrapper">
                     <input type="text" id="liveSearch" class="search-input" placeholder="بحث بالسريال، الخدمة أو المستخدم..." onkeyup="applyFilters()">
                 </div>
-                <div style="display: flex; gap: 8px; align-items: center;">
+                <div style="display: flex; gap: 8px;">
                     <button class="btn btn-export" onclick="exportToExcel()">📥 تصدير</button>
                     <button class="btn btn-print" onclick="window.print()">🖨️ طباعة</button>
                     <button class="btn btn-delete-multi" onclick="deleteSelected()">🗑️ حذف</button>
@@ -184,8 +176,8 @@
                 </select>
             </div>
             <div style="margin-top:20px; display:flex; gap:10px;">
-                <button class="btn btn-export" style="flex:1; height: 35px;" onclick="saveProduct()">حفظ</button>
-                <button class="btn btn-delete-multi" style="flex:1; height: 35px;" onclick="closeModal()">إلغاء</button>
+                <button class="btn btn-export" style="flex:1" onclick="saveProduct()">حفظ</button>
+                <button class="btn btn-delete-multi" style="flex:1" onclick="closeModal()">إلغاء</button>
             </div>
         </div>
     </div>
