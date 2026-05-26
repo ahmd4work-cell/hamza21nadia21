@@ -177,17 +177,14 @@
     <div id="productModal" class="modal">
         <div class="modal-content">
             <h3 style="margin-top:0; font-size:14px; text-align: center;">إضافة منتج جديد</h3>
-            
             <label class="info-label">نوع الطلب</label>
             <select id="p_type">
                 <option value="خدمة متنقلة">خدمة متنقلة</option>
                 <option value="هاتف وانترنت">هاتف وانترنت</option>
                 <option value="داتا">داتا</option>
             </select>
-            
             <label class="info-label">تفاصيل الطلب</label>
             <input type="text" id="p_name" placeholder="التفاصيل...">
-            
             <div style="display: flex; gap: 8px; align-items: flex-end; margin-bottom: 10px;">
                 <div style="flex: 1;">
                     <label class="info-label">العدد</label>
@@ -195,19 +192,14 @@
                 </div>
                 <div style="flex: 1;">
                     <div class="serial-container">
-                        <label>
-                            <input type="checkbox" id="auto_serial"> تسلسل تلقائي
-                        </label>
+                        <label><input type="checkbox" id="auto_serial"> تسلسل تلقائي</label>
                     </div>
                 </div>
             </div>
-
             <label class="info-label">السريال (البداية)</label>
             <input type="text" id="p_serial" placeholder="السريال الأول...">
-            
             <label class="info-label">الاشتراك</label>
             <input type="text" id="p_sub" placeholder="ر.س">
-            
             <div style="margin-top:10px; display:flex; gap:10px;">
                 <button class="btn btn-export" style="flex:1; height: 35px; justify-content: center;" onclick="saveProduct()">حفظ</button>
                 <button class="btn btn-delete-multi" style="flex:1; height: 35px; justify-content: center;" onclick="closeModal()">إلغاء</button>
@@ -235,20 +227,44 @@
             }
         }
 
+        function logActivity(msg) {
+            let logs = JSON.parse(localStorage.getItem('asgate_logs') || '[]');
+            const now = new Date();
+            
+            // استخراج اسم اليوم بالعربية
+            const days = ['الأحد', 'الأثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+            const dayName = days[now.getDay()];
+            
+            // تنسيق التاريخ والوقت
+            const dateStr = now.toLocaleDateString('en-GB'); // DD/MM/YYYY
+            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+            // التنسيق المطلوب: 👤 (اسم الموظف) 🗓️ الأربعاء 27/05/2026 01:23 AM ➡️
+            const fullMeta = `👤 (أحمد) &nbsp;🗓️ ${dayName} &nbsp;${dateStr} &nbsp;${timeStr} &nbsp;➡️ &nbsp;`;
+            
+            logs.unshift({ meta: fullMeta, msg: msg, orderId: currentOrderId });
+            localStorage.setItem('asgate_logs', JSON.stringify(logs.slice(0, 50)));
+            renderLogs();
+        }
+
+        function renderLogs() {
+            const logs = JSON.parse(localStorage.getItem('asgate_logs') || '[]');
+            const container = document.getElementById('activityLogs');
+            container.innerHTML = logs.filter(l => l.orderId === currentOrderId).map(l => `
+                <div class="log-entry"><span class="log-user">${l.meta}</span><span>${l.msg}</span></div>
+            `).join('');
+        }
+
         function renderProducts(filteredList = null) {
             const productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             const products = filteredList || productsDb[currentOrderId] || [];
-            
-            // تحديد نوع الهيدر بناءً على أول منتج أو الافتراضي "خدمة متنقلة"
             const type = (products.length > 0) ? products[0].type : "خدمة متنقلة";
             updateTableHeaders(type);
-
             const tbody = document.getElementById('productsBody');
             tbody.innerHTML = products.map((p, index) => {
                 const subVal = parseFloat(String(p.sub).replace(/[^\d.]/g, '')) || 0;
                 const isLocked = (p.status === "مكتمل" || p.status === "تم التوثيق");
                 let statusClass = (p.status === "مكتمل") ? "status-complete" : (p.status === "تم التوثيق" ? "status-verified" : "");
-
                 let dynamicCells = p.type === "خدمة متنقلة" ? `
                     <td class="editable-cell" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'serial', this.innerText)">${p.serial || ''}</td>
                     <td class="editable-cell" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'mobile', this.innerText)">${p.mobile || ''}</td>
@@ -258,7 +274,6 @@
                     <td class="editable-cell" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'coords', this.innerText)">${p.coords || ''}</td>
                     <td class="editable-cell" contenteditable="${!isLocked}" onblur="updateQuickField(${index}, 'city', this.innerText)">${p.city || ''}</td>
                 `;
-
                 return `
                     <tr class="${isLocked ? 'row-locked' : ''}" data-status="${p.status}">
                         <td style="width: 3.5%;"><input type="checkbox" class="row-checkbox" data-index="${index}" onchange="calculateTotals()"></td>
@@ -296,31 +311,14 @@
             `;
         }
 
-        function logActivity(msg) {
-            let logs = JSON.parse(localStorage.getItem('asgate_logs') || '[]');
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('en-GB');
-            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-            const fullLog = `أحمد | ${dateStr} ${timeStr}`;
-            logs.unshift({ meta: fullLog, msg: msg, orderId: currentOrderId });
-            localStorage.setItem('asgate_logs', JSON.stringify(logs.slice(0, 50)));
-            renderLogs();
-        }
-
-        function renderLogs() {
-            const logs = JSON.parse(localStorage.getItem('asgate_logs') || '[]');
-            const container = document.getElementById('activityLogs');
-            container.innerHTML = logs.filter(l => l.orderId === currentOrderId).map(l => `
-                <div class="log-entry"><span class="log-user">${l.meta}</span> ➡️ <span>${l.msg}</span></div>
-            `).join('');
-        }
-
         function updateQuickField(index, field, value) {
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             const item = db[currentOrderId][index];
             if(item[field] !== value.trim()) {
+                const oldVal = item[field];
                 item[field] = value.trim();
                 localStorage.setItem('asgate_products_db', JSON.stringify(db));
+                logActivity(`تعديل ${field} من (${oldVal}) إلى (${item[field]})`);
                 renderProducts();
             }
         }
@@ -355,6 +353,7 @@
                 let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
                 db[currentOrderId] = db[currentOrderId].filter((p, i) => !indexes.includes(i));
                 localStorage.setItem('asgate_products_db', JSON.stringify(db));
+                logActivity(`حذف ${indexes.length} منتج`);
                 renderProducts();
             }
         }
@@ -373,7 +372,6 @@
             let currentSerial = document.getElementById('p_serial').value.trim();
             const sub = document.getElementById('p_sub').value;
             const isAuto = document.getElementById('auto_serial').checked;
-            
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             if (!db[currentOrderId]) db[currentOrderId] = [];
 
@@ -397,10 +395,8 @@
                 });
                 logActivity(`إضافة منتج واحد بكمية ${qtyInput}`);
             }
-
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
             renderProducts(); closeModal();
-            
             document.getElementById('p_serial').value = '';
             document.getElementById('p_qty').value = 1;
             document.getElementById('auto_serial').checked = false;
