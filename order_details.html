@@ -38,7 +38,6 @@
 
         .header-section-wrapper { margin: 0 7% 10px 7%; display: flex; align-items: center; gap: 15px; }
         
-        /* تعديل ارتفاع زر العودة إلى 50 بكسل */
         .btn-back-outside { 
             text-decoration: none; background: var(--white); color: var(--nav-bg); 
             padding: 0 15px; border-radius: 10px; font-size: 14px; font-weight: 800; 
@@ -78,9 +77,8 @@
         .log-user { color: var(--accent-blue); font-weight: 800; }
 
         .btn { border: none; padding: 0 15px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 11px; color: white; display: flex; align-items: center; gap: 5px; box-sizing: border-box; }
-        .btn-add { background: var(--accent-blue); height: 35px; } /* ارتفاع زر الإضافة ليناسب التصميم */
+        .btn-add { background: var(--accent-blue); height: 35px; }
         
-        /* تعديل ارتفاع أزرار العمليات إلى 25 بكسل */
         .btn-export { background: var(--header-green); height: 25px; }
         .btn-print { background: #64748b; height: 25px; }
         .btn-delete-multi { background: var(--danger-red); height: 25px; }
@@ -138,8 +136,7 @@
         <div class="table-wrapper">
             <table id="mainTable">
                 <thead>
-                    <tr id="dynamicHeader">
-                        </tr>
+                    <tr id="dynamicHeader"></tr>
                 </thead>
                 <tbody id="productsBody"></tbody>
                 <tfoot>
@@ -174,15 +171,23 @@
             <label class="info-label">تفاصيل الطلب</label>
             <input type="text" id="p_name" placeholder="مثال: ترقية سرعة، شريحة جديدة...">
             
-            <label class="info-label">العدد</label>
-            <input type="number" id="p_qty" value="1">
+            <div style="display: flex; gap: 10px; align-items: flex-end; margin-bottom: 10px;">
+                <div style="flex: 1;">
+                    <label class="info-label">العدد</label>
+                    <input type="number" id="p_qty" value="1" style="margin-bottom: 0;">
+                </div>
+                <button type="button" class="btn btn-export" style="height: 42px; width: 120px; justify-content: center;" onclick="prepareMultiRows()">🔢 أعمدة متعددة</button>
+            </div>
+
+            <label class="info-label">السريال (بداية التسلسل)</label>
+            <input type="text" id="p_serial" placeholder="أدخل رقم السريال الأول...">
             
             <label class="info-label">الاشتراك</label>
             <input type="text" id="p_sub" placeholder="ر.س">
             
             <div style="margin-top:10px; display:flex; gap:10px;">
-                <button class="btn btn-export" style="flex:1; height: 35px;" onclick="saveProduct()">حفظ المنتج</button>
-                <button class="btn btn-delete-multi" style="flex:1; height: 35px;" onclick="closeModal()">إلغاء</button>
+                <button class="btn btn-export" style="flex:1; height: 35px; justify-content: center;" onclick="saveProduct()">حفظ المنتج</button>
+                <button class="btn btn-delete-multi" style="flex:1; height: 35px; justify-content: center;" onclick="closeModal()">إلغاء</button>
             </div>
         </div>
     </div>
@@ -259,7 +264,6 @@
         function updateTableHeaders(type) {
             const headerRow = document.getElementById('dynamicHeader');
             let dynamicHeads = "";
-            
             if (type === "خدمة متنقلة") {
                 dynamicHeads = `
                     <th style="width: 10%;">رقم السريال</th>
@@ -273,7 +277,6 @@
                     <th style="width: 9%;">المدينة</th>
                 `;
             }
-
             headerRow.innerHTML = `
                 <th style="width: 3.5%;"><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)"></th>
                 <th style="width: 9.5%;">نوع الطلب</th>
@@ -369,25 +372,63 @@
             }
         }
 
+        // دالة زيادة السريال تلقائياً
+        function nextSerial(serial) {
+            return serial.replace(/(\d+)(?!.*\d)/, function(n) {
+                return (parseInt(n) + 1).toString().padStart(n.length, '0');
+            });
+        }
+
+        function prepareMultiRows() {
+            const qty = parseInt(document.getElementById('p_qty').value);
+            if (qty <= 1) {
+                alert("يرجى إدخال عدد أكبر من 1 لاستخدام خاصية الأعمدة المتعددة.");
+                return;
+            }
+            document.getElementById('p_serial').focus();
+            document.getElementById('p_serial').style.boxShadow = "0 0 5px var(--header-green)";
+        }
+
         function saveProduct() {
             const type = document.getElementById('p_type').value;
             const name = document.getElementById('p_name').value;
-            const data = {
-                type: type, 
-                name: name,
-                qty: document.getElementById('p_qty').value, 
-                sub: document.getElementById('p_sub').value,
-                serial: '', mobile: '', user: '', 
-                sai: '', coords: '', city: '',
-                note: '', status: 'جاهز',
-                date: new Date().toLocaleDateString('en-GB')
-            };
+            const qtyInput = parseInt(document.getElementById('p_qty').value) || 1;
+            let currentSerial = document.getElementById('p_serial').value.trim();
+            const sub = document.getElementById('p_sub').value;
+            
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             if (!db[currentOrderId]) db[currentOrderId] = [];
-            db[currentOrderId].push(data);
+
+            // في حال تم اختيار أكثر من صف، نقوم بتكرار الإضافة
+            for (let i = 0; i < qtyInput; i++) {
+                const data = {
+                    type: type, 
+                    name: name,
+                    qty: 1, // كل صف يمثل وحدة واحدة بالسريال الخاص بها
+                    sub: sub,
+                    serial: currentSerial,
+                    mobile: '', user: '', 
+                    sai: '', coords: '', city: '',
+                    note: '', status: 'جاهز',
+                    date: new Date().toLocaleDateString('en-GB')
+                };
+                db[currentOrderId].push(data);
+                
+                // تحديث السريال للدورة القادمة إذا كان موجوداً
+                if (currentSerial !== "") {
+                    currentSerial = nextSerial(currentSerial);
+                }
+            }
+
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
-            logActivity(`إضافة منتج (${type}): ${name}`);
-            renderProducts(); closeModal();
+            logActivity(`إضافة عدد (${qtyInput}) منتجات - النوع: ${type}`);
+            renderProducts(); 
+            closeModal();
+            
+            // تصفير القيم
+            document.getElementById('p_serial').value = '';
+            document.getElementById('p_qty').value = 1;
+            document.getElementById('p_serial').style.boxShadow = "none";
         }
 
         function applyFilters() {
