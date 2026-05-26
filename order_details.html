@@ -90,9 +90,8 @@
         .editable-cell { cursor: cell; outline: none; }
         .row-locked { background-color: #f8fafc; color: #94a3b8; }
 
-        /* تعديل عرض النافذة المنبثقة ليكون 20% */
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
-        .modal-content { background: white; padding: 20px; border-radius: 12px; width: 20%; min-width: 300px; } /* 20% عرض الشاشة مع حد أدنى لسهولة القراءة */
+        .modal-content { background: white; padding: 20px; border-radius: 12px; width: 20%; min-width: 300px; }
         .modal-content input, .modal-content select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Cairo'; margin-bottom: 10px; box-sizing: border-box; font-size: 12px; }
         
         .serial-container { 
@@ -181,8 +180,8 @@
             
             <label class="info-label">نوع الطلب</label>
             <select id="p_type">
-                <option value="هاتف وانترنت">هاتف وانترنت</option>
                 <option value="خدمة متنقلة">خدمة متنقلة</option>
+                <option value="هاتف وانترنت">هاتف وانترنت</option>
                 <option value="داتا">داتا</option>
             </select>
             
@@ -239,6 +238,8 @@
         function renderProducts(filteredList = null) {
             const productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             const products = filteredList || productsDb[currentOrderId] || [];
+            
+            // تحديد نوع الهيدر بناءً على أول منتج أو الافتراضي "خدمة متنقلة"
             const type = (products.length > 0) ? products[0].type : "خدمة متنقلة";
             updateTableHeaders(type);
 
