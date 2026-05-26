@@ -95,8 +95,21 @@
         .modal-content input, .modal-content select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Cairo'; margin-bottom: 10px; box-sizing: border-box; }
         
         /* خيارات التسلسل */
-        .serial-group { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; background: #f8fafc; padding: 5px 10px; border-radius: 8px; border: 1px solid var(--light-border); }
-        .serial-group label { font-size: 11px; font-weight: 800; color: var(--header-green); cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .serial-container { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            background: #f0fdf4; 
+            height: 38px; 
+            border: 2px solid var(--header-green); 
+            border-radius: 8px; 
+            padding: 0 15px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .serial-container:hover { background: #dcfce7; }
+        .serial-container input { width: auto; margin-bottom: 0; cursor: pointer; }
+        .serial-container label { font-size: 13px; font-weight: 800; color: var(--header-green); cursor: pointer; display: flex; align-items: center; gap: 8px; margin: 0; }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
 </head>
@@ -180,11 +193,12 @@
                     <label class="info-label">العدد (عدد الصفوف)</label>
                     <input type="number" id="p_qty" value="1" style="margin-bottom: 0;">
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 5px;">
-                    <div class="serial-group">
-                        <label><input type="checkbox" id="auto_serial"> تسلسل تلقائي</label>
+                <div style="flex: 1;">
+                    <div class="serial-container">
+                        <label>
+                            <input type="checkbox" id="auto_serial"> تسلسل تلقائي
+                        </label>
                     </div>
-                    <button type="button" class="btn btn-export" style="height: 38px; width: 130px; justify-content: center;" onclick="prepareMultiRows()">🔢 صفوف متعددة</button>
                 </div>
             </div>
 
@@ -343,19 +357,11 @@
             }
         }
 
-        // دالة زيادة السريال تلقائياً (دعم للأرقام الكبيرة)
         function nextSerial(serial) {
             return serial.replace(/(\d+)(?!.*\d)/, function(n) {
                 let next = (BigInt(n) + 1n).toString();
                 return next.padStart(n.length, '0');
             });
-        }
-
-        function prepareMultiRows() {
-            const qty = parseInt(document.getElementById('p_qty').value);
-            if (qty <= 1) { alert("يرجى إدخال عدد أكبر من 1"); return; }
-            document.getElementById('p_serial').focus();
-            document.getElementById('p_serial').style.boxShadow = "0 0 5px var(--header-green)";
         }
 
         function saveProduct() {
@@ -380,10 +386,10 @@
             }
 
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
-            logActivity(`إضافة ${qtyInput} صف بنظام ${isAuto ? 'التسلسل' : 'التكرار'}`);
+            logActivity(`تمت إضافة ${qtyInput} منتج بنجاح`);
             renderProducts(); closeModal();
             
-            // تصفير
+            // تصفير الخانات
             document.getElementById('p_serial').value = '';
             document.getElementById('p_qty').value = 1;
             document.getElementById('auto_serial').checked = false;
