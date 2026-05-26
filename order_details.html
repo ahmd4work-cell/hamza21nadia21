@@ -37,7 +37,15 @@
         }
 
         .header-section-wrapper { margin: 0 7% 10px 7%; display: flex; align-items: center; gap: 15px; }
-        .btn-back-outside { text-decoration: none; background: var(--white); color: var(--nav-bg); padding: 8px 15px; border-radius: 10px; font-size: 12px; font-weight: 800; border: 2px solid #991b1b; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 5px; height: 40px; box-sizing: border-box; }
+        
+        /* تعديل ارتفاع زر العودة إلى 50 بكسل */
+        .btn-back-outside { 
+            text-decoration: none; background: var(--white); color: var(--nav-bg); 
+            padding: 0 15px; border-radius: 10px; font-size: 14px; font-weight: 800; 
+            border: 2px solid #991b1b; box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
+            transition: 0.2s; white-space: nowrap; display: flex; align-items: center; 
+            gap: 5px; height: 50px; box-sizing: border-box; 
+        }
 
         .order-header-info { background: white; padding: 0 25px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; flex-grow: 1; flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); height: 70px; box-sizing: border-box; }
         .info-item { display: flex; flex-direction: column; gap: 2px; min-width: 90px; }
@@ -69,11 +77,13 @@
         .log-entry { font-size: 12px; padding: 6px 0; border-bottom: 1px solid #f8fafc; color: #334155; }
         .log-user { color: var(--accent-blue); font-weight: 800; }
 
-        .btn { border: none; padding: 8px 15px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 11px; color: white; display: flex; align-items: center; gap: 5px; }
-        .btn-add { background: var(--accent-blue); }
-        .btn-export { background: var(--header-green); }
-        .btn-print { background: #64748b; }
-        .btn-delete-multi { background: var(--danger-red); }
+        .btn { border: none; padding: 0 15px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 11px; color: white; display: flex; align-items: center; gap: 5px; box-sizing: border-box; }
+        .btn-add { background: var(--accent-blue); height: 35px; } /* ارتفاع زر الإضافة ليناسب التصميم */
+        
+        /* تعديل ارتفاع أزرار العمليات إلى 25 بكسل */
+        .btn-export { background: var(--header-green); height: 25px; }
+        .btn-print { background: #64748b; height: 25px; }
+        .btn-delete-multi { background: var(--danger-red); height: 25px; }
 
         .status-select { font-family: 'Cairo'; font-size: 10px; font-weight: 700; padding: 2px; border-radius: 6px; width: 95%; cursor: pointer; border: 1px solid var(--border-color); height: 28px; }
         .status-complete { background-color: #16a34a !important; color: white !important; }
@@ -171,8 +181,8 @@
             <input type="text" id="p_sub" placeholder="ر.س">
             
             <div style="margin-top:10px; display:flex; gap:10px;">
-                <button class="btn btn-export" style="flex:1" onclick="saveProduct()">حفظ المنتج</button>
-                <button class="btn btn-delete-multi" style="flex:1" onclick="closeModal()">إلغاء</button>
+                <button class="btn btn-export" style="flex:1; height: 35px;" onclick="saveProduct()">حفظ المنتج</button>
+                <button class="btn btn-delete-multi" style="flex:1; height: 35px;" onclick="closeModal()">إلغاء</button>
             </div>
         </div>
     </div>
@@ -201,7 +211,6 @@
             const productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             const products = filteredList || productsDb[currentOrderId] || [];
             
-            // تحديد نوع الجدول بناءً على أول منتج أو نوع الطلب العام
             const type = (products.length > 0) ? products[0].type : "خدمة متنقلة";
             updateTableHeaders(type);
 
@@ -211,7 +220,6 @@
                 const isLocked = (p.status === "مكتمل" || p.status === "تم التوثيق");
                 let statusClass = (p.status === "مكتمل") ? "status-complete" : (p.status === "تم التوثيق" ? "status-verified" : "");
 
-                // الخانات المتغيرة
                 let dynamicCells = "";
                 if (p.type === "خدمة متنقلة") {
                     dynamicCells = `
@@ -369,7 +377,6 @@
                 name: name,
                 qty: document.getElementById('p_qty').value, 
                 sub: document.getElementById('p_sub').value,
-                // حقول افتراضية فارغة ليتم ملؤها في الجدول
                 serial: '', mobile: '', user: '', 
                 sai: '', coords: '', city: '',
                 note: '', status: 'جاهز',
