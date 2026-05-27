@@ -85,9 +85,11 @@
         .status-complete { background-color: #16a34a !important; color: white !important; }
         .status-verified { background-color: var(--soft-green) !important; color: #166534 !important; }
 
+        /* Modal Styles */
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
-        .modal-content { background: white; padding: 20px; border-radius: 12px; width: 300px; }
-        .modal-content input, .modal-content select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Cairo'; margin-bottom: 10px; box-sizing: border-box; font-size: 12px; }
+        .modal-content { background: white; padding: 20px; border-radius: 12px; width: 320px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-content h3 { margin-top: 0; margin-bottom: 15px; font-size: 15px; text-align: center; color: var(--nav-bg); }
+        .modal-content input, .modal-content select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-family: 'Cairo'; margin-bottom: 12px; box-sizing: border-box; font-size: 12px; outline: none; }
         
         @media print {
             .navbar, .sticky-top-section, .btn, .search-wrapper, .modal, .log-section { display: none !important; }
@@ -163,29 +165,36 @@
 
     <div id="productModal" class="modal">
         <div class="modal-content">
-            <h3 style="margin-top:0; font-size:14px; text-align: center;">إضافة منتج جديد</h3>
+            <h3>إضافة منتج جديد</h3>
+            <label style="font-size: 11px; font-weight: bold; color: #64748b;">نوع الخدمة</label>
             <select id="p_type" onchange="toggleSerialField()">
                 <option value="خدمة متنقلة">خدمة متنقلة</option>
                 <option value="هاتف وانترنت">هاتف وانترنت</option>
                 <option value="داتا">داتا</option>
             </select>
-            <input type="text" id="p_name" placeholder="تفاصيل المنتج...">
+            
+            <input type="text" id="p_name" placeholder="تفاصيل المنتج (مثال: باقة 200 جيجا)">
             <input type="number" id="p_qty" value="1" min="1" placeholder="الكمية">
-            <div style="margin-bottom:10px; display: flex; align-items: center; justify-content: center; background: #f0fdf4; height: 38px; border: 2px solid var(--header-green); border-radius: 8px; padding: 0 15px; cursor: pointer;">
-                <label style="font-size:11px; font-weight:bold; cursor:pointer;"><input type="checkbox" id="auto_serial"> تسلسل تلقائي للسيريالات</label>
+            
+            <div id="serial_section">
+                <div style="margin-bottom:10px; display: flex; align-items: center; justify-content: center; background: #f0fdf4; height: 35px; border: 1px solid var(--header-green); border-radius: 8px; cursor: pointer;">
+                    <label style="font-size:11px; font-weight:bold; cursor:pointer;"><input type="checkbox" id="auto_serial"> تسلسل تلقائي للسيريالات</label>
+                </div>
+                <input type="text" id="p_serial" placeholder="السريال أو الرقم الأول">
             </div>
-            <input type="text" id="p_serial" placeholder="السريال الأول">
+
             <input type="number" id="p_sub" placeholder="قيمة الاشتراك (ر.س)">
-            <div style="display:flex; gap:10px;">
-                <button class="btn btn-export" style="flex:1; height:35px; justify-content:center;" onclick="saveProduct()">حفظ</button>
-                <button class="btn btn-delete-multi" style="flex:1; height:35px; justify-content:center;" onclick="closeModal()">إلغاء</button>
+
+            <div style="display:flex; gap:10px; margin-top: 5px;">
+                <button class="btn" style="flex:1; height:35px; background:var(--header-green); justify-content:center;" onclick="saveProduct()">إضافة المنتج</button>
+                <button class="btn" style="flex:1; height:35px; background:var(--danger-red); justify-content:center;" onclick="closeModal()">إلغاء</button>
             </div>
         </div>
     </div>
 
     <script>
         let currentOrderId = new URLSearchParams(window.location.search).get('id');
-        const statusList = ["مكتمل", "تم التوثيق", "معلق", "جاهز", "مرتجع", "فقدان", "جديد"];
+        const statusList = ["جديد", "مكتمل", "تم التوثيق", "معلق", "جاهز", "مرتجع", "فقدان"];
 
         function loadOrderDetails() {
             const sales = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
@@ -204,7 +213,9 @@
         function renderProducts(filtered = null) {
             const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             const items = filtered || db[currentOrderId] || [];
-            const type = items.length > 0 ? items[0].type : "خدمة متنقلة";
+            
+            // تحديد نوع الهيدر بناءً على أول عنصر أو الافتراضي
+            const type = items.length > 0 ? items[0].type : (document.getElementById('p_type').value || "خدمة متنقلة");
             
             updateTableHeaders(type);
             const tbody = document.getElementById('productsBody');
@@ -252,10 +263,10 @@
                 `<th>رقم السريال</th><th>رقم الخدمة</th><th>المستخدم</th>` : 
                 `<th>رقم الكبينة</th><th>الإحداثيات</th><th>المدينة</th>`;
             header.innerHTML = `
-                <th><input type="checkbox" onclick="toggleAll(this)"></th>
-                <th>النوع</th><th>التفاصيل</th><th>العدد</th><th>الاشتراك</th><th>الإجمالي</th>
+                <th style="width: 30px;"><input type="checkbox" onclick="toggleAll(this)"></th>
+                <th style="width: 80px;">النوع</th><th>التفاصيل</th><th style="width: 50px;">العدد</th><th style="width: 80px;">الاشتراك</th><th style="width: 80px;">الإجمالي</th>
                 ${dynamic}
-                <th>الحالة</th><th>التاريخ</th><th>ملاحظة</th>
+                <th style="width: 90px;">الحالة</th><th style="width: 80px;">التاريخ</th><th>ملاحظة</th>
             `;
         }
 
@@ -263,30 +274,36 @@
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             db[currentOrderId][index][field] = value.trim();
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
+            
             if(field === 'status' || field === 'qty' || field === 'sub') {
                 syncSumsToSales();
-                renderProducts();
+                renderProducts(); // لإعادة تلوين الحالة أو تحديث الإجمالي
             }
         }
 
         function syncSumsToSales() {
             const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             const items = db[currentOrderId] || [];
-            let comp = 0, pend = 0, total = 0;
+            let completed = 0, pending = 0, total = 0;
+
             items.forEach(p => {
                 const val = (parseInt(p.qty) || 0) * (parseFloat(p.sub) || 0);
                 total += val;
-                if(p.status === "مكتمل") comp += val;
-                else if(p.status === "جديد" || p.status === "جاهز" || p.status === "معلق") pend += val;
+                if(p.status === "مكتمل") completed += val;
+                else if(["جديد", "جاهز", "معلق"].includes(p.status)) pending += val;
             });
+
+            // تحديث واجهة المستخدم في الرأس
+            document.getElementById('orderTotalSum').innerText = total.toFixed(2) + " ر.س";
+
+            // تحديث قاعدة بيانات المبيعات
             let sales = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
             let idx = sales.findIndex(o => String(o.id) === String(currentOrderId));
             if(idx !== -1) {
-                sales[idx].completedSum = comp;
-                sales[idx].pendingSum = pend;
+                sales[idx].completedSum = completed;
+                sales[idx].pendingSum = pending;
                 localStorage.setItem('asgate_sales_db', JSON.stringify(sales));
             }
-            document.getElementById('orderTotalSum').innerText = total.toFixed(2) + " ر.س";
         }
 
         function calculateTotals() {
@@ -305,47 +322,59 @@
 
         function saveProduct() {
             const type = document.getElementById('p_type').value;
-            const name = document.getElementById('p_name').value;
+            const name = document.getElementById('p_name').value || "بدون تفاصيل";
             const qty = parseInt(document.getElementById('p_qty').value) || 1;
             const sub = document.getElementById('p_sub').value || 0;
-            let serial = document.getElementById('p_serial').value;
+            let serial = document.getElementById('p_serial').value || "";
             const isAuto = document.getElementById('auto_serial').checked;
+
+            if(!currentOrderId) return alert("خطأ: لم يتم تحديد رقم الطلب");
 
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             if(!db[currentOrderId]) db[currentOrderId] = [];
 
-            if(isAuto && type === "خدمة متنقلة") {
+            if(isAuto && type === "خدمة متنقلة" && serial !== "") {
                 for(let i=0; i<qty; i++){
-                    db[currentOrderId].push({ type, name, qty: 1, sub, serial, status: "جديد", date: new Date().toLocaleDateString('en-GB') });
+                    db[currentOrderId].push({ 
+                        type, name, qty: 1, sub, serial, 
+                        status: "جديد", 
+                        date: new Date().toLocaleDateString('en-GB'),
+                        mobile: "", user: "", note: "" 
+                    });
+                    // زيادة السريال برقم واحد (يدعم الأرقام الكبيرة جداً)
                     serial = serial.replace(/(\d+)(?!.*\d)/, n => (BigInt(n)+1n).toString().padStart(n.length, '0'));
                 }
             } else {
-                db[currentOrderId].push({ type, name, qty, sub, serial, status: "جديد", date: new Date().toLocaleDateString('en-GB') });
+                db[currentOrderId].push({ 
+                    type, name, qty, sub, serial, 
+                    status: "جديد", 
+                    date: new Date().toLocaleDateString('en-GB'),
+                    mobile: "", user: "", note: "", sai: "", coords: "", city: ""
+                });
             }
             
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
+            
+            // إضافة سجل نشاط
+            addLog(`تم إضافة ${isAuto ? qty : 1} منتج جديد (${name})`);
+            
             syncSumsToSales();
             renderProducts();
             closeModal();
+            
+            // تصغير القيم للمرة القادمة
+            document.getElementById('p_name').value = "";
+            document.getElementById('p_serial').value = "";
+            document.getElementById('p_sub').value = "";
         }
 
-        function deleteSelected() {
-            const chks = document.querySelectorAll('.row-checkbox:checked');
-            if(chks.length === 0) return;
-            if(!confirm("حذف العناصر المختارة؟")) return;
-            let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
-            const idxs = Array.from(chks).map(c => parseInt(c.dataset.index));
-            db[currentOrderId] = db[currentOrderId].filter((_, i) => !idxs.includes(i));
-            localStorage.setItem('asgate_products_db', JSON.stringify(db));
-            syncSumsToSales();
-            renderProducts();
-        }
-
-        function applyFilters() {
-            const q = document.getElementById('liveSearch').value.toLowerCase();
-            const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
-            const filtered = db.filter(p => (p.serial || '').toLowerCase().includes(q) || (p.user || '').toLowerCase().includes(q));
-            renderProducts(filtered);
+        function addLog(msg) {
+            let logs = JSON.parse(localStorage.getItem('asgate_logs') || '[]');
+            const now = new Date();
+            const meta = `👤 (أحمد) 🗓️ ${now.toLocaleDateString('en-GB')} ${now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'})}`;
+            logs.unshift({ orderId: currentOrderId, meta, msg });
+            localStorage.setItem('asgate_logs', JSON.stringify(logs.slice(0, 100)));
+            renderLogs();
         }
 
         function renderLogs() {
@@ -355,17 +384,57 @@
                 .map(l => `<div class="log-entry"><span class="log-user">${l.meta}:</span> ${l.msg}</div>`).join('');
         }
 
+        function deleteSelected() {
+            const chks = document.querySelectorAll('.row-checkbox:checked');
+            if(chks.length === 0) return;
+            if(!confirm("هل أنت متأكد من حذف العناصر المختارة؟")) return;
+            
+            let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+            const idxs = Array.from(chks).map(c => parseInt(c.dataset.index));
+            
+            db[currentOrderId] = db[currentOrderId].filter((_, i) => !idxs.includes(i));
+            localStorage.setItem('asgate_products_db', JSON.stringify(db));
+            
+            addLog(`تم حذف ${chks.length} عنصر من الطلب`);
+            syncSumsToSales();
+            renderProducts();
+        }
+
+        function applyFilters() {
+            const q = document.getElementById('liveSearch').value.toLowerCase();
+            const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
+            const filtered = db.filter(p => 
+                (p.serial || '').toLowerCase().includes(q) || 
+                (p.user || '').toLowerCase().includes(q) ||
+                (p.name || '').toLowerCase().includes(q)
+            );
+            renderProducts(filtered);
+        }
+
         function toggleAll(s) { document.querySelectorAll('.row-checkbox').forEach(c => c.checked = s.checked); calculateTotals(); }
-        function openModal() { document.getElementById('productModal').style.display = 'flex'; }
-        function closeModal() { document.getElementById('productModal').style.display = 'none'; }
-        function toggleSerialField() { document.getElementById('p_serial').disabled = document.getElementById('p_type').value !== "خدمة متنقلة"; }
+        
+        function openModal() { 
+            document.getElementById('productModal').style.display = 'flex'; 
+        }
+        
+        function closeModal() { 
+            document.getElementById('productModal').style.display = 'none'; 
+        }
+
+        function toggleSerialField() { 
+            const type = document.getElementById('p_type').value;
+            const serialSection = document.getElementById('serial_section');
+            // إظهار حقل السريال فقط في الخدمة المتنقلة أو تخصيصه
+            serialSection.style.display = (type === "خدمة متنقلة") ? "block" : "block"; 
+        }
         
         function exportToExcel() {
             const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
+            if(db.length === 0) return alert("لا توجد بيانات للتصدير");
             const ws = XLSX.utils.json_to_sheet(db);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Details");
-            XLSX.writeFile(wb, `Order_${currentOrderId}.xlsx`);
+            XLSX.utils.book_append_sheet(wb, ws, "Order_Details");
+            XLSX.writeFile(wb, `Order_${currentOrderId}_Details.xlsx`);
         }
     </script>
 </body>
