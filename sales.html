@@ -6,7 +6,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* الألوان الجديدة المطلوبة */
             --nav-shiny-navy: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
             --header-shiny-purple: linear-gradient(180deg, #4c1d95 0%, #2e1065 100%);
             
@@ -24,7 +23,6 @@
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
 
-        /* شريط الصفحات - كحلي لامع */
         .navbar { 
             background: var(--nav-shiny-navy); 
             display: flex; 
@@ -60,7 +58,6 @@
         .table-wrapper { background: var(--white); border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         
-        /* شريط العناوين - بنفسجي داكن لامع */
         th { 
             background: var(--header-shiny-purple); 
             padding: 12px 5px; 
@@ -72,7 +69,6 @@
             text-shadow: 0 1px 2px rgba(0,0,0,0.3);
             position: relative;
         }
-        /* إضافة تأثير اللمعان الزجاجي على العناوين */
         th::after {
             content: "";
             position: absolute;
@@ -146,16 +142,17 @@
         <table id="salesTable">
             <thead>
                 <tr>
-                    <th style="width: 10%;">رقم الطلب</th>
-                    <th style="width: 13%;">اسم الطلب</th>
-                    <th style="width: 11%;">تاريخ الإنشاء</th>
-                    <th style="width: 15%;">الشركة</th>
+                    <th style="width: 8%;">رقم الطلب</th>
+                    <th style="width: 12%;">اسم الطلب</th>
+                    <th style="width: 10%;">تاريخ الإنشاء</th>
+                    <th style="width: 13%;">الشركة</th>
                     <th style="width: 10%;">السجل الرئيسي</th>
                     <th style="width: 10%;">السجل الفرعي</th>
                     <th style="width: 10%;">الحالة</th>
-                    <th style="width: 6%;">مكتمل</th>
-                    <th style="width: 6%;">معلق</th>
-                    <th style="width: 9%;">ملاحظات</th>
+                    <th style="width: 5%;">مكتمل</th>
+                    <th style="width: 5%;">معلق</th>
+                    <th style="width: 10%;">ملاحظات</th>
+                    <th style="width: 7%;">رقم الفرصة</th>
                 </tr>
             </thead>
             <tbody id="salesBody"></tbody>
@@ -202,7 +199,7 @@
         const days = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
         const dayName = days[d.getDay()];
         const dateStr = d.getDate().toString().padStart(2, '0') + '/' + (d.getMonth() + 1).toString().padStart(2, '0') + '/' + d.getFullYear();
-        return `👤 (اسم الموظف)    🗓️ ${dayName}    ${dateStr}`;
+        return `👤 (أحمد) &nbsp;&nbsp; 🗓️ ${dayName} &nbsp;&nbsp; ${dateStr}`;
     }
 
     function markAsChanged() { document.getElementById('saveBtn').classList.add('active'); }
@@ -248,7 +245,8 @@
             cr: document.getElementById('mCr').value,
             crSub: document.getElementById('mCrSub').value,
             status: "جديد",
-            notes: ""
+            notes: "",
+            oppNum: "-"
         };
         renderTableRow(data);
         markAsChanged();
@@ -279,6 +277,7 @@
                 <div class="notes-preview" onclick="openNote(this)" data-full-notes="${obj.notes || ''}">${getLastNoteOnly(obj.notes)}</div>
                 <div class="tooltip-box">${obj.notes || 'لا توجد ملاحظات'}</div>
             </td>
+            <td class="editable" contenteditable="true" oninput="markAsChanged()">${obj.oppNum || '-'}</td>
         `;
     }
 
@@ -327,7 +326,8 @@
             cr: r.cells[4].innerText,
             crSub: r.cells[5].innerText,
             status: r.cells[6].querySelector('select').value,
-            notes: r.cells[9].querySelector('.notes-preview').getAttribute('data-full-notes')
+            notes: r.cells[9].querySelector('.notes-preview').getAttribute('data-full-notes'),
+            oppNum: r.cells[10].innerText
         }));
         localStorage.setItem('asgate_sales_db', JSON.stringify(salesData));
         markAsSaved();
