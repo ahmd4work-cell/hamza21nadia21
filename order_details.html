@@ -5,58 +5,86 @@
     <title>تفاصيل الطلب | ASGate</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --nav-bg: #2e1065; --header-green: #15803d; --bg-color: #f4f7f9; --white: #ffffff; --border-color: #cbd5e1; }
+        :root {
+            --nav-bg: #2e1065;
+            --header-green: #15803d;
+            --bg-color: #f4f7f9;
+            --white: #ffffff;
+            --border-color: #cbd5e1;
+            --text-dark: #1e293b;
+        }
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; padding: 0; }
-        .navbar { background-color: var(--nav-bg); display: flex; align-items: center; padding: 0 20px; height: 37px; }
-        .navbar a { color: white; text-decoration: none; padding: 0 15px; font-size: 12px; font-weight: 700; }
-        .container { padding: 20px; }
-        .header-card { background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; margin-bottom: 20px; }
+        
+        .navbar { background-color: var(--nav-bg); display: flex; align-items: center; padding: 0 20px; height: 37px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .navbar a { color: white; text-decoration: none; padding: 0 15px; font-size: 12px; font-weight: 700; transition: 0.3s; }
+        .navbar a:hover { opacity: 0.8; }
+
+        .container { padding: 20px; max-width: 1200px; margin: auto; }
+        
+        .header-card { 
+            background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); 
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
         .info-box { text-align: center; }
-        .info-label { font-size: 11px; color: #64748b; display: block; }
-        .info-val { font-weight: 800; font-size: 15px; color: var(--nav-bg); }
-        .table-wrapper { background: white; border-radius: 10px; border: 1px solid var(--border-color); overflow: hidden; }
+        .info-label { font-size: 11px; color: #64748b; display: block; margin-bottom: 2px; }
+        .info-val { font-weight: 800; font-size: 16px; color: var(--nav-bg); }
+        
+        .total-highlight { border: 2px solid var(--header-green); padding: 8px 20px; border-radius: 10px; background: #f0fdf4; }
+
+        .table-wrapper { background: white; border-radius: 10px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; text-align: center; }
-        thead th { background: var(--header-green); color: white; padding: 10px; font-size: 12px; }
-        td { border: 1px solid #f1f5f9; padding: 10px; font-size: 13px; }
-        .status-select { font-family: 'Cairo'; padding: 5px; border-radius: 5px; width: 100%; }
-        .btn { border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; }
-        .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; }
-        .modal-content { background:white; padding:20px; border-radius:12px; width:300px; }
-        .modal-content input { width:100%; padding:8px; margin-bottom:10px; box-sizing:border-box; }
+        thead th { background: var(--header-green); color: white; padding: 12px; font-size: 12px; font-weight: 700; }
+        td { border-bottom: 1px solid #f1f5f9; padding: 12px; font-size: 13px; color: var(--text-dark); }
+        tbody tr:nth-child(even) { background-color: #f8fafc; }
+
+        .status-select { font-family: 'Cairo'; padding: 4px; border-radius: 5px; width: 100%; border: 1px solid var(--border-color); font-size: 11px; font-weight: 700; }
+        
+        .btn-group { margin-bottom: 15px; display: flex; gap: 10px; }
+        .btn { border: none; padding: 8px 18px; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; font-size: 12px; transition: 0.3s; }
+        .btn-add { background: #3b82f6; color: white; }
+        .btn-delete { background: #dc2626; color: white; }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        .modal { display: none; position: fixed; z-index: 1000; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; }
+        .modal-content { background:white; padding:25px; border-radius:12px; width:320px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-content h3 { margin-top: 0; font-size: 16px; color: var(--nav-bg); margin-bottom: 15px; }
+        .modal-content input { width:100%; padding:10px; margin-bottom:12px; border: 1px solid var(--border-color); border-radius: 6px; box-sizing:border-box; font-family: 'Cairo'; }
     </style>
 </head>
 <body onload="loadOrderDetails()">
 
 <nav class="navbar">
-    <a href="sales.html">➡️ العودة للمبيعات</a>
+    <a href="sales.html">➡️ العودة لجدول المبيعات</a>
 </nav>
 
 <div class="container">
     <div class="header-card">
         <div class="info-box"><span class="info-label">رقم الطلب</span><span class="info-val" id="orderId">-</span></div>
         <div class="info-box"><span class="info-label">الشركة</span><span class="info-val" id="orderComp">-</span></div>
-        <div class="info-box" style="border: 2px solid var(--header-green); padding: 5px 15px; border-radius: 8px;">
-            <span class="info-label">إجمالي الطلب</span><span class="info-val" id="orderTotalSum">0.00 ر.س</span>
+        <div class="info-box total-highlight">
+            <span class="info-label">إجمالي القيمة</span>
+            <span class="info-val" id="orderTotalSum" style="color: var(--header-green);">0.00 ر.س</span>
         </div>
     </div>
 
-    <div style="margin-bottom: 10px; display: flex; gap: 10px;">
-        <button class="btn" style="background: #3b82f6; color:white;" onclick="openModal()">+ إضافة منتج</button>
-        <button class="btn" style="background: #dc2626; color:white;" onclick="deleteSelected()">حذف المحدد</button>
+    <div class="btn-group">
+        <button class="btn btn-add" onclick="openModal()">+ إضافة منتج/خدمة</button>
+        <button class="btn btn-delete" onclick="deleteSelected()">حذف العناصر المحددة</button>
     </div>
 
     <div class="table-wrapper">
         <table>
             <thead>
                 <tr>
-                    <th><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>
-                    <th>النوع</th>
-                    <th>التفاصيل</th>
-                    <th>العدد</th>
-                    <th>الاشتراك</th>
-                    <th>الإجمالي</th>
-                    <th>الحالة</th>
-                    <th>ملاحظة</th>
+                    <th style="width: 5%;"><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>
+                    <th style="width: 15%;">النوع</th>
+                    <th style="width: 25%;">التفاصيل</th>
+                    <th style="width: 10%;">العدد</th>
+                    <th style="width: 12%;">السعر</th>
+                    <th style="width: 12%;">الإجمالي</th>
+                    <th style="width: 12%;">الحالة</th>
+                    <th style="width: 15%;">ملاحظة</th>
                 </tr>
             </thead>
             <tbody id="productsBody"></tbody>
@@ -66,12 +94,12 @@
 
 <div id="productModal" class="modal">
     <div class="modal-content">
-        <h3>إضافة منتج</h3>
-        <input type="text" id="p_name" placeholder="اسم المنتج/الخدمة">
-        <input type="number" id="p_qty" value="1" placeholder="العدد">
-        <input type="text" id="p_sub" placeholder="سعر الاشتراك">
-        <button class="btn" style="background:var(--header-green); color:white; width:100%;" onclick="saveProduct()">حفظ</button>
-        <button class="btn" style="width:100%; margin-top:5px;" onclick="closeModal()">إلغاء</button>
+        <h3>إضافة عنصر جديد</h3>
+        <input type="text" id="p_name" placeholder="اسم المنتج أو الخدمة">
+        <input type="number" id="p_qty" value="1" min="1" placeholder="الكمية">
+        <input type="number" id="p_sub" step="0.01" placeholder="سعر الوحدة (ر.س)">
+        <button class="btn btn-add" style="width:100%; margin-bottom:8px;" onclick="saveProduct()">حفظ العنصر</button>
+        <button class="btn" style="width:100%; background:#f1f5f9; color:#475569;" onclick="closeModal()">إلغاء</button>
     </div>
 </div>
 
@@ -79,6 +107,7 @@
     let currentOrderId = new URLSearchParams(window.location.search).get('id');
 
     function loadOrderDetails() {
+        if (!currentOrderId) return;
         const salesDb = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
         const order = salesDb.find(o => String(o.id) === String(currentOrderId));
         if (order) {
@@ -92,25 +121,26 @@
         const productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
         const products = productsDb[currentOrderId] || [];
         const tbody = document.getElementById('productsBody');
+        
         tbody.innerHTML = products.map((p, index) => {
             const subVal = parseFloat(p.sub) || 0;
             const lineTotal = (p.qty * subVal).toFixed(2);
             return `
                 <tr>
                     <td><input type="checkbox" class="row-checkbox" data-index="${index}"></td>
-                    <td>${p.type || 'خدمة'}</td>
+                    <td>عنصر بيع</td>
                     <td>${p.name}</td>
                     <td>${p.qty}</td>
-                    <td>${subVal}</td>
-                    <td style="font-weight:800; color:green;">${lineTotal}</td>
+                    <td>${subVal.toLocaleString()}</td>
+                    <td style="font-weight:800; color:#15803d;">${parseFloat(lineTotal).toLocaleString()}</td>
                     <td>
                         <select class="status-select" onchange="updateStatus(${index}, this.value)">
                             <option value="جديد" ${p.status==='جديد'?'selected':''}>جديد</option>
-                            <option value="مكتمل" ${p.status==='مكتمل'?'selected':''}>مكتمل</option>
-                            <option value="معلق" ${p.status==='معلق'?'selected':''}>معلق</option>
+                            <option value="مكتمل" ${p.status==='مكتمل'?'selected':''}>مكتمل ✅</option>
+                            <option value="معلق" ${p.status==='معلق'?'selected':''}>معلق ⏳</option>
                         </select>
                     </td>
-                    <td contenteditable="true" onblur="updateNote(${index}, this.innerText)">${p.note || ''}</td>
+                    <td contenteditable="true" style="font-size:11px;" onblur="updateNote(${index}, this.innerText)">${p.note || '-'}</td>
                 </tr>
             `;
         }).join('');
@@ -123,15 +153,15 @@
         let completed = 0, pending = 0, total = 0;
 
         products.forEach(p => {
-            const lineTotal = (p.qty * (parseFloat(p.sub) || 0));
+            const lineTotal = (parseFloat(p.qty) * (parseFloat(p.sub) || 0));
             total += lineTotal;
             if (p.status === "مكتمل") completed += lineTotal;
             if (p.status === "معلق") pending += lineTotal;
         });
 
-        document.getElementById('orderTotalSum').innerText = total.toFixed(2) + " ر.س";
+        document.getElementById('orderTotalSum').innerText = total.toLocaleString(undefined, {minimumFractionDigits: 2}) + " ر.س";
 
-        // تحديث صفحة المبيعات في الـ LocalStorage
+        // تحديث المبيعات في التخزين المحلي
         let salesDb = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
         let idx = salesDb.findIndex(o => String(o.id) === String(currentOrderId));
         if (idx !== -1) {
@@ -146,14 +176,22 @@
         db[currentOrderId][index].status = newStatus;
         localStorage.setItem('asgate_products_db', JSON.stringify(db));
         syncSumsToSales();
-        renderProducts(); // لإعادة التلوين أو التحديث البصري
+        renderProducts();
+    }
+
+    function updateNote(index, newNote) {
+        let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+        db[currentOrderId][index].note = newNote;
+        localStorage.setItem('asgate_products_db', JSON.stringify(db));
     }
 
     function saveProduct() {
         const name = document.getElementById('p_name').value;
-        const qty = parseInt(document.getElementById('p_qty').value) || 1;
-        const sub = document.getElementById('p_sub').value;
+        const qty = parseFloat(document.getElementById('p_qty').value) || 1;
+        const sub = parseFloat(document.getElementById('p_sub').value) || 0;
         
+        if (!name) return alert("يرجى إدخال اسم المنتج");
+
         let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
         if (!db[currentOrderId]) db[currentOrderId] = [];
         
@@ -162,21 +200,29 @@
         
         renderProducts();
         closeModal();
+        // تصفير الحقول
+        document.getElementById('p_name').value = '';
+        document.getElementById('p_sub').value = '';
     }
 
     function deleteSelected() {
         const checked = document.querySelectorAll('.row-checkbox:checked');
-        if (checked.length === 0) return;
+        if (checked.length === 0 || !confirm("هل أنت متأكد من حذف العناصر المختارة؟")) return;
+        
         let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
-        const indexes = Array.from(checked).map(c => parseInt(c.dataset.index));
-        db[currentOrderId] = db[currentOrderId].filter((_, i) => !indexes.includes(i));
+        const indexesToDelete = Array.from(checked).map(c => parseInt(c.dataset.index));
+        
+        db[currentOrderId] = db[currentOrderId].filter((_, i) => !indexesToDelete.includes(i));
         localStorage.setItem('asgate_products_db', JSON.stringify(db));
+        
+        document.getElementById('selectAll').checked = false;
         renderProducts();
     }
 
     function toggleAll(source) {
         document.querySelectorAll('.row-checkbox').forEach(c => c.checked = source.checked);
     }
+    
     function openModal() { document.getElementById('productModal').style.display = 'flex'; }
     function closeModal() { document.getElementById('productModal').style.display = 'none'; }
 </script>
