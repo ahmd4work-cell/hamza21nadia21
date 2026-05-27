@@ -49,7 +49,7 @@
         .btn-top { border: none; padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; color: white; transition: 0.3s; }
         .btn-add { background-color: var(--accent-blue); }
         
-        #save-status-indicator { display: none; } /* تم الإخفاء بناءً على طلبك */
+        #save-status-indicator { display: none; }
 
         .search-box { padding: 0 15px; border: 1px solid var(--border-color); border-radius: 8px; width: 300px; height: 32px; font-family: 'Cairo'; font-size: 11px; outline: none; }
 
@@ -71,6 +71,10 @@
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); position: relative; }
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
         
+        /* تنسيق صف نهاية الشهر */
+        .month-separator { height: 20px !important; background: #2e1065 !important; color: white !important; font-family: 'Cascadia Code', monospace; font-size: 10px; font-weight: bold; }
+        .month-separator td { height: 20px !important; color: white !important; border: none; }
+
         .editable { cursor: text; outline: none; transition: 0.2s; min-height: 20px; }
         .editable:focus { background-color: #fff; box-shadow: inset 0 0 0 2px var(--accent-blue); border-radius: 4px; }
 
@@ -96,10 +100,10 @@
         .order-link { color: var(--accent-blue); text-decoration: none; font-weight: 800; border-bottom: 1px dashed var(--accent-blue); cursor: pointer; }
 
         .log-section { background: #fff; padding: 15px; border-radius: 10px; border: 1px solid var(--border-color); margin-top: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .log-title { font-weight: 800; font-size: 13px; color: var(--nav-bg); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .log-title { font-weight: 800; font-size: 13px; color: var(--nav-bg); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
         
-        /* تحسين المسافات في سجل النشاط */
-        .log-entry { font-size: 11px; padding: 2px 0; border-bottom: 1px solid #f8fafc; color: #334155; white-space: pre-wrap; line-height: 1.4; }
+        /* تعديل المسافات في سجل النشاط لتكون متقاربة جداً */
+        .log-entry { font-size: 11px; padding: 0; margin: 0; border-bottom: 1px solid #f8fafc; color: #334155; white-space: pre-wrap; line-height: 1; }
         .log-user { color: var(--accent-blue); font-weight: 800; }
 
         .modal { display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
@@ -129,7 +133,8 @@
 <div class="container">
     <div class="action-bar">
         <button class="btn-top btn-add" onclick="openOrderModal()">+ إنشاء طلب مبيعات جديد</button>
-        <span id="save-status-indicator"></span> <input type="text" class="search-box" id="globalSearch" placeholder="🔍 بحث في الجدول..." onkeyup="filterSalesTable()">
+        <span id="save-status-indicator"></span> 
+        <input type="text" class="search-box" id="globalSearch" placeholder="🔍 بحث في الجدول..." onkeyup="filterSalesTable()">
     </div>
     
     <div class="table-wrapper">
@@ -194,7 +199,7 @@
     let currentActivePreview = null;
 
     function autoSave(actionDescription) {
-        const rows = document.querySelectorAll('#salesBody tr');
+        const rows = document.querySelectorAll('#salesBody tr:not(.month-separator)');
         const salesData = Array.from(rows).map(r => ({
             id: r.cells[0].innerText.replace('#', ''),
             type: r.cells[1].innerText,
@@ -252,6 +257,7 @@
         const comp = document.getElementById('mComp').value;
         const type = document.getElementById('mType').value || '-';
         if (!comp) return alert("اختر شركة أولاً");
+        
         const data = {
             id: Math.floor(1000 + Math.random() * 8999),
             type: type,
@@ -261,11 +267,36 @@
             crSub: document.getElementById('mCrSub').value,
             status: "جديد",
             notes: "",
-            oppNum: "" // تم إزالة علامة الـ - هنا
+            oppNum: ""
         };
+
+        // فحص تغيير الشهر قبل الإضافة
+        checkMonthTransition(data.date);
+
         renderTableRow(data);
         autoSave(`إنشاء طلب مبيعات جديد برقم #${data.id} للشركة: ${comp}`);
         closeOrderModal();
+    }
+
+    function checkMonthTransition(newDateStr) {
+        const saved = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
+        if (saved.length === 0) return;
+
+        const lastOrderDateStr = saved[saved.length - 1].date; // آخر طلب مضاف زمنياً
+        const lastParts = lastOrderDateStr.split('/');
+        const newParts = newDateStr.split('/');
+
+        // إذا اختلف الشهر أو السنة
+        if (lastParts[1] !== newParts[1] || lastParts[2] !== newParts[2]) {
+            insertMonthSeparator();
+        }
+    }
+
+    function insertMonthSeparator() {
+        const tbody = document.getElementById('salesBody');
+        const row = tbody.insertRow(0);
+        row.className = "month-separator";
+        row.innerHTML = `<td colspan="11">بالتوفيق في الشهر القادم ان شاء الله</td>`;
     }
 
     function renderTableRow(obj) {
@@ -322,14 +353,27 @@
 
     function loadSalesFromStorage() {
         const saved = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
-        document.getElementById('salesBody').innerHTML = "";
-        saved.reverse().forEach(item => renderTableRow(item));
+        const tbody = document.getElementById('salesBody');
+        tbody.innerHTML = "";
+        
+        // عرض البيانات مع الفواصل التاريخية
+        let lastMonth = "";
+        saved.forEach((item, index) => {
+            const currentMonth = item.date.split('/')[1] + '/' + item.date.split('/')[2];
+            if (index > 0 && lastMonth !== currentMonth) {
+                insertMonthSeparator();
+            }
+            renderTableRow(item);
+            lastMonth = currentMonth;
+        });
     }
 
     function filterSalesTable() {
         const q = document.getElementById('globalSearch').value.toLowerCase();
         document.querySelectorAll('#salesBody tr').forEach(r => {
-            r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none";
+            if(!r.classList.contains('month-separator')) {
+                r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none";
+            }
         });
     }
 
