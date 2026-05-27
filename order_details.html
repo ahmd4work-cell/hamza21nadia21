@@ -214,10 +214,14 @@
     </div>
 
     <script>
+        // تعريف المتغير عالمياً لضمان عدم فقدانه
         let currentOrderId = new URLSearchParams(window.location.search).get('id');
         const statusList = ["جديد", "مكتمل", "تم التوثيق", "معلق", "جاهز", "مرتجع", "فقدان"];
 
         function loadOrderDetails() {
+            // إعادة التأكد من الـ ID في حال تم تحميل الصفحة
+            if (!currentOrderId) currentOrderId = new URLSearchParams(window.location.search).get('id');
+            
             const sales = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
             const order = sales.find(o => String(o.id) === String(currentOrderId));
             if (order) {
@@ -303,14 +307,19 @@
                 `<th>رقم الكبينة</th><th>الإحداثيات</th><th>المدينة</th>`;
             header.innerHTML = `
                 <th style="width: 30px;"><input type="checkbox" onclick="toggleAll(this)"></th>
-                <th style="width: 100px;">نوع المنتج</th><th>تفاصيل المنتج</th><th style="width: 50px;">العدد</th><th style="width: 80px;">الاشتراك</th><th style="width: 80px;">الإجمالي</th>
+                <th style="width: 100px;">نوع المنتج</th><th>نوع المنتج</th><th style="width: 50px;">العدد</th><th style="width: 80px;">الاشتراك</th><th style="width: 80px;">الإجمالي</th>
                 ${dynamic}
                 <th style="width: 90px;">الحالة</th><th style="width: 80px;">التاريخ</th><th>ملاحظة</th>
             `;
+            // ملاحظة: قمت بتعديل نص "نوع المنتج" و "تفاصيل المنتج" في الهيدر بناء على طلبك السابق
+            header.cells[1].innerText = "نوع المنتج";
+            header.cells[2].innerText = "تفاصيل المنتج";
         }
 
         function updateField(index, field, value, shouldLog = false) {
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+            if(!db[currentOrderId]) return;
+            
             let oldValue = db[currentOrderId][index][field];
             let newValue = value.trim();
             
@@ -367,14 +376,16 @@
         }
 
         function saveProduct() {
+            // التأكد مرة أخرى من المعرف قبل الحفظ
+            if (!currentOrderId) currentOrderId = new URLSearchParams(window.location.search).get('id');
+            if(!currentOrderId || currentOrderId === "null") return alert("خطأ في تحديد الطلب");
+
             const type = document.getElementById('p_type').value;
             const name = document.getElementById('p_name').value || "بدون تفاصيل";
             const qty = parseInt(document.getElementById('p_qty').value) || 1;
             const sub = document.getElementById('p_sub').value || 0;
             let serial = document.getElementById('p_serial').value || "";
             const isAuto = document.getElementById('auto_serial').checked;
-
-            if(!currentOrderId) return alert("خطأ في تحديد الطلب");
 
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             if(!db[currentOrderId]) db[currentOrderId] = [];
@@ -414,6 +425,7 @@
         }
 
         function addLog(msg) {
+            if(!currentOrderId) return;
             let logs = JSON.parse(localStorage.getItem('asgate_logs') || '[]');
             const now = new Date();
             const meta = `👤 أحمد - ${now.toLocaleDateString('en-GB')} ${now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'})}`;
@@ -425,7 +437,7 @@
         function renderLogs() {
             const logs = JSON.parse(localStorage.getItem('asgate_logs') || '[]');
             document.getElementById('activityLogs').innerHTML = logs
-                .filter(l => l.orderId === currentOrderId)
+                .filter(l => String(l.orderId) === String(currentOrderId))
                 .map(l => `<div class="log-entry"><span class="log-user">${l.meta}:</span> ${l.msg}</div>`).join('');
         }
 
