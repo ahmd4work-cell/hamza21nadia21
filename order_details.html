@@ -63,7 +63,8 @@
             background-color: var(--header-green) !important; height: 37px; line-height: 37px;
             padding: 0 5px; color: white !important; font-size: 11px; font-weight: 800; text-align: center; 
             position: sticky; top: 174px; z-index: 1300; font-family: 'Cairo'; 
-            border: 0.5px solid rgba(255,255,255,0.2);
+            /* تم إزالة الحدود الجانبية لجعل الشريط يبدو قطعة واحدة */
+            border: none; 
         }
         
         td { border: 0.5px solid var(--light-border); text-align: center; height: 37px; line-height: 37px; font-size: 13px; font-weight: 500; color: var(--text-dark); padding: 0 5px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
@@ -94,7 +95,6 @@
         .modal-content { background: white; padding: 20px; border-radius: 12px; width: 20%; min-width: 300px; }
         .modal-content input, .modal-content select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Cairo'; margin-bottom: 10px; box-sizing: border-box; font-size: 12px; }
         
-        /* تنسيق الحقل المعطل */
         .modal-content input:disabled, .modal-content select:disabled { background-color: #e2e8f0; color: #94a3b8; cursor: not-allowed; border-color: #cbd5e1; }
 
         .serial-container { 
@@ -361,7 +361,6 @@
             });
         }
 
-        // وظيفة التحكم الاحترافية في حقل السريال
         function toggleSerialField() {
             const type = document.getElementById('p_type').value;
             const serialInput = document.getElementById('p_serial');
@@ -372,7 +371,7 @@
                 autoCheck.disabled = false;
             } else {
                 serialInput.disabled = true;
-                serialInput.value = ""; // تفريغ الحقل عند التعطيل
+                serialInput.value = ""; 
                 autoCheck.disabled = true;
                 autoCheck.checked = false;
             }
@@ -429,7 +428,7 @@
 
         function openModal() { 
             document.getElementById('productModal').style.display = 'flex'; 
-            toggleSerialField(); // للتأكد من حالة الحقل عند الفتح
+            toggleSerialField(); 
         }
         function closeModal() { document.getElementById('productModal').style.display = 'none'; }
         
