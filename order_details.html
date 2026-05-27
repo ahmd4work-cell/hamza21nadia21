@@ -72,23 +72,26 @@
         .table-footer { background-color: #000; color: #fff; height: 37px; font-family: 'Cairo'; }
         .table-footer td { color: #fff; border: none; font-weight: 800; font-size: 12px; height: 37px; line-height: 37px; }
 
-        /* سجل النشاط المحدث */
+        /* سجل النشاط المطور */
         .log-section { background: #fff; padding: 15px; border-radius: 10px; border: 1px solid var(--border-color); margin-top: 10px; }
-        .log-title-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .log-title { font-weight: 800; font-size: 13px; color: var(--nav-bg); display: flex; align-items: center; gap: 8px; margin: 0; }
-        .log-entry { font-size: 12px; padding: 6px 0; border-bottom: 1px solid #f8fafc; color: #334155; display: flex; justify-content: space-between; align-items: center; }
-        .log-user { color: var(--accent-blue); font-weight: 800; }
-        .file-link { color: var(--header-green); text-decoration: underline; cursor: pointer; font-weight: 700; margin-right: 10px; }
+        .log-title { font-weight: 800; font-size: 13px; color: var(--nav-bg); margin-bottom: 12px; display: block; }
+        
+        .log-input-container { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid var(--light-border); }
+        .log-text-input { flex-grow: 1; border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px; font-family: 'Cairo'; font-size: 12px; outline: none; }
+        .log-entry { font-size: 12px; padding: 8px 0; border-bottom: 1px solid #f1f5f9; color: #334155; display: flex; justify-content: space-between; align-items: center; }
+        .log-user { color: var(--accent-blue); font-weight: 800; margin-left: 5px; }
+        .file-attachment { display: inline-flex; align-items: center; background: #f1f5f9; padding: 2px 8px; border-radius: 4px; color: var(--header-green); text-decoration: none; font-weight: 700; cursor: pointer; border: 1px solid #cbd5e1; font-size: 11px; margin-top: 4px; }
+        .file-attachment:hover { background: #e2e8f0; }
 
         .btn { border: none; padding: 0 15px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 11px; color: white; display: flex; align-items: center; gap: 5px; box-sizing: border-box; }
         .btn-add { background: var(--accent-blue); height: 35px; }
         .btn-export { background: var(--header-green); height: 25px; }
         .btn-print { background: #64748b; height: 25px; }
         .btn-delete-multi { background: var(--danger-red); height: 25px; }
-        .btn-attach { background: #475569; height: 28px; font-size: 10px; }
+        .btn-send-log { background: var(--nav-bg); height: 32px; }
+        .btn-attach-log { background: #64748b; height: 32px; width: 40px; justify-content: center; padding: 0; }
 
         .status-select { font-family: 'Cairo'; font-size: 10px; font-weight: 700; padding: 2px; border-radius: 6px; width: 95%; cursor: pointer; border: 1px solid var(--border-color); height: 28px; }
-        
         .status-mektamel { background-color: #15803d !important; color: white !important; }
         .status-tawtheeq { background-color: var(--soft-green) !important; color: #166534 !important; }
         .status-moallaq { background-color: var(--warning-yellow) !important; color: #854d0e !important; }
@@ -102,14 +105,14 @@
         .modal-content h3 { margin-top: 0; margin-bottom: 15px; font-size: 15px; text-align: center; color: var(--nav-bg); }
         .modal-content input, .modal-content select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-family: 'Cairo'; margin-bottom: 12px; box-sizing: border-box; font-size: 12px; outline: none; }
 
-        .input-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 0; }
+        .input-row { display: flex; gap: 10px; align-items: flex-start; }
         .input-row > div { flex: 1; }
 
         .no-arrows::-webkit-inner-spin-button, .no-arrows::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         .no-arrows { -moz-appearance: textfield; }
 
         @media print {
-            .navbar, .sticky-top-section, .btn, .search-wrapper, .modal, .log-section { display: none !important; }
+            .navbar, .sticky-top-section, .btn, .search-wrapper, .modal, .log-section, .log-input-container { display: none !important; }
             .table-wrapper { border: none; box-shadow: none; }
             table { width: 100%; min-width: 100%; table-layout: auto; }
             th { position: static !important; background-color: #f1f1f1 !important; color: black !important; border: 1px solid #000 !important; }
@@ -175,12 +178,12 @@
         </div>
 
         <div class="log-section">
-            <div class="log-title-container">
-                <h3 class="log-title">سجل النشاط</h3>
-                <div>
-                    <input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect(this)">
-                    <button class="btn btn-attach" onclick="document.getElementById('fileInput').click()">📎 إرفاق ملف</button>
-                </div>
+            <span class="log-title">سجل النشاط والتواصل</span>
+            <div class="log-input-container">
+                <input type="text" id="logMsg" class="log-text-input" placeholder="اكتب رسالة أو ملاحظة هنا...">
+                <input type="file" id="logFile" style="display:none" onchange="processFileAndSend()">
+                <button class="btn btn-attach-log" onclick="document.getElementById('logFile').click()" title="إرفاق ملف">📎</button>
+                <button class="btn btn-send-log" onclick="processTextOnly()">إرسال</button>
             </div>
             <div id="activityLogs"></div>
         </div>
@@ -218,7 +221,7 @@
         const statusOptions = ["جديد", "مكتمل", "تم التوثيق", "معلق", "جاهز", "مرتجع", "فقدان"];
 
         function loadOrderDetails() {
-            if (!currentOrderId) currentOrderId = new URLSearchParams(window.location.search).get('id');
+            if (!currentOrderId) return;
             const sales = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
             const order = sales.find(o => String(o.id) === String(currentOrderId));
             if (order) {
@@ -232,26 +235,32 @@
             }
         }
 
-        function handleFileSelect(input) {
-            const file = input.files[0];
-            if (!file) return;
+        // معالجة سجل النشاط
+        function processTextOnly() {
+            const msg = document.getElementById('logMsg').value.trim();
+            if(!msg) return;
+            addLog(msg, null);
+            document.getElementById('logMsg').value = '';
+        }
+
+        function processFileAndSend() {
+            const fileInput = document.getElementById('logFile');
+            const msgInput = document.getElementById('logMsg');
+            const file = fileInput.files[0];
+            if(!file) return;
+
             const reader = new FileReader();
             reader.onload = function(e) {
                 const fileData = e.target.result;
-                addLog(`إرفاق ملف: ${file.name}`, { name: file.name, data: fileData });
-                input.value = ''; // Reset input
+                const msg = msgInput.value.trim() || `تم إرفاق ملف: ${file.name}`;
+                addLog(msg, { name: file.name, data: fileData });
+                fileInput.value = '';
+                msgInput.value = '';
             };
             reader.readAsDataURL(file);
         }
 
-        function downloadFile(data, name) {
-            const link = document.createElement('a');
-            link.href = data;
-            link.download = name;
-            link.click();
-        }
-
-        function addLog(msg, fileObj = null) {
+        function addLog(msg, fileObj) {
             let logs = JSON.parse(localStorage.getItem('asgate_logs') || '[]');
             const now = new Date();
             const meta = `👤 أحمد - ${now.toLocaleDateString('en-GB')} ${now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'})}`;
@@ -262,17 +271,28 @@
 
         function renderLogs() {
             const logs = JSON.parse(localStorage.getItem('asgate_logs') || '[]');
-            document.getElementById('activityLogs').innerHTML = logs
+            const container = document.getElementById('activityLogs');
+            container.innerHTML = logs
                 .filter(l => String(l.orderId) === String(currentOrderId))
                 .map(l => `
                     <div class="log-entry">
-                        <div><span class="log-user">${l.meta}:</span> ${l.msg}</div>
-                        ${l.file ? `<span class="file-link" onclick="downloadFile('${l.file.data}', '${l.file.name}')">📥 تحميل (${l.file.name})</span>` : ''}
+                        <div>
+                            <span class="log-user">${l.meta}:</span> 
+                            <span>${l.msg}</span>
+                            ${l.file ? `<br><a class="file-attachment" onclick="downloadFile('${l.file.data}', '${l.file.name}')">📥 ${l.file.name}</a>` : ''}
+                        </div>
                     </div>
                 `).join('');
         }
 
-        // باقي وظائف الصفحة الأصلية
+        function downloadFile(data, name) {
+            const link = document.createElement('a');
+            link.href = data;
+            link.download = name;
+            link.click();
+        }
+
+        // وظائف الجدول والمنتجات
         function handleTypeChange() {
             const type = document.getElementById('p_type').value;
             const serialInput = document.getElementById('p_serial');
@@ -284,35 +304,35 @@
         function renderProducts(filtered = null) {
             const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             let items = (filtered || db[currentOrderId] || []).map((p, i) => ({...p, originalIndex: i}));
-            items.sort((a, b) => {
-                if (a.status === "فقدان" && b.status !== "فقدان") return 1;
-                if (a.status !== "فقدان" && b.status === "فقدان") return -1;
-                return (b.updatedAt || 0) - (a.updatedAt || 0);
-            });
+            items.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+            
             updateTableHeaders(items.length > 0 ? items[0].type : "خدمة متنقلة");
             const tbody = document.getElementById('productsBody');
             tbody.innerHTML = '';
+            
             items.forEach((p) => {
                 const subVal = parseFloat(p.sub) || 0;
                 const lineTotal = (parseInt(p.qty) || 0) * subVal;
                 let sClass = p.status === "مكتمل" ? "status-mektamel" : (p.status === "تم التوثيق" ? "status-tawtheeq" : (p.status === "معلق" ? "status-moallaq" : (p.status === "مرتجع" ? "status-mortaja" : "")));
                 const locked = ["مكتمل", "تم التوثيق", "معلق"].includes(p.status);
+                
                 let dynamic = (p.type === "خدمة متنقلة") ? `
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'serial',this.innerText,true)">${p.serial||''}</td>
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'mobile',this.innerText,true)">${p.mobile||''}</td>
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'user',this.innerText,true)">${p.user||''}</td>` : `
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'sai',this.innerText,true)">${p.sai||''}</td>
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'coords',this.innerText,true)">${p.coords||''}</td>
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'city',this.innerText,true)">${p.city||''}</td>`;
+                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'serial',this.innerText)">${p.serial||''}</td>
+                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'mobile',this.innerText)">${p.mobile||''}</td>
+                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'user',this.innerText)">${p.user||''}</td>` : `
+                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'sai',this.innerText)">${p.sai||''}</td>
+                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'coords',this.innerText)">${p.coords||''}</td>
+                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'city',this.innerText)">${p.city||''}</td>`;
+
                 tbody.innerHTML += `<tr class="${locked?'row-locked':''}">
                     <td><input type="checkbox" class="row-checkbox" data-index="${p.originalIndex}" onchange="calculateTotals()" ${locked?'disabled':''}></td>
-                    <td>${p.type}</td><td contenteditable="true" onblur="updateField(${p.originalIndex},'name',this.innerText,true)">${p.name}</td>
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'qty',this.innerText,true)">${p.qty}</td>
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'sub',this.innerText,true)">${subVal.toFixed(2)}</td>
+                    <td>${p.type}</td><td contenteditable="true" onblur="updateField(${p.originalIndex},'name',this.innerText)">${p.name}</td>
+                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'qty',this.innerText)">${p.qty}</td>
+                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'sub',this.innerText)">${subVal.toFixed(2)}</td>
                     <td style="color:var(--header-green);font-weight:800;">${lineTotal.toFixed(2)}</td>${dynamic}
                     <td><select class="status-select ${sClass}" onchange="changeStatus(${p.originalIndex},this.value)">
                         ${statusOptions.map(s=>`<option value="${s}" ${p.status===s?'selected':''}>${s}</option>`).join('')}</select></td>
-                    <td style="font-size:10px">${p.date}</td><td contenteditable="true" onblur="updateField(${p.originalIndex},'note',this.innerText,true)">${p.note||''}</td></tr>`;
+                    <td style="font-size:10px">${p.date}</td><td contenteditable="true" onblur="updateField(${p.originalIndex},'note',this.innerText)">${p.note||''}</td></tr>`;
             });
             calculateTotals();
         }
@@ -323,16 +343,10 @@
             header.innerHTML = `<th style="width: 30px;"><input type="checkbox" onclick="toggleAll(this)"></th><th style="width:100px;">نوع المنتج</th><th>تفاصيل المنتج</th><th style="width:50px;">العدد</th><th style="width:80px;">الاشتراك</th><th style="width:80px;">الإجمالي</th>${dynamic}<th style="width:90px;">الحالة</th><th style="width:80px;">التاريخ</th><th>ملاحظة</th>`;
         }
 
-        function changeStatus(idx, s) {
-            if (["مكتمل", "تم التوثيق", "معلق"].includes(s) && !confirm("تنبيه: سيتم قفل هذا الصف ولن تتمكن من تعديله لاحقاً. هل أنت متأكد؟")) { renderProducts(); return; }
-            updateField(idx, 'status', s, true);
-        }
-
-        function updateField(idx, f, v, log = false) {
+        function updateField(idx, f, v) {
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             let item = db[currentOrderId][idx];
             if (item[f] !== v.trim()) {
-                if(log) addLog(`تعديل ${f} من (${item[f]}) إلى (${v.trim()})`);
                 item[f] = v.trim(); item.updatedAt = Date.now();
                 localStorage.setItem('asgate_products_db', JSON.stringify(db));
                 if(['status','qty','sub'].includes(f)) syncSumsToSales();
@@ -340,14 +354,15 @@
             }
         }
 
+        function changeStatus(idx, s) {
+            if (["مكتمل", "تم التوثيق", "معلق"].includes(s) && !confirm("تنبيه: سيتم قفل هذا الصف. هل أنت متأكد؟")) { renderProducts(); return; }
+            updateField(idx, 'status', s);
+        }
+
         function syncSumsToSales() {
             const items = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
-            let comp = 0, pend = 0, tot = 0;
-            items.forEach(p => { let v = (parseInt(p.qty)||0)*(parseFloat(p.sub)||0); tot+=v; if(p.status==="مكتمل") comp+=v; else if(["جديد","جاهز","معلق"].includes(p.status)) pend+=v; });
+            let tot = 0; items.forEach(p => tot += (parseInt(p.qty)||0)*(parseFloat(p.sub)||0));
             document.getElementById('orderTotalSum').innerText = tot.toFixed(2) + " ر.س";
-            let sales = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
-            let i = sales.findIndex(o => String(o.id) === String(currentOrderId));
-            if(i!==-1) { sales[i].completedSum = comp; sales[i].pendingSum = pend; localStorage.setItem('asgate_sales_db', JSON.stringify(sales)); }
         }
 
         function calculateTotals() {
@@ -361,12 +376,17 @@
             let serial = document.getElementById('p_serial').value || "", isAuto = document.getElementById('auto_serial').checked;
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             if(!db[currentOrderId]) db[currentOrderId] = [];
+            
             if(isAuto && type === "خدمة متنقلة" && serial !== "") {
-                for(let i=0; i<qty; i++){ db[currentOrderId].push({ type, name, qty:1, sub, serial, status:"جديد", date:new Date().toLocaleDateString('en-GB'), updatedAt:Date.now() });
-                serial = serial.replace(/(\d+)(?!.*\d)/, n => (BigInt(n)+1n).toString().padStart(n.length, '0')); }
-            } else { db[currentOrderId].push({ type, name, qty, sub, serial:(type==="خدمة متنقلة"?serial:""), status:"جديد", date:new Date().toLocaleDateString('en-GB'), updatedAt:Date.now() }); }
+                for(let i=0; i<qty; i++){ 
+                    db[currentOrderId].push({ type, name, qty:1, sub, serial, status:"جديد", date:new Date().toLocaleDateString('en-GB'), updatedAt:Date.now() });
+                    serial = serial.replace(/(\d+)(?!.*\d)/, n => (BigInt(n)+1n).toString().padStart(n.length, '0')); 
+                }
+            } else { 
+                db[currentOrderId].push({ type, name, qty, sub, serial:(type==="خدمة متنقلة"?serial:""), status:"جديد", date:new Date().toLocaleDateString('en-GB'), updatedAt:Date.now() }); 
+            }
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
-            addLog(`إضافة منتج: ${name}`); syncSumsToSales(); renderProducts(); closeModal();
+            syncSumsToSales(); renderProducts(); closeModal();
         }
 
         function deleteSelected() {
@@ -376,7 +396,7 @@
             const idxs = Array.from(chks).map(c => parseInt(c.dataset.index));
             db[currentOrderId] = db[currentOrderId].filter((_, i) => !idxs.includes(i));
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
-            addLog(`حذف ${idxs.length} منتجات`); syncSumsToSales(); renderProducts();
+            syncSumsToSales(); renderProducts();
         }
 
         function applyFilters() {
@@ -388,6 +408,7 @@
         function toggleAll(s) { document.querySelectorAll('.row-checkbox:not(:disabled)').forEach(c => c.checked = s.checked); calculateTotals(); }
         function openModal() { document.getElementById('productModal').style.display = 'flex'; handleTypeChange(); }
         function closeModal() { document.getElementById('productModal').style.display = 'none'; }
+        
         function exportToExcel() {
             const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
             const ws = XLSX.utils.json_to_sheet(db);
