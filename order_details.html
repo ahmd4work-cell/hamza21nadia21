@@ -94,6 +94,9 @@
         .modal-content { background: white; padding: 20px; border-radius: 12px; width: 20%; min-width: 300px; }
         .modal-content input, .modal-content select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Cairo'; margin-bottom: 10px; box-sizing: border-box; font-size: 12px; }
         
+        /* تنسيق الحقل المعطل */
+        .modal-content input:disabled, .modal-content select:disabled { background-color: #e2e8f0; color: #94a3b8; cursor: not-allowed; border-color: #cbd5e1; }
+
         .serial-container { 
             display: flex; 
             align-items: center; 
@@ -178,7 +181,7 @@
         <div class="modal-content">
             <h3 style="margin-top:0; font-size:14px; text-align: center;">إضافة منتج جديد</h3>
             <label class="info-label">نوع الطلب</label>
-            <select id="p_type">
+            <select id="p_type" onchange="toggleSerialField()">
                 <option value="خدمة متنقلة">خدمة متنقلة</option>
                 <option value="هاتف وانترنت">هاتف وانترنت</option>
                 <option value="داتا">داتا</option>
@@ -358,12 +361,28 @@
             });
         }
 
+        // وظيفة التحكم الاحترافية في حقل السريال
+        function toggleSerialField() {
+            const type = document.getElementById('p_type').value;
+            const serialInput = document.getElementById('p_serial');
+            const autoCheck = document.getElementById('auto_serial');
+            
+            if (type === "خدمة متنقلة") {
+                serialInput.disabled = false;
+                autoCheck.disabled = false;
+            } else {
+                serialInput.disabled = true;
+                serialInput.value = ""; // تفريغ الحقل عند التعطيل
+                autoCheck.disabled = true;
+                autoCheck.checked = false;
+            }
+        }
+
         function saveProduct() {
             const type = document.getElementById('p_type').value;
             const name = document.getElementById('p_name').value;
             let qtyInput = parseInt(document.getElementById('p_qty').value);
             
-            // تصحيح منطقي: إذا كان العدد أقل من 1، نعتبره 1
             if (isNaN(qtyInput) || qtyInput < 1) qtyInput = 1;
 
             let currentSerial = document.getElementById('p_serial').value.trim();
@@ -372,7 +391,7 @@
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             if (!db[currentOrderId]) db[currentOrderId] = [];
 
-            if (isAuto) {
+            if (isAuto && type === "خدمة متنقلة") {
                 for (let i = 0; i < qtyInput; i++) {
                     db[currentOrderId].push({
                         type: type, name: name, qty: 1, sub: sub,
@@ -408,7 +427,10 @@
             renderProducts(filtered);
         }
 
-        function openModal() { document.getElementById('productModal').style.display = 'flex'; }
+        function openModal() { 
+            document.getElementById('productModal').style.display = 'flex'; 
+            toggleSerialField(); // للتأكد من حالة الحقل عند الفتح
+        }
         function closeModal() { document.getElementById('productModal').style.display = 'none'; }
         
         function exportToExcel() {
