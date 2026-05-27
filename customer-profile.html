@@ -50,11 +50,12 @@
 
         .back-container { position: absolute; right: -85px; top: 5px; width: 75px; }
         .back-btn {
-            background: white; color: var(--danger-red); border: 1.5px solid var(--danger-red);
-            height: 35px; width: 100%; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; 
-            font-weight: 800; font-size: 11px; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            background: white; color: #475569; border: 1px solid var(--border-color);
+            height: 32px; width: 100%; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; 
+            font-weight: 800; font-size: 11px; transition: 0.3s; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            display: flex; align-items: center; justify-content: center; gap: 4px;
         }
-        .back-btn:hover { background: var(--danger-red); color: white; }
+        .back-btn:hover { background: #f8fafc; color: var(--nav-bg); border-color: #94a3b8; }
 
         .compact-section { 
             background: var(--white); border-radius: 12px; padding: 15px 25px; 
@@ -163,8 +164,8 @@
                 <div class="info-item"><label>الشركة:</label><span id="c-name">-</span></div>
                 <div class="info-item"><label>السجل:</label><span id="c-cr">-</span></div>
                 <div class="info-item"><label>العنوان:</label><span id="c-addr">-</span></div>
-                <div class="info-item"><label>منشأ العميل:</label><span id="c-source">-</span></div>
-                <div class="info-item"><label>مالك العميل:</label><span id="c-owner">-</span></div>
+                <div class="info-item"><label>مصدر العميل:</label><span id="c-source">-</span></div>
+                <div class="info-item"><label>يدير العميل:</label><span id="c-owner">-</span></div>
             </div>
         </div>
     </div>
