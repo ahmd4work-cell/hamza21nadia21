@@ -72,7 +72,6 @@
         .table-footer { background-color: #000; color: #fff; height: 37px; font-family: 'Cairo'; }
         .table-footer td { color: #fff; border: none; font-weight: 800; font-size: 12px; height: 37px; line-height: 37px; }
 
-        /* سجل النشاط المطور */
         .log-section { background: #fff; padding: 15px; border-radius: 10px; border: 1px solid var(--border-color); margin-top: 10px; }
         .log-title { font-weight: 800; font-size: 13px; color: var(--nav-bg); margin-bottom: 12px; display: block; }
         
@@ -235,7 +234,6 @@
             }
         }
 
-        // معالجة سجل النشاط
         function processTextOnly() {
             const msg = document.getElementById('logMsg').value.trim();
             if(!msg) return;
@@ -292,19 +290,17 @@
             link.click();
         }
 
-        // وظائف الجدول والمنتجات
-        function handleTypeChange() {
-            const type = document.getElementById('p_type').value;
-            const serialInput = document.getElementById('p_serial');
-            const autoLabel = document.getElementById('auto_label');
-            serialInput.disabled = (type !== "خدمة متنقلة");
-            autoLabel.style.display = (type === "خدمة متنقلة" ? "inline-block" : "none");
-        }
-
         function renderProducts(filtered = null) {
             const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             let items = (filtered || db[currentOrderId] || []).map((p, i) => ({...p, originalIndex: i}));
-            items.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+            
+            // ترتيب مخصص: الحالات العادية بالأحدث أولاً، ثم "فقدان" في الأسفل بالأقدم أولاً
+            items.sort((a, b) => {
+                if (a.status === "فقدان" && b.status !== "فقدان") return 1;
+                if (a.status !== "فقدان" && b.status === "فقدان") return -1;
+                if (a.status === "فقدان" && b.status === "فقدان") return (a.updatedAt || 0) - (b.updatedAt || 0);
+                return (b.updatedAt || 0) - (a.updatedAt || 0);
+            });
             
             updateTableHeaders(items.length > 0 ? items[0].type : "خدمة متنقلة");
             const tbody = document.getElementById('productsBody');
@@ -317,22 +313,22 @@
                 const locked = ["مكتمل", "تم التوثيق", "معلق"].includes(p.status);
                 
                 let dynamic = (p.type === "خدمة متنقلة") ? `
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'serial',this.innerText)">${p.serial||''}</td>
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'mobile',this.innerText)">${p.mobile||''}</td>
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'user',this.innerText)">${p.user||''}</td>` : `
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'sai',this.innerText)">${p.sai||''}</td>
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'coords',this.innerText)">${p.coords||''}</td>
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'city',this.innerText)">${p.city||''}</td>`;
+                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'serial',this.innerText,true)">${p.serial||''}</td>
+                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'mobile',this.innerText,true)">${p.mobile||''}</td>
+                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'user',this.innerText,true)">${p.user||''}</td>` : `
+                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'sai',this.innerText,true)">${p.sai||''}</td>
+                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'coords',this.innerText,true)">${p.coords||''}</td>
+                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'city',this.innerText,true)">${p.city||''}</td>`;
 
                 tbody.innerHTML += `<tr class="${locked?'row-locked':''}">
                     <td><input type="checkbox" class="row-checkbox" data-index="${p.originalIndex}" onchange="calculateTotals()" ${locked?'disabled':''}></td>
-                    <td>${p.type}</td><td contenteditable="true" onblur="updateField(${p.originalIndex},'name',this.innerText)">${p.name}</td>
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'qty',this.innerText)">${p.qty}</td>
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'sub',this.innerText)">${subVal.toFixed(2)}</td>
+                    <td>${p.type}</td><td contenteditable="true" onblur="updateField(${p.originalIndex},'name',this.innerText,true)">${p.name}</td>
+                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'qty',this.innerText,true)">${p.qty}</td>
+                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'sub',this.innerText,true)">${subVal.toFixed(2)}</td>
                     <td style="color:var(--header-green);font-weight:800;">${lineTotal.toFixed(2)}</td>${dynamic}
                     <td><select class="status-select ${sClass}" onchange="changeStatus(${p.originalIndex},this.value)">
                         ${statusOptions.map(s=>`<option value="${s}" ${p.status===s?'selected':''}>${s}</option>`).join('')}</select></td>
-                    <td style="font-size:10px">${p.date}</td><td contenteditable="true" onblur="updateField(${p.originalIndex},'note',this.innerText)">${p.note||''}</td></tr>`;
+                    <td style="font-size:10px">${p.date}</td><td contenteditable="true" onblur="updateField(${p.originalIndex},'note',this.innerText,true)">${p.note||''}</td></tr>`;
             });
             calculateTotals();
         }
@@ -343,10 +339,11 @@
             header.innerHTML = `<th style="width: 30px;"><input type="checkbox" onclick="toggleAll(this)"></th><th style="width:100px;">نوع المنتج</th><th>تفاصيل المنتج</th><th style="width:50px;">العدد</th><th style="width:80px;">الاشتراك</th><th style="width:80px;">الإجمالي</th>${dynamic}<th style="width:90px;">الحالة</th><th style="width:80px;">التاريخ</th><th>ملاحظة</th>`;
         }
 
-        function updateField(idx, f, v) {
+        function updateField(idx, f, v, log = false) {
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             let item = db[currentOrderId][idx];
             if (item[f] !== v.trim()) {
+                if(log) addLog(`تعديل ${f} للمنتج (${item.name}) من (${item[f]}) إلى (${v.trim()})`);
                 item[f] = v.trim(); item.updatedAt = Date.now();
                 localStorage.setItem('asgate_products_db', JSON.stringify(db));
                 if(['status','qty','sub'].includes(f)) syncSumsToSales();
@@ -356,6 +353,8 @@
 
         function changeStatus(idx, s) {
             if (["مكتمل", "تم التوثيق", "معلق"].includes(s) && !confirm("تنبيه: سيتم قفل هذا الصف. هل أنت متأكد؟")) { renderProducts(); return; }
+            let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+            addLog(`تغيير حالة المنتج (${db[currentOrderId][idx].name}) إلى: ${s}`);
             updateField(idx, 'status', s);
         }
 
@@ -385,16 +384,18 @@
             } else { 
                 db[currentOrderId].push({ type, name, qty, sub, serial:(type==="خدمة متنقلة"?serial:""), status:"جديد", date:new Date().toLocaleDateString('en-GB'), updatedAt:Date.now() }); 
             }
+            addLog(`إضافة منتج جديد: ${name}`);
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
             syncSumsToSales(); renderProducts(); closeModal();
         }
 
         function deleteSelected() {
             const chks = document.querySelectorAll('.row-checkbox:checked');
-            if(chks.length===0 || !confirm("حذف العناصر؟")) return;
+            if(chks.length===0 || !confirm("حذف العناصر المختارة؟")) return;
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             const idxs = Array.from(chks).map(c => parseInt(c.dataset.index));
             db[currentOrderId] = db[currentOrderId].filter((_, i) => !idxs.includes(i));
+            addLog(`حذف عدد ${idxs.length} من المنتجات`);
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
             syncSumsToSales(); renderProducts();
         }
