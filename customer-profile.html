@@ -62,6 +62,7 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             border: 1px solid var(--border-color);
             display: flex; flex-direction: column; position: relative;
+            margin-bottom: 10px;
         }
         .compact-section::before {
             content: ""; position: absolute; right: 0; top: 15%; height: 70%; width: 4px;
@@ -87,7 +88,7 @@
         }
         .add-mgr-btn:hover { background: #eff6ff; }
 
-        /* تسيق صف إضافة مسؤول جديد */
+        /* تنسيق صف إضافة مسؤول جديد */
         #new-mgr-row {
             display: none;
             margin-top: 15px;
@@ -104,7 +105,7 @@
             font-family: 'Cairo';
             font-size: 11px;
             outline: none;
-            width: 130px;
+            width: 120px;
         }
         .mgr-input:focus { border-color: var(--accent-blue); }
         .btn-save-mgr {
@@ -203,8 +204,8 @@
     </div>
 </div>
 
-<div class="manager-header-wrapper">
-    <div class="compact-section">
+<div class="manager-header-wrapper" id="managers-container">
+    <div class="compact-section" id="primary-manager-section">
         <div class="row-wrapper">
             <div class="section-label">👤 المسؤول المباشر:</div>
             <div class="data-row-inline">
@@ -260,17 +261,42 @@
 
     function saveNewManager() {
         const name = document.getElementById('new-mgr-name').value;
+        const mob = document.getElementById('new-mgr-mob').value;
+        const email = document.getElementById('new-mgr-email').value;
+        const job = document.getElementById('new-mgr-job').value;
+        const date = document.getElementById('new-mgr-date').value;
+
         if(!name) { alert("يرجى إدخال اسم المسؤول"); return; }
         
-        // هنا يتم منطق الحفظ (مثلاً في LocalStorage أو إرسال للسيرفر)
-        alert("تم حفظ بيانات المسؤول الجديد بنجاح");
-        document.getElementById('new-mgr-row').style.display = 'none';
+        // إنشاء القسم الجديد للمسؤول المضاف
+        const container = document.getElementById('managers-container');
+        const primarySection = document.getElementById('primary-manager-section');
         
-        // مسح الحقول بعد الحفظ
+        const newSection = document.createElement('div');
+        newSection.className = 'compact-section';
+        newSection.innerHTML = `
+            <div class="row-wrapper">
+                <div class="section-label">👤 مسؤول إضافي (${job || 'موظف'}):</div>
+                <div class="data-row-inline">
+                    <div class="info-item"><label>الاسم:</label><span>${name}</span></div>
+                    <div class="info-item"><label>الموبايل:</label><span>${mob || '-'}</span></div>
+                    <div class="info-item"><label>الايميل:</label><span>${email || '-'}</span></div>
+                    <div class="info-item"><label>التاريخ:</label><span style="font-size:10px; color:#64748b;">${date}</span></div>
+                </div>
+            </div>
+        `;
+
+        // إدراج الصف الجديد فوق الصف الأقدم (المسؤول المباشر)
+        container.insertBefore(newSection, primarySection);
+
+        // إخفاء صف الإدخال ومسح البيانات
+        document.getElementById('new-mgr-row').style.display = 'none';
         document.getElementById('new-mgr-name').value = "";
         document.getElementById('new-mgr-mob').value = "";
         document.getElementById('new-mgr-email').value = "";
         document.getElementById('new-mgr-job').value = "";
+        
+        alert("تم إضافة المسؤول الجديد بنجاح");
     }
 
     function goBackAndFocus() {
