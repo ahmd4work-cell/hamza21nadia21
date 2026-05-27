@@ -87,6 +87,38 @@
         }
         .add-mgr-btn:hover { background: #eff6ff; }
 
+        /* تسيق صف إضافة مسؤول جديد */
+        #new-mgr-row {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-color);
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .mgr-input {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-family: 'Cairo';
+            font-size: 11px;
+            outline: none;
+            width: 130px;
+        }
+        .mgr-input:focus { border-color: var(--accent-blue); }
+        .btn-save-mgr {
+            background: var(--accent-green);
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 6px;
+            font-family: 'Cairo';
+            font-weight: 800;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
         /* Lower Container & Controls */
         .full-width-container { width: 100%; padding: 0 20px 20px 20px; box-sizing: border-box; }
 
@@ -182,7 +214,16 @@
             </div>
         </div>
         <div>
-            <div class="add-mgr-btn" onclick="alert('إضافة مسؤول جديد')">✚ إضافة مسؤول آخر</div>
+            <div class="add-mgr-btn" onclick="showNewMgrRow()">✚ إضافة مسؤول آخر</div>
+        </div>
+
+        <div id="new-mgr-row">
+            <input type="text" id="new-mgr-name" class="mgr-input" placeholder="الاسم">
+            <input type="text" id="new-mgr-mob" class="mgr-input" placeholder="الموبايل">
+            <input type="text" id="new-mgr-email" class="mgr-input" placeholder="الايميل">
+            <input type="text" id="new-mgr-job" class="mgr-input" placeholder="الوظيفة">
+            <input type="text" id="new-mgr-date" class="mgr-input" readonly>
+            <button class="btn-save-mgr" onclick="saveNewManager()">حفظ</button>
         </div>
     </div>
 </div>
@@ -208,6 +249,29 @@
 <script>
     const urlParams = new URLSearchParams(window.location.search);
     const clientName = urlParams.get('name');
+
+    function showNewMgrRow() {
+        const row = document.getElementById('new-mgr-row');
+        const dateInput = document.getElementById('new-mgr-date');
+        const now = new Date();
+        dateInput.value = now.toLocaleDateString('en-GB');
+        row.style.display = 'flex';
+    }
+
+    function saveNewManager() {
+        const name = document.getElementById('new-mgr-name').value;
+        if(!name) { alert("يرجى إدخال اسم المسؤول"); return; }
+        
+        // هنا يتم منطق الحفظ (مثلاً في LocalStorage أو إرسال للسيرفر)
+        alert("تم حفظ بيانات المسؤول الجديد بنجاح");
+        document.getElementById('new-mgr-row').style.display = 'none';
+        
+        // مسح الحقول بعد الحفظ
+        document.getElementById('new-mgr-name').value = "";
+        document.getElementById('new-mgr-mob').value = "";
+        document.getElementById('new-mgr-email').value = "";
+        document.getElementById('new-mgr-job').value = "";
+    }
 
     function goBackAndFocus() {
         if(clientName) sessionStorage.setItem('last_viewed_client', clientName);
