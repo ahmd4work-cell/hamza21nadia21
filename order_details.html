@@ -266,30 +266,30 @@
                 let statusClass = p.status === "مكتمل" ? "status-complete" : (p.status === "تم التوثيق" ? "status-verified" : "");
                 
                 let dynamicCells = (p.type === "خدمة متنقلة") ? `
-                    <td contenteditable="true" onblur="updateField(${index}, 'serial', this.innerText)">${p.serial || ''}</td>
-                    <td contenteditable="true" onblur="updateField(${index}, 'mobile', this.innerText)">${p.mobile || ''}</td>
-                    <td contenteditable="true" onblur="updateField(${index}, 'user', this.innerText)">${p.user || ''}</td>
+                    <td contenteditable="true" onblur="updateField(${index}, 'serial', this.innerText, true)">${p.serial || ''}</td>
+                    <td contenteditable="true" onblur="updateField(${index}, 'mobile', this.innerText, true)">${p.mobile || ''}</td>
+                    <td contenteditable="true" onblur="updateField(${index}, 'user', this.innerText, true)">${p.user || ''}</td>
                 ` : `
-                    <td contenteditable="true" onblur="updateField(${index}, 'sai', this.innerText)">${p.sai || ''}</td>
-                    <td contenteditable="true" onblur="updateField(${index}, 'coords', this.innerText)">${p.coords || ''}</td>
-                    <td contenteditable="true" onblur="updateField(${index}, 'city', this.innerText)">${p.city || ''}</td>
+                    <td contenteditable="true" onblur="updateField(${index}, 'sai', this.innerText, true)">${p.sai || ''}</td>
+                    <td contenteditable="true" onblur="updateField(${index}, 'coords', this.innerText, true)">${p.coords || ''}</td>
+                    <td contenteditable="true" onblur="updateField(${index}, 'city', this.innerText, true)">${p.city || ''}</td>
                 `;
 
                 const row = `<tr>
                     <td><input type="checkbox" class="row-checkbox" data-index="${index}" onchange="calculateTotals()"></td>
                     <td>${p.type}</td>
-                    <td contenteditable="true" onblur="updateField(${index}, 'name', this.innerText)">${p.name}</td>
-                    <td contenteditable="true" onblur="updateField(${index}, 'qty', this.innerText)">${p.qty}</td>
-                    <td contenteditable="true" onblur="updateField(${index}, 'sub', this.innerText)">${subVal.toFixed(2)}</td>
+                    <td contenteditable="true" onblur="updateField(${index}, 'name', this.innerText, true)">${p.name}</td>
+                    <td contenteditable="true" onblur="updateField(${index}, 'qty', this.innerText, true)">${p.qty}</td>
+                    <td contenteditable="true" onblur="updateField(${index}, 'sub', this.innerText, true)">${subVal.toFixed(2)}</td>
                     <td style="color:var(--header-green); font-weight:800;">${lineTotal.toFixed(2)}</td>
                     ${dynamicCells}
                     <td>
-                        <select class="status-select ${statusClass}" onchange="updateField(${index}, 'status', this.value)">
+                        <select class="status-select ${statusClass}" onchange="updateField(${index}, 'status', this.value, true)">
                             ${statusList.map(s => `<option value="${s}" ${p.status===s?'selected':''}>${s}</option>`).join('')}
                         </select>
                     </td>
                     <td style="font-size:10px">${p.date}</td>
-                    <td contenteditable="true" onblur="updateField(${index}, 'note', this.innerText)">${p.note || ''}</td>
+                    <td contenteditable="true" onblur="updateField(${index}, 'note', this.innerText, true)">${p.note || ''}</td>
                 </tr>`;
                 tbody.innerHTML += row;
             });
@@ -309,13 +309,23 @@
             `;
         }
 
-        function updateField(index, field, value) {
+        function updateField(index, field, value, shouldLog = false) {
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
-            db[currentOrderId][index][field] = value.trim();
-            localStorage.setItem('asgate_products_db', JSON.stringify(db));
-            if(['status', 'qty', 'sub'].includes(field)) {
-                syncSumsToSales();
-                renderProducts();
+            let oldValue = db[currentOrderId][index][field];
+            let newValue = value.trim();
+            
+            if(oldValue !== newValue) {
+                db[currentOrderId][index][field] = newValue;
+                localStorage.setItem('asgate_products_db', JSON.stringify(db));
+                
+                if(shouldLog) {
+                    addLog(`تعديل ${field} في السطر ${index + 1} من (${oldValue}) إلى (${newValue})`);
+                }
+
+                if(['status', 'qty', 'sub'].includes(field)) {
+                    syncSumsToSales();
+                    renderProducts();
+                }
             }
         }
 
@@ -387,7 +397,7 @@
             }
             
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
-            addLog(`إضافة ${name}`);
+            addLog(`إضافة منتج: ${name} (الكمية: ${qty})`);
             syncSumsToSales();
             renderProducts();
             closeModal();
@@ -425,8 +435,12 @@
             if(!confirm("حذف العناصر المختارة؟")) return;
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             const idxs = Array.from(chks).map(c => parseInt(c.dataset.index));
+            
+            const count = idxs.length;
             db[currentOrderId] = db[currentOrderId].filter((_, i) => !idxs.includes(i));
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
+            
+            addLog(`حذف ${count} من المنتجات المختارة`);
             syncSumsToSales();
             renderProducts();
         }
