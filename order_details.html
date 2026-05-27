@@ -87,10 +87,22 @@
 
         /* Modal Styles */
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
-        .modal-content { background: white; padding: 20px; border-radius: 12px; width: 320px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-content { background: white; padding: 20px; border-radius: 12px; width: 360px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .modal-content h3 { margin-top: 0; margin-bottom: 15px; font-size: 15px; text-align: center; color: var(--nav-bg); }
         .modal-content input, .modal-content select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-family: 'Cairo'; margin-bottom: 12px; box-sizing: border-box; font-size: 12px; outline: none; }
         
+        /* Flex row for side by side inputs */
+        .input-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 0; }
+        .input-row > div { flex: 1; }
+
+        /* Hide arrows in number input for subscription */
+        .no-arrows::-webkit-inner-spin-button, 
+        .no-arrows::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        .no-arrows { -moz-appearance: textfield; }
+
         @media print {
             .navbar, .sticky-top-section, .btn, .search-wrapper, .modal, .log-section { display: none !important; }
             .table-wrapper { border: none; box-shadow: none; }
@@ -166,6 +178,7 @@
     <div id="productModal" class="modal">
         <div class="modal-content">
             <h3>إضافة منتج جديد</h3>
+            
             <label style="font-size: 11px; font-weight: bold; color: #64748b;">نوع الخدمة</label>
             <select id="p_type" onchange="toggleSerialField()">
                 <option value="خدمة متنقلة">خدمة متنقلة</option>
@@ -174,16 +187,25 @@
             </select>
             
             <input type="text" id="p_name" placeholder="تفاصيل المنتج (مثال: باقة 200 جيجا)">
-            <input type="number" id="p_qty" value="1" min="1" placeholder="الكمية">
-            
-            <div id="serial_section">
-                <div style="margin-bottom:10px; display: flex; align-items: center; justify-content: center; background: #f0fdf4; height: 35px; border: 1px solid var(--header-green); border-radius: 8px; cursor: pointer;">
-                    <label style="font-size:11px; font-weight:bold; cursor:pointer;"><input type="checkbox" id="auto_serial"> تسلسل تلقائي للسيريالات</label>
+
+            <div class="input-row">
+                <div style="flex: 0.4;">
+                    <label style="font-size: 10px; font-weight: bold; color: #64748b;">العدد</label>
+                    <input type="number" id="p_qty" value="1" min="1" placeholder="الكمية">
                 </div>
-                <input type="text" id="p_serial" placeholder="السريال أو الرقم الأول">
+                <div id="serial_section" style="flex: 1;">
+                    <label style="font-size: 10px; font-weight: bold; color: #64748b; display: flex; justify-content: space-between;">
+                        السريال الأول
+                        <span style="font-size: 9px; background: #f0fdf4; padding: 0 4px; border-radius: 4px; color: var(--header-green); border: 0.5px solid var(--header-green);">
+                            <input type="checkbox" id="auto_serial" style="width: auto; margin: 0; vertical-align: middle;"> تسلسل تلقائي
+                        </span>
+                    </label>
+                    <input type="text" id="p_serial" placeholder="السريال أو الرقم">
+                </div>
             </div>
 
-            <input type="number" id="p_sub" placeholder="قيمة الاشتراك (ر.س)">
+            <label style="font-size: 10px; font-weight: bold; color: #64748b;">قيمة الاشتراك (ر.س)</label>
+            <input type="number" id="p_sub" class="no-arrows" placeholder="0.00">
 
             <div style="display:flex; gap:10px; margin-top: 5px;">
                 <button class="btn" style="flex:1; height:35px; background:var(--header-green); justify-content:center;" onclick="saveProduct()">إضافة المنتج</button>
@@ -214,7 +236,6 @@
             const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             const items = filtered || db[currentOrderId] || [];
             
-            // تحديد نوع الهيدر بناءً على أول عنصر أو الافتراضي
             const type = items.length > 0 ? items[0].type : (document.getElementById('p_type').value || "خدمة متنقلة");
             
             updateTableHeaders(type);
@@ -277,7 +298,7 @@
             
             if(field === 'status' || field === 'qty' || field === 'sub') {
                 syncSumsToSales();
-                renderProducts(); // لإعادة تلوين الحالة أو تحديث الإجمالي
+                renderProducts();
             }
         }
 
@@ -293,10 +314,8 @@
                 else if(["جديد", "جاهز", "معلق"].includes(p.status)) pending += val;
             });
 
-            // تحديث واجهة المستخدم في الرأس
             document.getElementById('orderTotalSum').innerText = total.toFixed(2) + " ر.س";
 
-            // تحديث قاعدة بيانات المبيعات
             let sales = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
             let idx = sales.findIndex(o => String(o.id) === String(currentOrderId));
             if(idx !== -1) {
@@ -341,7 +360,6 @@
                         date: new Date().toLocaleDateString('en-GB'),
                         mobile: "", user: "", note: "" 
                     });
-                    // زيادة السريال برقم واحد (يدعم الأرقام الكبيرة جداً)
                     serial = serial.replace(/(\d+)(?!.*\d)/, n => (BigInt(n)+1n).toString().padStart(n.length, '0'));
                 }
             } else {
@@ -354,18 +372,15 @@
             }
             
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
-            
-            // إضافة سجل نشاط
             addLog(`تم إضافة ${isAuto ? qty : 1} منتج جديد (${name})`);
-            
             syncSumsToSales();
             renderProducts();
             closeModal();
             
-            // تصغير القيم للمرة القادمة
             document.getElementById('p_name').value = "";
             document.getElementById('p_serial').value = "";
             document.getElementById('p_sub').value = "";
+            document.getElementById('p_qty').value = "1";
         }
 
         function addLog(msg) {
@@ -412,20 +427,13 @@
         }
 
         function toggleAll(s) { document.querySelectorAll('.row-checkbox').forEach(c => c.checked = s.checked); calculateTotals(); }
-        
-        function openModal() { 
-            document.getElementById('productModal').style.display = 'flex'; 
-        }
-        
-        function closeModal() { 
-            document.getElementById('productModal').style.display = 'none'; 
-        }
+        function openModal() { document.getElementById('productModal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('productModal').style.display = 'none'; }
 
         function toggleSerialField() { 
             const type = document.getElementById('p_type').value;
             const serialSection = document.getElementById('serial_section');
-            // إظهار حقل السريال فقط في الخدمة المتنقلة أو تخصيصه
-            serialSection.style.display = (type === "خدمة متنقلة") ? "block" : "block"; 
+            serialSection.style.visibility = (type === "خدمة متنقلة") ? "visible" : "hidden"; 
         }
         
         function exportToExcel() {
