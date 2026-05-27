@@ -95,6 +95,12 @@
 
         .order-link { color: var(--accent-blue); text-decoration: none; font-weight: 800; border-bottom: 1px dashed var(--accent-blue); cursor: pointer; }
 
+        /* سجل النشاط المضاف */
+        .log-section { background: #fff; padding: 15px; border-radius: 10px; border: 1px solid var(--border-color); margin-top: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .log-title { font-weight: 800; font-size: 13px; color: var(--nav-bg); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .log-entry { font-size: 12px; padding: 6px 0; border-bottom: 1px solid #f8fafc; color: #334155; white-space: pre-wrap; }
+        .log-user { color: var(--accent-blue); font-weight: 800; }
+
         .modal { display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 15px; border-radius: 12px; width: 380px; display: flex; flex-direction: column; }
         
@@ -109,7 +115,7 @@
         .modal-results div { padding: 8px; font-size: 11px; cursor: pointer; border-bottom: 1px solid #f8fafc; }
     </style>
 </head>
-<body onload="loadSalesFromStorage()">
+<body onload="loadSalesFromStorage(); renderGeneralLogs();">
 
 <nav class="navbar">
     <a href="index.html">الرئيسية</a>
@@ -145,6 +151,11 @@
             </thead>
             <tbody id="salesBody"></tbody>
         </table>
+    </div>
+
+    <div class="log-section">
+        <div class="log-title">📋 سجل النشاط</div>
+        <div id="activityLogs"></div>
     </div>
 </div>
 
@@ -222,10 +233,11 @@
 
     function addOrderRow() {
         const comp = document.getElementById('mComp').value;
+        const type = document.getElementById('mType').value || '-';
         if (!comp) return alert("اختر شركة أولاً");
         const data = {
             id: Math.floor(1000 + Math.random() * 8999),
-            type: document.getElementById('mType').value || '-',
+            type: type,
             date: new Date().toLocaleDateString('en-GB'),
             comp: comp,
             cr: document.getElementById('mCr').value,
@@ -235,6 +247,10 @@
             oppNum: "-"
         };
         renderTableRow(data);
+        
+        // تسجيل في سجل النشاط
+        addGeneralLog(`إنشاء طلب مبيعات جديد برقم #${data.id} للشركة: ${comp} (نوع الطلب: ${type})`);
+        
         markAsChanged();
         closeOrderModal();
     }
@@ -303,6 +319,10 @@
             oppNum: r.cells[10].innerText
         }));
         localStorage.setItem('asgate_sales_db', JSON.stringify(salesData));
+        
+        // تسجيل في سجل النشاط
+        addGeneralLog(`تم حفظ كافة التغييرات المحدثة على جدول المبيعات`);
+        
         markAsSaved();
         alert("تم حفظ التعديلات");
     }
@@ -319,6 +339,34 @@
         document.querySelectorAll('#salesBody tr').forEach(r => {
             r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none";
         });
+    }
+
+    // دوال سجل النشاط (نفس آلية صفحة التفاصيل)
+    function addGeneralLog(msg) {
+        const logs = JSON.parse(localStorage.getItem('asgate_general_sales_logs') || '[]');
+        const now = new Date();
+        const days = ['الأحد', 'الأثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+        const dayName = days[now.getDay()];
+        const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+        const dateStr = now.toLocaleDateString('en-GB');
+
+        const fullMeta = `👤 (أحمد)  🗓️ ${dayName}  ${dateStr}  ${timeStr}  ➡️  : `;
+        
+        logs.unshift({ meta: fullMeta, msg: msg });
+        localStorage.setItem('asgate_general_sales_logs', JSON.stringify(logs.slice(0, 50)));
+        renderGeneralLogs();
+    }
+
+    function renderGeneralLogs() {
+        const logs = JSON.parse(localStorage.getItem('asgate_general_sales_logs') || '[]');
+        const container = document.getElementById('activityLogs');
+        if(container) {
+            container.innerHTML = logs.map(l => `
+                <div class="log-entry">
+                    <span class="log-user">${l.meta}</span>${l.msg}
+                </div>
+            `).join('');
+        }
     }
 </script>
 </body>
