@@ -71,21 +71,22 @@
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); position: relative; }
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
         
-        /* تنسيق صف نهاية الشهر المحدث */
-        .month-separator { height: 20px !important; background: transparent !important; }
-        .month-separator td { padding: 2px 0; border: none; }
-        .month-label {
-            background: #2e1065;
+        /* التنسيق الجديد لصف الفاصل الشهري */
+        .month-separator { height: 24px !important; background: transparent !important; }
+        .month-separator td { height: 24px !important; border: none !important; padding: 4px 0 !important; }
+        .month-content {
+            background-color: #2e1065;
             color: white;
             font-family: 'Cascadia Code', monospace;
-            font-size: 9px; /* تصغير الخط درجة */
+            font-size: 9px; /* تصغير الخط درجة واحدة */
             font-weight: bold;
-            display: block;
-            width: 50%; /* المساحة 50% */
+            width: 50%; /* مساحة 50% في المنتصف */
             margin: 0 auto;
-            line-height: 16px;
-            border-radius: 4px; /* حواف دائرية صغيرة جداً */
-            text-align: center;
+            border-radius: 5px; /* حواف دائرية صغيرة */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
         }
 
         .editable { cursor: text; outline: none; transition: 0.2s; min-height: 20px; }
@@ -303,7 +304,7 @@
         const tbody = document.getElementById('salesBody');
         const row = tbody.insertRow(0);
         row.className = "month-separator";
-        row.innerHTML = `<td colspan="11"><span class="month-label">بالتوفيق في الشهر القادم ان شاء الله</span></td>`;
+        row.innerHTML = `<td colspan="11"><div class="month-content">بالتوفيق في الشهر القادم ان شاء الله</div></td>`;
     }
 
     function renderTableRow(obj) {
@@ -320,7 +321,7 @@
             <td>${obj.comp}</td>
             <td>${obj.cr}</td>
             <td>${obj.crSub}</td>
-            <td><select class="status-select" onchange="autoSave('تغيير حالة الطلب #${obj.id} إلى ' + this.value)">${optionsHtml}</select></td>
+            <td><select class="status-select" onchange="autoSave('تغيير حالة الطلب #${obj.id} إلى ' + this.value)">${statusOptions.map(opt => `<option value="${opt}" ${obj.status === opt ? 'selected' : ''}>${opt}</option>`).join('')}</select></td>
             <td style="color:#16a34a; font-weight:800;">${sums.completed.toFixed(2)}</td>
             <td style="color:#dc2626; font-weight:800;">${sums.pending.toFixed(2)}</td>
             <td>
