@@ -71,9 +71,22 @@
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); position: relative; }
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
         
-        /* تنسيق صف نهاية الشهر */
-        .month-separator { height: 20px !important; background: #2e1065 !important; color: white !important; font-family: 'Cascadia Code', monospace; font-size: 10px; font-weight: bold; }
-        .month-separator td { height: 20px !important; color: white !important; border: none; }
+        /* تنسيق صف نهاية الشهر المحدث */
+        .month-separator { height: 20px !important; background: transparent !important; }
+        .month-separator td { padding: 2px 0; border: none; }
+        .month-label {
+            background: #2e1065;
+            color: white;
+            font-family: 'Cascadia Code', monospace;
+            font-size: 9px; /* تصغير الخط درجة */
+            font-weight: bold;
+            display: block;
+            width: 50%; /* المساحة 50% */
+            margin: 0 auto;
+            line-height: 16px;
+            border-radius: 4px; /* حواف دائرية صغيرة جداً */
+            text-align: center;
+        }
 
         .editable { cursor: text; outline: none; transition: 0.2s; min-height: 20px; }
         .editable:focus { background-color: #fff; box-shadow: inset 0 0 0 2px var(--accent-blue); border-radius: 4px; }
@@ -102,7 +115,6 @@
         .log-section { background: #fff; padding: 15px; border-radius: 10px; border: 1px solid var(--border-color); margin-top: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .log-title { font-weight: 800; font-size: 13px; color: var(--nav-bg); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
         
-        /* تعديل المسافات في سجل النشاط لتكون متقاربة جداً */
         .log-entry { font-size: 11px; padding: 0; margin: 0; border-bottom: 1px solid #f8fafc; color: #334155; white-space: pre-wrap; line-height: 1; }
         .log-user { color: var(--accent-blue); font-weight: 800; }
 
@@ -270,9 +282,7 @@
             oppNum: ""
         };
 
-        // فحص تغيير الشهر قبل الإضافة
         checkMonthTransition(data.date);
-
         renderTableRow(data);
         autoSave(`إنشاء طلب مبيعات جديد برقم #${data.id} للشركة: ${comp}`);
         closeOrderModal();
@@ -281,12 +291,9 @@
     function checkMonthTransition(newDateStr) {
         const saved = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
         if (saved.length === 0) return;
-
-        const lastOrderDateStr = saved[saved.length - 1].date; // آخر طلب مضاف زمنياً
+        const lastOrderDateStr = saved[saved.length - 1].date;
         const lastParts = lastOrderDateStr.split('/');
         const newParts = newDateStr.split('/');
-
-        // إذا اختلف الشهر أو السنة
         if (lastParts[1] !== newParts[1] || lastParts[2] !== newParts[2]) {
             insertMonthSeparator();
         }
@@ -296,7 +303,7 @@
         const tbody = document.getElementById('salesBody');
         const row = tbody.insertRow(0);
         row.className = "month-separator";
-        row.innerHTML = `<td colspan="11">بالتوفيق في الشهر القادم ان شاء الله</td>`;
+        row.innerHTML = `<td colspan="11"><span class="month-label">بالتوفيق في الشهر القادم ان شاء الله</span></td>`;
     }
 
     function renderTableRow(obj) {
@@ -342,7 +349,6 @@
             currentActivePreview.setAttribute('data-full-notes', updated);
             currentActivePreview.parentElement.querySelector('.tooltip-box').innerText = updated;
             currentActivePreview.innerText = "عرض السجل...";
-            
             const orderId = currentActivePreview.closest('tr').cells[0].innerText;
             autoSave(`إضافة ملاحظة جديدة للطلب ${orderId}`);
         }
@@ -355,8 +361,6 @@
         const saved = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
         const tbody = document.getElementById('salesBody');
         tbody.innerHTML = "";
-        
-        // عرض البيانات مع الفواصل التاريخية
         let lastMonth = "";
         saved.forEach((item, index) => {
             const currentMonth = item.date.split('/')[1] + '/' + item.date.split('/')[2];
@@ -385,7 +389,6 @@
         const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
         const dateStr = now.toLocaleDateString('en-GB');
         const fullMeta = `👤 (أحمد)  🗓️ ${dayName}  ${dateStr}  ${timeStr}  ➡️  : `;
-        
         logs.unshift({ meta: fullMeta, msg: msg });
         localStorage.setItem('asgate_general_sales_logs', JSON.stringify(logs.slice(0, 50)));
         renderGeneralLogs();
