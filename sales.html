@@ -49,8 +49,7 @@
         .btn-top { border: none; padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; color: white; transition: 0.3s; }
         .btn-add { background-color: var(--accent-blue); }
         
-        /* التعديل: إخفاء مؤشر الحفظ القديم */
-        #save-status-indicator { font-size: 11px; font-weight: 700; color: var(--accent-green); margin-right: 10px; }
+        #save-status-indicator { display: none; } /* تم الإخفاء بناءً على طلبك */
 
         .search-box { padding: 0 15px; border: 1px solid var(--border-color); border-radius: 8px; width: 300px; height: 32px; font-family: 'Cairo'; font-size: 11px; outline: none; }
 
@@ -72,7 +71,7 @@
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); position: relative; }
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
         
-        .editable { cursor: text; outline: none; transition: 0.2s; }
+        .editable { cursor: text; outline: none; transition: 0.2s; min-height: 20px; }
         .editable:focus { background-color: #fff; box-shadow: inset 0 0 0 2px var(--accent-blue); border-radius: 4px; }
 
         .notes-preview {
@@ -98,7 +97,9 @@
 
         .log-section { background: #fff; padding: 15px; border-radius: 10px; border: 1px solid var(--border-color); margin-top: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .log-title { font-weight: 800; font-size: 13px; color: var(--nav-bg); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-        .log-entry { font-size: 12px; padding: 6px 0; border-bottom: 1px solid #f8fafc; color: #334155; white-space: pre-wrap; }
+        
+        /* تحسين المسافات في سجل النشاط */
+        .log-entry { font-size: 11px; padding: 2px 0; border-bottom: 1px solid #f8fafc; color: #334155; white-space: pre-wrap; line-height: 1.4; }
         .log-user { color: var(--accent-blue); font-weight: 800; }
 
         .modal { display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
@@ -128,8 +129,7 @@
 <div class="container">
     <div class="action-bar">
         <button class="btn-top btn-add" onclick="openOrderModal()">+ إنشاء طلب مبيعات جديد</button>
-        <span id="save-status-indicator">✅ حفظ تلقائي مفعل</span>
-        <input type="text" class="search-box" id="globalSearch" placeholder="🔍 بحث في الجدول..." onkeyup="filterSalesTable()">
+        <span id="save-status-indicator"></span> <input type="text" class="search-box" id="globalSearch" placeholder="🔍 بحث في الجدول..." onkeyup="filterSalesTable()">
     </div>
     
     <div class="table-wrapper">
@@ -146,7 +146,7 @@
                     <th style="width: 6%;">مكتمل</th>
                     <th style="width: 6%;">معلق</th>
                     <th style="width: 10%;">ملاحظات</th>
-                    <th style="width: 5%;">الفرصة</th>
+                    <th style="width: 8%;">الفرصة</th>
                 </tr>
             </thead>
             <tbody id="salesBody"></tbody>
@@ -193,7 +193,6 @@
 <script>
     let currentActivePreview = null;
 
-    // وظيفة الحفظ التلقائي عند أي تغيير
     function autoSave(actionDescription) {
         const rows = document.querySelectorAll('#salesBody tr');
         const salesData = Array.from(rows).map(r => ({
@@ -212,11 +211,6 @@
         if(actionDescription) {
             addGeneralLog(actionDescription);
         }
-        
-        // إظهار وميض بسيط للتأكيد على الحفظ
-        const indicator = document.getElementById('save-status-indicator');
-        indicator.style.opacity = '0.5';
-        setTimeout(() => indicator.style.opacity = '1', 300);
     }
 
     function openOrderModal() { document.getElementById('orderModal').style.display = 'flex'; }
@@ -267,7 +261,7 @@
             crSub: document.getElementById('mCrSub').value,
             status: "جديد",
             notes: "",
-            oppNum: "-"
+            oppNum: "" // تم إزالة علامة الـ - هنا
         };
         renderTableRow(data);
         autoSave(`إنشاء طلب مبيعات جديد برقم #${data.id} للشركة: ${comp}`);
@@ -295,7 +289,7 @@
                 <div class="notes-preview" onclick="openNote(this)" data-full-notes="${obj.notes || ''}">${obj.notes ? 'عرض السجل...' : 'أضف ملاحظة'}</div>
                 <div class="tooltip-box">${obj.notes || 'لا توجد ملاحظات'}</div>
             </td>
-            <td class="editable" contenteditable="true" onblur="autoSave('تعديل رقم الفرصة للطلب #${obj.id}')">${obj.oppNum || '-'}</td>
+            <td class="editable" contenteditable="true" onblur="autoSave('تعديل رقم الفرصة للطلب #${obj.id}')">${obj.oppNum || ''}</td>
         `;
     }
 
