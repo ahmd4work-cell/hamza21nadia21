@@ -75,7 +75,6 @@
         .company-link { color: var(--accent-blue); text-decoration: none; font-weight: 800; border-bottom: 1px dashed var(--accent-blue); }
         .edit-input { width: 85%; height: 28px; border: 1px solid var(--accent-blue); border-radius: 4px; text-align: center; font-family: 'Cairo'; display: none; outline: none; }
 
-        /* حقل الموبايل مع أيقونة واتساب محسنة */
         .mobile-cell { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 5px; }
         .whatsapp-icon-btn { 
             cursor: pointer; 
@@ -123,7 +122,6 @@
             overflow: hidden; white-space: nowrap; text-overflow: ellipsis; display: block; margin: 0 auto;
         }
 
-        /* سجل النشاط */
         .log-section { background: #fff; padding: 15px; border-radius: 10px; border: 1px solid var(--border-color); margin-top: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .log-title { font-weight: 800; font-size: 13px; color: var(--nav-bg); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
         .log-entry { font-size: 11px; padding: 3px 0; border-bottom: 1px solid #f8fafc; color: #334155; line-height: 1.4; }
@@ -150,7 +148,7 @@
 <div class="container">
     <div class="action-bar">
         <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة عميل جديد</button>
-        <input type="text" id="tableSearch" class="search-input" placeholder="🔍 بحث عن عميل..." onkeyup="filterTable()">
+        <input type="text" id="tableSearch" class="search-input" placeholder="🔍 بحث (الشركة، المسؤول، الجوال، السجلات)..." onkeyup="filterTable()">
     </div>
     
     <div class="table-wrapper">
@@ -226,13 +224,31 @@
         if (saved) { JSON.parse(saved).forEach(item => renderRow(item)); }
     }
 
+    // وظيفة البحث المحدثة لتشمل أعمدة محددة
     function filterTable() {
-        const input = document.getElementById("tableSearch");
-        const filter = input.value.toLowerCase();
+        const filter = document.getElementById("tableSearch").value.toLowerCase();
         const tr = document.getElementById("tableBody").getElementsByTagName("tr");
+        
         for (let i = 0; i < tr.length; i++) {
-            const rowText = tr[i].innerText.toLowerCase();
-            tr[i].style.display = rowText.includes(filter) ? "" : "none";
+            const row = tr[i];
+            
+            // جلب القيم من الحقول المحددة
+            const company = row.querySelector('.company-link')?.innerText.toLowerCase() || "";
+            const manager = row.cells[2].querySelector('input')?.value.toLowerCase() || "";
+            const mobile = row.cells[3].querySelector('input')?.value.toLowerCase() || "";
+            const cr_main = row.cells[5].querySelector('input')?.value.toLowerCase() || "";
+            const cr_sub = row.cells[6].querySelector('input')?.value.toLowerCase() || "";
+            
+            // التحقق إذا كان الفلتر موجود في أي من القيم
+            if (company.includes(filter) || 
+                manager.includes(filter) || 
+                mobile.includes(filter) || 
+                cr_main.includes(filter) || 
+                cr_sub.includes(filter)) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
         }
     }
 
