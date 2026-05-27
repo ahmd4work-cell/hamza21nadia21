@@ -188,7 +188,7 @@
             <div style="display: flex; gap: 8px; align-items: flex-end; margin-bottom: 10px;">
                 <div style="flex: 1;">
                     <label class="info-label">العدد</label>
-                    <input type="number" id="p_qty" value="1" style="margin-bottom: 0;">
+                    <input type="number" id="p_qty" value="1" min="1" style="margin-bottom: 0;">
                 </div>
                 <div style="flex: 1;">
                     <div class="serial-container">
@@ -230,18 +230,11 @@
         function logActivity(msg) {
             let logs = JSON.parse(localStorage.getItem('asgate_logs') || '[]');
             const now = new Date();
-            
-            // استخراج اسم اليوم بالعربية
             const days = ['الأحد', 'الأثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
             const dayName = days[now.getDay()];
-            
-            // تنسيق التاريخ والوقت
-            const dateStr = now.toLocaleDateString('en-GB'); // DD/MM/YYYY
+            const dateStr = now.toLocaleDateString('en-GB'); 
             const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-
-            // التنسيق المطلوب: 👤 (اسم الموظف) 🗓️ الأربعاء 27/05/2026 01:23 AM ➡️
             const fullMeta = `👤 (أحمد) &nbsp;🗓️ ${dayName} &nbsp;${dateStr} &nbsp;${timeStr} &nbsp;➡️ &nbsp;`;
-            
             logs.unshift({ meta: fullMeta, msg: msg, orderId: currentOrderId });
             localStorage.setItem('asgate_logs', JSON.stringify(logs.slice(0, 50)));
             renderLogs();
@@ -368,7 +361,11 @@
         function saveProduct() {
             const type = document.getElementById('p_type').value;
             const name = document.getElementById('p_name').value;
-            const qtyInput = parseInt(document.getElementById('p_qty').value) || 1;
+            let qtyInput = parseInt(document.getElementById('p_qty').value);
+            
+            // تصحيح منطقي: إذا كان العدد أقل من 1، نعتبره 1
+            if (isNaN(qtyInput) || qtyInput < 1) qtyInput = 1;
+
             let currentSerial = document.getElementById('p_serial').value.trim();
             const sub = document.getElementById('p_sub').value;
             const isAuto = document.getElementById('auto_serial').checked;
