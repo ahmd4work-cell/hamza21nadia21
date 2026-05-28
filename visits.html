@@ -20,7 +20,6 @@
             --dark-yellow: #c29103;
         }
 
-        /* جعل الشاشة ثابتة لمنع ارتجاج وتمدد الصفحة بالكامل */
         html, body { 
             height: 100%; 
             margin: 0; 
@@ -33,7 +32,6 @@
             color: var(--text-dark); 
         }
 
-        /* واجهة الـ Dashboard الرئيسية */
         .dashboard-container {
             display: flex;
             flex-direction: column;
@@ -51,13 +49,12 @@
         .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; height: 26px; line-height: 26px; display: inline-block; transition: 0.3s; }
         .navbar a.active { background-color: var(--nav-active); color: #0f172a; border-radius: 6px; }
 
-        /* منطقة المحتوى المرنة المتغيرة */
         .main-content { 
             flex: 1; 
             display: flex; 
             flex-direction: column; 
             padding: 0 15px; 
-            min-height: 0; /* منع انهيار عناصر flex الهيكلية */
+            min-height: 0; 
         }
 
         .action-bar { display: flex; align-items: center; margin: 10px 0; gap: 10px; justify-content: space-between; flex-shrink: 0; }
@@ -74,7 +71,6 @@
         .search-input:focus { border-color: #8b5cf6; background: #ffffff; box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15); }
         .search-icon { position: absolute; right: 14px; width: 16px; height: 16px; color: #94a3b8; pointer-events: none; }
 
-        /* حاوية الجدول المستقلة مع شريط تمرير داخلي مخصص لها */
         .table-wrapper { 
             background: white; 
             border-radius: 10px; 
@@ -120,7 +116,6 @@
         
         .notes-preview { width: 100%; min-height: 20px; border: none; background: transparent; font-family: 'Cairo'; font-size: 11px; text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700; overflow: hidden; text-overflow: ellipsis; display: block; margin: 0 auto; }
 
-        /* 📋 قسم سجل النشاط الاحترافي الثابت في أسفل الصفحة */
         .activity-log-section { 
             margin: 15px 0 10px 0; 
             padding: 12px 18px; 
@@ -129,7 +124,7 @@
             border: 1px solid var(--border-soft);
             box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
             flex-shrink: 0; 
-            height: 140px; /* طول ثابت ومناسب للسجل */
+            height: 140px; 
             display: flex;
             flex-direction: column;
             box-sizing: border-box;
@@ -144,7 +139,6 @@
         .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
         .note-header-highlight { color: var(--dark-yellow); font-weight: bold; display: inline; }
 
-        /* توزيع الأعمدة بالتساوي */
         .col-company { width: 12%; } .col-manager { width: 8%; } .col-mobile { width: 8%; } 
         .col-email { width: 9%; } .col-record { width: 8%; } .col-service { width: 10%; }
         .col-status { width: 7%; } .col-date { width: 8%; } .col-notes { width: 15%; }
@@ -164,7 +158,7 @@
 
     <div class="main-content">
         <div class="action-bar">
-            <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة زيارة جديدة</button>
+            <button class="btn-top btn-add" id="addVisitBtn" onclick="insertNewRow()">+ إضافة زيارة جديدة</button>
             <div class="search-wrapper">
                 <input type="text" id="searchInput" class="search-input" placeholder="بحث عن اسم الشركة أو البيانات..." onkeyup="filterTable()">
                 <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" cy="21" x2="16.65" y2="16.65"></line></svg>
@@ -192,7 +186,6 @@
             </table>
         </div>
 
-        <!-- 📋 سجل النشاط الثابت في الجزء السفلي بنظام احترافي -->
         <div class="activity-log-section">
             <div class="activity-log-title">📋 سجل النشاط</div>
             <div id="activityList" class="activity-list"></div>
@@ -236,13 +229,14 @@
         const logContent = getFullDateTimePattern() + " " + action + (companyName !== "غير محدد" ? ` (${companyName})` : "");
         let logs = JSON.parse(localStorage.getItem('asgate_activity_logs') || '[]');
         logs.unshift(logContent);
-        if(logs.length > 100) logs.pop(); // الحفاظ على أداء المتصفح بحفظ آخر 100 نشاط
+        if(logs.length > 100) logs.pop();
         localStorage.setItem('asgate_activity_logs', JSON.stringify(logs));
         renderActivityLog();
     }
 
     function renderActivityLog() {
         const list = document.getElementById('activityList');
+        if (!list) return;
         const logs = JSON.parse(localStorage.getItem('asgate_activity_logs') || '[]');
         list.innerHTML = logs.map(log => `<div class="activity-item">${log}</div>`).join('');
     }
@@ -309,6 +303,12 @@
         `;
     }
 
+    function insertNewRow() { 
+        renderRow({}, true); 
+        saveAllDataSilently(); 
+        addToActivityLog('إنشاء زيارة جديدة');
+    }
+
     function saveAllDataSilently() {
         const data = [];
         document.querySelectorAll('#tableBody tr').forEach(row => {
@@ -334,15 +334,9 @@
         if (saved && JSON.parse(saved).length > 0) {
             JSON.parse(saved).forEach(item => renderRow(item));
         } else {
-            insertNewRow();
+            // لا تنشئ صفاً تلقائياً لتجنب تكرار سجل النشاط عند كل تحميل
         }
         renderActivityLog();
-    }
-
-    function insertNewRow() { 
-        renderRow({}, true); 
-        saveAllDataSilently(); 
-        addToActivityLog('إنشاء زيارة جديدة');
     }
 
     function getLastNoteOnly(fullText) {
@@ -365,7 +359,7 @@
         const newText = document.getElementById('modalTextArea').value.trim();
         if (newText !== "" && currentActivePreview) {
             const headerPattern = getFullDateTimePattern();
-            let oldNotes = currentActivePreview.getAttribute('data-full-notes'] || "";
+            let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
             let updatedNotes = oldNotes + (oldNotes ? "\n--------------------\n" : "") + headerPattern + " " + newText;
             
             const lastNoteText = getLastNoteOnly(updatedNotes);
