@@ -71,7 +71,7 @@
         .dropdown-menu .delete-btn:hover { background: #fee2e2; color: #ef4444; }
         .show { display: block; }
 
-        /* تعديل التلميح (Tooltip) ليكون بقدر عرض مربع الملاحظات تماماً */
+        /* التلميح (Tooltip) بقدر عرض مربع الملاحظات تماماً */
         .custom-tooltip-cell { position: relative; }
         .tooltip-box {
             position: absolute; 
@@ -81,8 +81,8 @@
             color: #fff;
             padding: 5px; 
             border-radius: 6px; 
-            width: 100%; /* العرض بالكامل متوافق مع عرض مربع الملاحظات للخلية */
-            height: 40px; /* الارتفاع 40 بكسل */
+            width: 100%; 
+            height: 40px; 
             font-size: 11px;
             line-height: 1.3; 
             white-space: nowrap; 
@@ -100,8 +100,11 @@
             transition: opacity 0.2s;
             box-sizing: border-box;
         }
-        .custom-tooltip-cell:hover .tooltip-box { opacity: 1; visibility: visible; }
-        .notes-preview { width: 90%; border: none; background: transparent; font-family: 'Cairo'; font-size: 11px; text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700; overflow: hidden; text-overflow: ellipsis; display: block; margin: 0 auto; }
+        /* لا يظهر التلميح إلا إذا كانت الخلية تحتوي على نص حقيقي (ليست فارغة) */
+        .custom-tooltip-cell:hover .tooltip-box:not(:empty) { opacity: 1; visibility: visible; }
+        
+        /* جعل مساحة الضغط للمربع الفارغ تشمل كامل الخلية للتمكن من النقر لفتح المودال بسهولة */
+        .notes-preview { width: 100%; min-height: 20px; border: none; background: transparent; font-family: 'Cairo'; font-size: 11px; text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700; overflow: hidden; text-overflow: ellipsis; display: block; margin: 0 auto; }
 
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-content { background: white; padding: 18px; border-radius: 12px; width: 440px; height: 480px; display: flex; flex-direction: column; }
@@ -130,7 +133,7 @@
         <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة زيارة جديدة</button>
         <div class="search-wrapper">
             <input type="text" id="searchInput" class="search-input" placeholder="بحث عن اسم الشركة أو البيانات..." onkeyup="filterTable()">
-            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" cy="21" x2="16.65" y2="16.65"></line></svg>
         </div>
     </div>
     
@@ -210,6 +213,7 @@
         const entryDate = v.visitDate || getTodayFormatted();
         const editDate = v.editDate || '';
         const notes = v.notes || '';
+        const lastNote = getLastNoteOnly(notes);
 
         row.innerHTML = `
             <td><input type="text" class="excel-input" value="${v.comp || ''}" oninput="saveAllDataSilently()"></td>
@@ -232,8 +236,8 @@
                 <input type="hidden" class="entry-date-val" value="${entryDate}">
             </td>
             <td class="custom-tooltip-cell">
-                <div class="notes-preview" onclick="openNote(this)" data-full-notes="${notes}">${getLastNoteOnly(notes)}</div>
-                <div class="tooltip-box">${getLastNoteOnly(notes)}</div>
+                <div class="notes-preview" onclick="openNote(this)" data-full-notes="${notes}">${lastNote}</div>
+                <div class="tooltip-box">${lastNote}</div>
             </td>
             <td>
                 <input type="text" class="excel-input readonly-input edit-date-display" value="${editDate}" readonly>
@@ -281,9 +285,9 @@
     function insertNewRow() { renderRow({}, true); saveAllDataSilently(); }
 
     function getLastNoteOnly(fullText) {
-        if (!fullText) return 'إضافة تفاصيل...';
+        if (!fullText) return '';
         const lines = fullText.split('\n').filter(l => l.trim() !== "" && !l.includes("👤") && !l.includes("---"));
-        return lines.length > 0 ? lines[lines.length - 1] : 'إضافة تفاصيل...';
+        return lines.length > 0 ? lines[lines.length - 1] : '';
     }
 
     function openNote(el) {
@@ -303,9 +307,10 @@
             let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
             let updatedNotes = oldNotes + (oldNotes ? "\n--------------------\n" : "") + headerPattern + " " + newText;
             
+            const lastNoteText = getLastNoteOnly(updatedNotes);
             currentActivePreview.setAttribute('data-full-notes', updatedNotes);
-            currentActivePreview.innerText = getLastNoteOnly(updatedNotes);
-            currentActivePreview.parentElement.querySelector('.tooltip-box').innerText = getLastNoteOnly(updatedNotes);
+            currentActivePreview.innerText = lastNoteText;
+            currentActivePreview.parentElement.querySelector('.tooltip-box').innerText = lastNoteText;
             
             updateEditDateField(currentActivePreview.closest('tr'));
             saveAllDataSilently();
