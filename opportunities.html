@@ -191,15 +191,15 @@
         const d = new Date();
         const timeStr = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
         const dateStr = getTodayFormatted();
-        return `👤 (أحمد) 🗓️ ${days[d.getDay()]} ${dateStr} ${timeStr}   `;
+        return `👤 (أحمد) 🗓️ ${days[d.getDay()]} ${dateStr} ${timeStr} ➡️ : `;
     }
 
     function formatNotesToHTML(rawText) {
         if (!rawText || rawText === "" || rawText === "[]") return "لا يوجد سجل متابعة سابق لهذه الشركة.";
         return rawText.split('\n--------------------\n').map(entry => {
-            const parts = entry.split('  ');
+            const parts = entry.split('➡️ : ');
             if (parts.length > 1) {
-                return `<span class="chat-header-style">${parts[0]}  </span>${parts[1]}`;
+                return `<span class="chat-header-style">${parts[0]}➡️ : </span>${parts[1]}`;
             }
             return entry;
         }).join('\n--------------------\n');
@@ -216,7 +216,7 @@
         hours = hours % 12 || 12;
         
         const timeFormatted = `${hours.toString().padStart(2, '0')}:${minutes} ${ampm}`;
-        const logHeaderHTML = `<span class="activity-header-part">👤 (أحمد)  🗓️ ${dayName}  ${dateStr}  <span class="activity-time-part">${timeFormatted}</span>    </span> `;
+        const logHeaderHTML = `<span class="activity-header-part">👤 (أحمد)  🗓️ ${dayName}  ${dateStr}  <span class="activity-time-part">${timeFormatted}</span>  ➡️  : </span> `;
 
         let cleanOld = (!oldVal || oldVal.trim() === "") ? "فارغ" : oldVal;
         let cleanNew = (!newVal || newVal.trim() === "") ? "فارغ" : newVal;
@@ -350,7 +350,7 @@
     function getLastNoteOnly(fullText) {
         if (!fullText || fullText === "" || fullText === "[]") return 'إضافة ملاحظة...';
         const notesArray = fullText.split('\n--------------------\n');
-        const parts = notesArray[notesArray.length - 1].split('  ');
+        const parts = notesArray[notesArray.length - 1].split('➡️ : ');
         return parts.length > 1 ? parts[1].trim() : 'إضافة ملاحظة...';
     }
 
