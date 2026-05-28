@@ -212,7 +212,7 @@
         return d.getDate().toString().padStart(2, '0') + '/' + (d.getMonth() + 1).toString().padStart(2, '0') + '/' + d.getFullYear();
     }
 
-    // دالة لجلب تفاصيل اليوم والوقت الكامل بالنمط المطلوب
+    // دالة لجلب تفاصيل اليوم والوقت الكامل بالنمط المطلوب بدون مسافات إضافية
     function getFullDateTimePattern() {
         const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
         const d = new Date();
@@ -266,7 +266,7 @@
             <td><input type="text" class="excel-input" value="${v.comp || ''}" oninput="markAsEdited(this)"></td>
             <td><input type="text" class="excel-input" value="${v.mgr || ''}" oninput="markAsEdited(this)"></td>
             <td><input type="text" class="excel-input" value="${v.mob || ''}" oninput="markAsEdited(this)"></td>
-            <td><input type="text" class="excel-input" value="${v.email || ''}" oninput="markAsEdited(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.email || ''}" oninput="paint=markAsEdited(this)"></td>
             <td><input type="text" class="excel-input" value="${v.record || ''}" oninput="markAsEdited(this)"></td>
             <td><input type="text" class="excel-input" value="${v.curServ || ''}" oninput="markAsEdited(this)"></td>
             <td>
@@ -359,7 +359,9 @@
         if (newText !== "" && currentActivePreview) {
             const headerPattern = getFullDateTimePattern();
             let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
-            let updatedNotes = oldNotes + (oldNotes ? "\n\n--------------------\n\n" : "") + headerPattern + " " + newText;
+            
+            // دمج الملاحظة الجديدة دون ترك أي أسطر فارغة فوق أو تحت الفاصل
+            let updatedNotes = oldNotes + (oldNotes ? "\n--------------------\n" : "") + headerPattern + " " + newText;
             
             currentActivePreview.setAttribute('data-full-notes', updatedNotes);
             currentActivePreview.innerText = getLastNoteOnly(updatedNotes);
