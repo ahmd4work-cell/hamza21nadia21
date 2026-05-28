@@ -71,7 +71,7 @@
         .dropdown-menu .delete-btn:hover { background: #fee2e2; color: #ef4444; }
         .show { display: block; }
 
-        /* التلميح (Tooltip) بقدر عرض مربع الملاحظات تماماً */
+        /* التلميح (Tooltip) بقدر عرض مربع الملاحظات تماماً وبإرتفاع 40 بكسل */
         .custom-tooltip-cell { position: relative; }
         .tooltip-box {
             position: absolute; 
@@ -100,10 +100,9 @@
             transition: opacity 0.2s;
             box-sizing: border-box;
         }
-        /* لا يظهر التلميح إلا إذا كانت الخلية تحتوي على نص حقيقي (ليست فارغة) */
+        /* يظهر التلميح عند التحويم إذا لم يكن فارغاً */
         .custom-tooltip-cell:hover .tooltip-box:not(:empty) { opacity: 1; visibility: visible; }
         
-        /* جعل مساحة الضغط للمربع الفارغ تشمل كامل الخلية للتمكن من النقر لفتح المودال بسهولة */
         .notes-preview { width: 100%; min-height: 20px; border: none; background: transparent; font-family: 'Cairo'; font-size: 11px; text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700; overflow: hidden; text-overflow: ellipsis; display: block; margin: 0 auto; }
 
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
