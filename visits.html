@@ -226,7 +226,8 @@
     }
 
     function addToActivityLog(action, companyName = "غير محدد") {
-        const logContent = getFullDateTimePattern() + " " + action + (companyName !== "غير محدد" ? ` (${companyName})` : "");
+        const displayComp = companyName.trim() === "" ? "غير محدد" : companyName;
+        const logContent = getFullDateTimePattern() + " " + action + " / شركة " + displayComp;
         let logs = JSON.parse(localStorage.getItem('asgate_activity_logs') || '[]');
         logs.unshift(logContent);
         if(logs.length > 100) logs.pop();
@@ -266,14 +267,14 @@
         const lastNote = getLastNoteOnly(notes);
 
         row.innerHTML = `
-            <td><input type="text" class="excel-input" value="${v.comp || ''}" onchange="addToActivityLog('تعديل اسم الشركة', this.value); saveAllDataSilently()"></td>
-            <td><input type="text" class="excel-input" value="${v.mgr || ''}" onchange="saveAllDataSilently()"></td>
-            <td><input type="text" class="excel-input" value="${v.mob || ''}" onchange="saveAllDataSilently()"></td>
-            <td><input type="text" class="excel-input" value="${v.email || ''}" onchange="saveAllDataSilently()"></td>
-            <td><input type="text" class="excel-input" value="${v.record || ''}" onchange="saveAllDataSilently()"></td>
-            <td><input type="text" class="excel-input" value="${v.curServ || ''}" onchange="saveAllDataSilently()"></td>
+            <td><input type="text" class="excel-input" value="${v.comp || ''}" onchange="addToActivityLog('تعديل اسم الشركة', this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently()"></td>
+            <td><input type="text" class="excel-input" value="${v.mgr || ''}" onchange="addToActivityLog('تعديل المسؤول', this.closest('tr').cells[0].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently()"></td>
+            <td><input type="text" class="excel-input" value="${v.mob || ''}" onchange="addToActivityLog('تعديل الموبايل', this.closest('tr').cells[0].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently()"></td>
+            <td><input type="text" class="excel-input" value="${v.email || ''}" onchange="addToActivityLog('تعديل ايميل', this.closest('tr').cells[0].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently()"></td>
+            <td><input type="text" class="excel-input" value="${v.record || ''}" onchange="addToActivityLog('تعديل السجل', this.closest('tr').cells[0].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently()"></td>
+            <td><input type="text" class="excel-input" value="${v.curServ || ''}" onchange="addToActivityLog('تعديل الخدمة', this.closest('tr').cells[0].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently()"></td>
             <td>
-                <select class="excel-input" onchange="addToActivityLog('تعديل حالة الزيارة', this.closest('tr').cells[0].querySelector('input').value); saveAllDataSilently()">
+                <select class="excel-input" onchange="addToActivityLog('تعديل حالة الزيارة', this.closest('tr').cells[0].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently()">
                     <option value="" ${!v.status ? 'selected' : ''}></option>
                     <option value="مهتم" ${v.status==='مهتم'?'selected':''}>مهتم</option>
                     <option value="50%" ${v.status==='50%'?'selected':''}>50%</option>
@@ -306,7 +307,7 @@
     function insertNewRow() { 
         renderRow({}, true); 
         saveAllDataSilently(); 
-        addToActivityLog('إنشاء زيارة جديدة');
+        addToActivityLog('إنشاء زيارة جديدة', '');
     }
 
     function saveAllDataSilently() {
@@ -333,8 +334,6 @@
         tbody.innerHTML = '';
         if (saved && JSON.parse(saved).length > 0) {
             JSON.parse(saved).forEach(item => renderRow(item));
-        } else {
-            // لا تنشئ صفاً تلقائياً لتجنب تكرار سجل النشاط عند كل تحميل
         }
         renderActivityLog();
     }
