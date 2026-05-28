@@ -140,6 +140,12 @@
 
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-content { background: white; padding: 18px; border-radius: 12px; width: 440px; height: 480px; display: flex; flex-direction: column; }
+        
+        /* مودال التأكيد المخصص المتوافق مع شروط الأزرار الملونة لـ (مهتم) */
+        .confirm-modal-content { background: white; padding: 25px; border-radius: 12px; width: 35px; min-width: 320px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .confirm-btn-yes { background-color: #22c55e; border: none; color: white; padding: 8px 25px; border-radius: 6px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; font-size: 12px; }
+        .confirm-btn-no { background-color: #ef4444; border: none; color: white; padding: 8px 25px; border-radius: 6px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; font-size: 12px; }
+
         .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
         
         .chat-header-style { color: var(--chat-yellow); font-weight: 800; }
@@ -201,6 +207,7 @@
     </div>
 </div>
 
+<!-- مودال تفاصيل الزيارة القديم -->
 <div id="noteModal" class="modal">
     <div class="modal-content">
         <div class="modal-header" style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right;">سجل متابعة الزيارة والنتائج</div>
@@ -213,8 +220,20 @@
     </div>
 </div>
 
+<!-- المودال الخاص لرسالة تأكيد تحويل الحالة "مهتم" بالأزرار المطلوبة -->
+<div id="interestedConfirmModal" class="modal">
+    <div class="confirm-modal-content">
+        <div style="font-family:'Cairo'; font-weight:700; font-size:13px; margin-bottom:20px; color:var(--text-dark);">سيتم تحويل الزيارة الى الفرص البيعية</div>
+        <div style="display:flex; justify-content:center; gap:15px;">
+            <button id="confirmYesBtn" class="confirm-btn-yes">نعم</button>
+            <button id="confirmNoBtn" class="confirm-btn-no">لا</button>
+        </div>
+    </div>
+</div>
+
 <script>
     let currentActivePreview = null;
+    let targetSelectElement = null; // للاحتفاظ بالـ select الحالي أثناء تأكيد مودال "مهتم"
 
     function getTodayFormatted() {
         const d = new Date();
@@ -283,13 +302,92 @@
     }
 
     function updateEditDateField(row) {
-        const entryDate = row.querySelector('.entry-date-val').value;
         const today = getTodayFormatted();
-        if (entryDate === today) return;
         const editFieldDisplay = row.querySelector('.edit-date-display');
         const editFieldHidden = row.querySelector('.edit-date-val');
         editFieldDisplay.value = today;
         editFieldHidden.value = today;
+    }
+
+    // دالة معالجة تغييرات القائمة المنسدلة للحالة والفرز المرتبط بها
+    function handleStatusChange(selectEl) {
+        const oldVal = selectEl.getAttribute('data-old') || "";
+        const newVal = selectEl.value;
+        const row = selectEl.closest('tr');
+        const companyName = row.cells[0].querySelector('input').value;
+
+        if (newVal === "مهتم") {
+            targetSelectElement = selectEl;
+            document.getElementById('interestedConfirmModal').style.display = "flex";
+            
+            // عند الضغط على نعم (زر أخضر)
+            document.getElementById('confirmYesBtn').onclick = function() {
+                addToActivityLog('الحالة', oldVal, "مهتم", companyName);
+                selectEl.setAttribute('data-old', "مهتم");
+                document.getElementById('interestedConfirmModal').style.display = "none";
+                updateEditDateField(row);
+                saveAllDataSilently();
+                sortTableRows();
+            };
+
+            // عند الضغط على لا (زر أحمر)
+            document.getElementById('confirmNoBtn').onclick = function() {
+                selectEl.value = ""; // تعود فارغة
+                selectEl.setAttribute('data-old', "");
+                document.getElementById('interestedConfirmModal').style.display = "none";
+                saveAllDataSilently();
+                sortTableRows();
+            };
+        } else {
+            // للحالات الأخرى (50%، 20%، فقدان، فارغ)
+            addToActivityLog('الحالة', oldVal, newVal, companyName);
+            selectEl.setAttribute('data-old', newVal);
+            updateEditDateField(row);
+            saveAllDataSilently();
+            sortTableRows();
+        }
+    }
+
+    // دالة الفرز المخصصة حسب الأولويات المطلوبة وتواريخ التعديل الأحدث
+    function sortTableRows() {
+        const tbody = document.getElementById('tableBody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+
+        function parseDate(dateStr) {
+            if (!dateStr) return 0;
+            const parts = dateStr.split('/');
+            if (parts.length !== 3) return 0;
+            return new Date(parts[2], parts[1] - 1, parts[0]).getTime();
+        }
+
+        rows.sort((a, b) => {
+            const statusA = a.cells[6].querySelector('select').value;
+            const statusB = b.cells[6].querySelector('select').value;
+
+            const editDateA = parseDate(a.querySelector('.edit-date-val').value || a.querySelector('.entry-date-val').value);
+            const editDateB = parseDate(b.querySelector('.edit-date-val').value || b.querySelector('.entry-date-val').value);
+
+            // تحديد وزن وأولوية كل حالة في الترتيب الرأسي
+            function getStatusWeight(status) {
+                if (status === "50%") return 4;
+                if (status === "20%") return 3;
+                if (status === "" || status === "مهتم") return 2; // الحالات الافتراضية والعادية في الوسط
+                if (status === "فقدان") return 1;
+                return 2;
+            }
+
+            const weightA = getStatusWeight(statusA);
+            const weightB = getStatusWeight(statusB);
+
+            if (weightA !== weightB) {
+                return weightB - weightA; // الأوزان الأعلى (50%) تكون أولاً، والأقل (فقدان) تكون في الأسفل
+            } else {
+                return editDateB - editDateA; // إذا تساوت الحالة يتم الترتيب حسب الأحدث تاريخ تعديل
+            }
+        });
+
+        // إعادة البناء بعد الترتيب والفرز التلقائي
+        rows.forEach(row => tbody.appendChild(row));
     }
 
     function renderRow(v = {}, prepend = false) {
@@ -299,21 +397,22 @@
         const editDate = v.editDate || '';
         const notes = v.notes || '';
         const lastNote = getLastNoteOnly(notes);
+        const currentStatus = v.status || ''; // افتراضياً فارغة
 
         row.innerHTML = `
-            <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الشركة', this.getAttribute('data-old'), this.value, this.value); this.setAttribute('data-old', this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently()"></td>
-            <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المسؤول', this.getAttribute('data-old'), this.value, this.closest('tr').cells[0].querySelector('input').value); this.setAttribute('data-old', this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently()"></td>
-            <td><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الموبايل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[0].querySelector('input').value); this.setAttribute('data-old', this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently()"></td>
-            <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الايميل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[0].querySelector('input').value); this.setAttribute('data-old', this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently()"></td>
-            <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('السجل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[0].querySelector('input').value); this.setAttribute('data-old', this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently()"></td>
-            <td><input type="text" class="excel-input" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الخدمة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[0].querySelector('input').value); this.setAttribute('data-old', this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently()"></td>
+            <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الشركة', this.getAttribute('data-old'), this.value, this.value); this.setAttribute('data-old', this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); sortTableRows();"></td>
+            <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المسؤول', this.getAttribute('data-old'), this.value, this.closest('tr').cells[0].querySelector('input').value); this.setAttribute('data-old', this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الموبايل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[0].querySelector('input').value); this.setAttribute('data-old', this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الايميل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[0].querySelector('input').value); this.setAttribute('data-old', this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('السجل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[0].querySelector('input').value); this.setAttribute('data-old', this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الخدمة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[0].querySelector('input').value); this.setAttribute('data-old', this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
             <td>
-                <select class="excel-input" data-old="${v.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الحالة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[0].querySelector('input').value); this.setAttribute('data-old', this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently()">
-                    <option value="" ${!v.status ? 'selected' : ''}></option>
-                    <option value="مهتم" ${v.status==='مهتم'?'selected':''}>مهتم</option>
-                    <option value="50%" ${v.status==='50%'?'selected':''}>50%</option>
-                    <option value="20%" ${v.status==='20%'?'selected':''}>20%</option>
-                    <option value="فقدان" ${v.status==='فقدان'?'selected':''}>فقدان</option>
+                <select class="excel-input" data-old="${currentStatus}" onchange="handleStatusChange(this)">
+                    <option value="" ${currentStatus === '' ? 'selected' : ''}></option>
+                    <option value="مهتم" ${currentStatus === 'مهتم' ? 'selected' : ''}>مهتم</option>
+                    <option value="50%" ${currentStatus === '50%' ? 'selected' : ''}>50%</option>
+                    <option value="20%" ${currentStatus === '20%' ? 'selected' : ''}>20%</option>
+                    <option value="فقدان" ${currentStatus === 'فقدان' ? 'selected' : ''}>فقدان</option>
                 </select>
             </td>
             <td>
@@ -341,6 +440,7 @@
     function insertNewRow() { 
         renderRow({}, true); 
         saveAllDataSilently(); 
+        sortTableRows();
     }
 
     function saveAllDataSilently() {
@@ -368,6 +468,7 @@
         if (saved && JSON.parse(saved).length > 0) {
             JSON.parse(saved).forEach(item => renderRow(item));
         }
+        sortTableRows(); // تطبيق الفرز التلقائي لضمان الترتيب الصحيح عند فتح الصفحة
         renderActivityLog();
     }
 
@@ -382,7 +483,7 @@
     function openNote(el) {
         currentActivePreview = el;
         const log = document.getElementById('historyLog');
-        const rawNotes = el.getAttribute('data-full-notes') || "";
+        const rawNotes = el.getAttribute('data-full-notes'] || "";
         log.innerHTML = formatNotesToHTML(rawNotes);
         document.getElementById('modalTextArea').value = "";
         document.getElementById('noteModal').style.display = "flex";
@@ -403,6 +504,7 @@
             
             updateEditDateField(currentActivePreview.closest('tr'));
             saveAllDataSilently();
+            sortTableRows();
         }
         closeNote();
     }
