@@ -73,7 +73,7 @@
         
         .company-wrapper { display: flex; align-items: center; justify-content: center; gap: 5px; }
         .company-link { color: var(--accent-blue); text-decoration: none; font-weight: 800; border-bottom: 1px dashed var(--accent-blue); }
-        .edit-input { width: 85%; height: 28px; border: 1px solid var(--accent-blue); border-radius: 4px; text-align: center; font-family: 'Cairo'; display: none; outline: none; }
+        .edit-input { width: 85%; height: 28px; border: 1px solid var(--accent-blue); border-radius: 4px; text-align: center; font-family: 'Cairo'; display: none; outline: none; margin: 0 auto; }
 
         .mobile-cell { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 5px; }
         .whatsapp-icon-btn { 
@@ -224,31 +224,19 @@
         if (saved) { JSON.parse(saved).forEach(item => renderRow(item)); }
     }
 
-    // وظيفة البحث المحدثة لتشمل أعمدة محددة
     function filterTable() {
         const filter = document.getElementById("tableSearch").value.toLowerCase();
         const tr = document.getElementById("tableBody").getElementsByTagName("tr");
-        
         for (let i = 0; i < tr.length; i++) {
             const row = tr[i];
-            
-            // جلب القيم من الحقول المحددة
             const company = row.querySelector('.company-link')?.innerText.toLowerCase() || "";
             const manager = row.cells[2].querySelector('input')?.value.toLowerCase() || "";
             const mobile = row.cells[3].querySelector('input')?.value.toLowerCase() || "";
             const cr_main = row.cells[5].querySelector('input')?.value.toLowerCase() || "";
             const cr_sub = row.cells[6].querySelector('input')?.value.toLowerCase() || "";
-            
-            // التحقق إذا كان الفلتر موجود في أي من القيم
-            if (company.includes(filter) || 
-                manager.includes(filter) || 
-                mobile.includes(filter) || 
-                cr_main.includes(filter) || 
-                cr_sub.includes(filter)) {
+            if (company.includes(filter) || manager.includes(filter) || mobile.includes(filter) || cr_main.includes(filter) || cr_sub.includes(filter)) {
                 row.style.display = "";
-            } else {
-                row.style.display = "none";
-            }
+            } else { row.style.display = "none"; }
         }
     }
 
@@ -259,26 +247,30 @@
         const creationDate = v.created || today;
         let initialNotes = v.notes || "";
 
+        // تحديد حالة العرض الأولي لاسم الشركة
+        const wrapperStyle = isNew ? 'display: none;' : 'display: flex;';
+        const inputStyle = isNew ? 'display: block;' : 'display: none;';
+
         row.innerHTML = `
             <td>
-                <div class="company-wrapper">
-                    <a href="customer-profile.html?name=${encodeURIComponent(v.comp || '')}" class="company-link">${v.comp || 'اسم الشركة...'}</a>
+                <div class="company-wrapper" style="${wrapperStyle}">
+                    <a href="customer-profile.html?name=${encodeURIComponent(v.comp || '')}" class="company-link">${v.comp || ''}</a>
                 </div>
-                <input type="text" class="edit-input" value="${v.comp || ''}" onblur="finalizeEdit(this)">
+                <input type="text" class="edit-input" style="${inputStyle}" value="${v.comp || ''}" placeholder="أدخل اسم الشركة..." onblur="finalizeEdit(this)">
             </td>
-            <td><input type="text" class="excel-input-standard" value="${v.address || ''}" onblur="autoSave('تعديل عنوان العميل: ' + this.closest('tr').querySelector('.company-link').innerText)"></td>
-            <td><input type="text" class="excel-input-standard" value="${v.mgr || ''}" onblur="autoSave('تعديل المسؤول لـ: ' + this.closest('tr').querySelector('.company-link').innerText)"></td>
+            <td><input type="text" class="excel-input-standard" value="${v.address || ''}" placeholder="العنوان..." onblur="autoSave('تعديل عنوان العميل: ' + this.closest('tr').querySelector('.company-link').innerText)"></td>
+            <td><input type="text" class="excel-input-standard" value="${v.mgr || ''}" placeholder="المسؤول..." onblur="autoSave('تعديل المسؤول لـ: ' + this.closest('tr').querySelector('.company-link').innerText)"></td>
             <td>
                 <div class="mobile-cell">
-                    <input type="text" class="excel-input-standard" value="${v.mob || ''}" onblur="autoSave('تعديل جوال العميل: ' + this.closest('tr').querySelector('.company-link').innerText)">
+                    <input type="text" class="excel-input-standard" value="${v.mob || ''}" placeholder="الموبايل..." onblur="autoSave('تعديل جوال العميل: ' + this.closest('tr').querySelector('.company-link').innerText)">
                     <a class="whatsapp-icon-btn" onclick="openWhatsApp(this)" title="واتساب">
                         <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.72.937 3.659 1.432 5.628 1.433h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                     </a>
                 </div>
             </td>
-            <td><input type="text" class="excel-input-standard" value="${v.email || ''}" onblur="autoSave()"></td>
-            <td><input type="text" class="excel-input-standard" value="${v.cr || ''}" onblur="autoSave()"></td>
-            <td><input type="text" class="excel-input-standard" value="${v.cr_sub || ''}" onblur="autoSave()"></td>
+            <td><input type="text" class="excel-input-standard" value="${v.email || ''}" placeholder="الايميل..." onblur="autoSave()"></td>
+            <td><input type="text" class="excel-input-standard" value="${v.cr || ''}" placeholder="الرئيسي..." onblur="autoSave()"></td>
+            <td><input type="text" class="excel-input-standard" value="${v.cr_sub || ''}" placeholder="الفرعي..." onblur="autoSave()"></td>
             <td class="custom-tooltip-cell">
                 <div class="notes-preview" onclick="openNote(this)" data-full-notes="${initialNotes}">${getLastNoteOnly(initialNotes)}</div>
                 <div class="tooltip-box">${initialNotes || 'لا توجد ملاحظات'}</div>
@@ -293,6 +285,11 @@
                 </div>
             </td>
         `;
+        
+        if(isNew) {
+            const input = row.querySelector('.edit-input');
+            setTimeout(() => input.focus(), 50);
+        }
     }
 
     function toggleDropdown(e, btn) {
@@ -316,12 +313,20 @@
         const td = input.parentElement;
         const wrapper = td.querySelector('.company-wrapper');
         const link = wrapper.querySelector('.company-link');
-        const oldName = link.innerText;
-        if (oldName !== input.value) {
-            link.innerText = input.value || 'اسم الشركة...';
-            link.href = "customer-profile.html?name=" + encodeURIComponent(input.value);
-            autoSave(`تعديل اسم العميل من ${oldName} إلى ${input.value}`);
+        const oldName = link.innerText.trim();
+        const newName = input.value.trim();
+
+        if (newName !== "") {
+            link.innerText = newName;
+            link.href = "customer-profile.html?name=" + encodeURIComponent(newName);
+            if (oldName !== newName) {
+                autoSave(`تعديل اسم العميل من ${oldName || 'جديد'} إلى ${newName}`);
+            }
+        } else {
+            // إذا كان الاسم فارغاً، نعيده للاسم القديم أو "اسم الشركة..."
+            link.innerText = oldName || 'اسم الشركة...';
         }
+        
         wrapper.style.display = 'flex';
         input.style.display = 'none';
     }
@@ -339,12 +344,10 @@
         const newText = document.getElementById('modalTextArea').value.trim();
         const row = currentActivePreview.closest('tr');
         const compName = row.querySelector('.company-link').innerText;
-
         if (newText !== "" && currentActivePreview) {
             const todayStr = getFullDateForNotes();
             let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
             let updatedNotes = oldNotes + (oldNotes ? "\n--------------------\n" : "") + todayStr + "\n" + newText;
-            
             currentActivePreview.setAttribute('data-full-notes', updatedNotes);
             currentActivePreview.innerText = getLastNoteOnly(updatedNotes);
             currentActivePreview.parentElement.querySelector('.tooltip-box').innerText = updatedNotes;
@@ -358,7 +361,10 @@
     function autoSave(logMsg) {
         const allData = [];
         document.querySelectorAll('#tableBody tr').forEach(row => {
-            const compVal = row.querySelector('.edit-input').value || row.querySelector('.company-link').innerText;
+            const link = row.querySelector('.company-link');
+            const editInput = row.querySelector('.edit-input');
+            // نأخذ القيمة من الـ input إذا كان ظاهراً، وإلا من الرابط
+            const compVal = (editInput.style.display === 'block') ? editInput.value : link.innerText;
             const otherInputs = row.querySelectorAll('input.excel-input-standard');
             const createdDate = row.querySelector('.creation-val').value;
             const noteDiv = row.querySelector('.notes-preview');
@@ -375,7 +381,7 @@
 
     function insertNewRow() { 
         renderRow({}, true); 
-        autoSave("إضافة عميل جديد للقائمة");
+        // لا نحفظ تلقائياً هنا لترك الحقول فارغة تماماً
     }
     
     function deleteRow(btn) { 
@@ -393,7 +399,6 @@
         const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
         const dateStr = now.toLocaleDateString('en-GB');
         const meta = `👤 (أحمد)  🗓️ ${days[now.getDay()]}  ${dateStr}  ${timeStr}  ➡️  : `;
-        
         logs.unshift({ meta, msg });
         localStorage.setItem('asgate_customer_logs', JSON.stringify(logs.slice(0, 30)));
         renderActivityLogs();
