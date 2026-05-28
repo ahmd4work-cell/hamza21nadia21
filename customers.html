@@ -110,7 +110,7 @@
         .custom-tooltip-cell { position: relative; }
         .tooltip-box {
             position: absolute; bottom: 100%; right: 0; background: #334155; color: #fff;
-            padding: 8px 12px; border-radius: 8px; width: 220px; font-size: 11px;
+            padding: 8px 12px; border-radius: 8px; width: 250px; font-size: 11px;
             line-height: 1.6; white-space: pre-wrap; text-align: right;
             opacity: 0; visibility: hidden; transition: 0.2s; z-index: 9999;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3); pointer-events: none; 
@@ -128,9 +128,9 @@
         .log-user { color: var(--accent-blue); font-weight: 800; }
 
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
-        .modal-content { background: white; padding: 15px; border-radius: 12px; width: 380px; height: 440px; display: flex; flex-direction: column; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .modal-header { font-weight: 800; color: #2e1065; margin-bottom: 10px; font-size: 14px; text-align: right; }
-        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; margin-bottom: 10px; font-size: 12px; color: #1e293b; text-align: right; line-height: 1.8; white-space: pre-wrap; }
+        .modal-content { background: white; padding: 15px; border-radius: 12px; width: 450px; height: 500px; display: flex; flex-direction: column; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-header { font-weight: 800; color: #2e1065; margin-bottom: 10px; font-size: 14px; text-align: right; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; margin-bottom: 10px; font-size: 11px; color: #1e293b; text-align: right; line-height: 1.6; white-space: pre-wrap; }
         .note-area { height: 80px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 8px; font-family: 'Cairo'; resize: none; outline: none; box-sizing: border-box; font-size: 13px; text-align: right; }
         .modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
     </style>
@@ -197,16 +197,22 @@
         return d.getDate().toString().padStart(2, '0') + '/' + (d.getMonth() + 1).toString().padStart(2, '0') + '/' + d.getFullYear();
     }
 
-    function getFullDateForNotes() {
+    function getFullChatHeader() {
         const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
         const d = new Date();
-        return "🗓️ " + days[d.getDay()] + " " + getTodayFormatted();
+        const timeStr = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+        const dateStr = d.getDate().toString().padStart(2, '0') + '/' + (d.getMonth() + 1).toString().padStart(2, '0') + '/' + d.getFullYear();
+        // تنسيق السجل المطلوب: 👤 (أحمد) 🗓️ الخميس 28/05/2026 11:00 AM ➡️ :
+        return `👤 (أحمد) 🗓️ ${days[d.getDay()]} ${dateStr} ${timeStr} ➡️ : `;
     }
 
     function getLastNoteOnly(fullText) {
         if (!fullText || fullText === "" || fullText === "[]") return 'إضافة ملاحظة...';
-        const lines = fullText.split('\n').filter(l => l.trim() !== "" && !l.includes("🗓️") && !l.includes("---"));
-        return lines.length > 0 ? lines[lines.length - 1] : 'إضافة ملاحظة...';
+        const notesArray = fullText.split('\n--------------------\n');
+        const lastEntry = notesArray[notesArray.length - 1];
+        // استخراج النص فقط بعد السهم ➡️ :
+        const parts = lastEntry.split('➡️ : ');
+        return parts.length > 1 ? parts[1].trim() : 'إضافة ملاحظة...';
     }
 
     function openWhatsApp(el) {
@@ -240,6 +246,29 @@
         }
     }
 
+    // خاصية التحقق من عدم التكرار
+    function isDuplicateCR(input, type) {
+        const val = input.value.trim();
+        if (!val) return false;
+        
+        const allData = JSON.parse(localStorage.getItem('asgate_customers_data') || '[]');
+        const currentRow = input.closest('tr');
+        const currentLink = currentRow.querySelector('.company-link').innerText.trim();
+
+        const duplicate = allData.find(item => {
+            // لا تقارن الصف مع نفسه عند التعديل
+            if (item.comp === currentLink && currentLink !== "") return false;
+            return (type === 'main' ? item.cr : item.cr_sub) === val;
+        });
+
+        if (duplicate) {
+            alert("⚠️ العميل موجود مسبقاً (رقم السجل مكرر)");
+            input.value = ""; // تفريغ الحقل المكرر
+            return true;
+        }
+        return false;
+    }
+
     function renderRow(v, isNew = false) {
         const tbody = document.getElementById('tableBody');
         const row = isNew ? tbody.insertRow(0) : tbody.insertRow();
@@ -247,7 +276,6 @@
         const creationDate = v.created || today;
         let initialNotes = v.notes || "";
 
-        // تحديد حالة العرض الأولي لاسم الشركة
         const wrapperStyle = isNew ? 'display: none;' : 'display: flex;';
         const inputStyle = isNew ? 'display: block;' : 'display: none;';
 
@@ -258,21 +286,21 @@
                 </div>
                 <input type="text" class="edit-input" style="${inputStyle}" value="${v.comp || ''}" placeholder="أدخل اسم الشركة..." onblur="finalizeEdit(this)">
             </td>
-            <td><input type="text" class="excel-input-standard" value="${v.address || ''}" placeholder="العنوان..." onblur="autoSave('تعديل عنوان العميل: ' + this.closest('tr').querySelector('.company-link').innerText)"></td>
-            <td><input type="text" class="excel-input-standard" value="${v.mgr || ''}" placeholder="المسؤول..." onblur="autoSave('تعديل المسؤول لـ: ' + this.closest('tr').querySelector('.company-link').innerText)"></td>
+            <td><input type="text" class="excel-input-standard" value="${v.address || ''}" placeholder="العنوان..." onblur="autoSave('تعديل عنوان العميل')"></td>
+            <td><input type="text" class="excel-input-standard" value="${v.mgr || ''}" placeholder="المسؤول..." onblur="autoSave('تعديل المسؤول')"></td>
             <td>
                 <div class="mobile-cell">
-                    <input type="text" class="excel-input-standard" value="${v.mob || ''}" placeholder="الموبايل..." onblur="autoSave('تعديل جوال العميل: ' + this.closest('tr').querySelector('.company-link').innerText)">
+                    <input type="text" class="excel-input-standard" value="${v.mob || ''}" placeholder="الموبايل..." onblur="autoSave('تعديل الجوال')">
                     <a class="whatsapp-icon-btn" onclick="openWhatsApp(this)" title="واتساب">
                         <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.72.937 3.659 1.432 5.628 1.433h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                     </a>
                 </div>
             </td>
             <td><input type="text" class="excel-input-standard" value="${v.email || ''}" placeholder="الايميل..." onblur="autoSave()"></td>
-            <td><input type="text" class="excel-input-standard" value="${v.cr || ''}" placeholder="الرئيسي..." onblur="autoSave()"></td>
-            <td><input type="text" class="excel-input-standard" value="${v.cr_sub || ''}" placeholder="الفرعي..." onblur="autoSave()"></td>
+            <td><input type="text" class="excel-input-standard" value="${v.cr || ''}" placeholder="الرئيسي..." onblur="isDuplicateCR(this, 'main'); autoSave()"></td>
+            <td><input type="text" class="excel-input-standard" value="${v.cr_sub || ''}" placeholder="الفرعي..." onblur="isDuplicateCR(this, 'sub'); autoSave()"></td>
             <td class="custom-tooltip-cell">
-                <div class="notes-preview" onclick="openNote(this)" data-full-notes="${initialNotes}">${getLastNoteOnly(initialNotes)}</div>
+                <div class="notes-preview" onclick="openNote(this)" data-full-notes='${initialNotes}'>${getLastNoteOnly(initialNotes)}</div>
                 <div class="tooltip-box">${initialNotes || 'لا توجد ملاحظات'}</div>
             </td>
             <td><span class="date-text" style="color:#64748b; font-size:10px;">${creationDate}</span><input type="hidden" class="creation-val" value="${creationDate}"></td>
@@ -323,7 +351,6 @@
                 autoSave(`تعديل اسم العميل من ${oldName || 'جديد'} إلى ${newName}`);
             }
         } else {
-            // إذا كان الاسم فارغاً، نعيده للاسم القديم أو "اسم الشركة..."
             link.innerText = oldName || 'اسم الشركة...';
         }
         
@@ -344,14 +371,18 @@
         const newText = document.getElementById('modalTextArea').value.trim();
         const row = currentActivePreview.closest('tr');
         const compName = row.querySelector('.company-link').innerText;
+        
         if (newText !== "" && currentActivePreview) {
-            const todayStr = getFullDateForNotes();
+            // استخدام التنسيق الجديد للمحادثة
+            const chatHeader = getFullChatHeader();
             let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
-            let updatedNotes = oldNotes + (oldNotes ? "\n--------------------\n" : "") + todayStr + "\n" + newText;
+            let entry = chatHeader + newText;
+            let updatedNotes = oldNotes + (oldNotes ? "\n--------------------\n" : "") + entry;
+            
             currentActivePreview.setAttribute('data-full-notes', updatedNotes);
             currentActivePreview.innerText = getLastNoteOnly(updatedNotes);
             currentActivePreview.parentElement.querySelector('.tooltip-box').innerText = updatedNotes;
-            autoSave(`إضافة ملاحظة جديدة للعميل: ${compName}`);
+            autoSave(`إضافة ملاحظة للعميل: ${compName}`);
         }
         closeNote();
     }
@@ -363,7 +394,6 @@
         document.querySelectorAll('#tableBody tr').forEach(row => {
             const link = row.querySelector('.company-link');
             const editInput = row.querySelector('.edit-input');
-            // نأخذ القيمة من الـ input إذا كان ظاهراً، وإلا من الرابط
             const compVal = (editInput.style.display === 'block') ? editInput.value : link.innerText;
             const otherInputs = row.querySelectorAll('input.excel-input-standard');
             const createdDate = row.querySelector('.creation-val').value;
@@ -381,7 +411,6 @@
 
     function insertNewRow() { 
         renderRow({}, true); 
-        // لا نحفظ تلقائياً هنا لترك الحقول فارغة تماماً
     }
     
     function deleteRow(btn) { 
