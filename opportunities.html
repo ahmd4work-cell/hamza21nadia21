@@ -7,10 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* الهوية البصرية الجديدة */
             --nav-shiny-navy: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
             --header-shiny-purple: linear-gradient(180deg, #4c1d95 0%, #2e1065 100%);
-            
             --nav-bg: #0f172a;
             --nav-active: #a78bfa;
             --bg-color: #f4f7f9;
@@ -22,160 +20,58 @@
             --dark-yellow: #c29103;
         }
 
-        html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: var(--bg-color); font-family: 'Cairo', sans-serif; font-size: 13px; line-height: 1.2; }
+        html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: var(--bg-color); font-family: 'Cairo', sans-serif; font-size: 13px; line-height: 1.2; color: var(--text-dark); }
+        .dashboard-container { display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; }
 
-        .dashboard-container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            box-sizing: border-box;
-        }
-
-        /* Navbar - الكحلي اللامع */
         .navbar { 
-            background: var(--nav-shiny-navy); 
-            display: flex; 
-            align-items: center; 
-            padding: 0 20px; 
-            margin: 10px 10px 5px 10px; 
-            border-radius: 12px; 
-            height: 37px; 
-            flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.1);
-            border: 1px solid #1e293b;
+            background: var(--nav-shiny-navy); display: flex; align-items: center; padding: 0 20px; margin: 10px 10px 5px 10px; 
+            border-radius: 12px; height: 37px; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: 1px solid #1e293b;
         }
-        .navbar a { 
-            color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; 
-            height: 26px; line-height: 26px; display: inline-block; transition: 0.3s; 
-        }
-        .navbar a.active { background-color: var(--nav-active); color: #0f172a; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; height: 26px; line-height: 26px; display: inline-block; transition: 0.3s; }
+        .navbar a.active { background-color: var(--nav-active); color: #0f172a; border-radius: 6px; }
 
-        .main-content { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            padding: 0 15px; 
-            min-height: 0; 
-        }
+        .main-content { flex: 1; display: flex; flex-direction: column; padding: 0 15px; min-height: 0; }
         .action-bar { display: flex; align-items: center; margin: 10px 0; gap: 10px; justify-content: space-between; flex-shrink: 0; }
         
         .btn-top { border: none; padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; font-size: 12px; }
         .btn-add { background-color: var(--accent-blue); }
-        .btn-save { background-color: #cbd5e1; color: #64748b; pointer-events: none; opacity: 0.6; }
-        .btn-save.active { 
-            background-color: var(--accent-green-active); color: white; pointer-events: auto; opacity: 1; 
-            box-shadow: 0 0 12px rgba(34, 197, 94, 0.5); 
-        }
 
-        .search-wrapper { position: relative; width: 300px; display: flex; align-items: center; }
+        .search-wrapper { position: relative; width: 320px; display: flex; align-items: center; }
         .search-input {
-            width: 100%; height: 32px; padding: 0 15px; border-radius: 8px;
-            border: 1px solid var(--border-soft); font-family: 'Cairo'; font-size: 11px; outline: none;
+            width: 100%; height: 35px; padding: 0 40px 0 15px; border-radius: 20px; border: 1px solid var(--border-soft);
+            font-family: 'Cairo'; font-size: 12px; font-weight: 700; outline: none;
         }
+        .search-icon { position: absolute; right: 14px; color: #94a3b8; pointer-events: none; }
 
-        /* الجدول */
-        .table-wrapper { 
-            background: white; 
-            border-radius: 10px; 
-            overflow-y: auto; 
-            border: 1px solid var(--border-soft); 
-            flex: 1; 
-            min-height: 0; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
-        }
+        .table-wrapper { background: white; border-radius: 10px; overflow-y: auto; border: 1px solid var(--border-soft); flex: 1; min-height: 0; }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th { background: var(--header-shiny-purple); color: white; padding: 12px 5px; font-size: 11px; font-weight: 800; position: sticky; top: 0; z-index: 10; }
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; }
         
-        /* شريط العناوين - البنفسجي اللامع */
-        th { 
-            background: var(--header-shiny-purple); 
-            color: white; 
-            padding: 12px 5px; 
-            font-size: 11px; 
-            font-weight: 800; 
-            text-align: center;
-            border-bottom: 2px solid #2e1065;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-            position: sticky; top: 0; z-index: 10;
-        }
-        th::after {
-            content: ""; position: absolute; top: 0; left: 0; right: 0; height: 50%;
-            background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
-            pointer-events: none;
-        }
-
-        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); position: relative; }
-        tbody tr:nth-child(even) { background-color: #eff6ff; }
-
-        .excel-input { width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; font-size: 11.5px; color: inherit; font-weight: inherit; }
+        .excel-input { width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; font-size: 11.5px; font-weight: inherit; }
         .readonly-input { color: #64748b; cursor: default; }
 
-        /* القائمة المنسدلة */
-        .dots-btn { cursor: pointer; font-size: 18px; color: #64748b; font-weight: bold; background: none; border: none; padding: 5px 10px; }
+        .dots-btn { cursor: pointer; font-size: 18px; color: #64748b; background: none; border: none; }
         .dropdown-menu { 
-            display: none; position: absolute; left: 10px; top: 35px; background: white; 
-            border: 1px solid var(--border-soft); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
-            z-index: 100; min-width: 120px; overflow: hidden;
+            display: none; position: absolute; left: 10px; background: white; border: 1px solid var(--border-soft); 
+            border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 100; min-width: 120px;
         }
-        .dropdown-menu button { 
-            width: 100%; padding: 8px 12px; border: none; background: none; font-family: 'Cairo'; 
-            font-size: 11px; text-align: right; cursor: pointer; transition: 0.2s; color: #475569; font-weight: 700;
-        }
-        .dropdown-menu button:hover { background: #f1f5f9; color: #0f172a; }
-        .dropdown-menu .delete-btn:hover { background: #fee2e2; color: red; }
+        .dropdown-menu button { width: 100%; padding: 9px 12px; border: none; background: none; font-family: 'Cairo'; font-size: 11px; text-align: right; cursor: pointer; }
         .show { display: block; }
 
-        /* الملاحظات */
+        /* Tooltip & Modal */
         .custom-tooltip-cell { position: relative; }
-        .tooltip-box {
-            position: absolute; bottom: 100%; right: 0; background: #334155; color: #fff;
-            padding: 8px 12px; border-radius: 8px; width: 220px; font-size: 11px;
-            line-height: 1.6; white-space: pre-wrap; text-align: right;
-            opacity: 0; visibility: hidden; transition: 0.2s; z-index: 9999;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3); pointer-events: none; 
-        }
-        .custom-tooltip-cell:hover .tooltip-box { opacity: 1; visibility: visible; }
-        .notes-preview {
-            width: 95%; border: none; background: transparent; font-family: 'Cairo'; font-size: 11px;
-            text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700;
-            overflow: hidden; white-space: nowrap; text-overflow: ellipsis; display: block; margin: 0 auto;
-        }
-
-        /* تنسيقات قسم سجل النشاط المضاف */
-        .activity-log-section { 
-            margin: 15px 0 10px 0; 
-            padding: 12px 18px; 
-            background: #ffffff; 
-            border-radius: 10px; 
-            border: 1px solid var(--border-soft);
-            box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
-            flex-shrink: 0; 
-            height: 140px; 
-            display: flex;
-            flex-direction: column;
-            box-sizing: border-box;
-        }
-        .activity-log-title { color: var(--dark-yellow); font-size: 13.5px; font-weight: 800; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; flex-shrink: 0; }
-        .activity-list { flex: 1; overflow-y: auto; font-size: 11.5px; line-height: 1.6; }
-        .activity-item { margin-bottom: 4px; border-bottom: 1px dashed #f8fafc; padding-bottom: 4px; color: #475569; display: flex; align-items: center; }
-        
-        .activity-time-part { font-size: 10.5px; color: #64748b; }
-        .activity-text-part { font-size: 11.5px; }
-
-        /* Modal */
+        .notes-preview { color: #3b82f6; cursor: pointer; font-weight: 700; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
-        .modal-content { background: white; padding: 15px; border-radius: 12px; width: 380px; height: 440px; display: flex; flex-direction: column; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .modal-header { font-weight: 800; color: #2e1065; margin-bottom: 10px; text-align: right; font-size: 14px; }
-        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 6px; padding: 12px; margin-bottom: 10px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.8; }
-        .note-area { height: 80px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 8px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; }
-        
-        /* Column Widths */
-        .col-company { width: 12%; } .col-manager { width: 8%; } .col-mobile { width: 8%; } 
-        .col-email { width: 8%; } .col-record { width: 8%; } .col-service { width: 10%; }
-        .col-status { width: 7%; } .col-date { width: 8%; } .col-notes { width: 15%; }
-        .col-edit { width: 8%; } .col-action { width: 50px; }
+        .modal-content { background: white; padding: 18px; border-radius: 12px; width: 440px; }
+        .history-log { height: 150px; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); padding: 10px; margin-bottom: 10px; font-size: 12px; text-align: right; }
+        .note-area { width: 100%; height: 80px; border-radius: 8px; border: 1px solid var(--border-soft); padding: 10px; font-family: 'Cairo'; resize: none; box-sizing: border-box; }
+
+        .col-comp { width: 15%; } .col-mgr { width: 10%; } .col-serv { width: 15%; } .col-val { width: 8%; }
+        .col-status { width: 10%; } .col-date { width: 10%; } .col-edit { width: 10%; } .col-notes { width: 17%; } .col-act { width: 5%; }
     </style>
 </head>
-<body onload="loadSavedData()">
+<body onload="loadData()">
 
 <div class="dashboard-container">
     <nav class="navbar">
@@ -188,12 +84,9 @@
 
     <div class="main-content">
         <div class="action-bar">
-            <div style="display: flex; gap: 10px;">
-                <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة فرصة بيعية</button>
-                <button id="saveBtn" class="btn-top btn-save" onclick="saveAllData()">حفظ البيانات</button>
-            </div>
+            <button class="btn-top btn-add" onclick="insertRow()">+ إضافة فرصة جديدة</button>
             <div class="search-wrapper">
-                <input type="text" id="searchInput" class="search-input" placeholder="🔍 بحث عن شركة..." onkeyup="filterTable()">
+                <input type="text" id="searchInput" class="search-input" placeholder="بحث عن فرصة..." onkeyup="filterTable()">
             </div>
         </div>
         
@@ -201,237 +94,182 @@
             <table>
                 <thead>
                     <tr>
-                        <th class="col-company">الشركة</th>
-                        <th class="col-manager">المسؤول</th>
-                        <th class="col-mobile">الموبايل</th>
-                        <th class="col-email">الإيميل</th>
-                        <th class="col-record">السجل</th>
-                        <th class="col-service">الخدمة</th>
+                        <th class="col-comp">الشركة</th>
+                        <th class="col-mgr">المسؤول</th>
+                        <th class="col-serv">الخدمة المطلوبة</th>
+                        <th class="col-val">القيمة المتوقعة</th>
                         <th class="col-status">الحالة</th>
-                        <th class="col-date">التاريخ</th>
-                        <th class="col-notes">ملاحظات</th>
-                        <th class="col-edit">تعديل</th>
-                        <th class="col-action">إجراء</th>
+                        <th class="col-date">تاريخ الإغلاق</th>
+                        <th class="col-notes">ملاحظات المتابعة</th>
+                        <th class="col-edit">تاريخ التعديل</th>
+                        <th class="col-act">إجراء</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
             </table>
-        </div>
-
-        <!-- قسم سجل النشاط المضاف حديثاً أسفل الصفحة بنفس الهوية البصرية -->
-        <div class="activity-log-section">
-            <div class="activity-log-title">📋 سجل النشاط</div>
-            <div id="activityList" class="activity-list"></div>
         </div>
     </div>
 </div>
 
 <div id="noteModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header">سجل متابعة الفرصة</div>
+        <div style="font-weight: 800; margin-bottom: 10px;">سجل المتابعة</div>
         <div id="historyLog" class="history-log"></div>
-        <textarea id="modalTextArea" class="note-area" placeholder="أدخل الملاحظة الجديدة هنا..."></textarea>
-        <div class="modal-footer" style="display:flex; justify-content: flex-end; gap:8px; margin-top:10px;">
-            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px;">إلغاء</button>
-            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 15px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px; font-weight:bold;">إضافة ملاحظة</button>
+        <textarea id="modalTextArea" class="note-area" placeholder="أضف ملاحظة جديدة..."></textarea>
+        <div style="display:flex; justify-content: flex-end; gap:8px; margin-top:10px;">
+            <button onclick="closeNote()" style="background:#94a3b8; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">إلغاء</button>
+            <button onclick="saveNote()" style="background:#22c55e; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; font-weight:bold;">حفظ</button>
         </div>
     </div>
 </div>
 
 <script>
-    let currentActivePreview = null;
-    let isDirty = false;
+    let currentNoteEl = null;
 
-    function getTodayFormatted() {
+    function getNow() {
         const d = new Date();
         return d.getDate().toString().padStart(2, '0') + '/' + (d.getMonth() + 1).toString().padStart(2, '0') + '/' + d.getFullYear();
     }
 
-    function getFullDateTimePattern() {
-        const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-        const d = new Date();
-        const dayName = days[d.getDay()];
-        const dateStr = getTodayFormatted();
-        let hours = d.getHours();
-        const minutes = d.getMinutes().toString().padStart(2, '0');
-        const ampm = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12 || 12;
-        return `👤 (أحمد)  🗓️ ${dayName}  ${dateStr}  ${hours.toString().padStart(2, '0')}:${minutes} ${ampm} ➡️ :`;
+    function parseDate(s) {
+        if(!s) return 0;
+        const p = s.split('/');
+        return new Date(p[2], p[1]-1, p[0]).getTime();
     }
 
-    function addToActivityLog(fieldName, oldVal, newVal, companyName) {
-        const timePart = getFullDateTimePattern();
-        const cleanOld = oldVal.trim() === "" ? "فارغ" : oldVal;
-        const cleanNew = newVal.trim() === "" ? "فارغ" : newVal;
-        const cleanCompany = companyName.trim() === "" ? "شركة غير محددة" : companyName;
-
-        let actionText = "";
-        if (fieldName === "الشركة") {
-            actionText = `تعديل الشركة ${cleanOld} الى ${cleanNew}  ( ${cleanNew} )`;
-        } else {
-            actionText = `تعديل ${fieldName} ${cleanOld} الى ${cleanNew}  ( ${cleanCompany} )`;
-        }
-
-        const fullLogHTML = `<span class="activity-time-part">${timePart}</span> <span class="activity-text-part">${actionText}</span>`;
-        
-        let logs = JSON.parse(localStorage.getItem('asgate_opp_activity_logs') || '[]');
-        logs.unshift(fullLogHTML);
-        if(logs.length > 100) logs.pop();
-        localStorage.setItem('asgate_opp_activity_logs', JSON.stringify(logs));
-        renderActivityLog();
+    function markEdited(input) {
+        const row = input.closest('tr');
+        const editField = row.querySelector('.edit-date-val');
+        const now = getNow();
+        editField.value = now;
+        row.querySelector('.edit-date-display').value = now;
+        saveAndSort();
     }
 
-    function renderActivityLog() {
-        const list = document.getElementById('activityList');
-        if (!list) return;
-        const logs = JSON.parse(localStorage.getItem('asgate_opp_activity_logs') || '[]');
-        list.innerHTML = logs.map(log => `<div class="activity-item">${log}</div>`).join('');
-    }
-
-    function toggleSaveBtn(active) {
-        isDirty = active;
-        document.getElementById('saveBtn').classList.toggle('active', active);
-    }
-
-    function markAsEdited(el) {
-        const row = el.closest('tr');
-        const entryDate = row.querySelector('.entry-date-val').value;
-        const editFieldDisplay = row.querySelector('.edit-date-display');
-        const editFieldHidden = row.querySelector('.edit-date-val');
-        
-        const today = getTodayFormatted();
-        if (entryDate !== today) {
-            editFieldDisplay.value = today;
-            editFieldHidden.value = today;
-        }
-        toggleSaveBtn(true);
-    }
-
-    function handleFieldChange(el, fieldName) {
-        const oldVal = el.getAttribute('data-old') || '';
-        const newVal = el.value;
-        if(oldVal !== newVal) {
-            const companyName = el.closest('tr').cells[0].querySelector('input').value;
-            addToActivityLog(fieldName, oldVal, newVal, companyName);
-            el.setAttribute('data-old', newVal);
-            markAsEdited(el);
-        }
-    }
-
-    function renderRow(v = {}, prepend = false) {
-        const tbody = document.getElementById('tableBody');
-        const row = prepend ? tbody.insertRow(0) : tbody.insertRow();
-        
-        const entryDate = v.entryDate || getTodayFormatted();
-        const editDate = v.editDate || '';
-        const notes = v.notes || '';
-
-        row.innerHTML = `
-            <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'الشركة')"></td>
-            <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'المسؤول')"></td>
-            <td><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'الموبايل')"></td>
-            <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'الايميل')"></td>
-            <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'السجل')"></td>
-            <td><input type="text" class="excel-input" value="${v.curServ || ''}" oninput="markAsEdited(this)"></td>
-            <td>
-                <select class="excel-input" data-old="${v.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'الحالة')">
-                    <option value="" ${!v.status ? 'selected' : ''}></option>
-                    <option value="مهتم" ${v.status==='مهتم'?'selected':''}>مهتم</option>
-                    <option value="50%" ${v.status==='50%'?'selected':''}>50%</option>
-                    <option value="20%" ${v.status==='20%'?'selected':''}>20%</option>
-                    <option value="فقدان" ${v.status==='فقدان'?'selected':''}>فقدان</option>
-                </select>
-            </td>
-            <td>
-                <input type="text" class="excel-input readonly-input" value="${entryDate}" readonly>
-                <input type="hidden" class="entry-date-val" value="${entryDate}">
-            </td>
-            <td class="custom-tooltip-cell">
-                <div class="notes-preview" onclick="openNote(this)" data-full-notes="${notes}">${getLastNoteOnly(notes)}</div>
-                <div class="tooltip-box">${notes || 'لا توجد ملاحظات'}</div>
-            </td>
-            <td>
-                <input type="text" class="excel-input readonly-input edit-date-display" value="${editDate}" readonly>
-                <input type="hidden" class="edit-date-val" value="${editDate}">
-            </td>
-            <td>
-                <button class="dots-btn" onclick="toggleDropdown(event, this)">⋮</button>
-                <div class="dropdown-menu">
-                    <button onclick="alert('سيتم إضافة خاصية تحويل الحساب قريباً')">تحويل الحساب</button>
-                    <button class="delete-btn" onclick="confirmDelete(this)">حذف</button>
-                    <button onclick="this.closest('tr').querySelector('input').focus()">تعديل</button>
-                </div>
-            </td>
-        `;
-    }
-
-    function saveAllData() {
+    function saveAndSort() {
         const data = [];
         document.querySelectorAll('#tableBody tr').forEach(row => {
-            const inputs = row.querySelectorAll('input, select');
-            const noteDiv = row.querySelector('.notes-preview');
+            const ins = row.querySelectorAll('input, select');
             data.push({
-                comp: inputs[0].value, mgr: inputs[1].value, mob: inputs[2].value, email: inputs[3].value,
-                record: inputs[4].value, curServ: inputs[5].value, status: inputs[6].value,
-                entryDate: row.querySelector('.entry-date-val').value,
-                notes: noteDiv.getAttribute('data-full-notes'),
-                editDate: row.querySelector('.edit-date-val').value
+                comp: ins[0].value, mgr: ins[1].value, serv: ins[2].value, val: ins[3].value,
+                status: ins[4].value, closeDate: ins[5].value,
+                notes: row.querySelector('.notes-preview').getAttribute('data-full') || '',
+                editDate: ins[6].value
             });
         });
-        localStorage.setItem('asgate_opportunities_data_v1', JSON.stringify(data));
-        toggleSaveBtn(false);
-        alert("تم حفظ البيانات بنجاح!");
+        localStorage.setItem('asgate_opps_v3', JSON.stringify(data));
+        renderTable(data);
     }
 
-    function loadSavedData() {
-        const saved = localStorage.getItem('asgate_opportunities_data_v1');
+    function renderTable(data) {
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = '';
-        if (saved && JSON.parse(saved).length > 0) {
-            JSON.parse(saved).forEach(item => renderRow(item));
-        } else {
-            insertNewRow();
-        }
-        renderActivityLog();
-        toggleSaveBtn(false);
+
+        // منطق الترتيب
+        data.sort((a, b) => {
+            if (a.status === 'مهتم' && b.status !== 'مهتم') return -1;
+            if (a.status !== 'مهتم' && b.status === 'مهتم') return 1;
+            
+            if (a.status === 'مهتم' && b.status === 'مهتم') {
+                return parseDate(a.closeDate) - parseDate(b.closeDate); // الأقرب تاريخ إغلاق بالأعلى
+            }
+
+            if (a.status === 'فقدان' && b.status !== 'فقدان') return 1;
+            if (a.status !== 'فقدان' && b.status === 'فقدان') return -1;
+
+            if (a.status === 'فقدان' && b.status === 'فقدان') {
+                return parseDate(a.editDate) - parseDate(b.editDate); // الأحدث تعديلاً بالأسفل (الأقدم تعديلاً بالأعلى في قسم الفقدان)
+            }
+            return 0;
+        });
+
+        data.forEach(v => {
+            const row = tbody.insertRow();
+            const lastNote = v.notes ? v.notes.split('\n').pop() : 'إضافة ملاحظة...';
+            row.innerHTML = `
+                <td><input type="text" class="excel-input" value="${v.comp||''}" onchange="markEdited(this)"></td>
+                <td><input type="text" class="excel-input" value="${v.mgr||''}" onchange="markEdited(this)"></td>
+                <td><input type="text" class="excel-input" value="${v.serv||''}" onchange="markEdited(this)"></td>
+                <td><input type="text" class="excel-input" value="${v.val||''}" onchange="markEdited(this)"></td>
+                <td>
+                    <select class="excel-input" onchange="markEdited(this)">
+                        <option value="" ${v.status===''?'selected':''}></option>
+                        <option value="مهتم" ${v.status==='مهتم'?'selected':''}>مهتم</option>
+                        <option value="فقدان" ${v.status==='فقدان'?'selected':''}>فقدان</option>
+                    </select>
+                </td>
+                <td><input type="text" class="excel-input" value="${v.closeDate||''}" placeholder="DD/MM/YYYY" onchange="markEdited(this)"></td>
+                <td class="custom-tooltip-cell">
+                    <div class="notes-preview" onclick="openNote(this)" data-full="${v.notes||''}">${lastNote}</div>
+                </td>
+                <td>
+                    <input type="text" class="excel-input readonly-input edit-date-display" value="${v.editDate||''}" readonly>
+                    <input type="hidden" class="edit-date-val" value="${v.editDate||''}">
+                </td>
+                <td>
+                    <button class="dots-btn" onclick="toggleDropdown(event, this)">⋮</button>
+                    <div class="dropdown-menu">
+                        <button style="color:red" onclick="deleteRow(this)">حذف</button>
+                    </div>
+                </td>
+            `;
+        });
     }
 
-    function insertNewRow() { renderRow({}, true); toggleSaveBtn(true); }
+    function insertRow() {
+        const data = JSON.parse(localStorage.getItem('asgate_opps_v3') || '[]');
+        data.unshift({ comp:'', mgr:'', serv:'', val:'', status:'', closeDate:'', notes:'', editDate: getNow() });
+        localStorage.setItem('asgate_opps_v3', JSON.stringify(data));
+        renderTable(data);
+    }
 
-    function getLastNoteOnly(fullText) {
-        if (!fullText) return 'إضافة ملاحظة...';
-        const lines = fullText.split('\n').filter(l => l.trim() !== "" && !l.includes("🗓️") && !l.includes("---"));
-        return lines.length > 0 ? lines[lines.length - 1] : 'إضافة ملاحظة...';
+    function loadData() {
+        const saved = localStorage.getItem('asgate_opps_v3');
+        if(saved) renderTable(JSON.parse(saved));
     }
 
     function openNote(el) {
-        currentActivePreview = el;
-        const log = document.getElementById('historyLog');
-        log.innerText = el.getAttribute('data-full-notes') || "لا توجد ملاحظات سابقة.";
-        document.getElementById('modalTextArea').value = "";
-        document.getElementById('noteModal').style.display = "flex";
-        setTimeout(() => { document.getElementById('modalTextArea').focus(); log.scrollTop = log.scrollHeight; }, 50);
+        currentNoteEl = el;
+        document.getElementById('historyLog').innerText = el.getAttribute('data-full') || 'لا توجد ملاحظات سابقة.';
+        document.getElementById('modalTextArea').value = '';
+        document.getElementById('noteModal').style.display = 'flex';
     }
 
     function saveNote() {
-        const newText = document.getElementById('modalTextArea').value.trim();
-        if (newText !== "" && currentActivePreview) {
-            const todayStr = "🗓️ " + getTodayFormatted();
-            let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
-            let updatedNotes = oldNotes + (oldNotes ? "\n--------------------\n" : "") + todayStr + "\n" + newText;
-            currentActivePreview.setAttribute('data-full-notes', updatedNotes);
-            currentActivePreview.innerText = getLastNoteOnly(updatedNotes);
-            currentActivePreview.parentElement.querySelector('.tooltip-box').innerText = updatedNotes;
-            markAsEdited(currentActivePreview);
+        const text = document.getElementById('modalTextArea').value.trim();
+        if(text && currentNoteEl) {
+            const old = currentNoteEl.getAttribute('data-full') || '';
+            const updated = (old ? old + '\n' : '') + getNow() + ': ' + text;
+            currentNoteEl.setAttribute('data-full', updated);
+            currentNoteEl.innerText = text;
+            markEdited(currentNoteEl);
         }
         closeNote();
     }
 
-    function closeNote() { document.getElementById('noteModal').style.display = "none"; }
-    function confirmDelete(btn) { if (confirm("هل أنت متأكد من حذف هذه الفرصة؟")) { btn.closest('tr').remove(); toggleSaveBtn(true); } }
-    function toggleDropdown(e, btn) { e.stopPropagation(); document.querySelectorAll('.dropdown-menu').forEach(m => { if(m !== btn.nextElementSibling) m.classList.remove('show'); }); btn.nextElementSibling.classList.toggle('show'); }
-    function filterTable() { const query = document.getElementById('searchInput').value.toLowerCase(); document.querySelectorAll('#tableBody tr').forEach(row => { row.style.display = row.innerText.toLowerCase().includes(query) ? "" : "none"; }); }
-    window.onclick = function(e) { if (!e.target.matches('.dots-btn')) { document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show')); } if (e.target == document.getElementById('noteModal')) closeNote(); }
+    function closeNote() { document.getElementById('noteModal').style.display = 'none'; }
+
+    function deleteRow(btn) {
+        if(confirm('حذف هذه الفرصة؟')) {
+            btn.closest('tr').remove();
+            saveAndSort();
+        }
+    }
+
+    function toggleDropdown(e, btn) {
+        e.stopPropagation();
+        document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+        btn.nextElementSibling.classList.toggle('show');
+    }
+
+    function filterTable() {
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        document.querySelectorAll('#tableBody tr').forEach(row => {
+            row.style.display = row.innerText.toLowerCase().includes(q) ? '' : 'none';
+        });
+    }
+
+    window.onclick = function() { document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show')); }
 </script>
 </body>
 </html>
