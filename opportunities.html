@@ -216,7 +216,7 @@
         hours = hours % 12 || 12;
         
         const timeFormatted = `${hours.toString().padStart(2, '0')}:${minutes} ${ampm}`;
-        const logHeaderHTML = `<span class="activity-header-part">👤 (أحمد)  🗓️ ${dayName}  ${dateStr}  <span class="activity-time-part">${timeFormatted}</span>  ➡️  : </span> `;
+        const logHeaderHTML = `<span class="activity-header-part">👤 (أحمد)  🗓️ ${dayName}  ${dateStr}  <span class="activity-time-part">${timeFormatted}</span>    </span> `;
 
         let cleanOld = (!oldVal || oldVal.trim() === "") ? "فارغ" : oldVal;
         let cleanNew = (!newVal || newVal.trim() === "") ? "فارغ" : newVal;
@@ -350,7 +350,7 @@
     function getLastNoteOnly(fullText) {
         if (!fullText || fullText === "" || fullText === "[]") return 'إضافة ملاحظة...';
         const notesArray = fullText.split('\n--------------------\n');
-        const parts = notesArray[notesArray.length - 1].split('➡️ : ');
+        const parts = notesArray[notesArray.length - 1].split('  ');
         return parts.length > 1 ? parts[1].trim() : 'إضافة ملاحظة...';
     }
 
