@@ -41,14 +41,13 @@
             width: 100%; height: 35px; padding: 0 40px 0 15px; border-radius: 20px; border: 1px solid var(--border-soft);
             font-family: 'Cairo'; font-size: 12px; font-weight: 700; outline: none;
         }
-        .search-icon { position: absolute; right: 14px; color: #94a3b8; pointer-events: none; }
 
         .table-wrapper { background: white; border-radius: 10px; overflow-y: auto; border: 1px solid var(--border-soft); flex: 1; min-height: 0; }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         th { background: var(--header-shiny-purple); color: white; padding: 12px 5px; font-size: 11px; font-weight: 800; position: sticky; top: 0; z-index: 10; }
-        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; }
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; position: relative; }
         
-        .excel-input { width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; font-size: 11.5px; font-weight: inherit; }
+        .excel-input { width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; font-size: 11.5px; font-weight: inherit; color: inherit; }
         .readonly-input { color: #64748b; cursor: default; }
 
         .dots-btn { cursor: pointer; font-size: 18px; color: #64748b; background: none; border: none; }
@@ -59,9 +58,29 @@
         .dropdown-menu button { width: 100%; padding: 9px 12px; border: none; background: none; font-family: 'Cairo'; font-size: 11px; text-align: right; cursor: pointer; }
         .show { display: block; }
 
+        /* تنسيقات سجل النشاط */
+        .activity-log-section { 
+            margin: 15px 0 10px 0; 
+            padding: 12px 18px; 
+            background: #ffffff; 
+            border-radius: 10px; 
+            border: 1px solid var(--border-soft);
+            box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
+            flex-shrink: 0; 
+            height: 140px; 
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+        .activity-log-title { color: var(--dark-yellow); font-size: 13.5px; font-weight: 800; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; flex-shrink: 0; }
+        .activity-list { flex: 1; overflow-y: auto; font-size: 11.5px; line-height: 1.6; }
+        .activity-item { margin-bottom: 4px; border-bottom: 1px dashed #f8fafc; padding-bottom: 4px; color: #475569; display: flex; align-items: center; }
+        .activity-time-part { font-size: 10.5px; color: #64748b; }
+        .activity-text-part { font-size: 11.5px; }
+
         /* Tooltip & Modal */
         .custom-tooltip-cell { position: relative; }
-        .notes-preview { color: #3b82f6; cursor: pointer; font-weight: 700; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+        .notes-preview { color: #3b82f6; cursor: pointer; font-weight: 700; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; width: 95%; margin: 0 auto; display: block; }
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 18px; border-radius: 12px; width: 440px; }
         .history-log { height: 150px; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); padding: 10px; margin-bottom: 10px; font-size: 12px; text-align: right; }
@@ -108,6 +127,12 @@
                 <tbody id="tableBody"></tbody>
             </table>
         </div>
+
+        <!-- قسم سجل النشاط المسترجع بالكامل -->
+        <div class="activity-log-section">
+            <div class="activity-log-title">📋 سجل النشاط</div>
+            <div id="activityList" class="activity-list"></div>
+        </div>
     </div>
 </div>
 
@@ -131,19 +156,70 @@
         return d.getDate().toString().padStart(2, '0') + '/' + (d.getMonth() + 1).toString().padStart(2, '0') + '/' + d.getFullYear();
     }
 
+    function getFullDateTimePattern() {
+        const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+        const d = new Date();
+        const dayName = days[d.getDay()];
+        const dateStr = getNow();
+        let hours = d.getHours();
+        const minutes = d.getMinutes().toString().padStart(2, '0');
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12 || 12;
+        return `👤 (أحمد)  🗓️ ${dayName}  ${dateStr}  ${hours.toString().padStart(2, '0')}:${minutes} ${ampm} ➡️ :`;
+    }
+
+    function addToActivityLog(fieldName, oldVal, newVal, companyName) {
+        const timePart = getFullDateTimePattern();
+        const cleanOld = (!oldVal || oldVal.trim() === "") ? "فارغ" : oldVal;
+        const cleanNew = (!newVal || newVal.trim() === "") ? "فارغ" : newVal;
+        const cleanCompany = (!companyName || companyName.trim() === "") ? "شركة غير محددة" : companyName;
+
+        let actionText = "";
+        if (fieldName === "الشركة") {
+            actionText = `تعديل الشركة ${cleanOld} الى ${cleanNew}  ( ${cleanNew} )`;
+        } else {
+            actionText = `تعديل ${fieldName} ${cleanOld} الى ${cleanNew}  ( ${cleanCompany} )`;
+        }
+
+        const fullLogHTML = `<span class="activity-time-part">${timePart}</span> <span class="activity-text-part">${actionText}</span>`;
+        
+        let logs = JSON.parse(localStorage.getItem('asgate_opp_activity_logs') || '[]');
+        logs.unshift(fullLogHTML);
+        if(logs.length > 100) logs.pop();
+        localStorage.setItem('asgate_opp_activity_logs', JSON.stringify(logs));
+        renderActivityLog();
+    }
+
+    function renderActivityLog() {
+        const list = document.getElementById('activityList');
+        if (!list) return;
+        const logs = JSON.parse(localStorage.getItem('asgate_opp_activity_logs') || '[]');
+        list.innerHTML = logs.map(log => `<div class="activity-item">${log}</div>`).join('');
+    }
+
     function parseDate(s) {
         if(!s) return 0;
         const p = s.split('/');
         return new Date(p[2], p[1]-1, p[0]).getTime();
     }
 
-    function markEdited(input) {
-        const row = input.closest('tr');
-        const editField = row.querySelector('.edit-date-val');
-        const now = getNow();
-        editField.value = now;
-        row.querySelector('.edit-date-display').value = now;
-        saveAndSort();
+    function handleFieldChange(input, fieldName) {
+        const oldVal = input.getAttribute('data-old') || '';
+        const newVal = input.value;
+        if(oldVal !== newVal) {
+            const row = input.closest('tr');
+            const companyName = row.cells[0].querySelector('input').value;
+            addToActivityLog(fieldName, oldVal, newVal, companyName);
+            input.setAttribute('data-old', newVal);
+            
+            // تحديث تاريخ التعديل التلقائي
+            const editField = row.querySelector('.edit-date-val');
+            const now = getNow();
+            editField.value = now;
+            row.querySelector('.edit-date-display').value = now;
+            
+            saveAndSort();
+        }
     }
 
     function saveAndSort() {
@@ -165,20 +241,20 @@
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = '';
 
-        // منطق الترتيب
+        // منطق الترتيب الذكي المطلـوب للفرص
         data.sort((a, b) => {
             if (a.status === 'مهتم' && b.status !== 'مهتم') return -1;
             if (a.status !== 'مهتم' && b.status === 'مهتم') return 1;
             
             if (a.status === 'مهتم' && b.status === 'مهتم') {
-                return parseDate(a.closeDate) - parseDate(b.closeDate); // الأقرب تاريخ إغلاق بالأعلى
+                return parseDate(a.closeDate) - parseDate(b.closeDate);
             }
 
             if (a.status === 'فقدان' && b.status !== 'فقدان') return 1;
             if (a.status !== 'فقدان' && b.status === 'فقدان') return -1;
 
             if (a.status === 'فقدان' && b.status === 'فقدان') {
-                return parseDate(a.editDate) - parseDate(b.editDate); // الأحدث تعديلاً بالأسفل (الأقدم تعديلاً بالأعلى في قسم الفقدان)
+                return parseDate(a.editDate) - parseDate(b.editDate);
             }
             return 0;
         });
@@ -187,18 +263,18 @@
             const row = tbody.insertRow();
             const lastNote = v.notes ? v.notes.split('\n').pop() : 'إضافة ملاحظة...';
             row.innerHTML = `
-                <td><input type="text" class="excel-input" value="${v.comp||''}" onchange="markEdited(this)"></td>
-                <td><input type="text" class="excel-input" value="${v.mgr||''}" onchange="markEdited(this)"></td>
-                <td><input type="text" class="excel-input" value="${v.serv||''}" onchange="markEdited(this)"></td>
-                <td><input type="text" class="excel-input" value="${v.val||''}" onchange="markEdited(this)"></td>
+                <td><input type="text" class="excel-input" value="${v.comp||''}" data-old="${v.comp||''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'الشركة')"></td>
+                <td><input type="text" class="excel-input" value="${v.mgr||''}" data-old="${v.mgr||''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'المسؤول')"></td>
+                <td><input type="text" class="excel-input" value="${v.serv||''}" data-old="${v.serv||''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'الخدمة المطلوبة')"></td>
+                <td><input type="text" class="excel-input" value="${v.val||''}" data-old="${v.val||''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'القيمة المتوقعة')"></td>
                 <td>
-                    <select class="excel-input" onchange="markEdited(this)">
+                    <select class="excel-input" data-old="${v.status||''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'الحالة')">
                         <option value="" ${v.status===''?'selected':''}></option>
                         <option value="مهتم" ${v.status==='مهتم'?'selected':''}>مهتم</option>
                         <option value="فقدان" ${v.status==='فقدان'?'selected':''}>فقدان</option>
                     </select>
                 </td>
-                <td><input type="text" class="excel-input" value="${v.closeDate||''}" placeholder="DD/MM/YYYY" onchange="markEdited(this)"></td>
+                <td><input type="text" class="excel-input" value="${v.closeDate||''}" data-old="${v.closeDate||''}" placeholder="DD/MM/YYYY" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'تاريخ الإغلاق')"></td>
                 <td class="custom-tooltip-cell">
                     <div class="notes-preview" onclick="openNote(this)" data-full="${v.notes||''}">${lastNote}</div>
                 </td>
@@ -226,6 +302,7 @@
     function loadData() {
         const saved = localStorage.getItem('asgate_opps_v3');
         if(saved) renderTable(JSON.parse(saved));
+        renderActivityLog();
     }
 
     function openNote(el) {
@@ -238,11 +315,24 @@
     function saveNote() {
         const text = document.getElementById('modalTextArea').value.trim();
         if(text && currentNoteEl) {
-            const old = currentNoteEl.getAttribute('data-full') || '';
-            const updated = (old ? old + '\n' : '') + getNow() + ': ' + text;
+            const row = currentNoteEl.closest('tr');
+            const companyName = row.cells[0].querySelector('input').value;
+            const oldNotes = currentNoteEl.getAttribute('data-full') || '';
+            const updated = (oldNotes ? oldNotes + '\n' : '') + getNow() + ': ' + text;
+            
+            // إضافة التغيير للملف وملاحظات السجل الرئيسي
+            addToActivityLog('الملاحظات', 'ملاحظة سابقة', text, companyName);
+            
             currentNoteEl.setAttribute('data-full', updated);
             currentNoteEl.innerText = text;
-            markEdited(currentNoteEl);
+            
+            // تحديث تاريخ التعديل التلقائي
+            const editField = row.querySelector('.edit-date-val');
+            const now = getNow();
+            editField.value = now;
+            row.querySelector('.edit-date-display').value = now;
+
+            saveAndSort();
         }
         closeNote();
     }
@@ -251,7 +341,10 @@
 
     function deleteRow(btn) {
         if(confirm('حذف هذه الفرصة؟')) {
-            btn.closest('tr').remove();
+            const row = btn.closest('tr');
+            const companyName = row.cells[0].querySelector('input').value;
+            addToActivityLog('الفرصة كاملة', companyName, 'تم الحذف', companyName);
+            row.remove();
             saveAndSort();
         }
     }
