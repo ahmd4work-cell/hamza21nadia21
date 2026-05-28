@@ -54,26 +54,12 @@
         .excel-input { width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; font-size: 11.5px; font-weight: inherit; color: inherit; }
         .readonly-input { color: #64748b; cursor: default; }
 
-        /* تعديل متقدم لقائمة الحالة لحصر السهم والمثلث بالجهة اليسرى للمربع ومنع تداخله خارجيا */
-        select.excel-input {
-            padding-left: 20px;
-            text-align-last: center;
-            cursor: pointer;
-        }
-
-        /* تنسيق حقل التقويم لتقريب الأيقونة إلى اليسار ومنع تداخلها مع العمود المجاور */
+        /* تنسيق مخصص لحقل التاريخ ليتناسب مع النمط العام */
         input[type="date"].excel-input {
             padding: 2px 5px;
-            direction: ltr; /* لتثبيت أيقونة التقويم في يسار حقل التاريخ تماماً بالقرب منه */
-            text-align: center;
-            cursor: pointer;
-        }
-        /* لتعديل ظهور الخانات بشكل متناسق مع النمط العربي داخل متصفحات كروم وإيدج */
-        input[type="date"].excel-input::-webkit-datetime-edit {
-            display: flex;
-            justify-content: center;
-            width: 100%;
             direction: rtl;
+            cursor: pointer;
+            text-align: center;
         }
 
         .dots-btn { cursor: pointer; font-size: 18px; color: #64748b; background: none; border: none; padding: 5px 10px; }
@@ -195,6 +181,7 @@
         return d.getDate().toString().padStart(2, '0') + '/' + (d.getMonth() + 1).toString().padStart(2, '0') + '/' + d.getFullYear();
     }
 
+    // دالة لتحويل تنسيق تاريخ HTML (YYYY-MM-DD) إلى التنسيق النصي العربي المعتاد (DD/MM/YYYY) لعرضه في سجلات النشاط بشكل منسق
     function formatHTMLDateToDisplay(dateString) {
         if(!dateString) return "فارغ";
         const p = dateString.split('-');
@@ -238,6 +225,7 @@
         let cleanNew = (!newVal || newVal.trim() === "") ? "فارغ" : newVal;
         const cleanCompany = (!companyName || companyName.trim() === "") ? "شركة غير محددة" : companyName;
 
+        // إذا كان الحقل هو تاريخ الإغلاق نقوم بتحسين طريقة عرضه بالسجل
         if(fieldName === "تاريخ الإغلاق") {
             cleanOld = oldVal ? formatHTMLDateToDisplay(oldVal) : "فارغ";
             cleanNew = newVal ? formatHTMLDateToDisplay(newVal) : "فارغ";
@@ -280,6 +268,7 @@
 
     function parseDate(s) {
         if(!s) return 0;
+        // التواريخ المدخلة من التقويم تكون بصيغة YYYY-MM-DD
         if(s.includes('-')) {
             return new Date(s).getTime();
         }
@@ -308,7 +297,7 @@
             if(ins.length > 0) {
                 data.push({
                     comp: ins[0].value, mgr: ins[1].value, serv: ins[2].value, val: ins[3].value,
-                    status: ins[4].value, closeDate: ins[5].value, 
+                    status: ins[4].value, closeDate: ins[5].value, // قيمة التقويم هنا تكون بـ YYYY-MM-DD
                     notes: noteDiv.getAttribute('data-full-notes') || '',
                     editDate: row.querySelector('.edit-date-val').value || ''
                 });
