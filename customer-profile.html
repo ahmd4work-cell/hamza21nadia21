@@ -65,7 +65,7 @@
         .mgr-input:disabled { color: #64748b; cursor: not-allowed; background: transparent; }
         
         /* تنسيق المربع الصغير */
-        .main-check { width: 16px; height: 16px; cursor: pointer; accent-color: var(--purple-mid); display: inline-block; vertical-align: middle; }
+        .main-check { width: 18px; height: 18px; cursor: pointer; accent-color: var(--purple-mid); position: relative; z-index: 5; }
         .main-check:disabled { cursor: not-allowed; }
 
         .btn-save-row { background: var(--order-green); color: white; border: none; padding: 2px 8px; font-family: 'Cairo'; font-size: 10px; font-weight: bold; border-radius: 4px; cursor: pointer; }
@@ -200,7 +200,6 @@
             <td><input type="text" class="mgr-input" value="${todayStr}" disabled style="color: #64748b;"></td>
             <td><button class="btn-save-row" onclick="lockAndSaveManagerRow(this)">حفظ</button></td>
         `;
-        row.querySelectorAll('input')[1].focus(); // التركيز على حقل الاسم تلقائياً
     }
 
     function lockAndSaveManagerRow(btn) {
@@ -208,7 +207,6 @@
         const inputs = row.querySelectorAll('.mgr-input');
         const isMain = row.querySelector('.main-check');
         
-        // التحقق من حقل الاسم (الآن هو العنصر الأول في مصفوفة المدخلات mgr-input)
         if(!inputs[0].value.trim()) {
             alert("يرجى إدخال اسم المسؤول أولاً.");
             inputs[0].focus();
@@ -229,10 +227,11 @@
         const managersList = [];
         tbody.querySelectorAll('tr').forEach(row => {
             const inputs = row.querySelectorAll('.mgr-input');
-            const isMain = row.querySelector('.main-check').checked;
+            const mainCheckbox = row.querySelector('.main-check');
+            // حفظ فقط الصفوف التي تم إقفالها (المحفوظة)
             if (inputs[0].disabled) {
                 managersList.push({
-                    isMain: isMain,
+                    isMain: mainCheckbox.checked,
                     name: inputs[0].value.trim(),
                     phone1: inputs[1].value.trim(),
                     phone2: inputs[2].value.trim(),
