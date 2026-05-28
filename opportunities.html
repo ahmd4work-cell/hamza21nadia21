@@ -54,13 +54,22 @@
         .excel-input { width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; font-size: 11.5px; font-weight: inherit; color: inherit; }
         .readonly-input { color: #64748b; cursor: default; }
 
-        /* تنسيق مخصص لحقل التاريخ ليتناسب مع النمط العام */
+        /* تعديل حقل التاريخ لإخفاء أيقونة التقويم وجعله يفتح عند الضغط */
         input[type="date"].excel-input {
-            padding: 2px 5px;
-            direction: rtl;
+            appearance: none;
+            -webkit-appearance: none;
             cursor: pointer;
             text-align: center;
+            background: transparent;
         }
+
+        /* إخفاء أيقونة التقويم الافتراضية في متصفحات كروم وإيدج */
+        input[type="date"].excel-input::-webkit-calendar-picker-indicator {
+            display: none;
+            -webkit-appearance: none;
+        }
+
+        select.excel-input { cursor: pointer; text-align-last: center; }
 
         .dots-btn { cursor: pointer; font-size: 18px; color: #64748b; background: none; border: none; padding: 5px 10px; }
         .dropdown-menu { 
@@ -83,19 +92,9 @@
         .custom-tooltip-cell:hover .tooltip-box:not(:empty) { opacity: 1; visibility: visible; }
         .notes-preview { width: 100%; min-height: 20px; border: none; background: transparent; font-family: 'Cairo'; font-size: 11.5px; text-align: center; cursor: pointer; color: #475569; font-weight: 700; overflow: hidden; text-overflow: ellipsis; display: block; margin: 0 auto; }
 
-        /* سجل النشاط */
         .activity-log-section { 
-            margin: 15px 0 10px 0; 
-            padding: 12px 18px; 
-            background: #ffffff; 
-            border-radius: 10px; 
-            border: 1px solid var(--border-soft);
-            box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
-            flex-shrink: 0; 
-            height: 140px; 
-            display: flex;
-            flex-direction: column;
-            box-sizing: border-box;
+            margin: 15px 0 10px 0; padding: 12px 18px; background: #ffffff; border-radius: 10px; border: 1px solid var(--border-soft);
+            box-shadow: 0 -3px 10px rgba(0,0,0,0.03); flex-shrink: 0; height: 140px; display: flex; flex-direction: column; box-sizing: border-box;
         }
         .activity-log-title { color: var(--dark-yellow); font-size: 13.5px; font-weight: 800; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; flex-shrink: 0; }
         .activity-list { flex: 1; overflow-y: auto; font-size: 11.5px; line-height: 1.6; }
@@ -104,7 +103,6 @@
         .activity-time-part { font-size: 10px; font-weight: normal; }
         .activity-text-part { font-size: 11.5px; color: #475569; }
 
-        /* المودال وسجل الشات الداخلي */
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-content { background: white; padding: 18px; border-radius: 12px; width: 440px; height: 480px; display: flex; flex-direction: column; }
         .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 11.5px; color: #475569; text-align: right; white-space: pre-wrap; line-height: 1.7; }
@@ -181,7 +179,6 @@
         return d.getDate().toString().padStart(2, '0') + '/' + (d.getMonth() + 1).toString().padStart(2, '0') + '/' + d.getFullYear();
     }
 
-    // دالة لتحويل تنسيق تاريخ HTML (YYYY-MM-DD) إلى التنسيق النصي العربي المعتاد (DD/MM/YYYY) لعرضه في سجلات النشاط بشكل منسق
     function formatHTMLDateToDisplay(dateString) {
         if(!dateString) return "فارغ";
         const p = dateString.split('-');
@@ -225,23 +222,14 @@
         let cleanNew = (!newVal || newVal.trim() === "") ? "فارغ" : newVal;
         const cleanCompany = (!companyName || companyName.trim() === "") ? "شركة غير محددة" : companyName;
 
-        // إذا كان الحقل هو تاريخ الإغلاق نقوم بتحسين طريقة عرضه بالسجل
         if(fieldName === "تاريخ الإغلاق") {
             cleanOld = oldVal ? formatHTMLDateToDisplay(oldVal) : "فارغ";
             cleanNew = newVal ? formatHTMLDateToDisplay(newVal) : "فارغ";
         }
 
-        let actionText = "";
-        if (fieldName === "الشركة") {
-            actionText = `تعديل الشركة ${cleanOld} الى ${cleanNew}  ( ${cleanNew} )`;
-        } else if (fieldName === "إجراء") {
-            actionText = `حذف فرصة شركة ( ${cleanCompany} )`;
-        } else {
-            actionText = `تعديل ${fieldName} ${cleanOld} الى ${cleanNew}  ( ${cleanCompany} )`;
-        }
+        let actionText = (fieldName === "إجراء") ? `حذف فرصة شركة ( ${cleanCompany} )` : `تعديل ${fieldName} ${cleanOld} الى ${cleanNew}  ( ${cleanCompany} )`;
 
         const fullLogHTML = `${logHeaderHTML}<span class="activity-text-part">${actionText}</span>`;
-        
         let logs = JSON.parse(localStorage.getItem('asgate_opp_activity_logs_v3') || '[]');
         logs.unshift(fullLogHTML);
         if(logs.length > 100) logs.pop();
@@ -251,27 +239,18 @@
 
     function renderActivityLog() {
         const list = document.getElementById('activityList');
-        if (!list) return;
-        const logs = JSON.parse(localStorage.getItem('asgate_opp_activity_logs_v3') || '[]');
-        list.innerHTML = logs.map(log => `<div class="activity-item">${log}</div>`).join('');
+        if (list) list.innerHTML = JSON.parse(localStorage.getItem('asgate_opp_activity_logs_v3') || '[]').map(log => `<div class="activity-item">${log}</div>`).join('');
     }
 
     function updateEditDateField(row) {
         const today = getTodayFormatted();
-        const editFieldDisplay = row.querySelector('.edit-date-display');
-        const editFieldHidden = row.querySelector('.edit-date-val');
-        if(editFieldDisplay && editFieldHidden) {
-            editFieldDisplay.value = today;
-            editFieldHidden.value = today;
-        }
+        row.querySelector('.edit-date-display').value = today;
+        row.querySelector('.edit-date-val').value = today;
     }
 
     function parseDate(s) {
         if(!s) return 0;
-        // التواريخ المدخلة من التقويم تكون بصيغة YYYY-MM-DD
-        if(s.includes('-')) {
-            return new Date(s).getTime();
-        }
+        if(s.includes('-')) return new Date(s).getTime();
         const p = s.split('/');
         return new Date(p[2], p[1]-1, p[0]).getTime();
     }
@@ -294,14 +273,12 @@
         document.querySelectorAll('#tableBody tr').forEach(row => {
             const ins = row.querySelectorAll('input, select');
             const noteDiv = row.querySelector('.notes-preview');
-            if(ins.length > 0) {
-                data.push({
-                    comp: ins[0].value, mgr: ins[1].value, serv: ins[2].value, val: ins[3].value,
-                    status: ins[4].value, closeDate: ins[5].value, // قيمة التقويم هنا تكون بـ YYYY-MM-DD
-                    notes: noteDiv.getAttribute('data-full-notes') || '',
-                    editDate: row.querySelector('.edit-date-val').value || ''
-                });
-            }
+            data.push({
+                comp: ins[0].value, mgr: ins[1].value, serv: ins[2].value, val: ins[3].value,
+                status: ins[4].value, closeDate: ins[5].value,
+                notes: noteDiv.getAttribute('data-full-notes') || '',
+                editDate: row.querySelector('.edit-date-val').value || ''
+            });
         });
         localStorage.setItem('asgate_opps_v3', JSON.stringify(data));
         renderTable(data);
@@ -314,14 +291,10 @@
         data.sort((a, b) => {
             if (a.status === 'مهتم' && b.status !== 'مهتم') return -1;
             if (a.status !== 'مهتم' && b.status === 'مهتم') return 1;
-            if (a.status === 'مهتم' && b.status === 'مهتم') {
-                return parseDate(a.closeDate) - parseDate(b.closeDate);
-            }
+            if (a.status === 'مهتم' && b.status === 'مهتم') return parseDate(a.closeDate) - parseDate(b.closeDate);
             if (a.status === 'فقدان' && b.status !== 'فقدان') return 1;
             if (a.status !== 'فقدان' && b.status === 'فقدان') return -1;
-            if (a.status === 'فقدان' && b.status === 'فقدان') {
-                return parseDate(a.editDate) - parseDate(b.editDate);
-            }
+            if (a.status === 'فقدان' && b.status === 'فقدان') return parseDate(a.editDate) - parseDate(b.editDate);
             return 0;
         });
 
@@ -341,7 +314,7 @@
                         <option value="فقدان" ${v.status==='فقدان'?'selected':''}>فقدان</option>
                     </select>
                 </td>
-                <td><input type="date" class="excel-input" value="${v.closeDate||''}" data-old="${v.closeDate||''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'تاريخ الإغلاق')"></td>
+                <td><input type="date" class="excel-input" value="${v.closeDate||''}" data-old="${v.closeDate||''}" onfocus="this.setAttribute('data-old', this.value)" onclick="this.showPicker()" onchange="handleFieldChange(this, 'تاريخ الإغلاق')"></td>
                 <td class="custom-tooltip-cell">
                     <div class="notes-preview" onclick="openNote(this)" data-full-notes="${notes}">${lastNote}</div>
                     <div class="tooltip-box">${lastNote === 'إضافة ملاحظة...' ? 'لا توجد ملاحظات' : lastNote}</div>
@@ -370,27 +343,21 @@
 
     function loadData() {
         const saved = localStorage.getItem('asgate_opps_v3');
-        if(saved && JSON.parse(saved).length > 0) {
-            renderTable(JSON.parse(saved));
-        } else {
-            renderTable([]);
-        }
+        renderTable(saved ? JSON.parse(saved) : []);
         renderActivityLog();
     }
 
     function getLastNoteOnly(fullText) {
         if (!fullText || fullText === "" || fullText === "[]") return 'إضافة ملاحظة...';
         const notesArray = fullText.split('\n--------------------\n');
-        const lastEntry = notesArray[notesArray.length - 1];
-        const parts = lastEntry.split('➡️ : ');
+        const parts = notesArray[notesArray.length - 1].split('➡️ : ');
         return parts.length > 1 ? parts[1].trim() : 'إضافة ملاحظة...';
     }
 
     function openNote(el) {
         currentActivePreview = el;
         const log = document.getElementById('historyLog');
-        const rawNotes = el.getAttribute('data-full-notes') || "";
-        log.innerHTML = formatNotesToHTML(rawNotes);
+        log.innerHTML = formatNotesToHTML(el.getAttribute('data-full-notes') || "");
         document.getElementById('modalTextArea').value = "";
         document.getElementById('noteModal').style.display = "flex";
         setTimeout(() => { document.getElementById('modalTextArea').focus(); log.scrollTop = log.scrollHeight; }, 50);
@@ -399,21 +366,11 @@
     function saveNote() {
         const newText = document.getElementById('modalTextArea').value.trim();
         if (newText !== "" && currentActivePreview) {
-            const chatHeader = getRawChatHeader();
             const row = currentActivePreview.closest('tr');
-            const companyName = row.cells[0].querySelector('input').value;
-            
             let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
-            let entry = chatHeader + newText;
-            let updatedNotes = oldNotes + (oldNotes ? "\n--------------------\n" : "") + entry;
-            
-            addToActivityLog('الملاحظات', 'ملاحظة سابقة', newText, companyName);
-            
+            let updatedNotes = oldNotes + (oldNotes ? "\n--------------------\n" : "") + getRawChatHeader() + newText;
+            addToActivityLog('الملاحظات', 'ملاحظة سابقة', newText, row.cells[0].querySelector('input').value);
             currentActivePreview.setAttribute('data-full-notes', updatedNotes);
-            currentActivePreview.innerText = getLastNoteOnly(updatedNotes);
-            currentActivePreview.parentElement.querySelector('.tooltip-box').innerText = getLastNoteOnly(updatedNotes);
-            
-            updateEditDateField(row);
             saveAndSort();
         }
         closeNote();
@@ -423,9 +380,8 @@
 
     function deleteRow(btn) {
         const row = btn.closest('tr');
-        const companyName = row.cells[0].querySelector('input').value;
         if(confirm('هل أنت متأكد من حذف هذه الفرصة من السجل؟')) {
-            addToActivityLog('إجراء', '', '', companyName);
+            addToActivityLog('إجراء', '', '', row.cells[0].querySelector('input').value);
             row.remove();
             saveAndSort();
         }
@@ -439,13 +395,11 @@
 
     function filterTable() {
         const q = document.getElementById('searchInput').value.toLowerCase();
-        document.querySelectorAll('#tableBody tr').forEach(row => {
-            row.style.display = row.innerText.toLowerCase().includes(q) ? '' : 'none';
-        });
+        document.querySelectorAll('#tableBody tr').forEach(row => { row.style.display = row.innerText.toLowerCase().includes(q) ? '' : 'none'; });
     }
 
     window.onclick = function(e) {
-        if (!e.target.matches('.dots-btn')) { document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show')); }
+        if (!e.target.matches('.dots-btn')) document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
         if (e.target == document.getElementById('noteModal')) closeNote();
     }
 </script>
