@@ -18,6 +18,7 @@
             --border-soft: #cbd5e1;
             --text-dark: #1e293b;
             --dark-yellow: #c29103;
+            --chat-yellow: #b45309; /* إضافة لون ترويسة الملاحظات المتوافق مع العملاء */
         }
 
         html, body { 
@@ -140,6 +141,10 @@
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-content { background: white; padding: 18px; border-radius: 12px; width: 440px; height: 480px; display: flex; flex-direction: column; }
         .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
+        
+        /* تنسيق العنوان داخل السجل باللون الأصفر الغامق مثل صفحة العملاء */
+        .chat-header-style { color: var(--chat-yellow); font-weight: 800; }
+        
         .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
         .note-header-highlight { color: var(--dark-yellow); font-weight: bold; display: inline; }
 
@@ -217,7 +222,29 @@
         return d.getDate().toString().padStart(2, '0') + '/' + (d.getMonth() + 1).toString().padStart(2, '0') + '/' + d.getFullYear();
     }
 
-    function getFullDateTimePattern() {
+    // وظيفة لإنشاء ترويسة الملاحظة النصية الخام للتخزين
+    function getRawChatHeader() {
+        const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+        const d = new Date();
+        const timeStr = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+        const dateStr = getTodayFormatted();
+        return `👤 (أحمد) 🗓️ ${days[d.getDay()]} ${dateStr} ${timeStr} ➡️ : `;
+    }
+
+    // تحويل النص المخزن إلى HTML ملون لعرضه داخل مودال الزيارات بنفس نمط العملاء
+    function formatNotesToHTML(rawText) {
+        if (!rawText) return "لا يوجد سجل زيارات سابق لهذه الشركة.";
+        return rawText.split('\n--------------------\n').map(entry => {
+            const parts = entry.split('➡️ : ');
+            if (parts.length > 1) {
+                return `<span class="chat-header-style">${parts[0]}➡️ : </span>${parts[1]}`;
+            }
+            return entry;
+        }).join('\n--------------------\n');
+    }
+
+    // دالة تسجيل الأنشطة بنمط مخصص وتغليف التوقيت بتنسيق أصغر
+    function addToActivityLog(fieldName, oldVal, newVal, companyName) {
         const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
         const d = new Date();
         const dayName = days[d.getDay()];
@@ -226,12 +253,8 @@
         const minutes = d.getMinutes().toString().padStart(2, '0');
         const ampm = hours >= 12 ? 'PM' : 'AM';
         hours = hours % 12 || 12;
-        return `👤 (أحمد)  🗓️ ${dayName}  ${dateStr}  ${hours.toString().padStart(2, '0')}:${minutes} ${ampm} ➡️ :`;
-    }
+        const timePart = `👤 (أحمد)  🗓️ ${dayName}  ${dateStr}  ${hours.toString().padStart(2, '0')}:${minutes} ${ampm} ➡️ :`;
 
-    // دالة تسجيل الأنشطة بنمط مخصص وتغليف التوقيت بتنسيق أصغر
-    function addToActivityLog(fieldName, oldVal, newVal, companyName) {
-        const timePart = getFullDateTimePattern();
         const cleanOld = oldVal.trim() === "" ? "فارغ" : oldVal;
         const cleanNew = newVal.trim() === "" ? "فارغ" : newVal;
         const cleanCompany = companyName.trim() === "" ? "شركة غير محددة" : companyName;
@@ -243,7 +266,6 @@
             actionText = `تعديل ${fieldName} ${cleanOld} الى ${cleanNew}  ( ${cleanCompany} )`;
         }
 
-        // دمج الجزأين معاً باستخدام فئات CSS للتحكم بحجم الخط
         const fullLogHTML = `<span class="activity-time-part">${timePart}</span> <span class="activity-text-part">${actionText}</span>`;
         
         let logs = JSON.parse(localStorage.getItem('asgate_activity_logs_v2') || '[]');
@@ -258,12 +280,6 @@
         if (!list) return;
         const logs = JSON.parse(localStorage.getItem('asgate_activity_logs_v2') || '[]');
         list.innerHTML = logs.map(log => `<div class="activity-item">${log}</div>`).join('');
-    }
-
-    function parseAndHighlightNotes(fullText) {
-        if (!fullText) return "لا يوجد سجل زيارات سابق لهذه الشركة.";
-        const regex = /(👤 \([^)]+\)  🗓️ [^ ]+  \d{2}\/\d{2}\/\d{4}  \d{2}:\d{2} [AP]M ➡️ :)/g;
-        return fullText.replace(regex, '<span class="note-header-highlight">$1</span>');
     }
 
     function updateEditDateField(row) {
@@ -306,7 +322,7 @@
             </td>
             <td class="custom-tooltip-cell">
                 <div class="notes-preview" onclick="openNote(this)" data-full-notes="${notes}">${lastNote}</div>
-                <div class="tooltip-box">${lastNote}</div>
+                <div class="tooltip-box">${lastNote || 'لا توجد ملاحظات'}</div>
             </td>
             <td>
                 <input type="text" class="excel-input readonly-input edit-date-display" value="${editDate}" readonly>
@@ -356,16 +372,18 @@
     }
 
     function getLastNoteOnly(fullText) {
-        if (!fullText) return '';
-        const lines = fullText.split('\n').filter(l => l.trim() !== "" && !l.includes("👤") && !l.includes("---"));
-        return lines.length > 0 ? lines[lines.length - 1] : '';
+        if (!fullText || fullText === "" || fullText === "[]") return 'إضافة ملاحظة...';
+        const notesArray = fullText.split('\n--------------------\n');
+        const lastEntry = notesArray[notesArray.length - 1];
+        const parts = lastEntry.split('➡️ : ');
+        return parts.length > 1 ? parts[1].trim() : 'إضافة ملاحظة...';
     }
 
     function openNote(el) {
         currentActivePreview = el;
         const log = document.getElementById('historyLog');
         const rawNotes = el.getAttribute('data-full-notes') || "";
-        log.innerHTML = parseAndHighlightNotes(rawNotes);
+        log.innerHTML = formatNotesToHTML(rawNotes);
         document.getElementById('modalTextArea').value = "";
         document.getElementById('noteModal').style.display = "flex";
         setTimeout(() => { document.getElementById('modalTextArea').focus(); log.scrollTop = log.scrollHeight; }, 50);
@@ -374,14 +392,14 @@
     function saveNote() {
         const newText = document.getElementById('modalTextArea').value.trim();
         if (newText !== "" && currentActivePreview) {
-            const headerPattern = getFullDateTimePattern();
+            const chatHeader = getRawChatHeader();
             let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
-            let updatedNotes = oldNotes + (oldNotes ? "\n--------------------\n" : "") + headerPattern + " " + newText;
+            let entry = chatHeader + newText;
+            let updatedNotes = oldNotes + (oldNotes ? "\n--------------------\n" : "") + entry;
             
-            const lastNoteText = getLastNoteOnly(updatedNotes);
             currentActivePreview.setAttribute('data-full-notes', updatedNotes);
-            currentActivePreview.innerText = lastNoteText;
-            currentActivePreview.parentElement.querySelector('.tooltip-box').innerText = lastNoteText;
+            currentActivePreview.innerText = getLastNoteOnly(updatedNotes);
+            currentActivePreview.parentElement.querySelector('.tooltip-box').innerText = updatedNotes;
             
             updateEditDateField(currentActivePreview.closest('tr'));
             saveAllDataSilently();
