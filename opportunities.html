@@ -199,7 +199,7 @@
         return rawText.split('\n--------------------\n').map(entry => {
             const parts = entry.split('➡️ : ');
             if (parts.length > 1) {
-                return `<span class="chat-header-style">${parts[0]}➡️ : </span>${parts[1]}`;
+                return `<span class="chat-header-style">${parts[0]} ➡️ : </span>${parts[1]}`;
             }
             return entry;
         }).join('\n--------------------\n');
