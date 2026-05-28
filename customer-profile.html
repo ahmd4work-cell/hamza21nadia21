@@ -18,7 +18,6 @@
         }
         body { background-color: var(--bg); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
         
-        /* Navbar */
         .navbar { 
             background-color: var(--purple-mid); display: flex; align-items: center; padding: 0 20px; 
             margin: 10px; border-radius: 12px; height: 37px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
@@ -27,23 +26,10 @@
         .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; border-radius: 8px; transition: 0.3s; line-height: 26px; height: 26px; display: inline-block; }
         .navbar a.active-link { background-color: var(--nav-active); color: var(--nav-purple-dark); }
 
-        /* حاوية بيانات المنشأة (بمسافة 10%) */
-        .company-header-wrapper {
-            margin: 20px 10% 8px 10%; 
-            position: relative;
-        }
+        .company-header-wrapper { margin: 20px 10% 8px 10%; position: relative; }
+        .manager-header-wrapper { margin: 0 12% 20px 12%; }
 
-        /* حاوية المسؤول المباشر (بمسافة 12%) */
-        .manager-header-wrapper {
-            margin: 0 12% 20px 12%;
-        }
-
-        .back-container {
-            position: absolute;
-            right: -7%;
-            top: 5px;
-            width: 6%;
-        }
+        .back-container { position: absolute; right: -7%; top: 5px; width: 6%; }
         .back-btn {
             background: white; color: var(--danger-red); border: 1.5px solid var(--danger-red);
             height: 37px; width: 100%; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; 
@@ -53,80 +39,48 @@
 
         .compact-section { 
             background: var(--white); border-radius: 8px; padding: 12px 20px; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            border-right: 4px solid var(--purple-mid);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-right: 4px solid var(--purple-mid);
             display: flex; flex-direction: column;
         }
 
         .row-wrapper { display: flex; align-items: center; justify-content: space-between; width: 100%; }
         .section-label { font-size: 12px; color: var(--nav-purple-dark); font-weight: 800; min-width: 110px; }
 
-        .data-row-inline { 
-            display: flex; flex-grow: 1; justify-content: flex-start; align-items: center; 
-            gap: 25px; margin-right: 15px; flex-wrap: wrap;
-        }
-        
+        .data-row-inline { display: flex; flex-grow: 1; justify-content: flex-start; align-items: center; gap: 25px; margin-right: 15px; flex-wrap: wrap; }
         .info-item { display: flex; align-items: center; gap: 6px; font-size: 11px; }
         .info-item label { color: #94a3b8; font-weight: bold; white-space: nowrap; }
         .info-item span { color: #1e293b; font-weight: 700; }
 
-        /* تنسيقات عنوان وجدول المسؤولين الجدد */
-        .manager-title-bar {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
+        .manager-title-bar { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
         .add-mgr-btn {
             background: var(--purple-mid); color: white; font-size: 11px; font-weight: bold; 
-            padding: 4px 12px; border-radius: 6px; cursor: pointer; border: none;
-            transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 4px 12px; border-radius: 6px; cursor: pointer; border: none; transition: 0.2s;
         }
-        .add-mgr-btn:hover { background: var(--nav-purple-dark); }
 
         .mgr-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 11.5px; }
         .mgr-table th { background: #f8fafc; color: #475569; font-weight: 800; padding: 8px; text-align: center; border: 1px solid var(--border-color); }
         .mgr-table td { padding: 6px; text-align: center; border: 1px solid var(--border-color); background: white; }
         
         .mgr-input { width: 95%; border: none; text-align: center; font-family: 'Cairo'; font-size: 11px; outline: none; background: transparent; font-weight: 600; color: #1e293b; }
-        .mgr-input:focus { border-bottom: 1px solid var(--purple-mid); }
-        .mgr-input:disabled { color: #64748b; background: transparent; cursor: not-allowed; }
+        .mgr-input:disabled { color: #64748b; cursor: not-allowed; }
+        
+        /* تنسيق المربع الصغير */
+        .main-check { width: 16px; height: 16px; cursor: pointer; accent-color: var(--purple-mid); }
 
         .btn-save-row { background: var(--order-green); color: white; border: none; padding: 2px 8px; font-family: 'Cairo'; font-size: 10px; font-weight: bold; border-radius: 4px; cursor: pointer; }
         .btn-locked-status { color: #64748b; font-size: 10px; font-weight: bold; }
 
-        /* حاوية الجزء السفلي (بعرض كامل) */
-        .full-width-container {
-            width: 100%;
-            padding: 10px 20px;
-            box-sizing: border-box;
-        }
-
+        .full-width-container { width: 100%; padding: 10px 20px; box-sizing: border-box; }
         .control-strip { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-
-        .tabs-wrapper { 
-            display: flex; background: var(--purple-mid); padding: 2px; 
-            border-radius: 8px; gap: 2px; flex-grow: 1; height: 32px; align-items: center;
-        }
-        .tab-btn { 
-            flex: 1; border: none; background: transparent; color: rgba(255,255,255,0.8); 
-            height: 28px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; 
-            font-size: 11px; border-radius: 6px; transition: 0.2s;
-        }
+        .tabs-wrapper { display: flex; background: var(--purple-mid); padding: 2px; border-radius: 8px; gap: 2px; flex-grow: 1; height: 32px; align-items: center; }
+        .tab-btn { flex: 1; border: none; background: transparent; color: rgba(255,255,255,0.8); height: 28px; cursor: pointer; font-family: 'Cairo'; font-weight: bold; font-size: 11px; border-radius: 6px; }
         .tab-btn.active { background: white; color: var(--purple-mid); }
 
-        .action-btn {
-            border: none; border-radius: 8px; padding: 0 15px; 
-            color: white; font-family: 'Cairo'; font-weight: bold; font-size: 11px; 
-            cursor: pointer; height: 32px; display: flex; align-items: center; gap: 5px;
-        }
+        .action-btn { border: none; border-radius: 8px; padding: 0 15px; color: white; font-family: 'Cairo'; font-weight: bold; font-size: 11px; cursor: pointer; height: 32px; display: flex; align-items: center; gap: 5px; }
         .btn-green { background-color: var(--order-green); }
         .btn-yellow { background-color: var(--visit-yellow); }
 
-        .content-area { 
-            background: white; border-radius: 10px; padding: 12px; 
-            min-height: 250px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
+        .content-area { background: white; border-radius: 10px; padding: 12px; min-height: 250px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; font-size: 11px; }
         th { text-align: right; color: #64748b; padding: 8px; border-bottom: 2px solid #eee; }
         td { padding: 8px; border-bottom: 1px solid #eee; }
@@ -146,7 +100,6 @@
     <div class="back-container">
         <button class="back-btn" onclick="goBackAndFocus()">رجوع</button>
     </div>
-
     <div class="compact-section">
         <div class="row-wrapper">
             <div class="section-label">🏢 بيانات المنشأة:</div>
@@ -161,29 +114,27 @@
     </div>
 </div>
 
-<!-- استبدال مربع المسؤول القديم بجدول المسؤولين الجديد المطور -->
 <div class="manager-header-wrapper">
     <div class="compact-section">
         <div class="manager-title-bar">
-            <div class="section-label" style="min-width: fit-content; margin-bottom: 0;">👤 مسؤولن اخرون </div>
-            <button class="add-mgr-btn" onclick="addNewManagerRow()"> إضافة مسؤول</button>
+            <div class="section-label" style="min-width: fit-content; margin-bottom: 0;">👤 الشخص المسؤول</div>
+            <button class="add-mgr-btn" onclick="addNewManagerRow()">+ إضافة مسؤول</button>
         </div>
         
         <table class="mgr-table">
             <thead>
                 <tr>
-                    <th style="width: 20%;">الاسم</th>
+                    <th style="width: 8%;">الرئيسي</th>
+                    <th style="width: 17%;">الاسم</th>
                     <th style="width: 15%;">رقم التواصل</th>
                     <th style="width: 15%;">رقم آخر</th>
-                    <th style="width: 20%;">الايميل</th>
-                    <th style="width: 15%;">الوظيفة</th>
+                    <th style="width: 18%;">الايميل</th>
+                    <th style="width: 12%;">الوظيفة</th>
                     <th style="width: 15%;">التاريخ</th>
                     <th style="width: 10%;">الإجراء</th>
                 </tr>
             </thead>
-            <tbody id="managerTableBody">
-                <!-- الصفوف تضاف ديناميكياً هنا -->
-            </tbody>
+            <tbody id="managerTableBody"></tbody>
         </table>
     </div>
 </div>
@@ -192,16 +143,14 @@
     <div class="control-strip">
         <button class="action-btn btn-green" onclick="alert('فتح نموذج طلب جديد')"> طلب جديد</button>
         <button class="action-btn btn-yellow" onclick="alert('فتح نموذج زيارة جديدة')"> زيارة جديدة</button>
-        
         <div class="tabs-wrapper">
             <button class="tab-btn active" id="btn-o" onclick="openTab('o-history')">سجل الطلبات</button>
             <button class="tab-btn" id="btn-a" onclick="openTab('attachments')">المرفقات</button>
             <button class="tab-btn" id="btn-v" onclick="openTab('v-history')">سجل الزيارات</button>
         </div>
     </div>
-
     <div class="content-area" id="display-frame">
-        <b id="frame-title" style="font-size:12px; color:var(--nav-purple-dark); display:block; margin-bottom:10px;">🛒 سجل الطلبات</b>
+        <b id="frame-title" style="font-size:12px; color:var(--nav-purple-dark); display:block; margin-bottom:10px;"> سجل الطلبات</b>
         <div id="table-content"></div>
     </div>
 </div>
@@ -224,7 +173,6 @@
         if(!clientName) return;
         const data = JSON.parse(localStorage.getItem('asgate_customers_data') || '[]');
         const client = data.find(c => c.comp === clientName);
-
         if(client) {
             document.title = `${client.comp} | ملف العميل`;
             document.getElementById('c-name').innerText = client.comp;
@@ -232,73 +180,56 @@
             document.getElementById('c-addr').innerText = client.address || 'غير محدد';
             document.getElementById('c-source').innerText = client.source || 'نظام داخلي';
             document.getElementById('c-owner').innerText = client.owner || 'غير محدد';
-            
-            // تحميل جدول المسؤولين المخصص لهذا العميل
             loadManagersData();
             openTab('o-history');
         }
     }
 
-    // إضافة صف مسؤول جديد
     function addNewManagerRow() {
         const tbody = document.getElementById('managerTableBody');
         const row = tbody.insertRow();
         const todayStr = getTodayDateFormatted();
-        
         row.innerHTML = `
+            <td><input type="checkbox" class="main-check"></td>
             <td><input type="text" class="mgr-input" placeholder="الاسم..."></td>
             <td><input type="text" class="mgr-input" placeholder="رقم التواصل..."></td>
             <td><input type="text" class="mgr-input" placeholder="رقم آخر..."></td>
             <td><input type="email" class="mgr-input" placeholder="الايميل..."></td>
             <td><input type="text" class="mgr-input" placeholder="الوظيفة..."></td>
-            <td><input type="text" class="mgr-input" value="${todayStr}" disabled style="color: #64748b;"></td>
+            <td><input type="text" class="mgr-input" value="${todayStr}" disabled></td>
             <td><button class="btn-save-row" onclick="lockAndSaveManagerRow(this)">حفظ</button></td>
         `;
-        row.querySelector('input').focus();
+        row.querySelectorAll('input')[1].focus();
     }
 
-    // تجميد وحفظ صف المسؤول ومنع التعديل/الحذف بعد ذلك
     function lockAndSaveManagerRow(btn) {
         const row = btn.closest('tr');
         const inputs = row.querySelectorAll('.mgr-input');
+        const isMain = row.querySelector('.main-check');
         
-        // التحقق من إدخال الاسم ورقم التواصل على الأقل
         if(!inputs[0].value.trim()) {
             alert("يرجى إدخال اسم المسؤول أولاً.");
             inputs[0].focus();
             return;
         }
 
-        // إخراج رسالة التنبيه المطلوبة قبل القفل والحفظ الرسمي
         alert("لن تتمكن من الحذف أو التعديل بعد ذلك");
-
-        // تجميد كافة الحقول لمنع التعديل نهائياً
-        inputs.forEach(input => {
-            input.disabled = true;
-        });
-
-        // استبدال زر الحفظ بعبارة "تم الحفظ مقفل"
-        const actionTd = btn.parentElement;
-        actionTd.innerHTML = `<span class="btn-locked-status">🔒 محفوظ ومقفل</span>`;
-
-        // حفظ البيانات في LocalStorage بشكل فوري وثابت
+        inputs.forEach(input => input.disabled = true);
+        isMain.disabled = true;
+        btn.parentElement.innerHTML = `<span class="btn-locked-status">🔒 محفوظ ومقفل</span>`;
         saveManagersToLocalStorage();
     }
 
-    // حفظ قائمة المسؤولين في المخزن المحلي للعميل الحالي
     function saveManagersToLocalStorage() {
         if (!clientName) return;
         const tbody = document.getElementById('managerTableBody');
-        const rows = tbody.querySelectorAll('tr');
         const managersList = [];
-
-        rows.forEach(row => {
+        tbody.querySelectorAll('tr').forEach(row => {
             const inputs = row.querySelectorAll('.mgr-input');
-            // نقوم بالحفظ فقط إذا كان الصف مقفلاً ومحفوظاً بشكل كامل
-            const isLocked = inputs[0].disabled;
-            
-            if (isLocked) {
+            const isMain = row.querySelector('.main-check').checked;
+            if (inputs[0].disabled) {
                 managersList.push({
+                    isMain: isMain,
                     name: inputs[0].value.trim(),
                     phone1: inputs[1].value.trim(),
                     phone2: inputs[2].value.trim(),
@@ -308,25 +239,21 @@
                 });
             }
         });
-
-        // حفظ البيانات تحت مفتاح فريد يرتبط باسم العميل لعدم الخلط
         const allManagersData = JSON.parse(localStorage.getItem('asgate_client_managers_db') || '{}');
         allManagersData[clientName] = managersList;
         localStorage.setItem('asgate_client_managers_db', JSON.stringify(allManagersData));
     }
 
-    // استدعاء البيانات المحفوظة وعرضها مقفلة بشكل كامل عند تحميل الصفحة
     function loadManagersData() {
         if (!clientName) return;
         const tbody = document.getElementById('managerTableBody');
-        tbody.innerHTML = ''; // تفريغ الجدول أولاً
-        
+        tbody.innerHTML = '';
         const allManagersData = JSON.parse(localStorage.getItem('asgate_client_managers_db') || '{}');
         const currentClientManagers = allManagersData[clientName] || [];
-
         currentClientManagers.forEach(mgr => {
             const row = tbody.insertRow();
             row.innerHTML = `
+                <td><input type="checkbox" class="main-check" ${mgr.isMain ? 'checked' : ''} disabled></td>
                 <td><input type="text" class="mgr-input" value="${mgr.name || ''}" disabled></td>
                 <td><input type="text" class="mgr-input" value="${mgr.phone1 || ''}" disabled></td>
                 <td><input type="text" class="mgr-input" value="${mgr.phone2 || ''}" disabled></td>
@@ -342,7 +269,6 @@
         const title = document.getElementById('frame-title');
         const content = document.getElementById('table-content');
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        
         if(tab === 'o-history') {
             document.getElementById('btn-o').classList.add('active');
             title.innerText = "🛒 سجل طلبات العميل";
