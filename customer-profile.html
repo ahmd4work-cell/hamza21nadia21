@@ -140,8 +140,8 @@
 
 <div class="full-width-container">
     <div class="control-strip">
-        <button class="action-btn btn-green" onclick="alert('فتح نموذج طلب جديد')"> طلب جديد</button>
-        <button class="action-btn btn-yellow" onclick="alert('فتح نموذج زيارة جديدة')"> زيارة جديدة</button>
+        <button class="action-btn btn-green" onclick="alert('فتح نموذج طلب جديد')">🛒 طلب جديد</button>
+        <button class="action-btn btn-yellow" onclick="alert('فتح نموذج زيارة جديدة')">🚗 زيارة جديدة</button>
         <div class="tabs-wrapper">
             <button class="tab-btn active" id="btn-o" onclick="openTab('o-history')">سجل الطلبات</button>
             <button class="tab-btn" id="btn-a" onclick="openTab('attachments')">المرفقات</button>
@@ -149,7 +149,7 @@
         </div>
     </div>
     <div class="content-area" id="display-frame">
-        <b id="frame-title" style="font-size:12px; color:var(--nav-purple-dark); display:block; margin-bottom:10px;"> سجل الطلبات</b>
+        <b id="frame-title" style="font-size:12px; color:var(--nav-purple-dark); display:block; margin-bottom:10px;">🛒 سجل الطلبات</b>
         <div id="table-content"></div>
     </div>
 </div>
@@ -166,6 +166,17 @@
     function getTodayDateFormatted() {
         const d = new Date();
         return d.getDate().toString().padStart(2, '0') + '/' + (d.getMonth() + 1).toString().padStart(2, '0') + '/' + d.getFullYear();
+    }
+
+    function handleMainSelection(checkbox) {
+        if (checkbox.checked) {
+            // إلغاء تحديد كافة المربعات الأخرى في الجدول
+            const allChecks = document.querySelectorAll('.main-check');
+            allChecks.forEach(cb => {
+                if (cb !== checkbox) cb.checked = false;
+            });
+        }
+        saveManagersToLocalStorage();
     }
 
     function loadClientData() {
@@ -189,7 +200,7 @@
         const row = tbody.insertRow();
         const todayStr = getTodayDateFormatted();
         row.innerHTML = `
-            <td><input type="checkbox" class="main-check" onchange="saveManagersToLocalStorage()"></td>
+            <td><input type="checkbox" class="main-check" onchange="handleMainSelection(this)"></td>
             <td><input type="text" class="mgr-input" placeholder="الاسم..."></td>
             <td><input type="text" class="mgr-input" placeholder="رقم التواصل..."></td>
             <td><input type="text" class="mgr-input" placeholder="رقم آخر..."></td>
@@ -224,7 +235,7 @@
         tbody.querySelectorAll('tr').forEach(row => {
             const inputs = row.querySelectorAll('.mgr-input');
             const mainCheckbox = row.querySelector('.main-check');
-            // يتم الحفظ فقط إذا تم الضغط على زر الحفظ (أصبحت الحقول معطلة)
+            // حفظ فقط الصفوف المقفلة
             if (inputs.length > 0 && inputs[0].disabled) {
                 managersList.push({
                     isMain: mainCheckbox.checked,
@@ -251,7 +262,7 @@
         currentClientManagers.forEach(mgr => {
             const row = tbody.insertRow();
             row.innerHTML = `
-                <td><input type="checkbox" class="main-check" ${mgr.isMain ? 'checked' : ''} onchange="saveManagersToLocalStorage()"></td>
+                <td><input type="checkbox" class="main-check" ${mgr.isMain ? 'checked' : ''} onchange="handleMainSelection(this)"></td>
                 <td><input type="text" class="mgr-input" value="${mgr.name || ''}" disabled></td>
                 <td><input type="text" class="mgr-input" value="${mgr.phone1 || ''}" disabled></td>
                 <td><input type="text" class="mgr-input" value="${mgr.phone2 || ''}" disabled></td>
