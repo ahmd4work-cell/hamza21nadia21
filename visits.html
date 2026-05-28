@@ -71,7 +71,7 @@
         .dropdown-menu .delete-btn:hover { background: #fee2e2; color: #ef4444; }
         .show { display: block; }
 
-        /* تعديل التلميح (Tooltip) حسب الطلب الجديد */
+        /* تعديل التلميح (Tooltip) ليكون بقدر عرض مربع الملاحظات تماماً */
         .custom-tooltip-cell { position: relative; }
         .tooltip-box {
             position: absolute; 
@@ -79,9 +79,9 @@
             right: 0; 
             background: #1e293b; 
             color: #fff;
-            padding: 5px 10px; 
+            padding: 5px; 
             border-radius: 6px; 
-            width: 20%; /* العرض 20% */
+            width: 100%; /* العرض بالكامل متوافق مع عرض مربع الملاحظات للخلية */
             height: 40px; /* الارتفاع 40 بكسل */
             font-size: 11px;
             line-height: 1.3; 
@@ -98,6 +98,7 @@
             justify-content: center;
             text-align: center;
             transition: opacity 0.2s;
+            box-sizing: border-box;
         }
         .custom-tooltip-cell:hover .tooltip-box { opacity: 1; visibility: visible; }
         .notes-preview { width: 90%; border: none; background: transparent; font-family: 'Cairo'; font-size: 11px; text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700; overflow: hidden; text-overflow: ellipsis; display: block; margin: 0 auto; }
@@ -129,7 +130,7 @@
         <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة زيارة جديدة</button>
         <div class="search-wrapper">
             <input type="text" id="searchInput" class="search-input" placeholder="بحث عن اسم الشركة أو البيانات..." onkeyup="filterTable()">
-            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" cy="21" x2="16.65" y2="16.65"></line></svg>
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
         </div>
     </div>
     
