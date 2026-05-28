@@ -205,7 +205,7 @@
     </div>
 </div>
 
-<!-- مودال تفاصيل الزيارة الجديد -->
+<!-- مودال تفاصيل الزيارة -->
 <div id="noteModal" class="modal">
     <div class="modal-content">
         <div class="modal-header" style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right;">سجل متابعة الزيارة والنتائج</div>
@@ -218,7 +218,7 @@
     </div>
 </div>
 
-<!-- المودال الخاص لرسالة تأكيد تحويل الحالة "مهتم" بالأزرار المطلوبة -->
+<!-- المودال الخاص لرسالة تأكيد تحويل الحالة "مهتم" -->
 <div id="interestedConfirmModal" class="modal">
     <div class="confirm-modal-content">
         <div style="font-family:'Cairo'; font-weight:700; font-size:13px; margin-bottom:20px; color:var(--text-dark);">سيتم تحويل الزيارة الى الفرص البيعية</div>
@@ -272,7 +272,7 @@
 
         const cleanOld = oldVal.trim() === "" ? "فارغ" : oldVal;
         const cleanNew = newVal.trim() === "" ? "فارغ" : newVal;
-        const cleanCompany = companyName.trim() === "" ? "شركة غير محددة" : companyName;
+        const cleanCompany = companyName.trim() === "" ? "شركة غير مححدد" : companyName;
 
         let actionText = "";
         if (fieldName === "الشركة") {
@@ -315,6 +315,9 @@
         const row = selectEl.closest('tr');
         const companyName = row.cells[0].querySelector('input').value;
 
+        // وسم الصف بعلامة تفيد بأنه تم تغيير حالته ولو لمرة واحدة ليخرج من نظام التثبيت العلوي المطلق
+        row.setAttribute('data-status-changed', 'true');
+
         if (newVal === "مهتم") {
             targetSelectElement = selectEl;
             document.getElementById('interestedConfirmModal').style.display = "flex";
@@ -344,7 +347,7 @@
         }
     }
 
-    // منطق الترتيب والفرز الجديد والمعدل بالكامل لتلبية الشروط المطلوبة بدقة
+    // نظام الفرز والترتيب المحدث بالكامل بناءً على توجيهاتك الدقيقة الجديدة
     function sortTableRows() {
         const tbody = document.getElementById('tableBody');
         if (!tbody) return;
@@ -361,34 +364,36 @@
             const statusA = a.cells[6].querySelector('select').value;
             const statusB = b.cells[6].querySelector('select').value;
 
-            const editDateStrA = a.querySelector('.edit-date-val').value;
-            const editDateStrB = b.querySelector('.edit-date-val').value;
+            const hasChangedA = a.getAttribute('data-status-changed') === 'true';
+            const hasChangedB = b.getAttribute('data-status-changed') === 'true';
 
-            const editDateA = parseDate(editDateStrA || a.querySelector('.entry-date-val').value);
-            const editDateB = parseDate(editDateStrB || b.querySelector('.entry-date-val').value);
+            // 1. فحص الصفوف المدرجة حديثاً (تظل بالأعلى دائماً طالما لم يتم المساس بحالتها)
+            const isBrandNewA = (!hasChangedA && statusA === "");
+            const isBrandNewB = (!hasChangedB && statusB === "");
 
-            // 1. فحص هل الصف عبارة عن "زيارة جديدة تماماً لم يتم تعديلها أو تغيير حالتها بعد"
-            const isBrandNewA = (statusA === "" && !editDateStrA);
-            const isBrandNewB = (statusB === "" && !editDateStrB);
-
-            if (isBrandNewA && !isBrandNewB) return -1; // تثبيت الصف الجديد تماماً في الأعلى
+            if (isBrandNewA && !isBrandNewB) return -1;
             if (!isBrandNewA && isBrandNewB) return 1;
+            if (isBrandNewA && isBrandNewB) return 0; // الحفاظ على ترتيبهم النسبي في الأعلى
 
-            // 2. إذا لم تكن صفوف جديدة، نطبق الأولوية الرأسية بناءً على وزن الحالة
-            function getStatusWeight(status) {
-                if (status === "50%") return 4;
-                if (status === "" || status === "مهتم" || status === "20%") return 3; // باقي الحالات المعدلة تأتي تحت الـ 50%
+            // 2. إذا خرجت الصفوف من التثبيت العلوي، يتم الفرز الرأسي بناءً على رتبة الحالة الجديدة
+            function getStatusRank(status) {
+                if (status === "50%") return 5;
+                if (status === "20%") return 4;
+                if (status === "" || status === "مهتم") return 3; // الحالات الفارغة المعدلة وباقي الحالات تأتي هنا
                 if (status === "فقدان") return 2;
-                return 3;
+                return 1;
             }
 
-            const weightA = getStatusWeight(statusA);
-            const weightB = getStatusWeight(statusB);
+            const rankA = getStatusRank(statusA);
+            const rankB = getStatusRank(statusB);
 
-            if (weightA !== weightB) {
-                return weightB - weightA; // الأوزان الأعلى تكون بالأعلى (50% أولاً، ثم الحالات الأخرى، ثم فقدان)
+            if (rankA !== rankB) {
+                return rankB - rankA; // الرتب الأعلى تظهر أولاً
             } else {
-                return editDateB - editDateA; // الأحدث فالأحدث حسب تاريخ التعديل
+                // 3. الترتيب الداخلي للحالة الواحدة (الأحدث فالأحدث حسب تاريخ التعديل أو تاريخ الزيارة)
+                const dateStrA = a.querySelector('.edit-date-val').value || a.querySelector('.entry-date-val').value;
+                const dateStrB = b.querySelector('.edit-date-val').value || b.querySelector('.entry-date-val').value;
+                return parseDate(dateStrB) - parseDate(dateStrA);
             }
         });
 
@@ -403,6 +408,11 @@
         const notes = v.notes || '';
         const lastNote = getLastNoteOnly(notes);
         const currentStatus = v.status || '';
+
+        // استعادة حالة التغيير السابقة إذا كانت محفوظة
+        if (v.statusChanged === 'true' || currentStatus !== '') {
+            row.setAttribute('data-status-changed', 'true');
+        }
 
         row.innerHTML = `
             <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الشركة', this.getAttribute('data-old'), this.value, this.value); this.setAttribute('data-old', this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); sortTableRows();"></td>
@@ -459,7 +469,8 @@
                     record: inputs[4].value, curServ: inputs[5].value, status: inputs[6].value,
                     visitDate: row.querySelector('.entry-date-val').value,
                     notes: noteDiv.getAttribute('data-full-notes') || '',
-                    editDate: row.querySelector('.edit-date-val').value || ''
+                    editDate: row.querySelector('.edit-date-val').value || '',
+                    statusChanged: row.getAttribute('data-status-changed') || 'false'
                 });
             }
         });
