@@ -62,10 +62,11 @@
         .mgr-table td { padding: 6px; text-align: center; border: 1px solid var(--border-color); background: white; }
         
         .mgr-input { width: 95%; border: none; text-align: center; font-family: 'Cairo'; font-size: 11px; outline: none; background: transparent; font-weight: 600; color: #1e293b; }
-        .mgr-input:disabled { color: #64748b; cursor: not-allowed; }
+        .mgr-input:disabled { color: #64748b; cursor: not-allowed; background: transparent; }
         
         /* تنسيق المربع الصغير */
-        .main-check { width: 16px; height: 16px; cursor: pointer; accent-color: var(--purple-mid); }
+        .main-check { width: 16px; height: 16px; cursor: pointer; accent-color: var(--purple-mid); display: inline-block; vertical-align: middle; }
+        .main-check:disabled { cursor: not-allowed; }
 
         .btn-save-row { background: var(--order-green); color: white; border: none; padding: 2px 8px; font-family: 'Cairo'; font-size: 10px; font-weight: bold; border-radius: 4px; cursor: pointer; }
         .btn-locked-status { color: #64748b; font-size: 10px; font-weight: bold; }
@@ -141,8 +142,8 @@
 
 <div class="full-width-container">
     <div class="control-strip">
-        <button class="action-btn btn-green" onclick="alert('فتح نموذج طلب جديد')"> طلب جديد</button>
-        <button class="action-btn btn-yellow" onclick="alert('فتح نموذج زيارة جديدة')"> زيارة جديدة</button>
+        <button class="action-btn btn-green" onclick="alert('فتح نموذج طلب جديد')">🛒 طلب جديد</button>
+        <button class="action-btn btn-yellow" onclick="alert('فتح نموذج زيارة جديدة')">🚗 زيارة جديدة</button>
         <div class="tabs-wrapper">
             <button class="tab-btn active" id="btn-o" onclick="openTab('o-history')">سجل الطلبات</button>
             <button class="tab-btn" id="btn-a" onclick="openTab('attachments')">المرفقات</button>
@@ -150,7 +151,7 @@
         </div>
     </div>
     <div class="content-area" id="display-frame">
-        <b id="frame-title" style="font-size:12px; color:var(--nav-purple-dark); display:block; margin-bottom:10px;"> سجل الطلبات</b>
+        <b id="frame-title" style="font-size:12px; color:var(--nav-purple-dark); display:block; margin-bottom:10px;">🛒 سجل الطلبات</b>
         <div id="table-content"></div>
     </div>
 </div>
@@ -196,10 +197,10 @@
             <td><input type="text" class="mgr-input" placeholder="رقم آخر..."></td>
             <td><input type="email" class="mgr-input" placeholder="الايميل..."></td>
             <td><input type="text" class="mgr-input" placeholder="الوظيفة..."></td>
-            <td><input type="text" class="mgr-input" value="${todayStr}" disabled></td>
+            <td><input type="text" class="mgr-input" value="${todayStr}" disabled style="color: #64748b;"></td>
             <td><button class="btn-save-row" onclick="lockAndSaveManagerRow(this)">حفظ</button></td>
         `;
-        row.querySelectorAll('input')[1].focus();
+        row.querySelectorAll('input')[1].focus(); // التركيز على حقل الاسم تلقائياً
     }
 
     function lockAndSaveManagerRow(btn) {
@@ -207,6 +208,7 @@
         const inputs = row.querySelectorAll('.mgr-input');
         const isMain = row.querySelector('.main-check');
         
+        // التحقق من حقل الاسم (الآن هو العنصر الأول في مصفوفة المدخلات mgr-input)
         if(!inputs[0].value.trim()) {
             alert("يرجى إدخال اسم المسؤول أولاً.");
             inputs[0].focus();
@@ -214,6 +216,7 @@
         }
 
         alert("لن تتمكن من الحذف أو التعديل بعد ذلك");
+        
         inputs.forEach(input => input.disabled = true);
         isMain.disabled = true;
         btn.parentElement.innerHTML = `<span class="btn-locked-status">🔒 محفوظ ومقفل</span>`;
