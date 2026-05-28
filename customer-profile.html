@@ -64,9 +64,7 @@
         .mgr-input { width: 95%; border: none; text-align: center; font-family: 'Cairo'; font-size: 11px; outline: none; background: transparent; font-weight: 600; color: #1e293b; }
         .mgr-input:disabled { color: #64748b; cursor: not-allowed; background: transparent; }
         
-        /* تنسيق محسن للمربع الصغير لضمان قابلية النقر */
-        .main-check { width: 18px; height: 18px; cursor: pointer !important; accent-color: var(--purple-mid); position: relative; pointer-events: auto; }
-        .main-check:disabled { cursor: not-allowed !important; }
+        .main-check { width: 18px; height: 18px; cursor: pointer !important; accent-color: var(--purple-mid); position: relative; }
 
         .btn-save-row { background: var(--order-green); color: white; border: none; padding: 2px 8px; font-family: 'Cairo'; font-size: 10px; font-weight: bold; border-radius: 4px; cursor: pointer; }
         .btn-locked-status { color: #64748b; font-size: 10px; font-weight: bold; }
@@ -142,8 +140,8 @@
 
 <div class="full-width-container">
     <div class="control-strip">
-        <button class="action-btn btn-green" onclick="alert('فتح نموذج طلب جديد')">🛒 طلب جديد</button>
-        <button class="action-btn btn-yellow" onclick="alert('فتح نموذج زيارة جديدة')">🚗 زيارة جديدة</button>
+        <button class="action-btn btn-green" onclick="alert('فتح نموذج طلب جديد')"> طلب جديد</button>
+        <button class="action-btn btn-yellow" onclick="alert('فتح نموذج زيارة جديدة')"> زيارة جديدة</button>
         <div class="tabs-wrapper">
             <button class="tab-btn active" id="btn-o" onclick="openTab('o-history')">سجل الطلبات</button>
             <button class="tab-btn" id="btn-a" onclick="openTab('attachments')">المرفقات</button>
@@ -151,7 +149,7 @@
         </div>
     </div>
     <div class="content-area" id="display-frame">
-        <b id="frame-title" style="font-size:12px; color:var(--nav-purple-dark); display:block; margin-bottom:10px;">🛒 سجل الطلبات</b>
+        <b id="frame-title" style="font-size:12px; color:var(--nav-purple-dark); display:block; margin-bottom:10px;"> سجل الطلبات</b>
         <div id="table-content"></div>
     </div>
 </div>
@@ -191,7 +189,7 @@
         const row = tbody.insertRow();
         const todayStr = getTodayDateFormatted();
         row.innerHTML = `
-            <td><input type="checkbox" class="main-check"></td>
+            <td><input type="checkbox" class="main-check" onchange="saveManagersToLocalStorage()"></td>
             <td><input type="text" class="mgr-input" placeholder="الاسم..."></td>
             <td><input type="text" class="mgr-input" placeholder="رقم التواصل..."></td>
             <td><input type="text" class="mgr-input" placeholder="رقم آخر..."></td>
@@ -205,7 +203,6 @@
     function lockAndSaveManagerRow(btn) {
         const row = btn.closest('tr');
         const inputs = row.querySelectorAll('.mgr-input');
-        const isMain = row.querySelector('.main-check');
         
         if(!inputs[0].value.trim()) {
             alert("يرجى إدخال اسم المسؤول أولاً.");
@@ -213,10 +210,9 @@
             return;
         }
 
-        alert("لن تتمكن من الحذف أو التعديل بعد ذلك");
+        alert("لن تتمكن من الحذف أو التعديل بعد ذلك (باستثناء تحديد المسؤول الرئيسي)");
         
         inputs.forEach(input => input.disabled = true);
-        isMain.disabled = true;
         btn.parentElement.innerHTML = `<span class="btn-locked-status">🔒 محفوظ ومقفل</span>`;
         saveManagersToLocalStorage();
     }
@@ -228,6 +224,7 @@
         tbody.querySelectorAll('tr').forEach(row => {
             const inputs = row.querySelectorAll('.mgr-input');
             const mainCheckbox = row.querySelector('.main-check');
+            // يتم الحفظ فقط إذا تم الضغط على زر الحفظ (أصبحت الحقول معطلة)
             if (inputs.length > 0 && inputs[0].disabled) {
                 managersList.push({
                     isMain: mainCheckbox.checked,
@@ -254,7 +251,7 @@
         currentClientManagers.forEach(mgr => {
             const row = tbody.insertRow();
             row.innerHTML = `
-                <td><input type="checkbox" class="main-check" ${mgr.isMain ? 'checked' : ''} disabled></td>
+                <td><input type="checkbox" class="main-check" ${mgr.isMain ? 'checked' : ''} onchange="saveManagersToLocalStorage()"></td>
                 <td><input type="text" class="mgr-input" value="${mgr.name || ''}" disabled></td>
                 <td><input type="text" class="mgr-input" value="${mgr.phone1 || ''}" disabled></td>
                 <td><input type="text" class="mgr-input" value="${mgr.phone2 || ''}" disabled></td>
