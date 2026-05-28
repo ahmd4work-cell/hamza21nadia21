@@ -205,7 +205,7 @@
     </div>
 </div>
 
-<!-- مودال تفاصيل الزيارة القديم -->
+<!-- مودال تفاصيل الزيارة الجديد -->
 <div id="noteModal" class="modal">
     <div class="modal-content">
         <div class="modal-header" style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right;">سجل متابعة الزيارة والنتائج</div>
@@ -344,6 +344,7 @@
         }
     }
 
+    // منطق الترتيب والفرز الجديد والمعدل بالكامل لتلبية الشروط المطلوبة بدقة
     function sortTableRows() {
         const tbody = document.getElementById('tableBody');
         if (!tbody) return;
@@ -360,24 +361,34 @@
             const statusA = a.cells[6].querySelector('select').value;
             const statusB = b.cells[6].querySelector('select').value;
 
-            const editDateA = parseDate(a.querySelector('.edit-date-val').value || a.querySelector('.entry-date-val').value);
-            const editDateB = parseDate(b.querySelector('.edit-date-val').value || b.querySelector('.entry-date-val').value);
+            const editDateStrA = a.querySelector('.edit-date-val').value;
+            const editDateStrB = b.querySelector('.edit-date-val').value;
 
+            const editDateA = parseDate(editDateStrA || a.querySelector('.entry-date-val').value);
+            const editDateB = parseDate(editDateStrB || b.querySelector('.entry-date-val').value);
+
+            // 1. فحص هل الصف عبارة عن "زيارة جديدة تماماً لم يتم تعديلها أو تغيير حالتها بعد"
+            const isBrandNewA = (statusA === "" && !editDateStrA);
+            const isBrandNewB = (statusB === "" && !editDateStrB);
+
+            if (isBrandNewA && !isBrandNewB) return -1; // تثبيت الصف الجديد تماماً في الأعلى
+            if (!isBrandNewA && isBrandNewB) return 1;
+
+            // 2. إذا لم تكن صفوف جديدة، نطبق الأولوية الرأسية بناءً على وزن الحالة
             function getStatusWeight(status) {
                 if (status === "50%") return 4;
-                if (status === "20%") return 3;
-                if (status === "" || status === "مهتم") return 2;
-                if (status === "فقدان") return 1;
-                return 2;
+                if (status === "" || status === "مهتم" || status === "20%") return 3; // باقي الحالات المعدلة تأتي تحت الـ 50%
+                if (status === "فقدان") return 2;
+                return 3;
             }
 
             const weightA = getStatusWeight(statusA);
             const weightB = getStatusWeight(statusB);
 
             if (weightA !== weightB) {
-                return weightB - weightA;
+                return weightB - weightA; // الأوزان الأعلى تكون بالأعلى (50% أولاً، ثم الحالات الأخرى، ثم فقدان)
             } else {
-                return editDateB - editDateA;
+                return editDateB - editDateA; // الأحدث فالأحدث حسب تاريخ التعديل
             }
         });
 
