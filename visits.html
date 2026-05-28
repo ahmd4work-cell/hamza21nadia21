@@ -132,6 +132,10 @@
         .activity-log-title { color: var(--dark-yellow); font-size: 13.5px; font-weight: 800; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; flex-shrink: 0; }
         .activity-list { flex: 1; overflow-y: auto; font-size: 11.5px; line-height: 1.6; }
         .activity-item { margin-bottom: 4px; border-bottom: 1px dashed #f8fafc; padding-bottom: 4px; color: #475569; display: flex; align-items: center; }
+        
+        /* فئة مخصصة لتصغير خط الوقت والتاريخ والرموز بمقدار درجة واحدة */
+        .activity-time-part { font-size: 10.5px; color: #64748b; }
+        .activity-text-part { font-size: 11.5px; }
 
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-content { background: white; padding: 18px; border-radius: 12px; width: 440px; height: 480px; display: flex; flex-direction: column; }
@@ -225,20 +229,34 @@
         return `👤 (أحمد)  🗓️ ${dayName}  ${dateStr}  ${hours.toString().padStart(2, '0')}:${minutes} ${ampm} ➡️ :`;
     }
 
-    function addToActivityLog(action, companyName = "غير محدد") {
-        const displayComp = companyName.trim() === "" ? "غير محدد" : companyName;
-        const logContent = getFullDateTimePattern() + " " + action + " / شركة " + displayComp;
-        let logs = JSON.parse(localStorage.getItem('asgate_activity_logs') || '[]');
-        logs.unshift(logContent);
+    // دالة تسجيل الأنشطة بنمط مخصص وتغليف التوقيت بتنسيق أصغر
+    function addToActivityLog(fieldName, oldVal, newVal, companyName) {
+        const timePart = getFullDateTimePattern();
+        const cleanOld = oldVal.trim() === "" ? "فارغ" : oldVal;
+        const cleanNew = newVal.trim() === "" ? "فارغ" : newVal;
+        const cleanCompany = companyName.trim() === "" ? "شركة غير محددة" : companyName;
+
+        let actionText = "";
+        if (fieldName === "الشركة") {
+            actionText = `تعديل الشركة ${cleanOld} الى ${cleanNew}  ( ${cleanNew} )`;
+        } else {
+            actionText = `تعديل ${fieldName} ${cleanOld} الى ${cleanNew}  ( ${cleanCompany} )`;
+        }
+
+        // دمج الجزأين معاً باستخدام فئات CSS للتحكم بحجم الخط
+        const fullLogHTML = `<span class="activity-time-part">${timePart}</span> <span class="activity-text-part">${actionText}</span>`;
+        
+        let logs = JSON.parse(localStorage.getItem('asgate_activity_logs_v2') || '[]');
+        logs.unshift(fullLogHTML);
         if(logs.length > 100) logs.pop();
-        localStorage.setItem('asgate_activity_logs', JSON.stringify(logs));
+        localStorage.setItem('asgate_activity_logs_v2', JSON.stringify(logs));
         renderActivityLog();
     }
 
     function renderActivityLog() {
         const list = document.getElementById('activityList');
         if (!list) return;
-        const logs = JSON.parse(localStorage.getItem('asgate_activity_logs') || '[]');
+        const logs = JSON.parse(localStorage.getItem('asgate_activity_logs_v2') || '[]');
         list.innerHTML = logs.map(log => `<div class="activity-item">${log}</div>`).join('');
     }
 
@@ -267,14 +285,14 @@
         const lastNote = getLastNoteOnly(notes);
 
         row.innerHTML = `
-            <td><input type="text" class="excel-input" value="${v.comp || ''}" onchange="addToActivityLog('تعديل اسم الشركة', this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently()"></td>
-            <td><input type="text" class="excel-input" value="${v.mgr || ''}" onchange="addToActivityLog('تعديل المسؤول', this.closest('tr').cells[0].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently()"></td>
-            <td><input type="text" class="excel-input" value="${v.mob || ''}" onchange="addToActivityLog('تعديل الموبايل', this.closest('tr').cells[0].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently()"></td>
-            <td><input type="text" class="excel-input" value="${v.email || ''}" onchange="addToActivityLog('تعديل ايميل', this.closest('tr').cells[0].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently()"></td>
-            <td><input type="text" class="excel-input" value="${v.record || ''}" onchange="addToActivityLog('تعديل السجل', this.closest('tr').cells[0].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently()"></td>
-            <td><input type="text" class="excel-input" value="${v.curServ || ''}" onchange="addToActivityLog('تعديل الخدمة', this.closest('tr').cells[0].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently()"></td>
+            <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الشركة', this.getAttribute('data-old'), this.value, this.value); this.setAttribute('data-old', this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently()"></td>
+            <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المسؤول', this.getAttribute('data-old'), this.value, this.closest('tr').cells[0].querySelector('input').value); this.setAttribute('data-old', this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently()"></td>
+            <td><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الموبايل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[0].querySelector('input').value); this.setAttribute('data-old', this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently()"></td>
+            <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الايميل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[0].querySelector('input').value); this.setAttribute('data-old', this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently()"></td>
+            <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('السجل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[0].querySelector('input').value); this.setAttribute('data-old', this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently()"></td>
+            <td><input type="text" class="excel-input" value="${v.curServ || ''}" onchange="updateEditDateField(this.closest('tr')); saveAllDataSilently()"></td>
             <td>
-                <select class="excel-input" onchange="addToActivityLog('تعديل حالة الزيارة', this.closest('tr').cells[0].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently()">
+                <select class="excel-input" data-old="${v.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الحالة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[0].querySelector('input').value); this.setAttribute('data-old', this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently()">
                     <option value="" ${!v.status ? 'selected' : ''}></option>
                     <option value="مهتم" ${v.status==='مهتم'?'selected':''}>مهتم</option>
                     <option value="50%" ${v.status==='50%'?'selected':''}>50%</option>
@@ -307,7 +325,6 @@
     function insertNewRow() { 
         renderRow({}, true); 
         saveAllDataSilently(); 
-        addToActivityLog('إنشاء زيارة جديدة', '');
     }
 
     function saveAllDataSilently() {
@@ -366,9 +383,6 @@
             currentActivePreview.innerText = lastNoteText;
             currentActivePreview.parentElement.querySelector('.tooltip-box').innerText = lastNoteText;
             
-            const companyName = currentActivePreview.closest('tr').cells[0].querySelector('input').value;
-            addToActivityLog('إضافة ملاحظة جديدة', companyName);
-            
             updateEditDateField(currentActivePreview.closest('tr'));
             saveAllDataSilently();
         }
@@ -378,10 +392,8 @@
     function closeNote() { document.getElementById('noteModal').style.display = "none"; }
 
     function confirmDelete(btn) { 
-        const companyName = btn.closest('tr').cells[0].querySelector('input').value;
         if (confirm("هل أنت متأكد من حذف هذه الزيارة من السجل؟")) { 
             btn.closest('tr').remove(); 
-            addToActivityLog('حذف زيارة', companyName);
             saveAllDataSilently(); 
         } 
     }
