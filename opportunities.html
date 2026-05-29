@@ -41,7 +41,6 @@
         
         .action-bar { display: flex; align-items: center; margin: 10px 0; gap: 15px; flex-shrink: 0; }
         .btn-top { border: none; padding: 0 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; font-size: 12px; height: 35px; }
-        /* استعادة اللون الأزرق */
         .btn-add { background-color: var(--accent-blue); }
 
         .search-wrapper { position: relative; width: 15%; display: flex; align-items: center; }
@@ -75,7 +74,6 @@
         .sub-table-row { display: none; background-color: #f8fafc; }
         .sub-table-container { padding: 8px 12% 12px 5%; } 
         .inner-table { width: 65%; background: white; border: 1px solid var(--border-soft); border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden; }
-        /* تغيير لون عناوين جدول المنتجات للأزرق */
         .inner-table th { background: var(--accent-blue); color: #fff; height: 24px; font-size: 9.5px; border-left: 1px solid rgba(255,255,255,0.2); }
         .inner-table td { height: 28px; border: 1px solid #edf2f7; padding: 0; }
         .inner-table input, .inner-table select { width: 100%; height: 100%; border: none; text-align: center; font-family: 'Cairo'; font-size: 10.5px; outline: none; background: transparent; }
@@ -91,7 +89,6 @@
         .btn-minus { background: #fee2e2; color: #ef4444; }
         .btn-minus:hover { background: #fecaca; }
 
-        /* تعديل لون المثلث للأزرق وتكبيره */
         .toggle-arrow { 
             cursor: pointer; font-size: 13px; color: var(--accent-blue); margin-right: 5px; 
             display: inline-block; transition: transform 0.2s; vertical-align: middle;
@@ -159,11 +156,12 @@
         .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
         .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
 
-        .col-select { width: 60px; }
-        .col-company { width: 12%; } .col-manager { width: 8%; } .col-mobile { width: 8%; } 
-        .col-email { width: 9%; } .col-record { width: 8%; } .col-date { width: 10%; } 
-        .col-service { width: 12%; } .col-notes { width: 13%; } .col-status { width: 7%; }
-        .col-edit { width: 8%; } .col-action { width: 100px; }
+        /* تعديل عرض الأعمدة لتناسب العمود الجديد */
+        .col-select { width: 50px; }
+        .col-company { width: 11%; } .col-manager { width: 8%; } .col-mobile { width: 8%; } 
+        .col-email { width: 9%; } .col-record { width: 8%; } .col-date { width: 9%; } 
+        .col-service { width: 11%; } .col-value { width: 7%; } .col-notes { width: 11%; } .col-status { width: 6%; }
+        .col-edit { width: 7%; } .col-action { width: 90px; }
     </style>
 </head>
 <body onload="loadSavedData()">
@@ -203,7 +201,8 @@
                         <th class="col-email">الإيميل</th>
                         <th class="col-record">السجل</th>
                         <th class="col-date">تاريخ الفرصة</th>
-                        <th class="col-service">الخدمة المطلوبة</th>
+                        <th class="col-service">الفرصة المقترحة</th>
+                        <th class="col-value">قيمة الفرصة</th>
                         <th class="col-notes">ملاحظات الفرصة</th>
                         <th class="col-status">الحالة</th>
                         <th class="col-edit">آخر تعديل</th>
@@ -243,8 +242,8 @@
 
 <script>
     let currentActivePreview = null;
-    const STORAGE_KEY = 'asgate_opportunities_final_v29'; 
-    const LOGS_KEY = 'asgate_opp_activity_logs_v29';
+    const STORAGE_KEY = 'asgate_opportunities_final_v30'; 
+    const LOGS_KEY = 'asgate_opp_activity_logs_v30';
 
     function getTodayFormatted() {
         const d = new Date();
@@ -290,7 +289,7 @@
                 const status = statusSelect.value;
                 if (date === today) tDay++;
                 if (date.startsWith(currentMonth)) tMonth++;
-                if (status === '50%') tSuccess++;
+                // ملاحظة: تم تعديل خيارات الحالة، يمكن تحديث شرط 'ناجحة' لاحقاً إذا لزم الأمر
             }
         });
         document.getElementById('stat-total').innerText = total;
@@ -352,13 +351,13 @@
                 <input type="text" class="excel-input readonly-input" value="${visitDate}" readonly>
                 <input type="hidden" class="visit-date-val" value="${visitDate}">
             </td>
-            <td><input type="text" class="excel-input" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الخدمة المطلوبة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الفرصة المقترحة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.valOpp || ''}" data-old="${v.valOpp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('قيمة الفرصة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
             <td>
                 <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الحالة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats(); reorderRows();">
                     <option value="" ${v.status === '' ? 'selected' : ''}></option>
                     <option value="مهتم" ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option>
-                    <option value="50%" ${v.status === '50%' ? 'selected' : ''}>50%</option>
                     <option value="فقدان" ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option>
                 </select>
             </td>
@@ -372,7 +371,7 @@
         `;
 
         subRow.innerHTML = `
-            <td colspan="12">
+            <td colspan="13">
                 <div class="sub-table-container">
                     <table class="inner-table">
                         <thead>
@@ -500,6 +499,7 @@
                 record: row.cells[5].querySelector('input').value,
                 visitDate: row.querySelector('.visit-date-val').value,
                 curServ: row.cells[7].querySelector('input').value,
+                valOpp: row.cells[8].querySelector('input').value,
                 notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '',
                 status: row.querySelector('.status-select').value,
                 editDate: row.querySelector('.edit-date-val').value,
