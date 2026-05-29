@@ -276,7 +276,7 @@
 
     const escapeHTML = str => {
         const div = document.createElement('div');
-        div.textContent = str?? '';
+        div.textContent = str || '';
         return div.innerHTML;
     };
 
@@ -292,7 +292,7 @@
         try {
             const dataStr = JSON.stringify(state.data);
             if (dataStr.length > MAX_STORAGE_SIZE) {
-                alert('تحذير: حجم البيانات كبير جداً. قد تفقد بعض البيانات القديمة.');
+                alert('تحذير: حجم البيانات كبير جداً. سيتم الاحتفاظ بآخر 500 سجل فقط.');
                 state.data = state.data.slice(-500);
             }
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data));
@@ -538,22 +538,20 @@
 
         $('#tableBody').addEventListener('change', e => {
             const target = e.target;
-            if (target.dataset.field) {
-                const row = target.closest('.main-row');
-                const companyName = row.querySelector('[data-field="comp"]').value;
-                const oldVal = target.dataset.oldValue || '';
-                const newVal = target.value;
-                const fieldMap = { comp: 'الشركة', mgr: 'المسؤول', mob: 'الموبايل', email: 'الإيميل', record: 'السجل', curServ: 'الخدمة المطلوبة', status: 'الحالة' };
-
-                addToActivityLog(fieldMap[target.dataset.field], oldVal, newVal, companyName);
-                target.dataset.oldValue = newVal;
-
-                row.querySelector('td:nth-child(11) input').value = formatDate();
+            if (target.dataset.field || target.closest('.product-body')) {
+                const row = target.closest('.main-row') || target.closest('.sub-table-row');
+                if (row.classList.contains('main-row')) {
+                    const companyName = row.querySelector('[data-field="comp"]').value;
+                    const oldVal = target.dataset.oldValue || '';
+                    const newVal = target.value;
+                    const fieldMap = { comp: 'الشركة', mgr: 'المسؤول', mob: 'الموبايل', email: 'الإيميل', record: 'السجل', curServ: 'الخدمة المطلوبة', status: 'الحالة' };
+                    if (target.dataset.field) {
+                        addToActivityLog(fieldMap[target.dataset.field], oldVal, newVal, companyName);
+                        row.querySelector('td:nth-child(11) input').value = formatDate();
+                    }
+                }
                 updateAllData();
                 updateStats();
-            }
-            if (target.closest('.product-body')) {
-                updateAllData();
             }
         });
 
@@ -581,25 +579,6 @@
             menu.classList.toggle('show');
         });
 
-        $('.dropdown-menu').addEventListener('click', e => {
-            if (e.target.dataset.action === 'delete') {
-                const selected = $$('.select-check:checked');
-                if (selected.length === 0) return alert('حدد صفاً أولاً');
-                if (confirm('تأكيد الحذف؟')) {
-                    selected.forEach(chk => {
-                        const row = chk.closest('tr');
-                        const id = row.dataset.id;
-                        const companyName = row.querySelector('[data-field="comp"]').value;
-                        addToActivityLog('إجراء', '', '', companyName);
-                        row.remove();
-                        $(`.sub-table-row[data-parent-id="${id}"]`)?.remove();
-                    });
-                    updateAllData();
-                    updateStats();
-                }
-            }
-        });
-
         $('#searchInput').addEventListener('input', e => {
             const q = e.target.value.toLowerCase().trim();
             $$('.main-row').forEach(r => {
@@ -620,6 +599,25 @@
         document.addEventListener('click', () => {
             $$('.dropdown-menu').forEach(m => m.classList.remove('show'));
         });
+
+        $('#bulkActionBtn').nextElementSibling.addEventListener('click', e => {
+            if (e.target.dataset.action === 'delete') {
+                const selected = $$('.select-check:checked');
+                if (selected.length === 0) return alert('حدد صفاً أولاً');
+                if (confirm('تأكيد حذف المحدد؟')) {
+                    selected.forEach(chk => {
+                        const row = chk.closest('tr');
+                        const companyName = row.querySelector('[data-field="comp"]').value;
+                        addToActivityLog('إجراء', '', '', companyName);
+                        $(`.sub-table-row[data-parent-id="${row.dataset.id}"]`).remove();
+                        row.remove();
+                    });
+                    updateAllData();
+                    updateStats();
+                }
+            }
+        });
     }
 
-    function getLastNoteOnly(full
+    function getLastNoteOnly(fullText) {
+        if (!fullText
