@@ -71,13 +71,13 @@
         
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; max-height: 45px; font-size: 11px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; }
         
-        /* تنسيق الصف الممدد للجدول الفرعي */
         .sub-table-row { display: none; background-color: #f8fafc; }
         .sub-table-container { padding: 8px 12% 12px 5%; } 
         .inner-table { width: 65%; background: white; border: 1px solid var(--border-soft); border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden; }
         .inner-table th { background: #64748b; height: 24px; font-size: 9.5px; border-left: 1px solid rgba(255,255,255,0.1); }
         .inner-table td { height: 28px; border: 1px solid #edf2f7; padding: 0; }
-        .inner-table input { width: 100%; height: 100%; border: none; text-align: center; font-family: 'Cairo'; font-size: 10.5px; outline: none; background: transparent; }
+        .inner-table input, .inner-table select { width: 100%; height: 100%; border: none; text-align: center; font-family: 'Cairo'; font-size: 10.5px; outline: none; background: transparent; }
+        .inner-table select { text-align-last: center; cursor: pointer; }
         
         .sub-action-btn { 
             width: 22px; height: 22px; border: none; border-radius: 4px; cursor: pointer; 
@@ -239,8 +239,8 @@
 
 <script>
     let currentActivePreview = null;
-    const STORAGE_KEY = 'asgate_opportunities_final_v28'; 
-    const LOGS_KEY = 'asgate_opp_activity_logs_v28';
+    const STORAGE_KEY = 'asgate_opportunities_final_v29'; 
+    const LOGS_KEY = 'asgate_opp_activity_logs_v29';
 
     function getTodayFormatted() {
         const d = new Date();
@@ -279,11 +279,15 @@
         const currentMonth = today.substring(0, 7);
         let total = rows.length, tDay = 0, tMonth = 0, tSuccess = 0;
         rows.forEach(row => {
-            const date = row.querySelector('.visit-date-val').value;
-            const status = row.querySelector('.status-select').value;
-            if (date === today) tDay++;
-            if (date.startsWith(currentMonth)) tMonth++;
-            if (status === '50%') tSuccess++;
+            const dateInput = row.querySelector('.visit-date-val');
+            const statusSelect = row.querySelector('.status-select');
+            if(dateInput && statusSelect) {
+                const date = dateInput.value;
+                const status = statusSelect.value;
+                if (date === today) tDay++;
+                if (date.startsWith(currentMonth)) tMonth++;
+                if (status === '50%') tSuccess++;
+            }
         });
         document.getElementById('stat-total').innerText = total;
         document.getElementById('stat-today').innerText = tDay;
@@ -313,19 +317,19 @@
                 <input type="checkbox" class="select-check">
                 <span class="toggle-arrow" onclick="toggleSubTable('${rowId}')">▶</span>
             </td>
-            <td><input type="text" class="excel-input" value="${v.comp || ''}" onchange="saveAllDataSilently(); updateStats();"></td>
-            <td><input type="text" class="excel-input" value="${v.mgr || ''}" onchange="saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${v.mob || ''}" onchange="saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${v.email || ''}" onchange="saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${v.record || ''}" onchange="saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الشركة', this.getAttribute('data-old'), this.value, this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats();"></td>
+            <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المسؤول', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الموبايل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الإيميل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('السجل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
             <td>
                 <input type="text" class="excel-input readonly-input" value="${visitDate}" readonly>
                 <input type="hidden" class="visit-date-val" value="${visitDate}">
             </td>
-            <td><input type="text" class="excel-input" value="${v.curServ || ''}" onchange="saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الخدمة المطلوبة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
             <td>
-                <select class="excel-input status-select" onchange="saveAllDataSilently(); updateStats();">
+                <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الحالة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats();">
                     <option value="" ${v.status === '' ? 'selected' : ''}></option>
                     <option value="مهتم" ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option>
                     <option value="50%" ${v.status === '50%' ? 'selected' : ''}>50%</option>
@@ -386,7 +390,14 @@
         const tbody = document.querySelector(`#sub-${rowId} .product-body`);
         const row = tbody.insertRow();
         row.innerHTML = `
-            <td><input type="text" value="${data.type || ''}" onchange="saveAllDataSilently()"></td>
+            <td>
+                <select onchange="saveAllDataSilently()">
+                    <option value="" ${data.type === '' ? 'selected' : ''}></option>
+                    <option value="خدمات تنقل" ${data.type === 'خدمات تنقل' ? 'selected' : ''}>خدمات تنقل</option>
+                    <option value="هاتف وانترنت" ${data.type === 'هاتف وانترنت' ? 'selected' : ''}>هاتف وانترنت</option>
+                    <option value="دوائر البيانات" ${data.type === 'دوائر البيانات' ? 'selected' : ''}>دوائر البيانات</option>
+                </select>
+            </td>
             <td><input type="text" value="${data.desc || ''}" onchange="saveAllDataSilently()"></td>
             <td><input type="text" value="${data.qty || ''}" onchange="saveAllDataSilently()"></td>
             <td><input type="text" value="${data.sub || ''}" onchange="saveAllDataSilently()"></td>
@@ -413,9 +424,12 @@
     }
 
     function deleteRow(btn, rowId) {
-        if(confirm('هل أنت متأكد؟')) {
+        const row = btn.closest('tr');
+        const companyName = document.getElementById(rowId).cells[1].querySelector('input').value;
+        if(confirm('هل أنت متأكد من الحذف؟')) {
+            addToActivityLog('إجراء', '', '', companyName);
             document.getElementById(rowId).remove();
-            document.getElementById('sub-' + rowId).remove();
+            if(document.getElementById('sub-' + rowId)) document.getElementById('sub-' + rowId).remove();
             saveAllDataSilently();
             updateStats();
         }
@@ -428,6 +442,8 @@
             selected.forEach(chk => {
                 const row = chk.closest('tr');
                 const id = row.id;
+                const companyName = row.cells[1].querySelector('input').value;
+                addToActivityLog('إجراء', '', '', companyName);
                 row.remove();
                 if(document.getElementById('sub-' + id)) document.getElementById('sub-' + id).remove();
             });
@@ -444,7 +460,7 @@
             const subRow = document.getElementById('sub-' + id);
             if(subRow) {
                 subRow.querySelectorAll('.product-body tr').forEach(pRow => {
-                    const inputs = pRow.querySelectorAll('input');
+                    const inputs = pRow.querySelectorAll('input, select');
                     products.push({ type: inputs[0].value, desc: inputs[1].value, qty: inputs[2].value, sub: inputs[3].value, total: inputs[4].value });
                 });
             }
@@ -500,6 +516,7 @@
         const raw = el.getAttribute('data-full-notes') || "";
         document.getElementById('historyLog').innerHTML = raw.split('\n--------------------\n').map(e => `<div class="activity-item">${e}</div>`).join('');
         document.getElementById('noteModal').style.display = "flex";
+        document.getElementById('modalTextArea').focus();
     }
 
     function saveNote() {
@@ -510,6 +527,10 @@
             let updated = old === "" ? entry : old + "\n--------------------\n" + entry;
             currentActivePreview.setAttribute('data-full-notes', updated);
             currentActivePreview.innerText = txt;
+            
+            const companyName = currentActivePreview.closest('tr').cells[1].querySelector('input').value;
+            addToActivityLog('ملاحظات الفرصة', '...', txt, companyName);
+            
             updateEditDateField(currentActivePreview.closest('tr'));
             saveAllDataSilently();
         }
