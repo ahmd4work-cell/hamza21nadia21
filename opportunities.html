@@ -103,6 +103,8 @@
             height: 100%; overflow: hidden; text-overflow: ellipsis; 
         }
 
+        .readonly-input { background: #f1f5f9 !important; color: #64748b; cursor: default; }
+
         .select-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent-blue); vertical-align: middle; }
 
         .action-cell { position: relative; overflow: visible !important; }
@@ -155,11 +157,12 @@
         .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
         .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
 
-        .col-select { width: 60px; }
+        /* تعديل أوزان الأعمدة بعد إضافة العمود الجديد */
+        .col-select { width: 50px; }
         .col-company { width: 12%; } .col-manager { width: 8%; } .col-mobile { width: 8%; } 
-        .col-email { width: 9%; } .col-record { width: 8%; } .col-date { width: 10%; } 
-        .col-service { width: 12%; } .col-notes { width: 13%; } .col-status { width: 7%; }
-        .col-edit { width: 8%; } .col-action { width: 100px; }
+        .col-email { width: 9%; } .col-record { width: 7%; } .col-date { width: 9%; } 
+        .col-service { width: 10%; } .col-value { width: 9%; } .col-notes { width: 12%; } 
+        .col-status { width: 7%; } .col-edit { width: 8%; } .col-action { width: 90px; }
     </style>
 </head>
 <body onload="loadSavedData()">
@@ -200,6 +203,7 @@
                         <th class="col-record">السجل</th>
                         <th class="col-date">تاريخ الفرصة</th>
                         <th class="col-service">الخدمة المطلوبة</th>
+                        <th class="col-value">قيمة الفرصة</th>
                         <th class="col-notes">ملاحظات الفرصة</th>
                         <th class="col-status">الحالة</th>
                         <th class="col-edit">آخر تعديل</th>
@@ -327,6 +331,7 @@
                 <input type="hidden" class="visit-date-val" value="${visitDate}">
             </td>
             <td><input type="text" class="excel-input" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الخدمة المطلوبة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input readonly-input opp-value-field" value="${v.oppValue || '0'}" readonly></td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
             <td>
                 <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الحالة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats();">
@@ -346,7 +351,7 @@
         `;
 
         subRow.innerHTML = `
-            <td colspan="12">
+            <td colspan="13">
                 <div class="sub-table-container">
                     <table class="inner-table">
                         <thead>
@@ -399,16 +404,44 @@
                 </select>
             </td>
             <td><input type="text" value="${data.desc || ''}" onchange="saveAllDataSilently()"></td>
-            <td><input type="text" value="${data.qty || ''}" onchange="saveAllDataSilently()"></td>
-            <td><input type="text" value="${data.sub || ''}" onchange="saveAllDataSilently()"></td>
-            <td><input type="text" value="${data.total || ''}" onchange="saveAllDataSilently()"></td>
+            <td><input type="number" class="qty-field" value="${data.qty || ''}" oninput="calculateProductTotal(this)"></td>
+            <td><input type="number" class="sub-field" value="${data.sub || ''}" oninput="calculateProductTotal(this)"></td>
+            <td><input type="text" class="total-field readonly-input" value="${data.total || '0'}" readonly></td>
             <td>
                 <div style="display:flex; justify-content:center; gap:5px; align-items:center;">
                     <button class="sub-action-btn btn-plus" onclick="addProductRow('${rowId}')">+</button>
-                    <button class="sub-action-btn btn-minus" onclick="if(this.closest('tbody').rows.length > 1) { this.closest('tr').remove(); saveAllDataSilently(); }">×</button>
+                    <button class="sub-action-btn btn-minus" onclick="if(this.closest('tbody').rows.length > 1) { this.closest('tr').remove(); calculateOpportunityValue('${rowId}'); saveAllDataSilently(); }">×</button>
                 </div>
             </td>
         `;
+    }
+
+    function calculateProductTotal(input) {
+        const row = input.closest('tr');
+        const qty = parseFloat(row.querySelector('.qty-field').value) || 0;
+        const sub = parseFloat(row.querySelector('.sub-field').value) || 0;
+        const totalField = row.querySelector('.total-field');
+        
+        const total = qty * sub;
+        totalField.value = total.toLocaleString(); // تنسيق الرقم مع فواصل
+        
+        // استخراج ID الصف الرئيسي لتحديث قيمة الفرصة الإجمالية
+        const subRowId = row.closest('.sub-table-row').id;
+        const mainRowId = subRowId.replace('sub-', '');
+        calculateOpportunityValue(mainRowId);
+        saveAllDataSilently();
+    }
+
+    function calculateOpportunityValue(mainRowId) {
+        const subRow = document.getElementById('sub-' + mainRowId);
+        let grandTotal = 0;
+        subRow.querySelectorAll('.total-field').forEach(field => {
+            const val = parseFloat(field.value.replace(/,/g, '')) || 0;
+            grandTotal += val;
+        });
+        
+        const mainRow = document.getElementById(mainRowId);
+        mainRow.querySelector('.opp-value-field').value = grandTotal.toLocaleString();
     }
 
     function toggleAllCheckboxes(source) {
@@ -424,7 +457,6 @@
     }
 
     function deleteRow(btn, rowId) {
-        const row = btn.closest('tr');
         const companyName = document.getElementById(rowId).cells[1].querySelector('input').value;
         if(confirm('هل أنت متأكد من الحذف؟')) {
             addToActivityLog('إجراء', '', '', companyName);
@@ -461,7 +493,13 @@
             if(subRow) {
                 subRow.querySelectorAll('.product-body tr').forEach(pRow => {
                     const inputs = pRow.querySelectorAll('input, select');
-                    products.push({ type: inputs[0].value, desc: inputs[1].value, qty: inputs[2].value, sub: inputs[3].value, total: inputs[4].value });
+                    products.push({ 
+                        type: inputs[0].value, 
+                        desc: inputs[1].value, 
+                        qty: inputs[2].value, 
+                        sub: inputs[3].value, 
+                        total: inputs[4].value 
+                    });
                 });
             }
 
@@ -473,6 +511,7 @@
                 record: row.cells[5].querySelector('input').value,
                 visitDate: row.querySelector('.visit-date-val').value,
                 curServ: row.cells[7].querySelector('input').value,
+                oppValue: row.querySelector('.opp-value-field').value,
                 notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '',
                 status: row.querySelector('.status-select').value,
                 editDate: row.querySelector('.edit-date-val').value,
