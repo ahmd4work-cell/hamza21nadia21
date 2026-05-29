@@ -43,6 +43,7 @@
         .btn-top { border: none; padding: 0 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; font-size: 12px; height: 35px; }
         .btn-add { background-color: var(--accent-blue); }
 
+        /* مربع البحث بـ 15% عرض و30 بكسل ارتفاع */
         .search-wrapper { position: relative; width: 15%; display: flex; align-items: center; }
         .search-input {
             width: 100%; height: 30px; padding: 0 10px; border-radius: 8px;
@@ -88,7 +89,7 @@
             font-family: 'Cairo'; font-weight: 700; transition: 0.2s;
             display: inline-flex; align-items: center; gap: 4px; line-height: 1;
         }
-        .header-dots-btn { background: rgba(255,255,255,0.1); color: white; border-color: rgba(255,255,255,0.3); font-size: 11px; }
+        .header-dots-btn { background: rgba(255,255,255,0.1); color: white; border-color: rgba(255,255,255,0.3); font-size: 11px; width: 85px; justify-content: center; }
         .header-dots-btn:hover { background: white; color: var(--header-shiny-purple); }
         .dots-btn:hover { background: #f8fafc; border-color: var(--accent-blue); color: var(--accent-blue); }
 
@@ -181,10 +182,10 @@
                         <th class="col-action" style="position: relative; overflow: visible;">
                             <button class="header-dots-btn" onclick="toggleDropdown(event, this)">إجراء •••</button>
                             <div class="dropdown-menu">
-                                <button onclick="handleBulkAction('تحويل')">تحويل المحدد</button>
-                                <button onclick="handleBulkAction('تصدير')">تصدير المحدد</button>
-                                <button onclick="handleBulkAction('طباعة')">طباعة المحدد</button>
-                                <button class="del-btn" onclick="handleBulkAction('حذف')">حذف المحدد</button>
+                                <button onclick="handleBulkAction('تحويل المحدد')">تحويل المحدد</button>
+                                <button onclick="handleBulkAction('تصدير المحدد')">تصدير المحدد</button>
+                                <button onclick="handleBulkAction('طباعة المحدد')">طباعة المحدد</button>
+                                <button class="del-btn" onclick="handleBulkAction('حذف المحدد')">حذف المحدد</button>
                             </div>
                         </th>
                     </tr>
@@ -214,6 +215,7 @@
 
 <script>
     let currentActivePreview = null;
+    const STORAGE_KEY = 'asgate_visits_final_v25'; // مفتاح تخزين فريد للنسخة الجديدة
 
     function getTodayFormatted() {
         const d = new Date();
@@ -234,15 +236,15 @@
         const val2 = newVal && newVal.trim() !== "" ? newVal : "فارغ";
         let actionText = fieldName === "إجراء" ? `حذف زيارة شركة ( ${cleanCompany} )` : `تعديل ${fieldName} من [${val1}] إلى [${val2}] في ( ${cleanCompany} )`;
         const fullLogHTML = `${headerHTML}<span class="activity-text-part">${actionText}</span>`;
-        let logs = JSON.parse(localStorage.getItem('asgate_activity_logs_v2') || '[]');
+        let logs = JSON.parse(localStorage.getItem('asgate_activity_logs_v25') || '[]');
         logs.unshift(fullLogHTML);
-        localStorage.setItem('asgate_activity_logs_v2', JSON.stringify(logs.slice(0, 100)));
+        localStorage.setItem('asgate_activity_logs_v25', JSON.stringify(logs.slice(0, 100)));
         renderActivityLog();
     }
 
     function renderActivityLog() {
         const list = document.getElementById('activityList');
-        const logs = JSON.parse(localStorage.getItem('asgate_activity_logs_v2') || '[]');
+        const logs = JSON.parse(localStorage.getItem('asgate_activity_logs_v25') || '[]');
         list.innerHTML = logs.map(log => `<div class="activity-item">${log}</div>`).join('');
     }
 
@@ -269,8 +271,8 @@
         const row = prepend ? tbody.insertRow(0) : tbody.insertRow();
         const today = getTodayFormatted();
         const visitDate = v.visitDate || today;
-        const fullNotes = v.notes || ''; // الاحتفاظ بكامل النص المخزن
-        const lastNote = getLastNoteOnly(fullNotes);
+        const notes = v.notes || '';
+        const lastNoteText = getLastNoteOnly(notes);
 
         row.innerHTML = `
             <td><input type="checkbox" class="select-check"></td>
@@ -284,7 +286,7 @@
                 <input type="hidden" class="visit-date-val" value="${visitDate}">
             </td>
             <td><input type="text" class="excel-input" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الخدمة الحالية', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
-            <td><div class="notes-preview" onclick="openNote(this)" data-full-notes="${fullNotes}">${lastNote}</div></td>
+            <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}-${Math.random()}">${lastNoteText}</div></td>
             <td>
                 <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الحالة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats();">
                     <option value="" ${v.status === '' ? 'selected' : ''}></option>
@@ -300,8 +302,8 @@
             <td class="action-cell">
                 <button class="dots-btn" onclick="toggleDropdown(event, this)">الإجراء ▾</button>
                 <div class="dropdown-menu">
-                    <button onclick="alert('جاري التعديل...')">تعديل</button>
-                    <button onclick="alert('جاري التحويل...')">تحويل</button>
+                    <button onclick="alert('تعديل فردي')">تعديل</button>
+                    <button onclick="alert('تحويل فردي')">تحويل</button>
                     <button class="del-btn" onclick="deleteRow(this)">حذف</button>
                 </div>
             </td>
@@ -324,23 +326,17 @@
     function handleBulkAction(action) {
         const selected = document.querySelectorAll('.select-check:checked');
         if (selected.length === 0) {
-            alert('يرجى تحديد زيارة واحدة على الأقل.');
+            alert('يرجى تحديد صف واحد على الأقل.');
             return;
         }
-
-        if (action === 'حذف') {
-            if(confirm(`هل أنت متأكد من حذف ${selected.length} زيارات محددة؟`)) {
-                selected.forEach(chk => {
-                    const row = chk.closest('tr');
-                    const comp = row.cells[1].querySelector('input').value;
-                    addToActivityLog('إجراء', '', '', comp);
-                    row.remove();
-                });
+        if (action === 'حذف المحدد') {
+            if(confirm(`هل أنت متأكد من حذف ${selected.length} صفوف؟`)) {
+                selected.forEach(chk => chk.closest('tr').remove());
                 saveAllDataSilently();
                 updateStats();
             }
         } else {
-            alert(`تم طلب عملية ${action} لعدد ${selected.length} سجلات.`);
+            alert(`تم تنفيذ: ${action} لـ ${selected.length} صف.`);
         }
     }
 
@@ -352,9 +348,7 @@
 
     function deleteRow(btn) {
         const row = btn.closest('tr');
-        const comp = row.cells[1].querySelector('input').value;
-        if(confirm('هل أنت متأكد من حذف هذه الزيارة؟')) {
-            addToActivityLog('إجراء', '', '', comp);
+        if(confirm('هل أنت متأكد؟')) {
             row.remove();
             saveAllDataSilently();
             updateStats();
@@ -366,6 +360,7 @@
     function saveAllDataSilently() {
         const data = [];
         document.querySelectorAll('#tableBody tr').forEach(row => {
+            const preview = row.querySelector('.notes-preview');
             data.push({
                 comp: row.cells[1].querySelector('input').value,
                 mgr: row.cells[2].querySelector('input').value,
@@ -374,16 +369,16 @@
                 record: row.cells[5].querySelector('input').value,
                 visitDate: row.querySelector('.visit-date-val').value,
                 curServ: row.cells[7].querySelector('input').value,
-                notes: row.querySelector('.notes-preview').getAttribute('data-full-notes'),
+                notes: preview.getAttribute('data-full-notes') || '',
                 status: row.querySelector('.status-select').value,
                 editDate: row.querySelector('.edit-date-val').value
             });
         });
-        localStorage.setItem('asgate_visits_final_v21', JSON.stringify(data));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
 
     function loadSavedData() {
-        const saved = localStorage.getItem('asgate_visits_final_v21');
+        const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) JSON.parse(saved).forEach(item => renderRow(item));
         renderActivityLog();
         updateStats();
@@ -397,39 +392,58 @@
         });
     }
 
+    // استخراج النص الأخير فقط للعرض في الجدول
     function getLastNoteOnly(fullText) {
-        if (!fullText) return 'إضافة ملاحظة...';
-        const arr = fullText.split('\n--------------------\n').filter(line => line.trim() !== "");
-        if (arr.length === 0) return 'إضافة ملاحظة...';
-        const last = arr[arr.length - 1];
-        const parts = last.split('&nbsp;&nbsp;</span>');
-        return parts.length > 1 ? parts[1].replace(/<[^>]*>/g, '').trim() : 'إضافة ملاحظة...';
+        if (!fullText || fullText.trim() === "") return 'إضافة ملاحظة...';
+        const arr = fullText.split('\n--------------------\n');
+        const lastEntry = arr[arr.length - 1];
+        // استخراج النص فقط من داخل span التنسيق
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = lastEntry;
+        const textPart = tempDiv.querySelector('.activity-text-part');
+        return textPart ? textPart.innerText : 'إضافة ملاحظة...';
     }
 
     function openNote(el) {
         currentActivePreview = el;
-        const raw = el.getAttribute('data-full-notes') || "";
-        // تحويل النص المخزن إلى عناصر مرئية داخل سجل المربع المنبثق
-        document.getElementById('historyLog').innerHTML = raw.split('\n--------------------\n').filter(e => e.trim() !== "").map(e => `<div class="activity-item">${e}</div>`).join('');
+        const rawNotes = el.getAttribute('data-full-notes') || "";
+        const historyLog = document.getElementById('historyLog');
+        
+        if (rawNotes.trim() !== "") {
+            historyLog.innerHTML = rawNotes.split('\n--------------------\n')
+                .map(entry => `<div class="activity-item" style="border-bottom:1px solid #e2e8f0; padding:5px 0;">${entry}</div>`)
+                .join('');
+        } else {
+            historyLog.innerHTML = '<div style="text-align:center; color:#94a3b8; margin-top:20px;">لا توجد ملاحظات سابقة</div>';
+        }
+        
         document.getElementById('noteModal').style.display = "flex";
+        document.getElementById('modalTextArea').focus();
     }
 
     function saveNote() {
         const newText = document.getElementById('modalTextArea').value.trim();
         if (newText && currentActivePreview) {
-            let old = currentActivePreview.getAttribute('data-full-notes') || "";
-            let entry = `${generateStyledHeader()}<span class="activity-text-part">${newText}</span>`;
-            // دمج النص الجديد مع القديم لضمان عدم الحذف عند الريفرش
-            let updated = old + (old ? "\n--------------------\n" : "") + entry;
-            currentActivePreview.setAttribute('data-full-notes', updated);
-            currentActivePreview.innerText = newText;
+            let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
+            let newEntry = `${generateStyledHeader()}<span class="activity-text-part">${newText}</span>`;
+            
+            // دمج الملاحظة الجديدة مع السجل القديم
+            let updatedFullNotes = oldNotes === "" ? newEntry : oldNotes + "\n--------------------\n" + newEntry;
+            
+            currentActivePreview.setAttribute('data-full-notes', updatedFullNotes);
+            currentActivePreview.innerText = newText; // عرض النص الجديد فقط في الجدول
+            
             updateEditDateField(currentActivePreview.closest('tr'));
             saveAllDataSilently();
         }
         closeNote();
     }
 
-    function closeNote() { document.getElementById('noteModal').style.display = "none"; document.getElementById('modalTextArea').value = ""; }
+    function closeNote() { 
+        document.getElementById('noteModal').style.display = "none"; 
+        document.getElementById('modalTextArea').value = ""; 
+    }
+
     window.onclick = (e) => {
         if (!e.target.matches('.dots-btn') && !e.target.matches('.header-dots-btn')) {
             document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
