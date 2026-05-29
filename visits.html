@@ -160,7 +160,7 @@
     <div class="modal-content">
         <div style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right;">سجل متابعة الزيارة والنتائج</div>
         <div id="historyLog" class="history-log"></div>
-        <textarea id="modalTextArea" class="note-area" placeholder="أدخل تفاصيل الملاحظة..."></textarea>
+        <textarea id="modalTextArea" class="note-area" placeholder="أدخل تفاصيل الملاحظة هنا..."></textarea>
         <div style="display:flex; justify-content: flex-end; gap:8px; margin-top:10px;">
             <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px;">تراجع</button>
             <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px; font-weight:bold;">حفظ الملاحظة</button>
@@ -171,7 +171,6 @@
 <script>
     let currentActivePreview = null;
 
-    // توحيد شكل التاريخ البرمجي YYYY-MM-DD
     function getTodayFormatted() {
         const d = new Date();
         return d.toISOString().split('T')[0];
@@ -184,6 +183,7 @@
         return `<span class="activity-header-part">👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${getTodayFormatted()}  <span class="activity-time-part">${timeFormatted}</span>&nbsp;&nbsp;</span>`;
     }
 
+    // سجل النشاط لا يشمل الملاحظات الآن بناء على طلبك
     function addToActivityLog(fieldName, oldVal, newVal, companyName) {
         const headerHTML = generateStyledHeader();
         const cleanCompany = companyName || "شركة جديدة";
@@ -315,8 +315,7 @@
             currentActivePreview.setAttribute('data-full-notes', updated);
             currentActivePreview.innerText = newText;
             
-            const comp = currentActivePreview.closest('tr').cells[0].querySelector('input').value;
-            addToActivityLog('ملاحظات الزيارة', 'تحديث ملاحظة', newText, comp);
+            // تم حذف سطر addToActivityLog الخاص بالملاحظات من هنا
             updateEditDateField(currentActivePreview.closest('tr'));
             saveAllDataSilently();
         }
