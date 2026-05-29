@@ -1,623 +1,171 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html dir="rtl" lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASGate - الفرص البيعية</title>
-    <meta name="description" content="نظام إدارة الفرص البيعية ASGate">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- الخطوط والأيقونات -->
+    <link href="https://googleapis.com" rel="stylesheet">
+    <link rel="stylesheet" href="https://cloudflare.com">
+    
     <style>
         :root {
             --nav-shiny-navy: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
             --header-shiny-purple: linear-gradient(180deg, #4c1d95 0%, #2e1065 100%);
+            --nav-bg: #0f172a;
             --nav-active: #a78bfa;
             --bg-color: #f4f7f9;
             --white: #ffffff;
             --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
             --accent-green-active: #22c55e;
             --border-soft: #cbd5e1;
             --text-dark: #1e293b;
             --dark-yellow: #c29103;
             --chat-yellow: #b45309;
-            --danger: #ef4444;
-            --radius: 10px;
         }
 
-        *, *::before, *::after { box-sizing: border-box; }
-        html, body {
-            height: 100%; margin: 0; padding: 0;
-            background-color: var(--bg-color); font-family: 'Cairo', sans-serif;
-            font-size: 13px; line-height: 1.4; color: var(--text-dark);
+        * { box-sizing: border-box; }
+
+        html, body { 
+            height: 100%; margin: 0; padding: 0; overflow: hidden; 
+            background-color: var(--bg-color); font-family: 'Cairo', sans-serif; 
+            font-size: 13px; line-height: 1.3; color: var(--text-dark); 
         }
 
-      .dashboard-container { display: flex; flex-direction: column; height: 100vh; }
+        .dashboard-container { display: flex; flex-direction: column; height: 100vh; }
 
-      .navbar {
-            background: var(--nav-shiny-navy); display: flex; align-items: center; padding: 0 20px; margin: 10px;
+        /* شريط التنقل العلوي */
+        .navbar { 
+            background: var(--nav-shiny-navy); display: flex; align-items: center; padding: 0 20px; margin: 10px 10px 5px 10px; 
             border-radius: 12px; height: 42px; flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15); border: 1px solid #1e293b;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.1); border: 1px solid #1e293b;
         }
-      .navbar a { color: white; text-decoration: none; padding: 6px 15px; font-weight: 700; font-size: 12px; transition: 0.2s; border-radius: 6px; }
-      .navbar a.active,.navbar a:hover { background-color: var(--nav-active); color: #0f172a; }
+        .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; height: 30px; line-height: 30px; display: inline-block; transition: 0.3s; }
+        .navbar a.active { background-color: var(--nav-active); color: #0f172a; border-radius: 6px; }
 
-      .main-content { flex: 1; display: flex; flex-direction: column; padding: 0 15px; min-height: 0; }
+        /* المحتوى الرئيسي */
+        .main-content { flex: 1; display: flex; flex-direction: column; padding: 0 15px; min-height: 0; }
+        
+        /* شريط العمليات والبحث */
+        .action-bar { display: flex; align-items: center; margin: 10px 0; gap: 15px; flex-shrink: 0; }
+        .btn-top { border: none; padding: 0 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; font-size: 12px; height: 35px; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-add { background-color: var(--accent-blue); }
+        .btn-add:hover { background-color: var(--accent-blue-hover); }
 
-      .action-bar { display: flex; flex-wrap: wrap; align-items: center; margin: 10px 0; gap: 10px; flex-shrink: 0; }
-      .btn { border: none; padding: 0 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; font-size: 12px; height: 35px; }
-      .btn:active { transform: scale(0.97); }
-      .btn-add { background-color: var(--accent-blue); }
-      .btn-add:hover { background-color: #2563eb; }
-
-      .search-wrapper { position: relative; flex: 0 1 220px; }
-      .search-input {
+        .search-wrapper { position: relative; width: 20%; display: flex; align-items: center; }
+        .search-wrapper i { position: absolute; right: 10px; color: #64748b; font-size: 12px; }
+        .search-input {
             width: 100%; height: 35px; padding: 0 35px 0 10px; border-radius: 8px;
             border: 1px solid var(--border-soft); background: #fff;
-            font-family: 'Cairo'; font-size: 12px; outline: none;
+            font-family: 'Cairo'; font-size: 12px; font-weight: 700; outline: none; transition: 0.2s;
         }
-      .search-input:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
-      .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+        .search-input:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
 
-      .stats-bar {
-            margin-right: auto; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
-            background: #fff; padding: 6px 12px; border-radius: 8px;
-            border: 1px solid var(--border-soft);
+        /* شريط الإحصائيات */
+        .stats-bar {
+            margin-right: auto; display: flex; gap: 15px; align-items: center;
+            background: #fff; padding: 0 15px; border-radius: 8px; height: 35px;
+            border: 1px solid var(--border-soft); box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
-      .stat-item { font-size: 11px; font-weight: 700; color: #475569; white-space: nowrap; }
-      .stat-val { color: var(--accent-blue); margin-right: 3px; font-weight: 800; }
+        .stat-item { font-size: 11px; font-weight: 800; color: #475569; white-space: nowrap; }
+        .stat-val { color: var(--accent-blue); margin-right: 3px; font-size: 12px; }
 
-      .table-wrapper {
-            background: white; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border-soft);
-            flex: 1; min-height: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); position: relative;
+        /* حاوية الجدول */
+        .table-wrapper { 
+            background: white; border-radius: 10px; overflow-y: auto; border: 1px solid var(--border-soft); 
+            flex: 1; min-height: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.02); position: relative;
         }
-      .table-scroll { overflow: auto; height: 100%; }
+        
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-
-        th {
-            background: var(--header-shiny-purple); color: white; padding: 0 5px; font-size: 11px; font-weight: 800;
-            text-align: center; position: sticky; top: 0; z-index: 50; height: 40px; user-select: none;
+        
+        th { 
+            background: var(--header-shiny-purple); color: white; padding: 0 5px; font-size: 11px; font-weight: 800; 
+            text-align: center; border-bottom: 2px solid #2e1065; position: sticky; top: 0; z-index: 50; height: 40px;
         }
+        
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; max-height: 45px; font-size: 11px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; }
+        
+        /* تأثير خطوط السجلات التبادلية */
+        tbody tr.main-row:nth-child(4n+1) { background-color: #eff6ff; }
+        tbody tr.main-row:hover { background-color: #f1f5f9; }
 
-        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; position: relative; }
-        tbody tr.main-row:hover { background-color: #f8fafc; }
-        tbody tr.main-row:nth-child(4n+1) { background-color: #f0f7ff; }
-
-      .excel-input {
-            width: 95%; border: 1px solid transparent; text-align: center; font-family: 'Cairo'; outline: none;
-            background: transparent; font-size: 11.5px; color: inherit; font-weight: inherit;
-            height: 30px; border-radius: 4px; transition: 0.1s;
+        /* الجدول الفرعي المخفي */
+        .sub-table-row { display: none; background-color: #f8fafc; }
+        .sub-table-container { padding: 10px 5% 15px 5%; } 
+        .inner-table { width: 100%; background: white; border: 1px solid var(--border-soft); border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden; }
+        .inner-table th { background: #64748b; height: 30px; font-size: 10.5px; border-left: 1px solid rgba(255,255,255,0.1); border-bottom: none; position: static; }
+        .inner-table td { height: 35px; border: 1px solid #edf2f7; padding: 0; }
+        .inner-table input, .inner-table select { width: 100%; height: 100%; border: none; text-align: center; font-family: 'Cairo'; font-size: 11px; outline: none; background: transparent; }
+        .inner-table select { text-align-last: center; cursor: pointer; }
+        
+        /* أزرار الإجراءات للجدول الداخلي */
+        .sub-action-btn { 
+            width: 24px; height: 24px; border: none; border-radius: 4px; cursor: pointer; 
+            font-size: 12px; display: inline-flex; align-items: center; justify-content: center;
+            transition: 0.2s; margin: 0 2px;
         }
-      .excel-input:focus { background: #fff; border-color: var(--accent-blue); box-shadow: 0 0 0 2px rgba(59,130,246,0.1); }
-      .excel-input[readonly] { cursor: default; background: transparent!important; border-color: transparent!important; }
+        .btn-plus { background: #22c55e; color: white; }
+        .btn-plus:hover { background: #16a34a; }
+        .btn-minus { background: #fee2e2; color: #ef4444; }
+        .btn-minus:hover { background: #fecaca; }
 
-      .toggle-arrow {
-            cursor: pointer; font-size: 10px; color: #64748b; margin-right: 5px;
+        /* سهم فتح القائمة الفرعية */
+        .toggle-arrow { 
+            cursor: pointer; font-size: 11px; color: #64748b; margin-right: 5px; 
             display: inline-block; transition: transform 0.2s; vertical-align: middle;
-            width: 16px; height: 16px; line-height: 16px;
         }
-      .toggle-arrow:hover { color: var(--accent-blue); }
-      .arrow-open { transform: rotate(90deg); }
+        .arrow-open { transform: rotate(90deg); color: var(--accent-blue); }
 
-      .sub-table-row { display: none; background-color: #f8fafc; }
-      .sub-table-container { padding: 10px 8% 12px 3%; }
-      .inner-table { width: 100%; max-width: 700px; background: white; border: 1px solid var(--border-soft); border-radius: 6px; }
-      .inner-table th { background: #64748b; height: 28px; font-size: 10px; }
-      .inner-table td { height: 32px; padding: 2px; }
-      .inner-table input,.inner-table select { width: 100%; height: 28px; border: 1px solid transparent; text-align: center; font-family: 'Cairo'; font-size: 11px; outline: none; background: transparent; border-radius: 4px; }
-      .inner-table input:focus,.inner-table select:focus { border-color: var(--accent-blue); background: #fff; }
-
-      .sub-action-btn {
-            width: 24px; height: 24px; border: none; border-radius: 4px; cursor: pointer;
-            font-size: 16px; font-weight: bold; display: inline-flex; align-items: center; justify-content: center;
+        /* حقول الإدخال الشبيهة بـ Excel */
+        .excel-input { 
+            width: 100%; border: none; text-align: center; font-family: 'Cairo'; outline: none; 
+            background: transparent; font-size: 11.5px; color: inherit; font-weight: inherit; 
+            height: 100%; padding: 0 5px; overflow: hidden; text-overflow: ellipsis; 
         }
-      .btn-plus { background: #22c55e; color: white; }
-      .btn-minus { background: #fee2e2; color: var(--danger); }
+        .excel-input:focus { background-color: #fff; box-shadow: inset 0 0 0 2px var(--accent-blue); border-radius: 4px; }
 
-      .action-cell { position: relative; }
-      .dots-btn,.header-dots-btn {
-            cursor: pointer; font-size: 11px; background: #fff;
-            border: 1px solid #cbd5e1; border-radius: 4px; padding: 5px 10px;
+        .select-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent-blue); vertical-align: middle; }
+
+        .action-cell { position: relative; overflow: visible !important; }
+        
+        /* أزرار الإجراءات ثلاثية النقاط */
+        .dots-btn, .header-dots-btn { 
+            cursor: pointer; font-size: 11px; color: #475569; background: #fff; 
+            border: 1px solid #cbd5e1; border-radius: 4px; padding: 4px 10px; 
             font-family: 'Cairo'; font-weight: 700; transition: 0.2s;
-            display: inline-flex; align-items: center; gap: 4px;
+            display: inline-flex; align-items: center; gap: 6px; line-height: 1;
         }
-      .header-dots-btn { background: rgba(255,255,255,0.1); color: white; border-color: rgba(255,255,255,0.3); }
-      .dots-btn:hover,.header-dots-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); background: #eff6ff; }
+        .header-dots-btn { background: rgba(255,255,255,0.1); color: white; border-color: rgba(255,255,255,0.3); font-size: 11px; width: 95px; justify-content: center; }
+        .header-dots-btn:hover { background: white; color: var(--header-shiny-purple); }
+        .dots-btn:hover { background: #f8fafc; border-color: var(--accent-blue); color: var(--accent-blue); }
 
-      .dropdown-menu {
-            display: none; position: absolute; left: 50%; transform: translateX(-50%);
-            top: 38px; background: white; border: 1px solid #e2e8f0; border-radius: 6px;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15); z-index: 100; min-width: 120px; padding: 4px;
+        /* القائمة المنسدلة */
+        .dropdown-menu { 
+            display: none; position: absolute; left: 50%; transform: translateX(-50%); 
+            top: 35px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; 
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 1000; min-width: 130px; padding: 4px;
         }
-      .dropdown-menu button {
-            width: 100%; padding: 7px 10px; border: none; background: none; font-family: 'Cairo';
-            font-size: 11px; text-align: right; cursor: pointer; color: #475569; font-weight: 600;
-            border-radius: 4px; display: block;
+        .dropdown-menu button { 
+            width: 100%; padding: 8px 10px; border: none; background: none; font-family: 'Cairo'; 
+            font-size: 11px; text-align: right; cursor: pointer; color: #475569; font-weight: 700; 
+            border-radius: 4px; transition: 0.2s; display: flex; align-items: center; gap: 8px;
         }
-      .dropdown-menu button:hover { background: #f1f5f9; color: var(--accent-blue); }
-      .dropdown-menu.del-btn:hover { background: #fee2e2; color: var(--danger); }
-      .show { display: block; }
+        .dropdown-menu button:hover { background: #f1f5f9; color: var(--accent-blue); }
+        .dropdown-menu .del-btn:hover { background: #fee2e2; color: #ef4444; }
+        .show { display: block !important; }
 
-      .notes-preview {
-            width: 95%; height: 30px; line-height: 30px; border: 1px solid transparent; background: transparent; font-family: 'Cairo';
-            font-size: 11px; text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700;
-            overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 0 auto; border-radius: 4px;
+        /* معاينة الملاحظات */
+        .notes-preview { 
+            width: 95%; height: 20px; border: none; background: transparent; font-family: 'Cairo'; 
+            font-size: 11px; text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700; 
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; margin: 0 auto; 
         }
-      .notes-preview:hover { background: #eff6ff; }
+        .notes-preview:hover { text-decoration: underline; }
 
-      .activity-log-section {
-            margin: 10px 0; padding: 12px 18px; background: #ffffff; border-radius: var(--radius);
-            border: 1px solid var(--border-soft); flex-shrink: 0; height: 140px; display: flex; flex-direction: column;
+        /* قسم سجل الأنشطة السفلي */
+        .activity-log-section { 
+            margin: 10px 0 10px 0; padding: 12px 18px; background: #ffffff; border-radius: 10px; 
+            border: 1px solid var(--border-soft); box-shadow: 0 -3px 10px rgba(0,0,0,0.03); flex-shrink: 0;
         }
-      .activity-log-title { color: var(--dark-yellow); font-size: 13px; font-weight: 800; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; }
-      .activity-list { flex: 1; overflow-y: auto; font-size: 11px; }
-      .activity-item { margin-bottom: 4px; border-bottom: 1px dashed #f8fafc; padding-bottom: 4px; color: #475569; }
-
-      .activity-header-part { font-size: 11px; color: var(--chat-yellow); font-weight: 800; }
-      .activity-time-part { font-size: 10px; font-weight: normal; }
-
-      .modal { display: none; position: fixed; z-index: 2000; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-      .modal-content { background: white; padding: 18px; border-radius: 12px; width: min(90vw, 480px); max-height: 80vh; display: flex; flex-direction: column; }
-      .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; }
-      .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; }
-      .note-area:focus { border-color: var(--accent-blue); }
-
-        @media (max-width: 768px) {
-          .stats-bar { margin-right: 0; width: 100%; }
-          .search-wrapper { flex: 1 1 100%; }
-          .action-bar { gap: 8px; }
-            table, thead, tbody, th, td, tr { display: block; }
-            thead { display: none; }
-            tr.main-row { margin-bottom: 10px; border: 1px solid var(--border-soft); border-radius: 8px; }
-            td { height: auto; padding: 8px; text-align: right; border: none; position: relative; padding-right: 40%; }
-            td::before { content: attr(data-label); position: absolute; right: 8px; font-weight: 800; color: #64748b; }
-          .col-select::before { content: ""!important; }
-          .col-select { padding-right: 8px!important; text-align: center!important; }
-        }
-
-      .col-select { width: 60px; }
-      .col-company { width: 12%; }.col-manager { width: 8%; }.col-mobile { width: 8%; }
-      .col-email { width: 9%; }.col-record { width: 8%; }.col-date { width: 10%; }
-      .col-service { width: 12%; }.col-notes { width: 13%; }.col-status { width: 7%; }
-      .col-edit { width: 8%; }.col-action { width: 100px; }
-    </style>
-</head>
-<body>
-
-<div class="dashboard-container">
-    <nav class="navbar" role="navigation">
-        <a href="index.html">الرئيسية</a>
-        <a href="visits.html">الزيارات</a>
-        <a href="opportunities.html" class="active" aria-current="page">الفرص البيعية</a>
-        <a href="customers.html">العملاء</a>
-        <a href="sales.html">المبيعات</a>
-    </nav>
-
-    <main class="main-content">
-        <div class="action-bar">
-            <button class="btn btn-add" id="addRowBtn" aria-label="إضافة فرصة بيعية جديدة">+ إضافة فرصة بيعية جديدة</button>
-            <div class="search-wrapper">
-                <input type="search" id="searchInput" class="search-input" placeholder="بحث..." aria-label="بحث في الفرص">
-                <span class="search-icon">🔍</span>
-            </div>
-
-            <div class="stats-bar" role="status" aria-live="polite">
-                <div class="stat-item">إجمالي الفرص: <span id="stat-total" class="stat-val">0</span></div>
-                <div class="stat-item">فرص الشهر: <span id="stat-month" class="stat-val">0</span></div>
-                <div class="stat-item">فرص اليوم: <span id="stat-today" class="stat-val">0</span></div>
-                <div class="stat-item">ناجحة: <span id="stat-success" class="stat-val">0</span></div>
-            </div>
-        </div>
-
-        <div class="table-wrapper">
-            <div class="table-scroll">
-                <table id="mainTable" role="table">
-                    <thead>
-                        <tr>
-                            <th class="col-select"><input type="checkbox" id="selectAll" aria-label="تحديد الكل"></th>
-                            <th class="col-company">الشركة</th>
-                            <th class="col-manager">المسؤول</th>
-                            <th class="col-mobile">الموبايل</th>
-                            <th class="col-email">الإيميل</th>
-                            <th class="col-record">السجل</th>
-                            <th class="col-date">تاريخ الفرصة</th>
-                            <th class="col-service">الخدمة المطلوبة</th>
-                            <th class="col-notes">ملاحظات الفرصة</th>
-                            <th class="col-status">الحالة</th>
-                            <th class="col-edit">آخر تعديل</th>
-                            <th class="col-action">
-                                <button class="header-dots-btn" id="bulkActionBtn" aria-haspopup="true">إجراء •••</button>
-                                <div class="dropdown-menu" role="menu">
-                                    <button role="menuitem" data-action="convert">تحويل المحدد</button>
-                                    <button role="menuitem" data-action="export">تصدير المحدد</button>
-                                    <button role="menuitem" data-action="print">طباعة المحدد</button>
-                                    <button role="menuitem" data-action="delete" class="del-btn">حذف المحدد</button>
-                                </div>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="activity-log-section">
-            <div class="activity-log-title">📋 سجل نشاط الفرص البيعية</div>
-            <div id="activityList" class="activity-list" role="log" aria-live="polite"></div>
-        </div>
-    </main>
-</div>
-
-<div id="noteModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="modal-content">
-        <div id="modalTitle" style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right;">سجل متابعة الفرصة والنتائج</div>
-        <div id="historyLog" class="history-log"></div>
-        <textarea id="modalTextArea" class="note-area" placeholder="أدخل تفاصيل الملاحظة هنا..." aria-label="نص الملاحظة"></textarea>
-        <div style="display:flex; justify-content: flex-end; gap:8px; margin-top:10px;">
-            <button id="cancelNoteBtn" class="btn" style="background:#94a3b8;">تراجع</button>
-            <button id="saveNoteBtn" class="btn" style="background:#22c55e;">حفظ الملاحظة</button>
-        </div>
-    </div>
-</div>
-
-<script type="module">
-    const STORAGE_KEY = 'asgate_opportunities_v3';
-    const LOGS_KEY = 'asgate_opp_activity_logs_v3';
-    const MAX_STORAGE_SIZE = 4 * 1024 * 1024;
-
-    const state = {
-        currentActivePreview: null,
-        data: [],
-        logs: []
-    };
-
-    const $ = sel => document.querySelector(sel);
-    const $$ = sel => document.querySelectorAll(sel);
-
-    const escapeHTML = str => {
-        const div = document.createElement('div');
-        div.textContent = str || '';
-        return div.innerHTML;
-    };
-
-    const formatDate = (date = new Date()) => date.toISOString().split('T')[0];
-    const formatTime = (date = new Date()) => date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-    const formatDay = (date = new Date()) => ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'][date.getDay()];
-
-    function generateId() {
-        return crypto.randomUUID? crypto.randomUUID() : 'row-' + Date.now() + Math.random().toString(36).substr(2, 9);
-    }
-
-    function saveToStorage() {
-        try {
-            const dataStr = JSON.stringify(state.data);
-            if (dataStr.length > MAX_STORAGE_SIZE) {
-                alert('تحذير: حجم البيانات كبير جداً. سيتم الاحتفاظ بآخر 500 سجل فقط.');
-                state.data = state.data.slice(-500);
-            }
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data));
-            localStorage.setItem(LOGS_KEY, JSON.stringify(state.logs.slice(0, 100)));
-        } catch (e) {
-            console.error('Storage error:', e);
-            alert('فشل حفظ البيانات. المساحة ممتلئة.');
-        }
-    }
-
-    function loadFromStorage() {
-        try {
-            state.data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            state.logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
-        } catch (e) {
-            console.error('Load error:', e);
-            state.data = [];
-            state.logs = [];
-        }
-    }
-
-    function addToActivityLog(fieldName, oldVal, newVal, companyName) {
-        const d = new Date();
-        const headerHTML = `<span class="activity-header-part">👤 (أحمد) 🗓 ${formatDay(d)} ${formatDate(d)} <span class="activity-time-part">${formatTime(d)}</span>&nbsp;&nbsp;</span>`;
-        const cleanCompany = companyName?.trim() || "شركة جديدة";
-        const val1 = oldVal?.trim() || "فارغ";
-        const val2 = newVal?.trim() || "فارغ";
-        const actionText = fieldName === "إجراء"
-          ? `حذف فرصة شركة ( ${escapeHTML(cleanCompany)} )`
-            : `تعديل ${fieldName} من [${escapeHTML(val1)}] إلى [${escapeHTML(val2)}] في ( ${escapeHTML(cleanCompany)} )`;
-
-        state.logs.unshift(`${headerHTML}<span class="activity-text-part">${actionText}</span>`);
-        if (state.logs.length > 100) state.logs.pop();
-        renderActivityLog();
-        saveToStorage();
-    }
-
-    function renderActivityLog() {
-        $('#activityList').innerHTML = state.logs.map(log => `<div class="activity-item">${log}</div>`).join('');
-    }
-
-    function updateStats() {
-        const today = formatDate();
-        const currentMonth = today.substring(0, 7);
-        let total = state.data.length, tDay = 0, tMonth = 0, tSuccess = 0;
-
-        state.data.forEach(row => {
-            if (row.visitDate === today) tDay++;
-            if (row.visitDate?.startsWith(currentMonth)) tMonth++;
-            if (row.status === '50%') tSuccess++;
-        });
-
-        $('#stat-total').textContent = total;
-        $('#stat-today').textContent = tDay;
-        $('#stat-month').textContent = tMonth;
-        $('#stat-success').textContent = tSuccess;
-    }
-
-    function renderRow(rowData, prepend = false) {
-        const rowId = rowData.id || generateId();
-        const data = { id: rowId, products: [{}],...rowData };
-
-        const mainRow = document.createElement('tr');
-        mainRow.className = 'main-row';
-        mainRow.dataset.id = rowId;
-
-        const subRow = document.createElement('tr');
-        subRow.className = 'sub-table-row';
-        subRow.dataset.parentId = rowId;
-
-        const lastNoteText = getLastNoteOnly(data.notes);
-
-        mainRow.innerHTML = `
-            <td class="col-select" data-label="تحديد">
-                <input type="checkbox" class="select-check" aria-label="تحديد الصف">
-                <span class="toggle-arrow" role="button" tabindex="0" aria-label="توسيع التفاصيل">▶</span>
-            </td>
-            <td data-label="الشركة"><input type="text" class="excel-input" value="${escapeHTML(data.comp || '')}" data-field="comp"></td>
-            <td data-label="المسؤول"><input type="text" class="excel-input" value="${escapeHTML(data.mgr || '')}" data-field="mgr"></td>
-            <td data-label="الموبايل"><input type="tel" class="excel-input" value="${escapeHTML(data.mob || '')}" data-field="mob"></td>
-            <td data-label="الإيميل"><input type="email" class="excel-input" value="${escapeHTML(data.email || '')}" data-field="email"></td>
-            <td data-label="السجل"><input type="text" class="excel-input" value="${escapeHTML(data.record || '')}" data-field="record"></td>
-            <td data-label="تاريخ الفرصة"><input type="text" class="excel-input" value="${escapeHTML(data.visitDate || formatDate())}" readonly></td>
-            <td data-label="الخدمة المطلوبة"><input type="text" class="excel-input" value="${escapeHTML(data.curServ || '')}" data-field="curServ"></td>
-            <td data-label="ملاحظات"><div class="notes-preview" role="button" tabindex="0" data-notes="${escapeHTML(data.notes || '')}">${escapeHTML(lastNoteText)}</div></td>
-            <td data-label="الحالة">
-                <select class="excel-input" data-field="status">
-                    <option value=""></option>
-                    <option value="مهتم" ${data.status === 'مهتم'? 'selected' : ''}>مهتم</option>
-                    <option value="50%" ${data.status === '50%'? 'selected' : ''}>50%</option>
-                    <option value="فقدان" ${data.status === 'فقدان'? 'selected' : ''}>فقدان</option>
-                </select>
-            </td>
-            <td data-label="آخر تعديل"><input type="text" class="excel-input" value="${escapeHTML(data.editDate || '')}" readonly></td>
-            <td class="action-cell" data-label="إجراء">
-                <button class="dots-btn" aria-haspopup="true">الإجراء ▾</button>
-                <div class="dropdown-menu" role="menu">
-                    <button role="menuitem" data-row-action="delete" class="del-btn">حذف</button>
-                </div>
-            </td>
-        `;
-
-        subRow.innerHTML = `
-            <td colspan="12">
-                <div class="sub-table-container">
-                    <table class="inner-table">
-                        <thead><tr>
-                            <th>نوع المنتج</th><th>تفاصيل المنتج</th><th>العدد</th><th>الاشتراك</th><th>الإجمالي</th><th style="width:65px">إجراء</th>
-                        </tr></thead>
-                        <tbody class="product-body"></tbody>
-                    </table>
-                </div>
-            </td>
-        `;
-
-        const tbody = $('#tableBody');
-        if (prepend) {
-            tbody.insertBefore(mainRow, tbody.firstChild);
-            tbody.insertBefore(subRow, mainRow.nextSibling);
-        } else {
-            tbody.appendChild(mainRow);
-            tbody.appendChild(subRow);
-        }
-
-        data.products.forEach(p => addProductRow(rowId, p));
-        updateStats();
-    }
-
-    function addProductRow(rowId, data = {}) {
-        const tbody = $(`.sub-table-row[data-parent-id="${rowId}"].product-body`);
-        if (!tbody) return;
-        const row = tbody.insertRow();
-        row.innerHTML = `
-            <td><select>
-                <option value=""></option>
-                <option value="خدمات تنقل" ${data.type === 'خدمات تنقل'? 'selected' : ''}>خدمات تنقل</option>
-                <option value="هاتف وانترنت" ${data.type === 'هاتف وانترنت'? 'selected' : ''}>هاتف وانترنت</option>
-                <option value="دوائر البيانات" ${data.type === 'دوائر البيانات'? 'selected' : ''}>دوائر البيانات</option>
-            </select></td>
-            <td><input type="text" value="${escapeHTML(data.desc || '')}"></td>
-            <td><input type="number" value="${escapeHTML(data.qty || '')}"></td>
-            <td><input type="number" value="${escapeHTML(data.sub || '')}"></td>
-            <td><input type="number" value="${escapeHTML(data.total || '')}"></td>
-            <td>
-                <div style="display:flex; justify-content:center; gap:5px;">
-                    <button class="sub-action-btn btn-plus" aria-label="إضافة منتج">+</button>
-                    <button class="sub-action-btn btn-minus" aria-label="حذف منتج">×</button>
-                </div>
-            </td>
-        `;
-    }
-
-    function collectRowData(rowId) {
-        const mainRow = $(`.main-row[data-id="${rowId}"]`);
-        if (!mainRow) return null;
-
-        const products = [];
-        $$(`.sub-table-row[data-parent-id="${rowId}"].product-body tr`).forEach(pRow => {
-            const inputs = pRow.querySelectorAll('input, select');
-            products.push({
-                type: inputs[0].value,
-                desc: inputs[1].value,
-                qty: inputs[2].value,
-                sub: inputs[3].value,
-                total: inputs[4].value
-            });
-        });
-
-        return {
-            id: rowId,
-            comp: mainRow.querySelector('[data-field="comp"]').value,
-            mgr: mainRow.querySelector('[data-field="mgr"]').value,
-            mob: mainRow.querySelector('[data-field="mob"]').value,
-            email: mainRow.querySelector('[data-field="email"]').value,
-            record: mainRow.querySelector('[data-field="record"]').value,
-            visitDate: mainRow.querySelector('td:nth-child(7) input').value,
-            curServ: mainRow.querySelector('[data-field="curServ"]').value,
-            notes: mainRow.querySelector('.notes-preview').dataset.notes || '',
-            status: mainRow.querySelector('[data-field="status"]').value,
-            editDate: mainRow.querySelector('td:nth-child(11) input').value,
-            products
-        };
-    }
-
-    function updateAllData() {
-        state.data = [];
-        $$('.main-row').forEach(row => {
-            const data = collectRowData(row.dataset.id);
-            if (data) state.data.push(data);
-        });
-        saveToStorage();
-    }
-
-    function initEventListeners() {
-        $('#tableBody').addEventListener('click', e => {
-            const target = e.target;
-
-            if (target.classList.contains('toggle-arrow')) {
-                const rowId = target.closest('tr').dataset.id;
-                const subRow = $(`.sub-table-row[data-parent-id="${rowId}"]`);
-                const isOpen = subRow.style.display === 'table-row';
-                subRow.style.display = isOpen? 'none' : 'table-row';
-                target.classList.toggle('arrow-open',!isOpen);
-            }
-
-            if (target.classList.contains('dots-btn')) {
-                e.stopPropagation();
-                const menu = target.nextElementSibling;
-                $$('.dropdown-menu').forEach(m => m!== menu && m.classList.remove('show'));
-                menu.classList.toggle('show');
-            }
-
-            if (target.classList.contains('notes-preview')) {
-                openNote(target);
-            }
-
-            if (target.dataset.rowAction === 'delete') {
-                const row = target.closest('.main-row');
-                const companyName = row.querySelector('[data-field="comp"]').value;
-                if (confirm('هل أنت متأكد من الحذف؟')) {
-                    addToActivityLog('إجراء', '', '', companyName);
-                    $(`.sub-table-row[data-parent-id="${row.dataset.id}"]`).remove();
-                    row.remove();
-                    updateAllData();
-                    updateStats();
-                }
-            }
-
-            if (target.classList.contains('btn-plus')) {
-                const rowId = target.closest('.sub-table-row').dataset.parentId;
-                addProductRow(rowId);
-                updateAllData();
-            }
-
-            if (target.classList.contains('btn-minus')) {
-                const tbody = target.closest('tbody');
-                if (tbody.rows.length > 1) {
-                    target.closest('tr').remove();
-                    updateAllData();
-                }
-            }
-        });
-
-        $('#tableBody').addEventListener('change', e => {
-            const target = e.target;
-            if (target.dataset.field || target.closest('.product-body')) {
-                const row = target.closest('.main-row') || target.closest('.sub-table-row');
-                if (row.classList.contains('main-row')) {
-                    const companyName = row.querySelector('[data-field="comp"]').value;
-                    const oldVal = target.dataset.oldValue || '';
-                    const newVal = target.value;
-                    const fieldMap = { comp: 'الشركة', mgr: 'المسؤول', mob: 'الموبايل', email: 'الإيميل', record: 'السجل', curServ: 'الخدمة المطلوبة', status: 'الحالة' };
-                    if (target.dataset.field) {
-                        addToActivityLog(fieldMap[target.dataset.field], oldVal, newVal, companyName);
-                        row.querySelector('td:nth-child(11) input').value = formatDate();
-                    }
-                }
-                updateAllData();
-                updateStats();
-            }
-        });
-
-        $('#tableBody').addEventListener('focus', e => {
-            if (e.target.dataset.field) {
-                e.target.dataset.oldValue = e.target.value;
-            }
-        }, true);
-
-        $('#addRowBtn').addEventListener('click', () => {
-            const newData = { id: generateId(), visitDate: formatDate(), products: [{}] };
-            renderRow(newData, true);
-            state.data.unshift(newData);
-            updateAllData();
-        });
-
-        $('#selectAll').addEventListener('change', e => {
-            $$('.select-check').forEach(chk => chk.checked = e.target.checked);
-        });
-
-        $('#bulkActionBtn').addEventListener('click', e => {
-            e.stopPropagation();
-            const menu = e.target.nextElementSibling;
-            $$('.dropdown-menu').forEach(m => m!== menu && m.classList.remove('show'));
-            menu.classList.toggle('show');
-        });
-
-        $('#searchInput').addEventListener('input', e => {
-            const q = e.target.value.toLowerCase().trim();
-            $$('.main-row').forEach(r => {
-                const text = [1,2,3,4,5].map(i => r.cells[i].querySelector('input').value.toLowerCase()).join(' ');
-                const show = text.includes(q);
-                r.style.display = show? '' : 'none';
-                const sub = $(`.sub-table-row[data-parent-id="${r.dataset.id}"]`);
-                if (sub) sub.style.display = 'none';
-            });
-        });
-
-        $('#cancelNoteBtn').addEventListener('click', closeNote);
-        $('#saveNoteBtn').addEventListener('click', saveNote);
-        $('#noteModal').addEventListener('click', e => {
-            if (e.target === $('#noteModal')) closeNote();
-        });
-
-        document.addEventListener('click', () => {
-            $$('.dropdown-menu').forEach(m => m.classList.remove('show'));
-        });
-
-        $('#bulkActionBtn').nextElementSibling.addEventListener('click', e => {
-            if (e.target.dataset.action === 'delete') {
-                const selected = $$('.select-check:checked');
-                if (selected.length === 0) return alert('حدد صفاً أولاً');
-                if (confirm('تأكيد حذف المحدد؟')) {
-                    selected.forEach(chk => {
-                        const row = chk.closest('tr');
-                        const companyName = row.querySelector('[data-field="comp"]').value;
-                        addToActivityLog('إجراء', '', '', companyName);
-                        $(`.sub-table-row[data-parent-id="${row.dataset.id}"]`).remove();
-                        row.remove();
-                    });
-                    updateAllData();
-                    updateStats();
-                }
-            }
-        });
-    }
-
-    function getLastNoteOnly(fullText) {
-        if (!fullText
+        .activity-title { font-weight: 800; font-size: 13px; color: var(--text-dark); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
