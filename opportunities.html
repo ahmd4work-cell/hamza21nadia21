@@ -19,8 +19,6 @@
             --text-dark: #1e293b;
             --dark-yellow: #c29103;
             --chat-yellow: #b45309;
-            /* اللون الأصفر المطلوب */
-            --asgate-yellow: #ffc107; 
         }
 
         html, body { 
@@ -43,8 +41,8 @@
         
         .action-bar { display: flex; align-items: center; margin: 10px 0; gap: 15px; flex-shrink: 0; }
         .btn-top { border: none; padding: 0 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; font-size: 12px; height: 35px; }
-        /* تعديل لون زر الإضافة للأصفر */
-        .btn-add { background-color: var(--asgate-yellow); color: #000; }
+        /* استعادة اللون الأزرق */
+        .btn-add { background-color: var(--accent-blue); }
 
         .search-wrapper { position: relative; width: 15%; display: flex; align-items: center; }
         .search-input {
@@ -77,8 +75,8 @@
         .sub-table-row { display: none; background-color: #f8fafc; }
         .sub-table-container { padding: 8px 12% 12px 5%; } 
         .inner-table { width: 65%; background: white; border: 1px solid var(--border-soft); border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden; }
-        /* تعديل لون عناوين جدول المنتجات للأصفر */
-        .inner-table th { background: var(--asgate-yellow); color: #000; height: 24px; font-size: 9.5px; border-left: 1px solid rgba(0,0,0,0.1); }
+        /* تغيير لون عناوين جدول المنتجات للأزرق */
+        .inner-table th { background: var(--accent-blue); color: #fff; height: 24px; font-size: 9.5px; border-left: 1px solid rgba(255,255,255,0.2); }
         .inner-table td { height: 28px; border: 1px solid #edf2f7; padding: 0; }
         .inner-table input, .inner-table select { width: 100%; height: 100%; border: none; text-align: center; font-family: 'Cairo'; font-size: 10.5px; outline: none; background: transparent; }
         .inner-table select { text-align-last: center; cursor: pointer; }
@@ -93,10 +91,11 @@
         .btn-minus { background: #fee2e2; color: #ef4444; }
         .btn-minus:hover { background: #fecaca; }
 
-        /* تعديل لون المثلث للأصفر */
+        /* تعديل لون المثلث للأزرق وتكبيره */
         .toggle-arrow { 
-            cursor: pointer; font-size: 10px; color: var(--asgate-yellow); margin-right: 5px; 
+            cursor: pointer; font-size: 13px; color: var(--accent-blue); margin-right: 5px; 
             display: inline-block; transition: transform 0.2s; vertical-align: middle;
+            font-weight: bold;
         }
         .arrow-open { transform: rotate(90deg); }
 
@@ -300,7 +299,6 @@
         document.getElementById('stat-success').innerText = tSuccess;
     }
 
-    // وظيفة إعادة ترتيب الصفوف بناءً على الحالة
     function reorderRows() {
         const tbody = document.getElementById('tableBody');
         const rows = Array.from(tbody.querySelectorAll('.main-row'));
@@ -308,18 +306,14 @@
         rows.sort((a, b) => {
             const statusA = a.querySelector('.status-select').value;
             const statusB = b.querySelector('.status-select').value;
-            
-            // "مهتم" في الأعلى (قيمة 1)، "فقدان" في الأسفل (قيمة -1)
             const getRank = (status) => {
                 if (status === 'مهتم') return 1;
                 if (status === 'فقدان') return -1;
                 return 0;
             };
-            
             return getRank(statusB) - getRank(statusA);
         });
 
-        // إعادة دمج الصفوف الرئيسية مع صفوفها الفرعية في الـ DOM
         rows.forEach(mainRow => {
             const subRow = document.getElementById('sub-' + mainRow.id);
             tbody.appendChild(mainRow);
@@ -404,7 +398,7 @@
         }
 
         updateStats();
-        if(!prepend) reorderRows(); // إعادة الترتيب عند التحميل أو الإضافة
+        if(!prepend) reorderRows();
     }
 
     function toggleSubTable(rowId) {
