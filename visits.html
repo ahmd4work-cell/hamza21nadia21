@@ -43,7 +43,7 @@
         .btn-top { border: none; padding: 0 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; font-size: 12px; height: 35px; }
         .btn-add { background-color: var(--accent-blue); }
 
-        .search-wrapper { position: relative; width: 250px; display: flex; align-items: center; }
+        .search-wrapper { position: relative; width: 180px; display: flex; align-items: center; }
         .search-input {
             width: 100%; height: 35px; padding: 0 15px; border-radius: 8px;
             border: 1px solid var(--border-soft); background: #fff;
@@ -80,25 +80,25 @@
 
         .select-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent-blue); }
 
-        /* تعديل عمود الإجراء ليكون تقني وأنيق */
         .action-cell { position: relative; overflow: visible !important; }
         
+        /* زر الإجراء المطور */
         .dots-btn { 
             cursor: pointer; font-size: 10px; color: #475569; background: #fff; 
-            border: 1px solid #cbd5e1; border-radius: 4px; padding: 4px 10px; 
+            border: 1px solid #cbd5e1; border-radius: 4px; padding: 4px 8px; 
             font-family: 'Cairo'; font-weight: 700; transition: 0.2s;
-            display: inline-flex; align-items: center; gap: 4px; line-height: 1;
+            display: inline-flex; align-items: center; gap: 2px; line-height: 1;
         }
         .dots-btn:hover { background: #f8fafc; border-color: var(--accent-blue); color: var(--accent-blue); }
 
         .dropdown-menu { 
             display: none; position: absolute; left: 50%; transform: translateX(-50%); 
             top: 35px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; 
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 1000; min-width: 90px; padding: 4px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 1000; min-width: 110px; padding: 4px;
         }
         .dropdown-menu button { 
-            width: 100%; padding: 6px 10px; border: none; background: none; font-family: 'Cairo'; 
-            font-size: 10.5px; text-align: right; cursor: pointer; color: #475569; font-weight: 700; 
+            width: 100%; padding: 7px 10px; border: none; background: none; font-family: 'Cairo'; 
+            font-size: 10px; text-align: right; cursor: pointer; color: #475569; font-weight: 700; 
             border-radius: 4px; transition: 0.2s; display: block;
         }
         .dropdown-menu button:hover { background: #f1f5f9; color: var(--accent-blue); }
@@ -133,7 +133,7 @@
         .col-company { width: 12%; } .col-manager { width: 8%; } .col-mobile { width: 8%; } 
         .col-email { width: 9%; } .col-record { width: 8%; } .col-date { width: 10%; } 
         .col-service { width: 12%; } .col-notes { width: 13%; } .col-status { width: 7%; }
-        .col-edit { width: 8%; } .col-action { width: 85px; }
+        .col-edit { width: 8%; } .col-action { width: 90px; }
     </style>
 </head>
 <body onload="loadSavedData()">
@@ -151,7 +151,7 @@
         <div class="action-bar">
             <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة زيارة جديدة</button>
             <div class="search-wrapper">
-                <input type="text" id="searchInput" class="search-input" placeholder="بحث في البيانات الأساسية..." onkeyup="filterTable()">
+                <input type="text" id="searchInput" class="search-input" placeholder="بحث 🔍" onkeyup="filterTable()">
             </div>
             
             <div class="stats-bar">
@@ -289,15 +289,39 @@
                 <input type="hidden" class="edit-date-val" value="${v.editDate || ''}">
             </td>
             <td class="action-cell">
-                <button class="dots-btn" onclick="toggleDropdown(event, this)">الإجراء ▾</button>
+                <button class="dots-btn" onclick="toggleDropdown(event, this)">إجراء •••</button>
                 <div class="dropdown-menu">
-                    <button onclick="alert('جاري التعديل...')">تعديل</button>
-                    <button onclick="alert('جاري التحويل...')">تحويل</button>
-                    <button class="del-btn" onclick="deleteRow(this)">حذف</button>
+                    <button onclick="handleBulkAction('تحويل')">تحويل المحدد</button>
+                    <button onclick="handleBulkAction('تصدير')">تصدير المحدد</button>
+                    <button onclick="handleBulkAction('طباعة')">طباعة المحدد</button>
+                    <button class="del-btn" onclick="handleBulkAction('حذف')">حذف المحدد</button>
                 </div>
             </td>
         `;
         updateStats();
+    }
+
+    function handleBulkAction(action) {
+        const selected = document.querySelectorAll('.select-check:checked');
+        if (selected.length === 0) {
+            alert('يرجى تحديد صف واحد على الأقل.');
+            return;
+        }
+        
+        if (action === 'حذف') {
+            if(confirm(`هل أنت متأكد من حذف ${selected.length} من العناصر المحددة؟`)) {
+                selected.forEach(chk => {
+                    const row = chk.closest('tr');
+                    const comp = row.cells[1].querySelector('input').value;
+                    addToActivityLog('إجراء', '', '', comp);
+                    row.remove();
+                });
+                saveAllDataSilently();
+                updateStats();
+            }
+        } else {
+            alert(`تم طلب ${action} لعدد ${selected.length} عنصر.`);
+        }
     }
 
     function toggleAllCheckboxes(source) {
@@ -316,17 +340,6 @@
         const today = getTodayFormatted();
         row.querySelector('.edit-date-display').value = today;
         row.querySelector('.edit-date-val').value = today;
-    }
-
-    function deleteRow(btn) {
-        const row = btn.closest('tr');
-        const comp = row.cells[1].querySelector('input').value;
-        if(confirm('هل أنت متأكد من حذف هذه الزيارة؟')) {
-            addToActivityLog('إجراء', '', '', comp);
-            row.remove();
-            saveAllDataSilently();
-            updateStats();
-        }
     }
 
     function insertNewRow() { renderRow({}, true); saveAllDataSilently(); }
