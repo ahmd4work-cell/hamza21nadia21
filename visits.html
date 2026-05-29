@@ -94,6 +94,17 @@
         .excel-input { width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; font-size: 11.5px; color: inherit; font-weight: inherit; }
         .readonly-input { color: #64748b; cursor: default; }
 
+        /* تعديل حقل التاريخ لإخفاء أيقونة التقويم */
+        input[type="date"].excel-input {
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+        input[type="date"].excel-input::-webkit-calendar-picker-indicator {
+            display: none;
+            -webkit-appearance: none;
+        }
+
         .dots-btn { cursor: pointer; font-size: 18px; color: #64748b; background: none; border: none; padding: 5px 10px; }
         .dropdown-menu { 
             display: none; position: absolute; left: 10px; top: 35px; background: white; 
@@ -153,7 +164,7 @@
 
         .col-company { width: 12%; } .col-manager { width: 8%; } .col-mobile { width: 8%; } 
         .col-email { width: 9%; } .col-record { width: 8%; } .col-service { width: 10%; }
-        .col-status { width: 7%; } .col-date { width: 8%; } .col-notes { width: 15%; }
+        .col-status { width: 7%; } .col-date { width: 10%; } .col-notes { width: 15%; }
         .col-edit { width: 8%; } .col-action { width: 50px; }
     </style>
 </head>
@@ -205,7 +216,6 @@
     </div>
 </div>
 
-<!-- مودال تفاصيل الزيارة -->
 <div id="noteModal" class="modal">
     <div class="modal-content">
         <div class="modal-header" style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right;">سجل متابعة الزيارة والنتائج</div>
@@ -218,7 +228,6 @@
     </div>
 </div>
 
-<!-- المودال الخاص لرسالة تأكيد تحويل الحالة "مهتم" -->
 <div id="interestedConfirmModal" class="modal">
     <div class="confirm-modal-content">
         <div style="font-family:'Cairo'; font-weight:700; font-size:13px; margin-bottom:20px; color:var(--text-dark);">سيتم تحويل الزيارة الى الفرص البيعية</div>
@@ -236,6 +245,11 @@
     function getTodayFormatted() {
         const d = new Date();
         return d.getDate().toString().padStart(2, '0') + '/' + (d.getMonth() + 1).toString().padStart(2, '0') + '/' + d.getFullYear();
+    }
+
+    function getTodayHTMLFormat() {
+        const d = new Date();
+        return d.getFullYear() + '-' + (d.getMonth() + 1).toString().padStart(2, '0') + '-' + d.getDate().toString().padStart(2, '0');
     }
 
     function getRawChatHeader() {
@@ -268,23 +282,23 @@
         hours = hours % 12 || 12;
         
         const timeFormatted = `${hours.toString().padStart(2, '0')}:${minutes} ${ampm}`;
-        const logHeaderHTML = `<span class="activity-header-part">👤 (أحمد)  🗓️ ${dayName}  ${dateStr}  <span class="activity-time-part">${timeFormatted}</span>  ➡️  : </span>`;
+        // تم استبدال "➡️ : " بمسافتين هنا بناءً على طلبك
+        const logHeaderHTML = `<span class="activity-header-part">👤 (أحمد)  🗓️ ${dayName}  ${dateStr}  <span class="activity-time-part">${timeFormatted}</span>&nbsp;&nbsp;</span>`;
 
-        const cleanOld = oldVal.trim() === "" ? "فارغ" : oldVal;
-        const cleanNew = newVal.trim() === "" ? "فارغ" : newVal;
-        const cleanCompany = companyName.trim() === "" ? "شركة غير مححدد" : companyName;
+        const cleanOld = (oldVal && oldVal.trim() !== "") ? oldVal : "فارغ";
+        const cleanNew = (newVal && newVal.trim() !== "") ? newVal : "فارغ";
+        const cleanCompany = (companyName && companyName.trim() !== "") ? companyName : "شركة غير محددة";
 
         let actionText = "";
-        if (fieldName === "الشركة") {
-            actionText = `تعديل الشركة ${cleanOld} الى ${cleanNew}  ( ${cleanNew} )`;
-        } else if (fieldName === "إجراء") {
+        if (fieldName === "إجراء") {
             actionText = `حذف زيارة شركة ( ${cleanCompany} )`;
+        } else if (fieldName === "الشركة") {
+            actionText = `تعديل الشركة ${cleanOld} الى ${cleanNew} ( ${cleanNew} )`;
         } else {
-            actionText = `تعديل ${fieldName} ${cleanOld} الى ${cleanNew}  ( ${cleanCompany} )`;
+            actionText = `تعديل ${fieldName} ${cleanOld} الى ${cleanNew} ( ${cleanCompany} )`;
         }
 
         const fullLogHTML = `${logHeaderHTML}<span class="activity-text-part">${actionText}</span>`;
-        
         let logs = JSON.parse(localStorage.getItem('asgate_activity_logs_v2') || '[]');
         logs.unshift(fullLogHTML);
         if(logs.length > 100) logs.pop();
@@ -315,7 +329,6 @@
         const row = selectEl.closest('tr');
         const companyName = row.cells[0].querySelector('input').value;
 
-        // وسم الصف بعلامة تفيد بأنه تم تغيير حالته ولو لمرة واحدة ليخرج من نظام التثبيت العلوي المطلق
         row.setAttribute('data-status-changed', 'true');
 
         if (newVal === "مهتم") {
@@ -347,7 +360,6 @@
         }
     }
 
-    // نظام الفرز والترتيب المحدث بالكامل بناءً على توجيهاتك الدقيقة الجديدة
     function sortTableRows() {
         const tbody = document.getElementById('tableBody');
         if (!tbody) return;
@@ -355,6 +367,7 @@
 
         function parseDate(dateStr) {
             if (!dateStr) return 0;
+            if (dateStr.includes('-')) return new Date(dateStr).getTime();
             const parts = dateStr.split('/');
             if (parts.length !== 3) return 0;
             return new Date(parts[2], parts[1] - 1, parts[0]).getTime();
@@ -363,23 +376,20 @@
         rows.sort((a, b) => {
             const statusA = a.cells[6].querySelector('select').value;
             const statusB = b.cells[6].querySelector('select').value;
-
             const hasChangedA = a.getAttribute('data-status-changed') === 'true';
             const hasChangedB = b.getAttribute('data-status-changed') === 'true';
 
-            // 1. فحص الصفوف المدرجة حديثاً (تظل بالأعلى دائماً طالما لم يتم المساس بحالتها)
             const isBrandNewA = (!hasChangedA && statusA === "");
             const isBrandNewB = (!hasChangedB && statusB === "");
 
             if (isBrandNewA && !isBrandNewB) return -1;
             if (!isBrandNewA && isBrandNewB) return 1;
-            if (isBrandNewA && isBrandNewB) return 0; // الحفاظ على ترتيبهم النسبي في الأعلى
+            if (isBrandNewA && isBrandNewB) return 0;
 
-            // 2. إذا خرجت الصفوف من التثبيت العلوي، يتم الفرز الرأسي بناءً على رتبة الحالة الجديدة
             function getStatusRank(status) {
                 if (status === "50%") return 5;
                 if (status === "20%") return 4;
-                if (status === "" || status === "مهتم") return 3; // الحالات الفارغة المعدلة وباقي الحالات تأتي هنا
+                if (status === "" || status === "مهتم") return 3;
                 if (status === "فقدان") return 2;
                 return 1;
             }
@@ -388,28 +398,25 @@
             const rankB = getStatusRank(statusB);
 
             if (rankA !== rankB) {
-                return rankB - rankA; // الرتب الأعلى تظهر أولاً
+                return rankB - rankA;
             } else {
-                // 3. الترتيب الداخلي للحالة الواحدة (الأحدث فالأحدث حسب تاريخ التعديل أو تاريخ الزيارة)
-                const dateStrA = a.querySelector('.edit-date-val').value || a.querySelector('.entry-date-val').value;
-                const dateStrB = b.querySelector('.edit-date-val').value || b.querySelector('.entry-date-val').value;
-                return parseDate(dateStrB) - parseDate(dateStrA);
+                const dateA = parseDate(a.querySelector('.edit-date-val').value || a.querySelector('.entry-date-val').value);
+                const dateB = parseDate(b.querySelector('.edit-date-val').value || b.querySelector('.entry-date-val').value);
+                return dateB - dateA;
             }
         });
-
         rows.forEach(row => tbody.appendChild(row));
     }
 
     function renderRow(v = {}, prepend = false) {
         const tbody = document.getElementById('tableBody');
         const row = prepend ? tbody.insertRow(0) : tbody.insertRow();
-        const entryDate = v.visitDate || getTodayFormatted();
+        const entryDate = v.visitDate || getTodayHTMLFormat();
         const editDate = v.editDate || '';
         const notes = v.notes || '';
         const lastNote = getLastNoteOnly(notes);
         const currentStatus = v.status || '';
 
-        // استعادة حالة التغيير السابقة إذا كانت محفوظة
         if (v.statusChanged === 'true' || currentStatus !== '') {
             row.setAttribute('data-status-changed', 'true');
         }
@@ -431,7 +438,7 @@
                 </select>
             </td>
             <td>
-                <input type="text" class="excel-input readonly-input" value="${entryDate}" readonly>
+                <input type="date" class="excel-input" value="${entryDate}" data-old="${entryDate}" onclick="this.showPicker()" onchange="addToActivityLog('تاريخ الزيارة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[0].querySelector('input').value); this.setAttribute('data-old', this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently();">
                 <input type="hidden" class="entry-date-val" value="${entryDate}">
             </td>
             <td class="custom-tooltip-cell">
@@ -467,7 +474,7 @@
                 data.push({
                     comp: inputs[0].value, mgr: inputs[1].value, mob: inputs[2].value, email: inputs[3].value,
                     record: inputs[4].value, curServ: inputs[5].value, status: inputs[6].value,
-                    visitDate: row.querySelector('.entry-date-val').value,
+                    visitDate: inputs[7].value,
                     notes: noteDiv.getAttribute('data-full-notes') || '',
                     editDate: row.querySelector('.edit-date-val').value || '',
                     statusChanged: row.getAttribute('data-status-changed') || 'false'
@@ -538,7 +545,7 @@
     }
 
     function toggleDropdown(e, btn) { e.stopPropagation(); document.querySelectorAll('.dropdown-menu').forEach(m => { if(m !== btn.nextElementSibling) m.classList.remove('show'); }); btn.nextElementSibling.classList.toggle('show'); }
-    function filterTable() { const query = document.getElementById('searchInput').value.toLowerCase(); document.querySelectorAll('#tableBody tr').forEach(row => { row.style.display = row.innerText.toLowerCase().includes(query) ? "" : "none"; }); }
+    function filterTable() { const query = document.getElementById('searchInput').value.toLowerCase(); document.querySelectorAll('#tableBody tr').forEach(row => { row.style.display = row.innerText.toLowerCase().includes(query) ? \"\" : \"none\"; }); }
     window.onclick = function(e) { if (!e.target.matches('.dots-btn')) { document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show')); } if (e.target == document.getElementById('noteModal')) closeNote(); }
 </script>
 </body>
