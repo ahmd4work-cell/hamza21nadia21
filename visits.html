@@ -43,7 +43,6 @@
         .btn-top { border: none; padding: 0 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; font-size: 12px; height: 35px; }
         .btn-add { background-color: var(--accent-blue); }
 
-        /* تعديل مربع البحث */
         .search-wrapper { position: relative; width: 15%; display: flex; align-items: center; }
         .search-input {
             width: 100%; height: 30px; padding: 0 10px; border-radius: 8px;
@@ -83,7 +82,6 @@
 
         .action-cell { position: relative; overflow: visible !important; }
         
-        /* تصميم زر رأس العمود والصفوف */
         .dots-btn, .header-dots-btn { 
             cursor: pointer; font-size: 10px; color: #475569; background: #fff; 
             border: 1px solid #cbd5e1; border-radius: 4px; padding: 4px 10px; 
@@ -271,8 +269,8 @@
         const row = prepend ? tbody.insertRow(0) : tbody.insertRow();
         const today = getTodayFormatted();
         const visitDate = v.visitDate || today;
-        const notes = v.notes || '';
-        const lastNote = getLastNoteOnly(notes);
+        const fullNotes = v.notes || ''; // الاحتفاظ بكامل النص المخزن
+        const lastNote = getLastNoteOnly(fullNotes);
 
         row.innerHTML = `
             <td><input type="checkbox" class="select-check"></td>
@@ -286,7 +284,7 @@
                 <input type="hidden" class="visit-date-val" value="${visitDate}">
             </td>
             <td><input type="text" class="excel-input" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الخدمة الحالية', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
-            <td><div class="notes-preview" onclick="openNote(this)" data-full-notes="${notes}">${lastNote}</div></td>
+            <td><div class="notes-preview" onclick="openNote(this)" data-full-notes="${fullNotes}">${lastNote}</div></td>
             <td>
                 <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الحالة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats();">
                     <option value="" ${v.status === '' ? 'selected' : ''}></option>
@@ -401,7 +399,8 @@
 
     function getLastNoteOnly(fullText) {
         if (!fullText) return 'إضافة ملاحظة...';
-        const arr = fullText.split('\n--------------------\n');
+        const arr = fullText.split('\n--------------------\n').filter(line => line.trim() !== "");
+        if (arr.length === 0) return 'إضافة ملاحظة...';
         const last = arr[arr.length - 1];
         const parts = last.split('&nbsp;&nbsp;</span>');
         return parts.length > 1 ? parts[1].replace(/<[^>]*>/g, '').trim() : 'إضافة ملاحظة...';
@@ -410,7 +409,8 @@
     function openNote(el) {
         currentActivePreview = el;
         const raw = el.getAttribute('data-full-notes') || "";
-        document.getElementById('historyLog').innerHTML = raw.split('\n--------------------\n').map(e => `<div class="activity-item">${e}</div>`).join('');
+        // تحويل النص المخزن إلى عناصر مرئية داخل سجل المربع المنبثق
+        document.getElementById('historyLog').innerHTML = raw.split('\n--------------------\n').filter(e => e.trim() !== "").map(e => `<div class="activity-item">${e}</div>`).join('');
         document.getElementById('noteModal').style.display = "flex";
     }
 
@@ -419,6 +419,7 @@
         if (newText && currentActivePreview) {
             let old = currentActivePreview.getAttribute('data-full-notes') || "";
             let entry = `${generateStyledHeader()}<span class="activity-text-part">${newText}</span>`;
+            // دمج النص الجديد مع القديم لضمان عدم الحذف عند الريفرش
             let updated = old + (old ? "\n--------------------\n" : "") + entry;
             currentActivePreview.setAttribute('data-full-notes', updated);
             currentActivePreview.innerText = newText;
@@ -429,7 +430,11 @@
     }
 
     function closeNote() { document.getElementById('noteModal').style.display = "none"; document.getElementById('modalTextArea').value = ""; }
-    window.onclick = () => document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+    window.onclick = (e) => {
+        if (!e.target.matches('.dots-btn') && !e.target.matches('.header-dots-btn')) {
+            document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+        }
+    };
 </script>
 </body>
 </html>
