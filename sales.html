@@ -2,8 +2,7 @@
 <html dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASGate - إدارة المبيعات</title>
+    <title>المبيعات | ASGate</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -13,81 +12,66 @@
             --nav-active: #a78bfa;
             --bg-color: #f4f7f9;
             --white: #ffffff;
+            --zebra-blue: #eff6ff;
+            --border-color: #cbd5e1;
             --accent-blue: #3b82f6;
             --accent-green: #22c55e;
-            --border-soft: #cbd5e1;
             --text-dark: #1e293b;
-            --dark-yellow: #c29103;
         }
 
-        html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: var(--bg-color); font-family: 'Cairo', sans-serif; }
+        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
 
-        /* Navbar */
         .navbar { 
-            background: var(--nav-shiny-navy); display: flex; align-items: center; 
-            padding: 0 20px; margin: 10px; border-radius: 12px; height: 38px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 1px solid #1e293b;
+            background: var(--nav-shiny-navy); display: flex; align-items: center; padding: 0 20px; 
+            margin: 10px; border-radius: 12px; height: 37px; position: sticky; top: 10px; z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: 1px solid #1e293b; box-sizing: border-box;
         }
         .navbar a { 
-            color: var(--white); text-decoration: none; padding: 0 15px; font-weight: 700; 
-            font-size: 12px; border-radius: 6px; transition: 0.3s; line-height: 28px;
+            color: var(--white); text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; 
+            border-radius: 6px; transition: 0.3s; line-height: 26px; display: inline-block;
         }
         .navbar a.active { background-color: var(--nav-active); color: #0f172a; }
 
-        .main-layout { display: flex; height: calc(100% - 70px); padding: 0 10px 10px 10px; gap: 10px; box-sizing: border-box; }
+        .container { padding: 0 15px; }
+        .action-bar { display: flex; align-items: center; margin: 12px 0; gap: 10px; }
 
-        /* Right Side: Table & Actions */
-        .content-area { flex: 1; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+        .btn-add { background-color: var(--accent-blue); border: none; padding: 7px 18px; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; font-size: 12px; font-family: 'Cairo'; }
+        .search-box { padding: 0 15px; border: 1px solid var(--border-color); border-radius: 8px; width: 300px; height: 32px; font-family: 'Cairo'; font-size: 11px; outline: none; }
 
-        /* Analysis & Action Bar */
-        .top-cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .card { background: white; border-radius: 10px; border: 1px solid var(--border-soft); padding: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .card-title { font-weight: 800; font-size: 13px; color: var(--nav-bg); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .table-wrapper { background: var(--white); border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th { background: var(--header-shiny-purple); padding: 12px 5px; color: var(--white); font-size: 11px; font-weight: 800; text-align: center; position: sticky; top: 0; }
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); position: relative; }
+        tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
 
-        .btn-add { background: var(--accent-blue); color: white; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; font-family: 'Cairo'; font-size: 12px; }
-        .search-box { flex: 1; padding: 0 15px; border: 1px solid var(--border-soft); border-radius: 6px; height: 35px; font-family: 'Cairo'; font-size: 12px; outline: none; }
-
-        /* Table Design */
-        .table-container { flex: 1; background: white; border-radius: 10px; border: 1px solid var(--border-soft); overflow: auto; position: relative; }
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; min-width: 900px; }
-        th { background: var(--header-shiny-purple); color: white; position: sticky; top: 0; z-index: 10; font-size: 11px; padding: 10px 5px; font-weight: 800; }
-        td { border-bottom: 1px solid #f1f5f9; padding: 6px 4px; text-align: center; font-size: 11px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        
-        /* Status Buttons */
-        .status-btn { 
-            padding: 4px 8px; border-radius: 5px; font-size: 10px; font-weight: 800; border: 1px solid rgba(0,0,0,0.1); cursor: pointer; width: 80px;
-        }
+        /* ميزة الحالة: أزرار ملونة */
+        .status-btn { padding: 4px 8px; border-radius: 5px; font-size: 10px; font-weight: 800; border: 1px solid rgba(0,0,0,0.1); cursor: pointer; min-width: 70px; }
         .st-جديد { background: #e0f2fe; color: #0369a1; }
         .st-مكتمل { background: #dcfce7; color: #15803d; }
         .st-معلق { background: #fef9c3; color: #a16207; }
         .st-مرتجع { background: #fee2e2; color: #b91c1c; }
 
-        /* Notes & Tooltip */
-        .notes-cell { cursor: pointer; color: var(--accent-blue); position: relative; }
-        .tooltip { 
-            visibility: hidden; position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
-            background: #334155; color: white; padding: 10px; border-radius: 8px; width: 200px;
-            white-space: normal; z-index: 100; font-weight: 400; font-size: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        /* ميزة الملاحظات والفقاعة */
+        .notes-preview { color: var(--accent-blue); cursor: pointer; font-weight: 700; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding: 0 5px; }
+        .tooltip-box { 
+            position: absolute; bottom: 100%; right: 0; background: #334155; color: #fff; padding: 8px; 
+            border-radius: 8px; width: 220px; font-size: 10px; opacity: 0; visibility: hidden; transition: 0.2s; z-index: 999; pointer-events: none; white-space: normal;
         }
-        .notes-cell:hover .tooltip { visibility: visible; }
+        td:hover .tooltip-box { opacity: 1; visibility: visible; }
 
-        /* Left Side: Activity Logs */
-        .side-panel { width: 320px; background: white; border-radius: 10px; border: 1px solid var(--border-soft); display: flex; flex-direction: column; overflow: hidden; }
-        .panel-header { background: #f8fafc; padding: 12px; font-weight: 800; font-size: 13px; border-bottom: 1px solid var(--border-soft); }
-        .log-list { flex: 1; overflow-y: auto; padding: 10px; }
-        .log-item { margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px dashed #e2e8f0; line-height: 1.5; }
-        .log-meta { font-size: 10px; color: #64748b; font-weight: bold; margin-bottom: 2px; }
-        .log-msg { font-size: 11px; color: var(--text-dark); }
+        /* سجل النشاط الموحد */
+        .log-section { background: #fff; padding: 15px; border-radius: 10px; border: 1px solid var(--border-color); margin-top: 20px; }
+        .log-title { font-weight: 800; font-size: 13px; color: var(--nav-bg); margin-bottom: 10px; }
+        .log-entry { margin-bottom: 5px; border-bottom: 1px dashed #f1f5f9; padding-bottom: 5px; font-size: 11px; }
+        .log-meta { color: #64748b; font-weight: bold; font-size: 10px; }
 
-        /* Modals */
-        .modal { display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
-        .modal-card { background: white; padding: 20px; border-radius: 12px; width: 400px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
-        input, select, textarea { width: 100%; padding: 8px; margin: 5px 0 15px 0; border: 1px solid var(--border-soft); border-radius: 6px; font-family: 'Cairo'; box-sizing: border-box; }
+        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 15px; border-radius: 12px; width: 380px; }
         
-        .month-sep { background: #2e1065 !important; color: white; font-size: 10px; height: 24px; pointer-events: none; }
+        .month-separator { background: #2e1065 !important; color: white; font-size: 10px; font-weight: bold; text-align: center; }
     </style>
 </head>
-<body onload="initSales()">
+<body onload="loadSalesFromStorage(); renderLogs();">
 
 <nav class="navbar">
     <a href="index.html">الرئيسية</a>
@@ -97,71 +81,47 @@
     <a href="sales.html" class="active">المبيعات</a>
 </nav>
 
-<div class="main-layout">
-    <div class="content-area">
-        <div class="top-cards-grid">
-            <div class="card">
-                <div class="card-title">🚀 الإجراءات</div>
-                <div style="display:flex; gap:8px;">
-                    <button class="btn-add" onclick="openOrderModal()">+ طلب مبيعات جديد</button>
-                    <input type="text" id="globalSearch" class="search-box" placeholder="ابحث برقم الطلب أو الشركة..." onkeyup="filterSales()">
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-title">📊 تحليل سريع (هذا الشهر)</div>
-                <div id="quickStats" style="font-size: 11px; display: flex; justify-content: space-around; align-items: center; height: 35px;">
-                    </div>
-            </div>
-        </div>
-
-        <div class="table-container">
-            <table id="salesTable">
-                <thead>
-                    <tr>
-                        <th style="width: 30px;"><input type="checkbox" onclick="toggleAll(this)"></th>
-                        <th style="width: 60px;">رقم الطلب</th>
-                        <th style="width: 120px;">اسم الطلب</th>
-                        <th style="width: 130px;">الشركة</th>
-                        <th style="width: 80px;">التاريخ</th>
-                        <th style="width: 90px;">الحالة</th>
-                        <th style="width: 70px;">مكتمل</th>
-                        <th style="width: 70px;">معلق</th>
-                        <th style="width: 100px;">الملاحظات</th>
-                        <th style="width: 60px;">الفرصة</th>
-                    </tr>
-                </thead>
-                <tbody id="salesBody"></tbody>
-            </table>
-        </div>
+<div class="container">
+    <div class="action-bar">
+        <button class="btn-add" onclick="openOrderModal()">+ إنشاء طلب مبيعات جديد</button>
+        <input type="text" class="search-box" id="globalSearch" placeholder="🔍 بحث في الجدول..." onkeyup="filterSalesTable()">
+    </div>
+    
+    <div class="table-wrapper">
+        <table id="salesTable">
+            <thead>
+                <tr>
+                    <th style="width: 30px;"><input type="checkbox" onclick="toggleAll(this)"></th>
+                    <th style="width: 7%;">رقم الطلب</th>
+                    <th style="width: 12%;">اسم الطلب</th>
+                    <th style="width: 9%;">تاريخ الإنشاء</th>
+                    <th style="width: 13%;">الشركة</th>
+                    <th style="width: 9%;">السجل الرئيسي</th>
+                    <th style="width: 9%;">السجل الفرعي</th>
+                    <th style="width: 9%;">الحالة</th>
+                    <th style="width: 7%;">مكتمل</th>
+                    <th style="width: 7%;">معلق</th>
+                    <th style="width: 12%;">ملاحظات</th>
+                    <th style="width: 7%;">الفرصة</th>
+                </tr>
+            </thead>
+            <tbody id="salesBody"></tbody>
+        </table>
     </div>
 
-    <div class="side-panel">
-        <div class="panel-header">📋 سجل نشاط المبيعات</div>
-        <div id="activityLogs" class="log-list"></div>
+    <div class="log-section">
+        <div class="log-title">📋 سجل النشاط (طبق الأصل)</div>
+        <div id="activityLogs"></div>
     </div>
 </div>
 
 <div id="noteModal" class="modal">
-    <div class="modal-card">
-        <div style="font-weight: 800; margin-bottom: 10px;">إضافة ملاحظة للطلب</div>
-        <textarea id="modalTextArea" style="height: 100px;" placeholder="اكتب الملاحظة هنا..."></textarea>
-        <div style="display:flex; gap:10px; justify-content: flex-end;">
-            <button onclick="closeModal('noteModal')" style="padding:8px 15px; border-radius:6px; border:none; cursor:pointer;">إلغاء</button>
-            <button onclick="saveNote()" style="background:var(--accent-green); color:white; padding:8px 15px; border-radius:6px; border:none; cursor:pointer; font-weight:bold;">حفظ الملاحظة</button>
-        </div>
-    </div>
-</div>
-
-<div id="orderModal" class="modal">
-    <div class="modal-card">
-        <div style="font-weight: 800; margin-bottom: 15px; text-align: center;">إنشاء طلب مبيعات جديد</div>
-        <label style="font-size: 11px; font-weight: bold;">اسم الشركة</label>
-        <input type="text" id="mComp" placeholder="ادخل اسم الشركة">
-        <label style="font-size: 11px; font-weight: bold;">اسم الطلب</label>
-        <input type="text" id="mType" placeholder="مثال: توريد أجهزة مكتبية">
-        <div style="display:flex; gap:10px;">
-            <button onclick="closeModal('orderModal')" style="flex:1; padding:10px; border:none; border-radius:6px; cursor:pointer;">إلغاء</button>
-            <button onclick="addNewOrder()" style="flex:1; padding:10px; background:var(--nav-bg); color:white; border:none; border-radius:6px; cursor:pointer; font-weight:bold;">إضافة</button>
+    <div class="modal-content">
+        <div style="font-weight: 800; color: #2e1065; margin-bottom: 10px;">سجل ملاحظات الطلب</div>
+        <textarea id="modalTextArea" style="width:100%; height:80px; font-family:'Cairo'; padding:8px; border-radius:6px; border:1px solid #cbd5e1;" placeholder="أضف ملاحظة جديدة..."></textarea>
+        <div style="display:flex; justify-content: flex-end; gap:8px; margin-top:10px;">
+            <button onclick="closeNote()" style="background:#94a3b8; color:white; border:none; padding:7px 15px; border-radius:6px; cursor:pointer;">إلغاء</button>
+            <button onclick="saveNote()" style="background:#22c55e; color:white; border:none; padding:7px 15px; border-radius:6px; cursor:pointer; font-weight:bold;">حفظ</button>
         </div>
     </div>
 </div>
@@ -169,77 +129,50 @@
 <script>
     let currentOrderId = null;
 
-    function initSales() {
-        renderTable();
-        renderLogs();
-        updateStats();
-    }
-
-    function renderTable() {
-        const data = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
+    function loadSalesFromStorage() {
+        const saved = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
         const tbody = document.getElementById('salesBody');
-        tbody.innerHTML = '';
-        
-        let lastMonth = '';
-        data.reverse().forEach(item => {
-            const currentMonth = item.date.split('/')[1];
-            if (lastMonth && lastMonth !== currentMonth) {
-                const sep = tbody.insertRow();
-                sep.className = 'month-sep';
-                sep.innerHTML = `<td colspan="10" style="text-align:center;">بالتوفيق في الشهر الجديد إن شاء الله 🚀</td>`;
-            }
-
-            const row = tbody.insertRow();
-            const sums = calculateSums(item.id);
-            
-            row.innerHTML = `
-                <td><input type="checkbox" class="row-check"></td>
-                <td><a href="order_details.html?id=${item.id}" style="color:var(--accent-blue); font-weight:bold; text-decoration:none;">#${item.id}</a></td>
-                <td contenteditable="true" onblur="updateField(${item.id}, 'type', this.innerText)">${item.type}</td>
-                <td>${item.comp}</td>
-                <td style="color:#64748b;">${item.date}</td>
-                <td>
-                    <button class="status-btn st-${item.status}" onclick="cycleStatus(${item.id}, this)">${item.status}</button>
-                </td>
-                <td style="color:var(--accent-green); font-weight:800;">${sums.completed}</td>
-                <td style="color:#dc2626; font-weight:800;">${sums.pending}</td>
-                <td class="notes-cell" onclick="openNote(${item.id})">
-                    ${item.notes ? item.notes.split('\n').pop().substring(0, 15) + '...' : 'أضف ملاحظة'}
-                    <div class="tooltip">${item.notes || 'لا توجد ملاحظات سابقة'}</div>
-                </td>
-                <td contenteditable="true" onblur="updateField(${item.id}, 'oppNum', this.innerText)">${item.oppNum || '-'}</td>
-            `;
-            lastMonth = currentMonth;
-        });
+        tbody.innerHTML = "";
+        saved.forEach(item => renderTableRow(item));
     }
 
-    function calculateSums(orderId) {
-        // هذه الوظيفة تفترض وجود قاعدة بيانات للمنتجات مربوطة برقم الطلب
-        const productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
-        const products = productsDb[orderId] || [];
-        let comp = 0, pend = 0;
-        products.forEach(p => {
-            const val = (p.qty || 0) * (p.price || 0);
-            if(p.status === 'مكتمل') comp += val;
-            else pend += val;
-        });
-        return { completed: comp.toFixed(2), pending: pend.toFixed(2) };
+    function renderTableRow(obj) {
+        const tbody = document.getElementById('salesBody');
+        const row = tbody.insertRow(0);
+        
+        row.innerHTML = `
+            <td><input type="checkbox" class="row-check"></td>
+            <td><a href="order_details.html?id=${obj.id}" style="color:var(--accent-blue); text-decoration:none; font-weight:800;">#${obj.id}</a></td>
+            <td contenteditable="true" onblur="updateData(${obj.id}, 'type', this.innerText)">${obj.type}</td>
+            <td style="color:#64748b;">${obj.date}</td>
+            <td>${obj.comp}</td>
+            <td>${obj.cr}</td>
+            <td>${obj.crSub}</td>
+            <td>
+                <button class="status-btn st-${obj.status}" onclick="cycleStatus(${obj.id}, this)">${obj.status}</button>
+            </td>
+            <td style="color:var(--accent-green); font-weight:800;">0.00</td>
+            <td style="color:#dc2626; font-weight:800;">0.00</td>
+            <td>
+                <div class="notes-preview" onclick="openNote(${obj.id})">${obj.notes ? obj.notes.split('\n').pop().substring(0,20) : 'أضف ملاحظة...'}</div>
+                <div class="tooltip-box">${obj.notes || 'لا توجد ملاحظات'}</div>
+            </td>
+            <td contenteditable="true" onblur="updateData(${obj.id}, 'oppNum', this.innerText)">${obj.oppNum || ''}</td>
+        `;
     }
 
     function cycleStatus(id, btn) {
         const states = ["جديد", "معلق", "مكتمل", "مرتجع"];
-        let current = states.indexOf(btn.innerText);
-        let next = states[(current + 1) % states.length];
-        
-        updateField(id, 'status', next);
+        let next = states[(states.indexOf(btn.innerText) + 1) % states.length];
         btn.innerText = next;
         btn.className = `status-btn st-${next}`;
-        addLog(`تغيير حالة الطلب #${id}`, `إلى ${next}`);
+        updateData(id, 'status', next);
+        addLog(`تحديث حالة الطلب #${id}`, `إلى ${next}`);
     }
 
     function openNote(id) {
         currentOrderId = id;
-        document.getElementById('noteModal').style.display = 'flex';
+        document.getElementById('noteModal').style.display = "flex";
     }
 
     function saveNote() {
@@ -248,45 +181,20 @@
             const data = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
             const idx = data.findIndex(i => i.id == currentOrderId);
             const dateStr = new Date().toLocaleDateString('en-GB');
-            const entry = `👤 (أحمد) 🗓️ ${dateStr}: ${txt}`;
-            
-            data[idx].notes = (data[idx].notes || '') + '\n' + entry;
+            const newEntry = `👤 (أحمد) 🗓️ ${dateStr}: ${txt}`;
+            data[idx].notes = (data[idx].notes || "") + "\n" + newEntry;
             localStorage.setItem('asgate_sales_db', JSON.stringify(data));
-            addLog(`إضافة ملاحظة للطلب #${currentOrderId}`, txt);
-            renderTable();
+            addLog(`ملاحظة جديدة للطلب #${currentOrderId}`, txt);
+            loadSalesFromStorage();
         }
-        closeModal('noteModal');
-    }
-
-    function addNewOrder() {
-        const comp = document.getElementById('mComp').value;
-        const type = document.getElementById('mType').value;
-        if(!comp) return alert("يرجى كتابة اسم الشركة");
-
-        const newOrder = {
-            id: Math.floor(1000 + Math.random() * 9000),
-            comp: comp,
-            type: type || 'طلب جديد',
-            date: new Date().toLocaleDateString('en-GB'),
-            status: 'جديد',
-            notes: '',
-            oppNum: ''
-        };
-
-        const data = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
-        data.push(newOrder);
-        localStorage.setItem('asgate_sales_db', JSON.stringify(data));
-        addLog("إنشاء طلب جديد", `شركة: ${comp}`);
-        initSales();
-        closeModal('orderModal');
+        closeNote();
     }
 
     function addLog(action, msg) {
         const logs = JSON.parse(localStorage.getItem('asgate_sales_logs') || '[]');
         const now = new Date();
-        const time = now.toLocaleTimeString('ar-SA', {hour:'2-digit', minute:'2-digit'});
         logs.unshift({
-            meta: `👤 أحمد | 🗓️ ${now.toLocaleDateString('en-GB')} | 🕒 ${time}`,
+            meta: `👤 أحمد | 🗓️ ${now.toLocaleDateString('en-GB')} | 🕒 ${now.toLocaleTimeString('ar-SA')}`,
             action: action,
             msg: msg
         });
@@ -297,14 +205,14 @@
     function renderLogs() {
         const logs = JSON.parse(localStorage.getItem('asgate_sales_logs') || '[]');
         document.getElementById('activityLogs').innerHTML = logs.map(l => `
-            <div class="log-item">
+            <div class="log-entry">
                 <div class="log-meta">${l.meta}</div>
-                <div class="log-msg"><b>${l.action}:</b> ${l.msg}</div>
+                <div><b>${l.action}:</b> ${l.msg}</div>
             </div>
         `).join('');
     }
 
-    function updateField(id, field, val) {
+    function updateData(id, field, val) {
         const data = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
         const idx = data.findIndex(i => i.id == id);
         if(idx !== -1) {
@@ -313,32 +221,12 @@
         }
     }
 
-    function updateStats() {
-        const data = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
-        const thisMonth = new Date().getMonth() + 1;
-        const monthData = data.filter(i => parseInt(i.date.split('/')[1]) === thisMonth);
-        
-        document.getElementById('quickStats').innerHTML = `
-            <span>📦 طلبات الشهر: <b>${monthData.length}</b></span>
-            <span style="color:var(--accent-green)">✅ مكتمل: <b>${monthData.filter(i=>i.status==='مكتمل').length}</b></span>
-            <span style="color:#dc2626">⏳ معلق: <b>${monthData.filter(i=>i.status==='معلق').length}</b></span>
-        `;
-    }
-
-    function filterSales() {
+    function toggleAll(src) { document.querySelectorAll('.row-check').forEach(c => c.checked = src.checked); }
+    function closeNote() { document.getElementById('noteModal').style.display = "none"; document.getElementById('modalTextArea').value = ""; }
+    function filterSalesTable() {
         const q = document.getElementById('globalSearch').value.toLowerCase();
-        const rows = document.querySelectorAll('#salesBody tr:not(.month-sep)');
-        rows.forEach(r => {
-            r.style.display = r.innerText.toLowerCase().includes(q) ? '' : 'none';
-        });
+        document.querySelectorAll('#salesBody tr').forEach(r => r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none");
     }
-
-    function toggleAll(src) {
-        document.querySelectorAll('.row-check').forEach(c => c.checked = src.checked);
-    }
-
-    function openOrderModal() { document.getElementById('orderModal').style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 </script>
 </body>
 </html>
