@@ -25,8 +25,14 @@
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
 
         .navbar { 
-            background: var(--nav-shiny-navy); display: flex; align-items: center; padding: 0 20px; margin: 10px;
-            border-radius: 12px; height: 38px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            background: var(--nav-shiny-navy); 
+            display: flex; 
+            align-items: center; 
+            padding: 0 20px; 
+            margin: 10px;
+            border-radius: 12px;
+            height: 38px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 13px; transition: 0.3s; }
         .navbar a.active { background-color: var(--nav-active); color: #0f172a; border-radius: 6px; padding: 5px 15px; }
@@ -39,20 +45,21 @@
         .search-box { width: 200px; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border-color); font-family: 'Cairo'; }
 
         .table-container { background: white; border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: var(--header-shiny-purple); color: white; padding: 10px; font-size: 12px; }
-        td { border-bottom: 1px solid #f1f5f9; text-align: center; padding: 8px; font-size: 12px; font-weight: 600; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th { background: var(--header-shiny-purple); color: white; padding: 10px; font-size: 12px; position: sticky; top: 0; }
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; padding: 8px; font-size: 12px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         tr:nth-child(even) { background: var(--zebra-blue); }
 
         .excel-input { width: 95%; border: none; text-align: center; font-family: 'Cairo'; background: transparent; font-weight: 600; outline: none; }
 
-        /* تنسيق نظام الملاحظات المنقول */
+        /* نظام الملاحظات المطور - خلية المعاينة */
         .notes-preview { 
             width: 95%; height: 20px; border: none; background: transparent; font-family: 'Cairo'; 
             font-size: 11px; text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700; 
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; margin: 0 auto; 
         }
 
+        /* تنسيق المودال (النافذة المنبثقة) */
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-content { background: white; padding: 18px; border-radius: 12px; width: 440px; height: 480px; display: flex; flex-direction: column; }
         .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
@@ -120,7 +127,7 @@
 
 <script>
     let currentActivePreview = null;
-    const STORAGE_KEY = 'asgate_sales_data';
+    const STORAGE_KEY = 'asgate_sales_data_main';
 
     function getTodayFormatted() {
         return new Date().toISOString().split('T')[0];
@@ -133,9 +140,10 @@
         return `<span class="activity-header-part">👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${getTodayFormatted()}  <span class="activity-time-part">${time}</span>&nbsp;&nbsp;</span>`;
     }
 
-    function addRow(data = {}) {
+    // إضافة صف مع الحفاظ على توزيع الأعمدة الأصلي
+    function addRow(data = {}, prepend = true) {
         const tbody = document.getElementById('salesBody');
-        const row = tbody.insertRow(0);
+        const row = prepend ? tbody.insertRow(0) : tbody.insertRow();
         const notes = data.notes || '';
         const lastNote = getLastNoteOnly(notes);
 
@@ -153,7 +161,7 @@
             </td>
             <td><button onclick="deleteRow(this)" style="color:red; border:none; background:none; cursor:pointer; font-weight:bold;">حذف</button></td>
         `;
-        saveAll();
+        if (prepend) saveAll();
     }
 
     function deleteRow(btn) {
@@ -171,7 +179,7 @@
                 invNo: tr.cells[1].querySelector('input').value,
                 amount: tr.cells[2].querySelector('input').value,
                 date: tr.cells[3].querySelector('input').value,
-                notes: tr.cells[4].querySelector('.notes-preview').getAttribute('data-full-notes'),
+                notes: tr.cells[4].querySelector('.notes-preview').getAttribute('data-full-notes') || '',
                 status: tr.cells[5].querySelector('select').value
             });
         });
@@ -180,11 +188,11 @@
 
     function loadData() {
         const saved = localStorage.getItem(STORAGE_KEY);
-        if(saved) JSON.parse(saved).forEach(d => addRow(d));
+        if(saved) JSON.parse(saved).forEach(d => addRow(d, false));
         renderActivityLog();
     }
 
-    /* نظام الملاحظات المنقول */
+    /* نظام الملاحظات نسخة طبق الأصل من الزيارات */
     function getLastNoteOnly(fullText) {
         if (!fullText || fullText.trim() === "") return 'إضافة ملاحظة...';
         const arr = fullText.split('\n--------------------\n');
@@ -232,23 +240,25 @@
     }
 
     function addToActivityLog(msg, company) {
-        const logs = JSON.parse(localStorage.getItem('asgate_sales_logs') || '[]');
-        const entry = `${generateStyledHeader()} <span class="activity-text-part">إضافة ملاحظة: ${msg} (لشركة: ${company || 'غير محدد'})</span>`;
+        const logs = JSON.parse(localStorage.getItem('asgate_sales_logs_history') || '[]');
+        const entry = `${generateStyledHeader()} <span class="activity-text-part">إضافة ملاحظة: ${msg} (لشركة: ${company || 'جديدة'})</span>`;
         logs.unshift(entry);
-        localStorage.setItem('asgate_sales_logs', JSON.stringify(logs.slice(0, 50)));
+        localStorage.setItem('asgate_sales_logs_history', JSON.stringify(logs.slice(0, 50)));
         renderActivityLog();
     }
 
     function renderActivityLog() {
-        const logs = JSON.parse(localStorage.getItem('asgate_sales_logs') || '[]');
-        document.getElementById('activityLogs').innerHTML = logs.map(l => `<div class="activity-item">${l}</div>`).join('');
+        const logs = JSON.parse(localStorage.getItem('asgate_sales_logs_history') || '[]');
+        const container = document.getElementById('activityLogs');
+        if(container) container.innerHTML = logs.map(l => `<div class="activity-item">${l}</div>`).join('');
     }
 
     function filterTable() {
         const q = document.getElementById('search').value.toLowerCase();
         document.querySelectorAll('#salesBody tr').forEach(tr => {
-            const text = tr.innerText.toLowerCase();
-            tr.style.display = text.includes(q) ? '' : 'none';
+            const match = tr.cells[0].querySelector('input').value.toLowerCase().includes(q) || 
+                          tr.cells[1].querySelector('input').value.toLowerCase().includes(q);
+            tr.style.display = match ? '' : 'none';
         });
     }
 </script>
