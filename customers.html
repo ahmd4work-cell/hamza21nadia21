@@ -128,7 +128,6 @@
         .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
         .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
 
-        /* تعديل عرض الأعمدة */
         .col-select { width: 30px; }
         .col-id { width: 45px; }
         .col-company { width: 140px; }
@@ -163,15 +162,17 @@
             
             <div class="stats-bar">
                 <div class="stat-item">إجمالي العملاء: <span id="stat-total" class="stat-val">0</span></div>
-                <div class="stat-item">السجلات الرئيسية: <span id="stat-main" class="stat-val">0</span></div>
-                <div class="stat-item">السجلات الفرعية: <span id="stat-sub" class="stat-val">0</span></div>
+                <div class="stat-item">عملاء الشهر: <span id="stat-month" class="stat-val">0</span></div>
+                <div class="stat-item">عملاء اليوم: <span id="stat-today" class="stat-val">0</span></div>
             </div>
 
             <div class="bulk-action-wrapper">
                 <button class="btn-bulk-trigger" onclick="toggleDropdown(event, this)">إجراء ▾</button>
                 <div class="dropdown-menu">
-                    <button onclick="handleBulkAction('تغيير التصنيف')">تغيير التصنيف</button>
-                    <button onclick="handleBulkAction('تصدير بيانات')">تصدير بيانات</button>
+                    <button onclick="handleBulkAction('تغيير المالك')">تغيير المالك</button>
+                    <button onclick="handleBulkAction('تعديل')">تعديل</button>
+                    <button onclick="handleBulkAction('تصدير')">تصدير</button>
+                    <button onclick="handleBulkAction('طباعة')">طباعة</button>
                     <button class="del-btn" onclick="handleBulkAction('حذف')">حذف</button>
                 </div>
             </div>
@@ -257,14 +258,22 @@
 
     function updateStats() {
         const rows = document.querySelectorAll('#tableBody .main-row');
-        let mainCount = 0, subCount = 0;
+        const today = getTodayFormatted();
+        const currentMonth = today.substring(0, 7); // YYYY-MM
+        
+        let total = rows.length;
+        let countToday = 0;
+        let countMonth = 0;
+
         rows.forEach(r => {
-            if(r.cells[3].querySelector('input').value.trim() !== "") mainCount++;
-            if(r.cells[4].querySelector('input').value.trim() !== "") subCount++;
+            const dateVal = r.querySelector('.created-date-val').value;
+            if(dateVal === today) countToday++;
+            if(dateVal.startsWith(currentMonth)) countMonth++;
         });
-        document.getElementById('stat-total').innerText = rows.length;
-        document.getElementById('stat-main').innerText = mainCount;
-        document.getElementById('stat-sub').innerText = subCount;
+
+        document.getElementById('stat-total').innerText = total;
+        document.getElementById('stat-month').innerText = countMonth;
+        document.getElementById('stat-today').innerText = countToday;
     }
 
     function renderRow(c = {}, prepend = false) {
@@ -276,7 +285,6 @@
         
         const notes = c.notes || '';
         const lastNoteText = getLastNoteOnly(notes);
-        // تاريخ الإنشاء يثبت ولا يتغير
         const createdAt = c.createdDate || getTodayFormatted();
 
         mainRow.innerHTML = `
