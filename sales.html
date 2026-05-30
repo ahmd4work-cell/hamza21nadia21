@@ -45,10 +45,38 @@
         .navbar a.active { background-color: var(--nav-active); color: #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
         .container { padding: 0 15px; }
-        .action-bar { display: flex; align-items: center; margin: 12px 0; gap: 10px; }
+
+        /* تنسيق مربعات الإحصائيات والإجراءات */
+        .top-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 15px; margin-top: 15px; }
+        
+        .stat-card, .action-card { 
+            background: white; border-radius: 12px; padding: 15px; 
+            border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .card-title { font-weight: 800; font-size: 13px; color: var(--nav-bg); margin-bottom: 12px; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; }
+        
+        .stats-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .stat-group { display: flex; flex-direction: column; gap: 8px; }
+        .stat-group-label { font-size: 11px; font-weight: 800; color: #64748b; background: #f8fafc; padding: 2px 8px; border-radius: 4px; width: fit-content; }
+        
+        .stat-row { display: flex; justify-content: space-between; font-size: 12px; border-bottom: 1px dashed #f1f5f9; padding: 2px 0; }
+        .stat-label { color: #475569; }
+        .stat-value { font-weight: 800; color: var(--nav-bg); }
+        .val-green { color: #16a34a; }
+        .val-red { color: #dc2626; }
+
+        .action-btns { display: flex; flex-direction: column; gap: 8px; }
+        .btn-action { 
+            width: 100%; border: none; padding: 10px; border-radius: 8px; 
+            font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; 
+            display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;
+        }
+
+        .action-bar { display: flex; align-items: center; margin: 15px 0; gap: 10px; }
 
         .btn-top { border: none; padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; color: white; transition: 0.3s; }
-        .btn-add { background-color: var(--accent-blue); }
+        .btn-add { background-color: var(--accent-blue); color: white; }
 
         .search-box { padding: 0 15px; border: 1px solid var(--border-color); border-radius: 8px; width: 300px; height: 32px; font-family: 'Cairo'; font-size: 11px; outline: none; }
 
@@ -64,7 +92,6 @@
             text-align: center; 
             border-bottom: 2px solid #2e1065;
             text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-            position: relative;
         }
 
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; max-height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); position: relative; overflow: hidden; }
@@ -73,30 +100,15 @@
         .month-separator { height: 24px !important; background: transparent !important; }
         .month-separator td { height: 24px !important; border: none !important; padding: 4px 0 !important; }
         .month-content {
-            background-color: #2e1065;
-            color: white;
-            font-family: 'Cascadia Code', monospace;
-            font-size: 10px; 
-            font-weight: bold;
-            width: 50%; 
-            margin: 0 auto;
-            border-radius: 5px; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
+            background-color: #2e1065; color: white; font-family: 'Cascadia Code', monospace;
+            font-size: 10px; font-weight: bold; width: 50%; margin: 0 auto;
+            border-radius: 5px; display: flex; align-items: center; justify-content: center; height: 100%;
         }
 
         .editable { cursor: text; outline: none; transition: 0.2s; min-height: 20px; }
         .editable:focus { background-color: #fff; box-shadow: inset 0 0 0 2px var(--accent-blue); border-radius: 4px; }
 
-        .notes-container {
-            height: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
+        .notes-container { height: 35px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .notes-preview {
             width: 90%; border: none; background: transparent; font-family: 'Cairo'; font-size: 10px;
             text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700;
@@ -104,19 +116,9 @@
         }
 
         .status-select {
-            font-family: 'Cairo';
-            font-size: 11px;
-            font-weight: 800;
-            padding: 4px 8px;
-            border-radius: 20px;
-            border: 1.5px solid #e2e8f0;
-            background: #f8fafc;
-            width: 95%;
-            cursor: pointer;
-            outline: none;
-            transition: all 0.3s ease;
-            text-align: center;
-            appearance: none;
+            font-family: 'Cairo'; font-size: 11px; font-weight: 800; padding: 4px 8px;
+            border-radius: 20px; border: 1.5px solid #e2e8f0; background: #f8fafc;
+            width: 95%; cursor: pointer; outline: none; transition: all 0.3s ease; text-align: center; appearance: none;
         }
         
         .status-select[data-val="مكتمل"] { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
@@ -146,7 +148,7 @@
         .modal-results div { padding: 8px; font-size: 11px; cursor: pointer; border-bottom: 1px solid #f8fafc; }
     </style>
 </head>
-<body onload="loadSalesFromStorage(); renderGeneralLogs();">
+<body onload="loadSalesFromStorage(); renderGeneralLogs(); updateStats();">
 
 <nav class="navbar">
     <a href="index.html">الرئيسية</a>
@@ -157,9 +159,57 @@
 </nav>
 
 <div class="container">
+    <div class="top-grid">
+        <div class="stat-card">
+            <div class="card-title">📊 ملخص إحصائيات المبيعات</div>
+            <div class="stats-wrapper">
+                <div class="stat-group">
+                    <div class="stat-group-label">إجمالي كافة الطلبات</div>
+                    <div class="stat-row">
+                        <span class="stat-label">عدد الطلبات:</span>
+                        <span class="stat-value" id="stat-total-count">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">قيمة المكتمل:</span>
+                        <span class="stat-value val-green" id="stat-total-completed">0.00</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">قيمة المعلق:</span>
+                        <span class="stat-value val-red" id="stat-total-pending">0.00</span>
+                    </div>
+                </div>
+                <div class="stat-group">
+                    <div class="stat-group-label" id="label-current-month">إحصائيات الشهر الحالي</div>
+                    <div class="stat-row">
+                        <span class="stat-label">طلبات الشهر:</span>
+                        <span class="stat-value" id="stat-month-count">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">مكتمل الشهر:</span>
+                        <span class="stat-value val-green" id="stat-month-completed">0.00</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">معلق الشهر:</span>
+                        <span class="stat-value val-red" id="stat-month-pending">0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="action-card">
+            <div class="card-title">⚡ إجراءات سريعة</div>
+            <div class="action-btns">
+                <button class="btn-action btn-add" onclick="openOrderModal()">
+                    <span>➕ إنشاء طلب مبيعات جديد</span>
+                </button>
+                <button class="btn-action" style="background:#f1f5f9; color:#475569; border:1px solid #cbd5e1;" onclick="location.reload()">
+                    <span>🔄 تحديث البيانات</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="action-bar">
-        <button class="btn-top btn-add" onclick="openOrderModal()">+ إنشاء طلب مبيعات جديد</button>
-        <span id="save-status-indicator"></span> 
         <input type="text" class="search-box" id="globalSearch" placeholder="🔍 بحث في الجدول..." onkeyup="filterSalesTable()">
     </div>
     
@@ -226,8 +276,7 @@
     let currentActivePreview = null;
 
     function getTodayFormatted() {
-        const d = new Date();
-        return d.toISOString().split('T')[0];
+        return new Date().toISOString().split('T')[0];
     }
 
     function generateStyledHeader() {
@@ -236,6 +285,42 @@
         const dateStr = getTodayFormatted();
         const timeFormatted = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
         return `<span class="activity-header-part">👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${dateStr}  <span class="activity-time-part">${timeFormatted}</span>&nbsp;&nbsp;</span>`;
+    }
+
+    function updateStats() {
+        const saved = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
+        const now = new Date();
+        const currentMonthStr = (now.getMonth() + 1).toString().padStart(2, '0');
+        const currentYearStr = now.getFullYear().toString();
+
+        let totalCount = 0, totalComp = 0, totalPend = 0;
+        let monthCount = 0, monthComp = 0, monthPend = 0;
+
+        saved.forEach(item => {
+            const sums = calculateOrderSums(item.id);
+            totalCount++;
+            totalComp += sums.completed;
+            totalPend += sums.pending;
+
+            // فحص الشهر (تنسيق التاريخ YYYY-MM-DD)
+            const parts = item.date.split('-');
+            if (parts[0] === currentYearStr && parts[1] === currentMonthStr) {
+                monthCount++;
+                monthComp += sums.completed;
+                monthPend += sums.pending;
+            }
+        });
+
+        document.getElementById('stat-total-count').innerText = totalCount;
+        document.getElementById('stat-total-completed').innerText = totalComp.toLocaleString('en-US', {minimumFractionDigits: 2});
+        document.getElementById('stat-total-pending').innerText = totalPend.toLocaleString('en-US', {minimumFractionDigits: 2});
+        
+        document.getElementById('stat-month-count').innerText = monthCount;
+        document.getElementById('stat-month-completed').innerText = monthComp.toLocaleString('en-US', {minimumFractionDigits: 2});
+        document.getElementById('stat-month-pending').innerText = monthPend.toLocaleString('en-US', {minimumFractionDigits: 2});
+        
+        const monthNames = ["يناير", "فبراير", "مارس", "إبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+        document.getElementById('label-current-month').innerText = `إحصائيات شهر ${monthNames[now.getMonth()]}`;
     }
 
     function autoSave() {
@@ -253,6 +338,7 @@
             owner: r.cells[11].innerText
         }));
         localStorage.setItem('asgate_sales_db', JSON.stringify(salesData));
+        updateStats();
     }
 
     function openOrderModal() { document.getElementById('orderModal').style.display = 'flex'; }
@@ -309,7 +395,7 @@
         };
 
         checkMonthTransition(data.date);
-        renderTableRow(data, true); // true تعني الإضافة في الأعلى
+        renderTableRow(data, true);
         autoSave();
         addGeneralLog("اسم الطلب", "", type, comp, `إنشاء طلب مبيعات جديد برقم #${data.id}`);
         closeOrderModal();
@@ -318,7 +404,7 @@
     function checkMonthTransition(newDateStr) {
         const saved = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
         if (saved.length === 0) return;
-        const lastOrderDateStr = saved[0].date; // نقارن مع الأول لأنه الأحدث
+        const lastOrderDateStr = saved[0].date;
         const lastParts = lastOrderDateStr.split('-');
         const newParts = newDateStr.split('-');
         if (lastParts[1] !== newParts[1] || lastParts[0] !== newParts[0]) {
@@ -342,8 +428,7 @@
         
         row.innerHTML = `
             <td><a href="order_details.html?id=${obj.id}" class="order-link">#${obj.id}</a></td>
-            <td class="editable" contenteditable="true" 
-                onblur="updateField(this, 'اسم الطلب', 1, '${obj.comp}', ${obj.id})">${obj.type}</td>
+            <td class="editable" contenteditable="true" onblur="updateField(this, 'اسم الطلب', 1, '${obj.comp}', ${obj.id})">${obj.type}</td>
             <td style="color:#64748b;">${obj.date}</td>
             <td>${obj.comp}</td>
             <td>${obj.cr}</td>
@@ -362,8 +447,7 @@
                     <div class="notes-preview" onclick="openNote(this)" data-full-notes='${(obj.notes || '').replace(/'/g, "&apos;")}'>${lastNoteText}</div>
                 </div>
             </td>
-            <td class="editable" contenteditable="true" 
-                onblur="updateField(this, 'الفرصة', 10, '${obj.comp}', ${obj.id})">${obj.oppNum || ''}</td>
+            <td class="editable" contenteditable="true" onblur="updateField(this, 'الفرصة', 10, '${obj.comp}', ${obj.id})">${obj.oppNum || ''}</td>
             <td style="color:#64748b; font-weight:bold;">${obj.owner || 'أحمد'}</td>
         `;
     }
@@ -423,22 +507,20 @@
         let saved = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
         const tbody = document.getElementById('salesBody');
         tbody.innerHTML = "";
-        
-        // الترتيب: الأحدث تاريخاً ورقم طلب في الأعلى
         saved.sort((a, b) => {
             if (b.date !== a.date) return b.date.localeCompare(a.date);
             return b.id - a.id;
         });
-
         let lastMonth = "";
         saved.forEach((item, index) => {
             const currentMonth = item.date.split('-')[1] + '-' + item.date.split('-')[0];
             if (index > 0 && lastMonth !== currentMonth) {
                 insertMonthSeparator();
             }
-            renderTableRow(item, false); // false لأننا نرسم القائمة مرتبة أصلاً
+            renderTableRow(item, false);
             lastMonth = currentMonth;
         });
+        updateStats();
     }
 
     function filterSalesTable() {
