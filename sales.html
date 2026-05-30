@@ -1,1 +1,481 @@
+<!DOCTYPE html>
+<html dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المبيعات | ASGate</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --nav-shiny-navy: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+            --header-shiny-purple: linear-gradient(180deg, #4c1d95 0%, #2e1065 100%);
+            --nav-bg: #0f172a;
+            --nav-active: #a78bfa;
+            --bg-color: #f4f7f9;
+            --white: #ffffff;
+            --accent-blue: #3b82f6;
+            --accent-green-active: #22c55e;
+            --border-soft: #cbd5e1;
+            --text-dark: #1e293b;
+            --dark-yellow: #c29103;
+            --chat-yellow: #b45309;
+        }
 
+        html, body { 
+            height: 100%; margin: 0; padding: 0; overflow: hidden; 
+            background-color: var(--bg-color); font-family: 'Cairo', sans-serif; 
+            font-size: 13px; line-height: 1.2; color: var(--text-dark); 
+        }
+
+        .dashboard-container { display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; }
+
+        .navbar { 
+            background: var(--nav-shiny-navy); display: flex; align-items: center; padding: 0 20px; margin: 10px 10px 5px 10px; 
+            border-radius: 12px; height: 37px; flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.1); border: 1px solid #1e293b;
+        }
+        .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; height: 26px; line-height: 26px; display: inline-block; transition: 0.3s; }
+        .navbar a.active { background-color: var(--nav-active); color: #0f172a; border-radius: 6px; }
+
+        .main-content { flex: 1; display: flex; flex-direction: column; padding: 0 15px; min-height: 0; }
+        
+        .action-bar { display: flex; align-items: center; margin: 10px 0; gap: 15px; flex-shrink: 0; }
+        .btn-top { border: none; padding: 0 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; font-size: 12px; height: 35px; }
+        .btn-add { background-color: var(--accent-blue); }
+
+        .search-wrapper { position: relative; width: 15%; display: flex; align-items: center; }
+        .search-input {
+            width: 100%; height: 30px; padding: 0 10px; border-radius: 8px;
+            border: 1px solid var(--border-soft); background: #fff;
+            font-family: 'Cairo'; font-size: 12px; font-weight: 700; outline: none;
+        }
+
+        .stats-bar {
+            margin-right: auto; display: flex; gap: 10px; align-items: center;
+            background: #fff; padding: 0 10px; border-radius: 5px; height: 25px;
+            border: 1px solid var(--border-soft); box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .stat-item { font-size: 10px; font-weight: 800; color: #475569; white-space: nowrap; }
+        .stat-val { color: var(--accent-blue); margin-right: 3px; }
+
+        .table-wrapper { 
+            background: white; border-radius: 10px; overflow-y: auto; border: 1px solid var(--border-soft); 
+            flex: 1; min-height: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.02); position: relative;
+        }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        
+        th { 
+            background: var(--header-shiny-purple); color: white; padding: 0 5px; font-size: 11px; font-weight: 800; 
+            text-align: center; border-bottom: 2px solid #2e1065; position: sticky; top: 0; z-index: 50; height: 40px;
+        }
+        
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; max-height: 45px; font-size: 11px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; }
+        tbody tr:nth-child(even) { background-color: #eff6ff; }
+
+        .excel-input { 
+            width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; 
+            background: transparent; font-size: 11.5px; color: inherit; font-weight: inherit; 
+            height: 100%; overflow: hidden; text-overflow: ellipsis; 
+        }
+
+        .select-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent-blue); }
+
+        .action-cell { position: relative; overflow: visible !important; }
+        
+        .dots-btn, .header-dots-btn { 
+            cursor: pointer; font-size: 10px; color: #475569; background: #fff; 
+            border: 1px solid #cbd5e1; border-radius: 4px; padding: 4px 10px; 
+            font-family: 'Cairo'; font-weight: 700; transition: 0.2s;
+            display: inline-flex; align-items: center; gap: 4px; line-height: 1;
+        }
+        .header-dots-btn { background: rgba(255,255,255,0.1); color: white; border-color: rgba(255,255,255,0.3); font-size: 11px; width: 85px; justify-content: center; }
+        .header-dots-btn:hover { background: white; color: var(--header-shiny-purple); }
+        .dots-btn:hover { background: #f8fafc; border-color: var(--accent-blue); color: var(--accent-blue); }
+
+        .dropdown-menu { 
+            display: none; position: absolute; left: 50%; transform: translateX(-50%); 
+            top: 35px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; 
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 1000; min-width: 110px; padding: 4px;
+        }
+        .dropdown-menu button { 
+            width: 100%; padding: 6px 10px; border: none; background: none; font-family: 'Cairo'; 
+            font-size: 10.5px; text-align: right; cursor: pointer; color: #475569; font-weight: 700; 
+            border-radius: 4px; transition: 0.2s; display: block;
+        }
+        .dropdown-menu button:hover { background: #f1f5f9; color: var(--accent-blue); }
+        .dropdown-menu .del-btn:hover { background: #fee2e2; color: #ef4444; }
+        .show { display: block; }
+
+        .notes-preview { 
+            width: 95%; height: 20px; border: none; background: transparent; font-family: 'Cairo'; 
+            font-size: 11px; text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700; 
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; margin: 0 auto; 
+        }
+
+        .activity-log-section { 
+            margin: 15px 0 10px 0; padding: 12px 18px; background: #ffffff; border-radius: 10px; 
+            border: 1px solid var(--border-soft); box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
+            flex-shrink: 0; height: 140px; display: flex; flex-direction: column; box-sizing: border-box;
+        }
+        .activity-log-title { color: var(--dark-yellow); font-size: 13.5px; font-weight: 800; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; flex-shrink: 0; }
+        .activity-list { flex: 1; overflow-y: auto; font-size: 11.5px; line-height: 1.6; }
+        .activity-item { margin-bottom: 4px; border-bottom: 1px dashed #f8fafc; padding-bottom: 4px; color: #475569; display: flex; align-items: center; }
+        
+        .activity-header-part { font-size: 11.5px; color: var(--chat-yellow); font-weight: 800; }
+        .activity-time-part { font-size: 10px; font-weight: normal; }
+        .activity-text-part { font-size: 11.5px; color: #475569; }
+
+        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .modal-content { background: white; padding: 18px; border-radius: 12px; width: 440px; height: 480px; display: flex; flex-direction: column; }
+        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
+        .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
+
+        .col-select { width: 35px; }
+        .col-company { width: 12%; } .col-manager { width: 8%; } .col-mobile { width: 8%; } 
+        .col-email { width: 9%; } .col-record { width: 8%; } .col-date { width: 10%; } 
+        .col-service { width: 12%; } .col-notes { width: 13%; } .col-status { width: 7%; }
+        .col-edit { width: 8%; } .col-action { width: 100px; }
+    </style>
+</head>
+<body onload="loadSavedData()">
+
+<div class="dashboard-container">
+    <nav class="navbar">
+        <a href="index.html">الرئيسية</a>
+        <a href="visits.html">الزيارات</a>
+        <a href="opportunities.html">الفرص البيعية</a>
+        <a href="customers.html">العملاء</a>
+        <a href="sales.html" class="active">المبيعات</a>
+    </nav>
+
+    <div class="main-content">
+        <div class="action-bar">
+            <button class="btn-top btn-add" onclick="openOrderModal()">+ إنشاء طلب مبيعات جديد</button>
+            <div class="search-wrapper">
+                <input type="text" id="searchInput" class="search-input" placeholder="بحث 🔍" onkeyup="filterTable()">
+            </div>
+            
+            <div class="stats-bar">
+                <div class="stat-item">إجمالي الزيارات: <span id="stat-total" class="stat-val">0</span></div>
+                <div class="stat-item">زيارات الشهر: <span id="stat-month" class="stat-val">0</span></div>
+                <div class="stat-item">زيارات اليوم: <span id="stat-today" class="stat-val">0</span></div>
+                <div class="stat-item">ناجحة: <span id="stat-success" class="stat-val">0</span></div>
+            </div>
+        </div>
+        
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="col-select"><input type="checkbox" onclick="toggleAllCheckboxes(this)"></th>
+                        <th style="width: 8%;">رقم الطلب</th>
+                        <th style="width: 12%;">اسم الطلب</th>
+                        <th class="col-company">الشركة</th>
+                        <th style="width: 10%;">السجل الرئيسي</th>
+                        <th style="width: 10%;">السجل الفرعي</th>
+                        <th class="col-date">تاريخ الإنشاء</th>
+                        <th class="col-status">الحالة</th>
+                        <th style="width: 7%;">مكتمل</th>
+                        <th style="width: 7%;">معلق</th>
+                        <th class="col-notes">الملاحظات</th>
+                        <th class="col-action">
+                            <button class="header-dots-btn" onclick="toggleDropdown(event, this)">إجراء •••</button>
+                            <div class="dropdown-menu">
+                                <button onclick="handleBulkAction('تصدير المحدد')">تصدير المحدد</button>
+                                <button onclick="handleBulkAction('طباعة المحدد')">طباعة المحدد</button>
+                                <button class="del-btn" onclick="handleBulkAction('حذف المحدد')">حذف المحدد</button>
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+
+        <div class="activity-log-section">
+            <div class="activity-log-title">📋 سجل النشاط</div>
+            <div id="activityList" class="activity-list"></div>
+        </div>
+    </div>
+</div>
+
+
+    <!-- مودال إنشاء طلب مبيعات جديد -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content" style="height: auto; width: 400px;">
+            <div style="font-weight: 800; color: #2e1065; margin-bottom: 15px; text-align: center; font-size: 16px;">إنشاء طلب مبيعات جديد</div>
+            
+            <div style="position: relative; margin-bottom: 12px;">
+                <label style="display: block; font-size: 11px; font-weight: 800; margin-bottom: 4px;">ابحث عن الشركة (بالاسم أو السجل):</label>
+                <input type="text" id="mSearchField" class="note-area" style="height: 35px;" placeholder="اكتب للبحث..." onkeyup="handleSearchCustomer()">
+                <div id="mResults" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #cbd5e1; z-index: 10005; border-radius: 6px; max-height: 120px; overflow-y: auto; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"></div>
+            </div>
+
+            <input type="hidden" id="mComp">
+            <input type="hidden" id="mCr">
+            <input type="hidden" id="mCrSub">
+
+            <div style="margin-bottom: 12px;">
+                <label style="display: block; font-size: 11px; font-weight: 800; margin-bottom: 4px;">اسم / نوع الطلب:</label>
+                <input type="text" id="mType" class="note-area" style="height: 35px;" placeholder="مثال: توريد أجهزة مكتبية">
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button onclick="closeOrderModal()" style="flex: 1; background: #94a3b8; color: white; border: none; padding: 10px; border-radius: 8px; font-family: Cairo; font-weight: bold; cursor: pointer;">إلغاء</button>
+                <button onclick="addOrderRow()" style="flex: 1; background: var(--accent-blue); color: white; border: none; padding: 10px; border-radius: 8px; font-family: Cairo; font-weight: bold; cursor: pointer;">إنشاء الطلب</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="noteModal" class="modal">
+    <div class="modal-content">
+        <div style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right;">سجل متابعة الزيارة والنتائج</div>
+        <div id="historyLog" class="history-log"></div>
+        <textarea id="modalTextArea" class="note-area" placeholder="أدخل تفاصيل الملاحظة هنا..."></textarea>
+        <div style="display:flex; justify-content: flex-end; gap:8px; margin-top:10px;">
+            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px;">تراجع</button>
+            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px; font-weight:bold;">حفظ الملاحظة</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    let currentActivePreview = null;
+    const STORAGE_KEY = 'asgate_sales_main_v1';
+    const LOGS_KEY = 'asgate_sales_logs_v1';
+
+    function getTodayFormatted() {
+        const d = new Date();
+        return d.toLocaleDateString('en-GB');
+    }
+
+    function generateStyledHeader() {
+        const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+        const d = new Date();
+        const timeFormatted = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+        return `<span class="activity-header-part">👤 (أحمد) 🗓️ ${days[d.getDay()]} ${getTodayFormatted()} <span class="activity-time-part">${timeFormatted}</span>&nbsp;&nbsp;</span>`;
+    }
+
+    function addToActivityLog(fieldName, oldVal, newVal, companyName) {
+        const headerHTML = generateStyledHeader();
+        const cleanCompany = companyName || "طلب مبيعات";
+        const val1 = oldVal || "فارغ";
+        const val2 = newVal || "فارغ";
+        let actionText = `تعديل ${fieldName} من [${val1}] إلى [${val2}] في ( ${cleanCompany} )`;
+        
+        if (fieldName === "إجراء") actionText = `حذف طلب مبيعات شركة ( ${cleanCompany} )`;
+        if (fieldName === "إنشاء") actionText = `إنشاء طلب مبيعات جديد لشركة ( ${cleanCompany} ) باسم [${newVal}]`;
+
+        const fullLogHTML = `${headerHTML}<span class="activity-text-part">${actionText}</span>`;
+        let logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
+        logs.unshift(fullLogHTML);
+        localStorage.setItem(LOGS_KEY, JSON.stringify(logs.slice(0, 100)));
+        renderActivityLog();
+    }
+
+    function renderActivityLog() {
+        const list = document.getElementById('activityList');
+        const logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
+        if (list) list.innerHTML = logs.map(log => `<div class="activity-item">${log}</div>`).join('');
+    }
+
+    function saveAllDataSilently() {
+        const rows = document.querySelectorAll('#tableBody tr');
+        let data = [];
+        rows.forEach(r => {
+            const notesEl = r.querySelector('.notes-preview');
+            data.push({
+                orderId: r.cells[1].innerText.replace('#', ''),
+                orderName: r.cells[2].querySelector('input').value,
+                comp: r.cells[3].querySelector('input').value,
+                cr: r.cells[4].querySelector('input').value,
+                cr_sub: r.cells[5].querySelector('input').value,
+                date: r.cells[6].querySelector('input').value,
+                status: r.cells[7].querySelector('select').value,
+                completed: r.cells[8].querySelector('input').value,
+                pending: r.cells[9].querySelector('input').value,
+                notes: notesEl ? notesEl.getAttribute('data-full-notes') : ""
+            });
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        updateStats();
+    }
+
+    function loadSavedData() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+            const data = JSON.parse(raw);
+            const body = document.getElementById('tableBody');
+            body.innerHTML = '';
+            data.forEach(v => renderTableRow(v));
+        }
+        renderActivityLog();
+        updateStats();
+    }
+
+    function renderTableRow(v) {
+        const body = document.getElementById('tableBody');
+        const tr = document.createElement('tr');
+        const notes = v.notes || "";
+        const lastNoteText = getLastNoteOnly(notes);
+
+        tr.innerHTML = `
+            <td class="col-select"><input type="checkbox" class="select-check"></td>
+            <td style="font-family: 'Cascadia Code', monospace; color: var(--accent-blue); font-weight: 800;">#${v.orderId}</td>
+            <td><input type="text" class="excel-input" value="${v.orderName || ''}" onchange="addToActivityLog('اسم الطلب', '', this.value, this.closest('tr').cells[3].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.comp || ''}" onchange="saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.cr || ''}" onchange="saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.cr_sub || '-'}" onchange="saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.date || ''}" readonly></td>
+            <td>
+                <select class="status-select" onchange="saveAllDataSilently();">
+                    <option value="جديد" ${v.status==='جديد'?'selected':''}>جديد</option>
+                    <option value="قيد العمل" ${v.status==='قيد العمل'?'selected':''}>قيد العمل</option>
+                    <option value="مكتمل" ${v.status==='مكتمل'?'selected':''}>مكتمل</option>
+                    <option value="ملغي" ${v.status==='ملغي'?'selected':''}>ملغي</option>
+                </select>
+            </td>
+            <td><input type="text" class="excel-input" value="${v.completed || '0'}" onchange="saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.pending || '0'}" onchange="saveAllDataSilently();"></td>
+            <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}'>${lastNoteText}</div></td>
+            <td class="action-cell">
+                <button class="dots-btn" onclick="toggleDropdown(event, this)">خيار •••</button>
+                <div class="dropdown-menu">
+                    <button onclick="alert('سيتم فتح تفاصيل الطلب رقم #' + this.closest('tr').cells[1].innerText)">تفاصيل الطلب</button>
+                    <button class="del-btn" onclick="deleteRow(this)">حذف الطلب</button>
+                </div>
+            </td>
+        `;
+        body.appendChild(tr);
+    }
+
+    // Modal & Business Logic
+    function openOrderModal() { document.getElementById('orderModal').style.display = 'flex'; }
+    function closeOrderModal() { document.getElementById('orderModal').style.display = 'none'; }
+
+    function handleSearchCustomer() {
+        const q = document.getElementById('mSearchField').value.toLowerCase();
+        const resDiv = document.getElementById('mResults');
+        if (q.length < 1) { resDiv.style.display = 'none'; return; }
+        
+        // Mock searching in customers (can be expanded to real storage)
+        const customers = JSON.parse(localStorage.getItem('asgate_customers_v2') || '[]');
+        const filtered = customers.filter(c => c.comp.toLowerCase().includes(q) || c.cr.includes(q));
+        
+        if (filtered.length > 0) {
+            resDiv.innerHTML = filtered.map(c => `<div style="padding:8px; cursor:pointer; border-bottom:1px solid #eee;" onclick="selectCustomer('${c.comp.replace(/'/g,"\'")}','${c.cr}','${c.cr_sub}')">${c.comp}</div>`).join('');
+            resDiv.style.display = 'block';
+        } else { resDiv.style.display = 'none'; }
+    }
+
+    function selectCustomer(comp, cr, crSub) {
+        document.getElementById('mComp').value = comp;
+        document.getElementById('mCr').value = cr;
+        document.getElementById('mCrSub').value = crSub || '-';
+        document.getElementById('mSearchField').value = comp;
+        document.getElementById('mResults').style.display = 'none';
+    }
+
+    function addOrderRow() {
+        const comp = document.getElementById('mComp').value;
+        const type = document.getElementById('mType').value;
+        if (!comp) { alert("يرجى اختيار شركة أولاً"); return; }
+        
+        const newOrder = {
+            orderId: Math.floor(1000 + Math.random() * 8999),
+            orderName: type || "طلب جديد",
+            comp: comp,
+            cr: document.getElementById('mCr').value,
+            cr_sub: document.getElementById('mCrSub').value,
+            date: getTodayFormatted(),
+            status: "جديد",
+            completed: "0",
+            pending: "0",
+            notes: ""
+        };
+        
+        renderTableRow(newOrder);
+        saveAllDataSilently();
+        addToActivityLog('إنشاء', '', newOrder.orderName, comp);
+        closeOrderModal();
+    }
+
+    function deleteRow(btn) {
+        const tr = btn.closest('tr');
+        const comp = tr.cells[3].querySelector('input').value;
+        if (confirm(`هل أنت متأكد من حذف طلب شركة (${comp})؟`)) {
+            addToActivityLog('إجراء', '', '', comp);
+            tr.remove();
+            saveAllDataSilently();
+        }
+    }
+
+    function toggleDropdown(e, btn) {
+        e.stopPropagation();
+        const menu = btn.nextElementSibling;
+        document.querySelectorAll('.dropdown-menu').forEach(m => { if(m!==menu) m.classList.remove('show'); });
+        menu.classList.toggle('show');
+    }
+
+    function toggleAllCheckboxes(master) {
+        document.querySelectorAll('.select-check').forEach(c => c.checked = master.checked);
+    }
+
+    function filterTable() {
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        document.querySelectorAll('#tableBody tr').forEach(r => {
+            const text = r.innerText.toLowerCase() + r.querySelector('input').value.toLowerCase();
+            r.style.display = text.includes(q) ? "" : "none";
+        });
+    }
+
+    function updateStats() {
+        const rows = document.querySelectorAll('#tableBody tr');
+        document.getElementById('totalCount').innerText = rows.length;
+        // Simplified stats
+        let monthCount = 0;
+        rows.forEach(r => { if(r.cells[6].querySelector('input').value.includes('/05/2026')) monthCount++; });
+        document.getElementById('monthCount').innerText = monthCount;
+    }
+
+    function openNote(el) {
+        currentActivePreview = el;
+        const fullNotes = el.getAttribute('data-full-notes') || "";
+        document.getElementById('historyLog').innerHTML = fullNotes === "" ? "لا يوجد سجل ملاحظات سابق." : fullNotes.replace(/
+/g, '<br>');
+        document.getElementById('noteModal').style.display = "flex";
+        document.getElementById('modalTextArea').focus();
+    }
+
+    function saveNote() {
+        const txt = document.getElementById('modalTextArea').value.trim();
+        if (txt && currentActivePreview) {
+            let old = currentActivePreview.getAttribute('data-full-notes') || "";
+            let entry = `${generateStyledHeader()}<span class="activity-text-part">${txt}</span>`;
+            let updated = old === "" ? entry : old + "
+--------------------
+" + entry;
+            currentActivePreview.setAttribute('data-full-notes', updated);
+            currentActivePreview.innerText = txt;
+            saveAllDataSilently();
+        }
+        closeNote();
+    }
+
+    function closeNote() { document.getElementById('noteModal').style.display = "none"; document.getElementById('modalTextArea').value = ""; }
+    function getLastNoteOnly(fullText) {
+        if (!fullText || fullText.trim() === "") return 'إضافة ملاحظة...';
+        const arr = fullText.split('
+--------------------
+');
+        const lastEntry = arr[arr.length - 1];
+        const parts = lastEntry.split('</span>&nbsp;&nbsp;</span>');
+        return parts.length > 1 ? parts[1].replace(/<[^>]*>?/gm, '').trim() : lastEntry.replace(/<[^>]*>?/gm, '').trim();
+    }
+
+    window.onclick = () => { document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show')); };
+</script>
+
+</body>
+</html>
