@@ -39,7 +39,7 @@
 
         .main-content { flex: 1; display: flex; flex-direction: column; padding: 0 15px; min-height: 0; }
         
-        .action-bar { display: flex; align-items: center; margin: 10px 0; gap: 15px; flex-shrink: 0; }
+        .action-bar { display: flex; align-items: center; margin: 10px 0; gap: 10px; flex-shrink: 0; }
         .btn-top { border: none; padding: 0 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; font-size: 12px; height: 35px; }
         .btn-add { background-color: var(--accent-blue); }
 
@@ -57,6 +57,16 @@
         }
         .stat-item { font-size: 10px; font-weight: 800; color: #475569; white-space: nowrap; }
         .stat-val { color: var(--accent-blue); margin-right: 3px; }
+
+        /* تنسيق زر الإجراء الجديد بجانب الإحصائيات */
+        .bulk-action-wrapper { position: relative; display: flex; align-items: center; }
+        .btn-bulk-trigger { 
+            height: 25px; padding: 0 12px; border-radius: 5px; border: 1px solid var(--border-soft);
+            background: #fff; color: var(--text-dark); font-family: 'Cairo'; font-size: 11px; font-weight: 800;
+            cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: 0.2s;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .btn-bulk-trigger:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
 
         .table-wrapper { 
             background: white; border-radius: 10px; overflow-y: auto; border: 1px solid var(--border-soft); 
@@ -108,14 +118,12 @@
 
         .action-cell { position: relative; overflow: visible !important; }
         
-        .dots-btn, .header-dots-btn { 
+        .dots-btn { 
             cursor: pointer; font-size: 10px; color: #475569; background: #fff; 
             border: 1px solid #cbd5e1; border-radius: 4px; padding: 4px 10px; 
             font-family: 'Cairo'; font-weight: 700; transition: 0.2s;
             display: inline-flex; align-items: center; gap: 4px; line-height: 1;
         }
-        .header-dots-btn { background: rgba(255,255,255,0.1); color: white; border-color: rgba(255,255,255,0.3); font-size: 11px; width: 85px; justify-content: center; }
-        .header-dots-btn:hover { background: white; color: var(--header-shiny-purple); }
         .dots-btn:hover { background: #f8fafc; border-color: var(--accent-blue); color: var(--accent-blue); }
 
         .dropdown-menu { 
@@ -123,6 +131,9 @@
             top: 35px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; 
             box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 1000; min-width: 110px; padding: 4px;
         }
+        /* تعديل موقع دروب داون شريط الأدوات ليكون لليمين قليلاً */
+        .bulk-action-wrapper .dropdown-menu { left: 0; transform: none; top: 28px; }
+
         .dropdown-menu button { 
             width: 100%; padding: 6px 10px; border: none; background: none; font-family: 'Cairo'; 
             font-size: 10.5px; text-align: right; cursor: pointer; color: #475569; font-weight: 700; 
@@ -156,7 +167,7 @@
         .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
         .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
 
-        /* تعديل عرض الأعمدة لتناسب العمود الجديد */
+        /* عرض الأعمدة */
         .col-select { width: 50px; }
         .col-company { width: 11%; } .col-manager { width: 8%; } .col-mobile { width: 8%; } 
         .col-email { width: 9%; } .col-record { width: 8%; } .col-date { width: 9%; } 
@@ -182,6 +193,16 @@
                 <input type="text" id="searchInput" class="search-input" placeholder="بحث 🔍" onkeyup="filterTable()">
             </div>
             
+            <div class="bulk-action-wrapper">
+                <button class="btn-bulk-trigger" onclick="toggleDropdown(event, this)">إجراء ▾</button>
+                <div class="dropdown-menu">
+                    <button onclick="handleBulkAction('تحويل المحدد')">تحويل المحدد</button>
+                    <button onclick="handleBulkAction('تصدير المحدد')">تصدير المحدد</button>
+                    <button onclick="handleBulkAction('طباعة المحدد')">طباعة المحدد</button>
+                    <button class="del-btn" onclick="handleBulkAction('حذف المحدد')">حذف المحدد</button>
+                </div>
+            </div>
+
             <div class="stats-bar">
                 <div class="stat-item">إجمالي الفرص: <span id="stat-total" class="stat-val">0</span></div>
                 <div class="stat-item">فرص الشهر: <span id="stat-month" class="stat-val">0</span></div>
@@ -206,15 +227,7 @@
                         <th class="col-notes">ملاحظات الفرصة</th>
                         <th class="col-status">الحالة</th>
                         <th class="col-edit">آخر تعديل</th>
-                        <th class="col-action" style="position: relative; overflow: visible;">
-                            <button class="header-dots-btn" onclick="toggleDropdown(event, this)">إجراء •••</button>
-                            <div class="dropdown-menu">
-                                <button onclick="handleBulkAction('تحويل المحدد')">تحويل المحدد</button>
-                                <button onclick="handleBulkAction('تصدير المحدد')">تصدير المحدد</button>
-                                <button onclick="handleBulkAction('طباعة المحدد')">طباعة المحدد</button>
-                                <button class="del-btn" onclick="handleBulkAction('حذف المحدد')">حذف المحدد</button>
-                            </div>
-                        </th>
+                        <th class="col-action">العمليات</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -289,7 +302,6 @@
                 const status = statusSelect.value;
                 if (date === today) tDay++;
                 if (date.startsWith(currentMonth)) tMonth++;
-                // ملاحظة: تم تعديل خيارات الحالة، يمكن تحديث شرط 'ناجحة' لاحقاً إذا لزم الأمر
             }
         });
         document.getElementById('stat-total').innerText = total;
@@ -574,7 +586,7 @@
     function closeNote() { document.getElementById('noteModal').style.display = "none"; document.getElementById('modalTextArea').value = ""; }
     
     window.onclick = (e) => {
-        if (!e.target.matches('.dots-btn') && !e.target.matches('.header-dots-btn')) {
+        if (!e.target.matches('.dots-btn') && !e.target.matches('.btn-bulk-trigger')) {
             document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
         }
     };
