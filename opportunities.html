@@ -58,7 +58,6 @@
         .stat-item { font-size: 10px; font-weight: 800; color: #475569; white-space: nowrap; }
         .stat-val { color: var(--accent-blue); margin-right: 3px; }
 
-        /* تنسيق حاوية زر الإجراء ليكون على اليسار */
         .bulk-action-wrapper { position: relative; display: flex; align-items: center; margin-right: 5px; }
         .btn-bulk-trigger { 
             height: 25px; padding: 0 12px; border-radius: 5px; border: 1px solid var(--border-soft);
@@ -118,21 +117,11 @@
 
         .action-cell { position: relative; overflow: visible !important; }
         
-        .dots-btn { 
-            cursor: pointer; font-size: 10px; color: #475569; background: #fff; 
-            border: 1px solid #cbd5e1; border-radius: 4px; padding: 4px 10px; 
-            font-family: 'Cairo'; font-weight: 700; transition: 0.2s;
-            display: inline-flex; align-items: center; gap: 4px; line-height: 1;
-        }
-        .dots-btn:hover { background: #f8fafc; border-color: var(--accent-blue); color: var(--accent-blue); }
-
         .dropdown-menu { 
-            display: none; position: absolute; left: 50%; transform: translateX(-50%); 
-            top: 35px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; 
+            display: none; position: absolute; left: 0; 
+            top: 28px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; 
             box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 1000; min-width: 110px; padding: 4px;
         }
-        /* القائمة المنسدلة لزر إجراء العلوي */
-        .bulk-action-wrapper .dropdown-menu { left: 0; transform: none; top: 28px; }
 
         .dropdown-menu button { 
             width: 100%; padding: 6px 10px; border: none; background: none; font-family: 'Cairo'; 
@@ -172,7 +161,7 @@
         .col-company { width: 11%; } .col-manager { width: 8%; } .col-mobile { width: 8%; } 
         .col-email { width: 9%; } .col-record { width: 8%; } .col-date { width: 9%; } 
         .col-service { width: 11%; } .col-value { width: 7%; } .col-notes { width: 11%; } .col-status { width: 6%; }
-        .col-edit { width: 7%; } .col-action { width: 90px; }
+        .col-edit { width: 7%; } .col-owner { width: 10%; }
     </style>
 </head>
 <body onload="loadSavedData()">
@@ -227,7 +216,7 @@
                         <th class="col-notes">ملاحظات الفرصة</th>
                         <th class="col-status">الحالة</th>
                         <th class="col-edit">آخر تعديل</th>
-                        <th class="col-action">العمليات</th>
+                        <th class="col-owner">المالك</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -374,12 +363,7 @@
                 </select>
             </td>
             <td><input type="text" class="excel-input readonly-input edit-date-display" value="${v.editDate || ''}" readonly><input type="hidden" class="edit-date-val" value="${v.editDate || ''}"></td>
-            <td class="action-cell">
-                <button class="dots-btn" onclick="toggleDropdown(event, this)">الإجراء ▾</button>
-                <div class="dropdown-menu">
-                    <button class="del-btn" onclick="deleteRow(this, '${rowId}')">حذف</button>
-                </div>
-            </td>
+            <td><input type="text" class="excel-input" value="${v.owner || ''}" data-old="${v.owner || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المالك', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
         `;
 
         subRow.innerHTML = `
@@ -462,11 +446,11 @@
     }
 
     function deleteRow(btn, rowId) {
-        const row = btn.closest('tr');
-        const companyName = document.getElementById(rowId).cells[1].querySelector('input').value;
+        const row = document.getElementById(rowId);
+        const companyName = row.cells[1].querySelector('input').value;
         if(confirm('هل أنت متأكد من الحذف؟')) {
             addToActivityLog('إجراء', '', '', companyName);
-            document.getElementById(rowId).remove();
+            row.remove();
             if(document.getElementById('sub-' + rowId)) document.getElementById('sub-' + rowId).remove();
             saveAllDataSilently();
             updateStats();
@@ -515,6 +499,7 @@
                 notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '',
                 status: row.querySelector('.status-select').value,
                 editDate: row.querySelector('.edit-date-val').value,
+                owner: row.cells[12].querySelector('input').value,
                 products: products
             });
         });
@@ -534,7 +519,7 @@
     function filterTable() {
         const q = document.getElementById('searchInput').value.toLowerCase();
         document.querySelectorAll('.main-row').forEach(r => {
-            const match = [1,2,3,4,5].some(idx => r.cells[idx].querySelector('input').value.toLowerCase().includes(q));
+            const match = [1,2,3,4,5,12].some(idx => r.cells[idx].querySelector('input').value.toLowerCase().includes(q));
             r.style.display = match ? "" : "none";
             const sub = document.getElementById('sub-' + r.id);
             if(sub) sub.style.display = 'none';
@@ -586,7 +571,7 @@
     function closeNote() { document.getElementById('noteModal').style.display = "none"; document.getElementById('modalTextArea').value = ""; }
     
     window.onclick = (e) => {
-        if (!e.target.matches('.dots-btn') && !e.target.matches('.btn-bulk-trigger')) {
+        if (!e.target.matches('.btn-bulk-trigger')) {
             document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
         }
     };
