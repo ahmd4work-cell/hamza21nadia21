@@ -86,7 +86,6 @@
         .inner-table th { background: var(--accent-blue); color: #fff; height: 24px; font-size: 9.5px; border-left: 1px solid rgba(255,255,255,0.2); }
         .inner-table td { height: 28px; border: 1px solid #edf2f7; padding: 0; }
         .inner-table input, .inner-table select { width: 100%; height: 100%; border: none; text-align: center; font-family: 'Cairo'; font-size: 10.5px; outline: none; background: transparent; }
-        .inner-table select { text-align-last: center; cursor: pointer; }
         
         .sub-action-btn { 
             width: 22px; height: 22px; border: none; border-radius: 4px; cursor: pointer; 
@@ -112,17 +111,15 @@
             background: transparent; font-size: 11.5px; color: inherit; font-weight: inherit; 
             height: 100%; overflow: hidden; text-overflow: ellipsis; 
         }
+        .readonly-input { color: #64748b; cursor: default; }
 
         .select-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent-blue); vertical-align: middle; }
 
-        .action-cell { position: relative; overflow: visible !important; }
-        
         .dropdown-menu { 
             display: none; position: absolute; left: 0; 
             top: 28px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; 
             box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 1000; min-width: 110px; padding: 4px;
         }
-
         .dropdown-menu button { 
             width: 100%; padding: 6px 10px; border: none; background: none; font-family: 'Cairo'; 
             font-size: 10.5px; text-align: right; cursor: pointer; color: #475569; font-weight: 700; 
@@ -156,7 +153,6 @@
         .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
         .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
 
-        /* عرض الأعمدة */
         .col-select { width: 3%; }
         .col-company { width: 12%; } 
         .col-manager { width: 8%; } 
@@ -164,10 +160,10 @@
         .col-email { width: 8%; } 
         .col-record { width: 8%; } 
         .col-date { width: 8%; } 
-        .col-type { width: 8%; } 
-        .col-next-visit { width: 8%; } 
+        .col-serv { width: 8%; } 
+        .col-next { width: 8%; } 
         .col-notes { width: 12%; } 
-        .col-status { width: 5%; }
+        .col-status { width: 6%; }
         .col-edit { width: 8%; } 
         .col-owner { width: 8%; }
     </style>
@@ -192,7 +188,7 @@
             
             <div class="stats-bar">
                 <div class="stat-item">إجمالي الزيارات: <span id="stat-total" class="stat-val">0</span></div>
-                <div class="stat-item">زيارات الشهر الحالي: <span id="stat-month" class="stat-val">0</span></div>
+                <div class="stat-item">زيارات الشهر: <span id="stat-month" class="stat-val">0</span></div>
                 <div class="stat-item">زيارات اليوم: <span id="stat-today" class="stat-val">0</span></div>
             </div>
 
@@ -219,9 +215,9 @@
                         <th class="col-email">الإيميل</th>
                         <th class="col-record">السجل</th>
                         <th class="col-date">تاريخ الزيارة</th>
-                        <th class="col-type">نوع الزيارة</th>
-                        <th class="col-next-visit">الزيارة القادمة</th>
-                        <th class="col-notes">محضر الاجتماع</th>
+                        <th class="col-serv">الفرصة المقترحة</th>
+                        <th class="col-next">الزيارة القادمة</th>
+                        <th class="col-notes">ملاحظات الزيارة</th>
                         <th class="col-status">الحالة</th>
                         <th class="col-edit">آخر تعديل</th>
                         <th class="col-owner">المالك</th>
@@ -240,20 +236,20 @@
 
 <div id="noteModal" class="modal">
     <div class="modal-content">
-        <div style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right;">سجل محضر الاجتماع والمتابعة</div>
+        <div style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right;">سجل متابعة الزيارة والنتائج</div>
         <div id="historyLog" class="history-log"></div>
-        <textarea id="modalTextArea" class="note-area" placeholder="أدخل تفاصيل الاجتماع هنا..."></textarea>
+        <textarea id="modalTextArea" class="note-area" placeholder="أدخل تفاصيل الملاحظة هنا..."></textarea>
         <div style="display:flex; justify-content: flex-end; gap:8px; margin-top:10px;">
             <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px;">تراجع</button>
-            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px; font-weight:bold;">حفظ المحضر</button>
+            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px; font-weight:bold;">حفظ الملاحظة</button>
         </div>
     </div>
 </div>
 
 <script>
     let currentActivePreview = null;
-    const STORAGE_KEY = 'asgate_visits_data_v30'; // مفتاح تخزين مختلف عن الفرص
-    const LOGS_KEY = 'asgate_visits_logs_v30';
+    const STORAGE_KEY = 'asgate_visits_final_v40'; 
+    const LOGS_KEY = 'asgate_visits_logs_v40';
 
     function getTodayFormatted() {
         const d = new Date();
@@ -293,12 +289,9 @@
         let total = rows.length, tDay = 0, tMonth = 0;
         
         rows.forEach(row => {
-            const dateInput = row.querySelector('.visit-date-val');
-            if(dateInput) {
-                const date = dateInput.value;
-                if (date === today) tDay++;
-                if (date.startsWith(currentMonth)) tMonth++;
-            }
+            const dateVal = row.querySelector('.visit-date-display').value;
+            if (dateVal === today) tDay++;
+            if (dateVal.startsWith(currentMonth)) tMonth++;
         });
         
         document.getElementById('stat-total').innerText = total;
@@ -306,32 +299,9 @@
         document.getElementById('stat-month').innerText = tMonth;
     }
 
-    function reorderRows() {
-        const tbody = document.getElementById('tableBody');
-        const rows = Array.from(tbody.querySelectorAll('.main-row'));
-        
-        rows.sort((a, b) => {
-            const statusA = a.querySelector('.status-select').value;
-            const statusB = b.querySelector('.status-select').value;
-            const getRank = (status) => {
-                if (status === 'تمت') return 1;
-                if (status === 'ملغاة') return -1;
-                return 0;
-            };
-            return getRank(statusB) - getRank(statusA);
-        });
-
-        rows.forEach(mainRow => {
-            const subRow = document.getElementById('sub-' + mainRow.id);
-            tbody.appendChild(mainRow);
-            if(subRow) tbody.appendChild(subRow);
-        });
-    }
-
     function renderRow(v = {}, prepend = false) {
         const tbody = document.getElementById('tableBody');
-        const rowId = 'visit-' + Date.now() + Math.random().toString(36).substr(2, 5);
-        
+        const rowId = 'vis-' + Date.now() + Math.random().toString(36).substr(2, 5);
         const mainRow = prepend ? tbody.insertRow(0) : tbody.insertRow();
         mainRow.className = 'main-row';
         mainRow.id = rowId;
@@ -350,30 +320,23 @@
                 <input type="checkbox" class="select-check">
                 <span class="toggle-arrow" onclick="toggleSubTable('${rowId}')">▶</span>
             </td>
-            <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الشركة', this.getAttribute('data-old'), this.value, this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats();"></td>
+            <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الشركة', this.getAttribute('data-old'), this.value, this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
             <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المسؤول', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
             <td><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الموبايل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
             <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الإيميل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
             <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('السجل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
-            <td>
-                <input type="date" class="excel-input visit-date-val" value="${visitDate}" onchange="addToActivityLog('تاريخ الزيارة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateStats(); saveAllDataSilently();">
-            </td>
-            <td>
-                <select class="excel-input type-select" data-old="${v.type || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('نوع الزيارة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();">
-                    <option value="" ${v.type === '' ? 'selected' : ''}></option>
-                    <option value="ميدانية" ${v.type === 'ميدانية' ? 'selected' : ''}>ميدانية</option>
-                    <option value="هاتفية" ${v.type === 'هاتفية' ? 'selected' : ''}>هاتفية</option>
-                    <option value="اونلاين" ${v.type === 'اونلاين' ? 'selected' : ''}>اونلاين</option>
-                </select>
-            </td>
+            <td><input type="text" class="excel-input readonly-input visit-date-display" value="${visitDate}" readonly></td>
+            <td><input type="text" class="excel-input" value="${v.propOpp || ''}" data-old="${v.propOpp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الفرصة المقترحة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
             <td><input type="date" class="excel-input" value="${v.nextVisit || ''}" onchange="saveAllDataSilently();"></td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
             <td>
-                <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الحالة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats(); reorderRows();">
+                <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الحالة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();">
                     <option value="" ${v.status === '' ? 'selected' : ''}></option>
-                    <option value="تمت" ${v.status === 'تمت' ? 'selected' : ''}>تمت</option>
-                    <option value="مجدولة" ${v.status === 'مجدولة' ? 'selected' : ''}>مجدولة</option>
-                    <option value="ملغاة" ${v.status === 'ملغاة' ? 'selected' : ''}>ملغاة</option>
+                    <option value="مهتم" ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option>
+                    <option value="غير مهتم" ${v.status === 'غير مهتم' ? 'selected' : ''}>غير مهتم</option>
+                    <option value="لا يرد" ${v.status === 'لا يرد' ? 'selected' : ''}>لا يرد</option>
+                    <option value="مشغول" ${v.status === 'مشغول' ? 'selected' : ''}>مشغول</option>
+                    <option value="تم التوقيع" ${v.status === 'تم التوقيع' ? 'selected' : ''}>تم التوقيع</option>
                 </select>
             </td>
             <td><input type="text" class="excel-input readonly-input edit-date-display" value="${v.editDate || ''}" readonly><input type="hidden" class="edit-date-val" value="${v.editDate || ''}"></td>
@@ -386,11 +349,11 @@
                     <table class="inner-table">
                         <thead>
                             <tr>
-                                <th>نوع الخدمة المعروضة</th>
-                                <th>تفاصيل النقاش</th>
-                                <th>العدد التقديري</th>
-                                <th>قيمة العرض</th>
-                                <th>إجراءات مطلوبة</th>
+                                <th>نوع المنتج المعروض</th>
+                                <th>التفاصيل</th>
+                                <th>الكمية</th>
+                                <th>الاشتراك المتوقع</th>
+                                <th>الإجمالي</th>
                                 <th style="width:65px">إجراء</th>
                             </tr>
                         </thead>
@@ -407,7 +370,6 @@
         }
 
         updateStats();
-        if(!prepend) reorderRows();
     }
 
     function toggleSubTable(rowId) {
@@ -426,18 +388,7 @@
         const tbody = document.querySelector(`#sub-${rowId} .product-body`);
         const row = tbody.insertRow();
         row.innerHTML = `
-            <td>
-                <select onchange="saveAllDataSilently()">
-                    <option value="" ${data.type === '' ? 'selected' : ''}></option>
-                    <option value="جوال" ${data.type === 'جوال' ? 'selected' : ''}>جوال</option>
-                    <option value="بيانات" ${data.type === 'بيانات' ? 'selected' : ''}>بيانات</option>
-                    <option value="هاتف" ${data.type === 'هاتف' ? 'selected' : ''}>هاتف</option>
-                    <option value="فايبر" ${data.type === 'فايبر' ? 'selected' : ''}>فايبر</option>
-                    <option value="DIA" ${data.type === 'DIA' ? 'selected' : ''}>DIA</option>
-                    <option value="SIP Trunk" ${data.type === 'SIP Trunk' ? 'selected' : ''}>SIP Trunk</option>
-                    <option value="IPvpn" ${data.type === 'IPvpn' ? 'selected' : ''}>IPvpn</option>
-                </select>
-            </td>
+            <td><input type="text" value="${data.type || ''}" onchange="saveAllDataSilently()"></td>
             <td><input type="text" value="${data.desc || ''}" onchange="saveAllDataSilently()"></td>
             <td><input type="text" value="${data.qty || ''}" onchange="saveAllDataSilently()"></td>
             <td><input type="text" value="${data.sub || ''}" onchange="saveAllDataSilently()"></td>
@@ -490,7 +441,7 @@
             const subRow = document.getElementById('sub-' + id);
             if(subRow) {
                 subRow.querySelectorAll('.product-body tr').forEach(pRow => {
-                    const inputs = pRow.querySelectorAll('input, select');
+                    const inputs = pRow.querySelectorAll('input');
                     products.push({ type: inputs[0].value, desc: inputs[1].value, qty: inputs[2].value, sub: inputs[3].value, total: inputs[4].value });
                 });
             }
@@ -501,8 +452,8 @@
                 mob: row.cells[3].querySelector('input').value,
                 email: row.cells[4].querySelector('input').value,
                 record: row.cells[5].querySelector('input').value,
-                visitDate: row.querySelector('.visit-date-val').value,
-                type: row.querySelector('.type-select').value,
+                visitDate: row.querySelector('.visit-date-display').value,
+                propOpp: row.cells[7].querySelector('input').value,
                 nextVisit: row.cells[8].querySelector('input').value,
                 notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '',
                 status: row.querySelector('.status-select').value,
@@ -517,7 +468,6 @@
     function loadSavedData() {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) JSON.parse(saved).forEach(item => renderRow(item));
-        reorderRows();
         renderActivityLog();
         updateStats();
     }
@@ -535,13 +485,13 @@
     }
 
     function getLastNoteOnly(fullText) {
-        if (!fullText) return 'إضافة محضر اجتماع...';
+        if (!fullText) return 'إضافة ملاحظة...';
         const arr = fullText.split('\n--------------------\n');
         const last = arr[arr.length - 1];
         const temp = document.createElement('div');
         temp.innerHTML = last;
         const txt = temp.querySelector('.activity-text-part');
-        return txt ? txt.innerText : 'إضافة محضر اجتماع...';
+        return txt ? txt.innerText : 'إضافة ملاحظة...';
     }
 
     function openNote(el) {
@@ -562,7 +512,7 @@
             currentActivePreview.innerText = txt;
             
             const companyName = currentActivePreview.closest('tr').cells[1].querySelector('input').value;
-            addToActivityLog('محضر الاجتماع', '...', txt, companyName);
+            addToActivityLog('ملاحظات الزيارة', '...', txt, companyName);
             
             updateEditDateField(currentActivePreview.closest('tr'));
             saveAllDataSilently();
