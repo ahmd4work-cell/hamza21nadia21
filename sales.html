@@ -16,6 +16,7 @@
             --border-color: #cbd5e1;
             --accent-blue: #3b82f6;
             --accent-green: #22c55e;
+            --btn-disabled: #94a3b8;
             --text-dark: #1e293b;
             --chat-yellow: #b45309;
         }
@@ -23,52 +24,88 @@
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
 
         .navbar { 
-            background: var(--nav-shiny-navy); display: flex; align-items: center; padding: 0 20px; margin: 10px; 
-            border-radius: 12px; height: 37px; position: sticky; top: 10px; z-index: 1000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.1); border: 1px solid #1e293b;
+            background: var(--nav-shiny-navy); 
+            display: flex; 
+            align-items: center; 
+            padding: 0 20px; 
+            margin: 10px; 
+            border-radius: 12px; 
+            height: 37px; 
+            position: sticky; 
+            top: 10px; 
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.1); 
+            box-sizing: border-box;
+            border: 1px solid #1e293b;
         }
-        .navbar a { color: var(--white); text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; border-radius: 6px; line-height: 26px; height: 26px; display: inline-block; }
-        .navbar a.active { background-color: var(--nav-active); color: #0f172a; }
+        .navbar a { 
+            color: var(--white); text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; 
+            border-radius: 6px; transition: 0.3s; line-height: 26px; height: 26px; display: inline-block;
+        }
+        .navbar a.active { background-color: var(--nav-active); color: #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
         .container { padding: 0 15px; }
         .action-bar { display: flex; align-items: center; margin: 12px 0; gap: 10px; }
 
-        .btn-top { border: none; padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; color: white; background-color: var(--accent-blue); }
+        .btn-top { border: none; padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; color: white; transition: 0.3s; }
+        .btn-add { background-color: var(--accent-blue); }
+
+        .search-box { padding: 0 15px; border: 1px solid var(--border-color); border-radius: 8px; width: 300px; height: 32px; font-family: 'Cairo'; font-size: 11px; outline: none; }
 
         .table-wrapper { background: var(--white); border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         
-        th { background: var(--header-shiny-purple); padding: 12px 5px; color: var(--white); font-size: 11px; font-weight: 800; border-bottom: 2px solid #2e1065; }
-        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); }
-        tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
-
-        .status-select {
-            font-family: 'Cairo'; font-size: 10.5px; font-weight: 800; padding: 3px 8px; border-radius: 6px;
-            border: 1px solid var(--border-color); cursor: pointer; outline: none; background: #fff; width: 90%;
+        th { 
+            background: var(--header-shiny-purple); 
+            padding: 12px 5px; 
+            color: var(--white); 
+            font-size: 11px; 
+            font-weight: 800; 
+            text-align: center; 
+            border-bottom: 2px solid #2e1065;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
 
-        /* تنسيقات ألوان الحالات */
-        .status-new { color: #3b82f6; border-right: 4px solid #3b82f6; }
-        .status-working { color: #f59e0b; border-right: 4px solid #f59e0b; }
-        .status-done { color: #10b981; border-right: 4px solid #10b981; }
-        .status-canceled { color: #ef4444; border-right: 4px solid #ef4444; }
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); }
+        tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
+        
+        /* تنسيق عمود الحالة */
+        .status-select {
+            font-family: 'Cairo';
+            font-size: 10.5px;
+            font-weight: 800;
+            padding: 4px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: #fff;
+            width: 90%;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .editable { cursor: text; outline: none; min-height: 20px; }
+        .editable:focus { background-color: #fff; box-shadow: inset 0 0 0 2px var(--accent-blue); border-radius: 4px; }
 
         .notes-preview {
-            width: 90%; cursor: pointer; color: #3b82f6; font-weight: 700;
+            width: 90%; border: none; background: transparent; font-family: 'Cairo'; font-size: 10px;
+            text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700;
             overflow: hidden; white-space: nowrap; text-overflow: ellipsis; display: block; margin: 0 auto;
         }
 
         .log-section { background: #fff; padding: 15px; border-radius: 10px; border: 1px solid var(--border-color); margin-top: 20px; }
-        .log-entry { margin-bottom: 4px; border-bottom: 1px dashed #f8fafc; font-size: 11.5px; display: flex; align-items: center; }
-        .activity-header-part { color: var(--chat-yellow); font-weight: 800; }
+        .log-title { font-weight: 800; font-size: 13px; color: var(--nav-bg); margin-bottom: 8px; }
+        .log-entry { margin-bottom: 4px; border-bottom: 1px dashed #f8fafc; padding-bottom: 4px; display: flex; align-items: center; }
+        .activity-time-part { font-size: 10px; color: var(--chat-yellow); font-weight: 800; }
+        .activity-text-part { font-size: 11.5px; color: #475569; margin-right: 8px; }
 
+        /* المودال */
         .modal { display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-content { background: white; padding: 18px; border-radius: 12px; width: 440px; display: flex; flex-direction: column; }
-        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 12px; height: 250px; text-align: right; white-space: pre-wrap; }
-        .note-area { height: 80px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; box-sizing: border-box; }
+        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 12px; height: 250px; text-align: right; }
+        .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; box-sizing: border-box; }
     </style>
 </head>
-<body onload="loadSalesData(); renderGeneralLogs();">
+<body onload="loadSalesFromStorage(); renderGeneralLogs();">
 
 <nav class="navbar">
     <a href="index.html">الرئيسية</a>
@@ -80,12 +117,12 @@
 
 <div class="container">
     <div class="action-bar">
-        <button class="btn-top" onclick="alert('فتح مودال إضافة طلب جديد')">+ إنشاء طلب مبيعات جديد</button>
-        <input type="text" id="globalSearch" placeholder="🔍 بحث في الجدول..." onkeyup="filterTable()" style="padding: 5px 15px; border-radius: 8px; border: 1px solid #cbd5e1; width: 250px; font-family: 'Cairo';">
+        <button class="btn-top btn-add" onclick="openOrderModal()">+ إنشاء طلب مبيعات جديد</button>
+        <input type="text" class="search-box" id="globalSearch" placeholder="🔍 بحث في الجدول..." onkeyup="filterSalesTable()">
     </div>
     
     <div class="table-wrapper">
-        <table>
+        <table id="salesTable">
             <thead>
                 <tr>
                     <th style="width: 8%;">رقم الطلب</th>
@@ -94,7 +131,8 @@
                     <th style="width: 12%;">الحالة</th>
                     <th style="width: 10%;">مكتمل</th>
                     <th style="width: 10%;">معلق</th>
-                    <th style="width: 20%;">ملاحظات</th>
+                    <th style="width: 15%;">ملاحظات</th>
+                    <th style="width: 8%;">الفرصة</th>
                 </tr>
             </thead>
             <tbody id="salesBody"></tbody>
@@ -102,7 +140,7 @@
     </div>
 
     <div class="log-section">
-        <div style="font-weight: 800; margin-bottom: 10px;">📋 سجل النشاط</div>
+        <div class="log-title">📋 سجل النشاط العام</div>
         <div id="activityLogs"></div>
     </div>
 </div>
@@ -111,7 +149,7 @@
     <div class="modal-content">
         <div style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right;">سجل ملاحظات الطلب</div>
         <div id="historyLog" class="history-log"></div>
-        <textarea id="modalTextArea" class="note-area" placeholder="أضف ملاحظة جديدة..."></textarea>
+        <textarea id="modalTextArea" class="note-area" placeholder="أدخل تفاصيل الملاحظة هنا..."></textarea>
         <div style="display:flex; justify-content: flex-end; gap:8px; margin-top:10px;">
             <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo;">تراجع</button>
             <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo; font-weight:bold;">حفظ</button>
@@ -121,115 +159,114 @@
 
 <script>
     let currentActivePreview = null;
-    const STORAGE_KEY = 'asgate_sales_db';
-    const LOG_KEY = 'asgate_general_sales_logs';
 
-    function generateHeader() {
-        const d = new Date();
-        return `<span class="activity-header-part">👤 (أحمد)  🗓️ ${d.toLocaleDateString('en-GB')}  ${d.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', hour12:true})} ➡️ : </span>`;
+    function getNowMeta() {
+        const now = new Date();
+        const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+        const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+        const dateStr = now.toLocaleDateString('en-GB');
+        return `👤 (أحمد)  🗓️ ${days[now.getDay()]}  ${dateStr}  ${timeStr}  ➡️ : `;
     }
 
-    function loadSalesData() {
-        const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-        const tbody = document.getElementById('salesBody');
-        tbody.innerHTML = data.length ? "" : "<tr><td colspan='7'>لا توجد بيانات</td></tr>";
-        data.forEach(item => renderRow(item));
+    function autoSave() {
+        const rows = document.querySelectorAll('#salesBody tr');
+        const salesData = Array.from(rows).map(r => ({
+            id: r.cells[0].innerText.replace('#', ''),
+            type: r.cells[1].innerText,
+            comp: r.cells[2].innerText,
+            status: r.cells[3].querySelector('select').value,
+            done: r.cells[4].innerText,
+            pending: r.cells[5].innerText,
+            notes: r.cells[6].querySelector('.notes-preview').getAttribute('data-full-notes'),
+            oppNum: r.cells[7].innerText
+        }));
+        localStorage.setItem('asgate_sales_db', JSON.stringify(salesData));
     }
 
-    function renderRow(item) {
+    function renderTableRow(obj) {
         const tbody = document.getElementById('salesBody');
-        const row = tbody.insertRow();
-        const statuses = ["جديد", "قيد التنفيذ", "مكتمل", "ملغي"];
+        const row = tbody.insertRow(0);
+        const statusOptions = ["جديد", "قيد التنفيذ", "مكتمل", "معلق", "ملغي"];
         
         row.innerHTML = `
-            <td>#${item.id}</td>
-            <td>${item.type}</td>
-            <td>${item.comp}</td>
+            <td>#${obj.id}</td>
+            <td class="editable" contenteditable="true" onblur="autoSave()">${obj.type}</td>
+            <td>${obj.comp}</td>
             <td>
-                <select class="status-select" onchange="updateStatus(this, '${item.id}')">
-                    ${statuses.map(s => `<option value="${s}" ${item.status === s ? 'selected' : ''}>${s}</option>`).join('')}
+                <select class="status-select" onchange="addGeneralLog('الحالة', '', this.value, '${obj.comp}', 'تغيير حالة الطلب #' + '${obj.id}'); autoSave();">
+                    ${statusOptions.map(opt => `<option value="${opt}" ${obj.status === opt ? 'selected' : ''}>${opt}</option>`).join('')}
                 </select>
             </td>
-            <td style="color:#16a34a;">${item.done || '0.00'}</td>
-            <td style="color:#dc2626;">${item.pending || '0.00'}</td>
-            <td><div class="notes-preview" onclick="openNote(this)" data-full-notes="${item.notes || ''}">${getLastNote(item.notes)}</div></td>
+            <td style="color:#16a34a;">${obj.done || '0.00'}</td>
+            <td style="color:#dc2626;">${obj.pending || '0.00'}</td>
+            <td>
+                <div class="notes-preview" onclick="openNote(this)" data-full-notes='${(obj.notes || "")}'>${getLastNoteOnly(obj.notes)}</div>
+            </td>
+            <td class="editable" contenteditable="true" onblur="autoSave()">${obj.oppNum || ''}</td>
         `;
-        applyStatusColor(row.querySelector('select'));
     }
 
-    function updateStatus(select, id) {
-        const newVal = select.value;
-        const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
-        const index = data.findIndex(i => i.id == id);
-        const oldVal = data[index].status;
-
-        if (oldVal !== newVal) {
-            data[index].status = newVal;
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-            applyStatusColor(select);
-            addLog(`تغيير حالة الطلب #${id} من [${oldVal}] إلى [${newVal}] للشركة (${data[index].comp})`);
-        }
-    }
-
-    function applyStatusColor(select) {
-        select.classList.remove('status-new', 'status-working', 'status-done', 'status-canceled');
-        if (select.value === "جديد") select.classList.add('status-new');
-        if (select.value === "قيد التنفيذ") select.classList.add('status-working');
-        if (select.value === "مكتمل") select.classList.add('status-done');
-        if (select.value === "ملغي") select.classList.add('status-canceled');
-    }
-
-    function addLog(msg) {
-        const logs = JSON.parse(localStorage.getItem(LOG_KEY) || '[]');
-        logs.unshift(generateHeader() + `<span style="color:#475569">${msg}</span>`);
-        localStorage.setItem(LOG_KEY, JSON.stringify(logs.slice(0, 50)));
-        renderGeneralLogs();
-    }
-
-    function renderGeneralLogs() {
-        const logs = JSON.parse(localStorage.getItem(LOG_KEY) || '[]');
-        document.getElementById('activityLogs').innerHTML = logs.map(l => `<div class="log-entry">${l}</div>`).join('');
+    function getLastNoteOnly(fullText) {
+        if (!fullText || fullText.trim() === "") return 'إضافة ملاحظة...';
+        const arr = fullText.split('\n--------------------\n');
+        const lastEntry = arr[arr.length - 1];
+        if (lastEntry.includes('➡️ :')) return lastEntry.split('➡️ :')[1].trim();
+        return lastEntry;
     }
 
     function openNote(el) {
         currentActivePreview = el;
-        const notes = el.getAttribute('data-full-notes') || "";
-        document.getElementById('historyLog').innerHTML = notes ? notes.replace(/\n/g, '<br>') : "لا توجد ملاحظات";
+        const rawNotes = el.getAttribute('data-full-notes') || "";
+        document.getElementById('historyLog').innerText = rawNotes || "لا توجد ملاحظات سابقة";
         document.getElementById('noteModal').style.display = "flex";
+        document.getElementById('modalTextArea').focus();
     }
 
     function saveNote() {
-        const txt = document.getElementById('modalTextArea').value.trim();
-        if (txt) {
-            let old = currentActivePreview.getAttribute('data-full-notes') || "";
-            let entry = `${generateHeader()} ${txt}`;
-            let updated = old ? old + "\n--------------------\n" + entry : entry;
-            currentActivePreview.setAttribute('data-full-notes', updated);
-            currentActivePreview.innerText = txt;
+        const newText = document.getElementById('modalTextArea').value.trim();
+        if (newText && currentActivePreview) {
+            let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
+            let newEntry = `${getNowMeta()} ${newText}`;
+            let updatedFullNotes = oldNotes === "" ? newEntry : oldNotes + "\n--------------------\n" + newEntry;
             
-            // تحديث في الـ LocalStorage
-            const row = currentActivePreview.closest('tr');
-            const id = row.cells[0].innerText.replace('#', '');
-            const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
-            const idx = data.findIndex(i => i.id == id);
-            data[idx].notes = updated;
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            currentActivePreview.setAttribute('data-full-notes', updatedFullNotes);
+            currentActivePreview.innerText = newText;
             
-            addLog(`إضافة ملاحظة جديدة للطلب #${id}`);
+            const orderId = currentActivePreview.closest('tr').cells[0].innerText;
+            const compName = currentActivePreview.closest('tr').cells[2].innerText;
+            addGeneralLog("الملاحظات", "...", newText, compName, `إضافة ملاحظة للطلب ${orderId}`);
+            autoSave();
         }
         closeNote();
     }
 
     function closeNote() { document.getElementById('noteModal').style.display = "none"; document.getElementById('modalTextArea').value = ""; }
 
-    function getLastNote(full) {
-        if (!full) return "إضافة ملاحظة...";
-        const parts = full.split('--------------------');
-        const last = parts[parts.length - 1];
-        return last.includes('➡️ :') ? last.split('➡️ :')[1].trim() : last;
+    function addGeneralLog(field, oldV, newV, company, action) {
+        const logs = JSON.parse(localStorage.getItem('asgate_general_sales_logs') || '[]');
+        const entry = { meta: getNowMeta(), msg: `${action} ( ${company} )` };
+        logs.unshift(entry);
+        localStorage.setItem('asgate_general_sales_logs', JSON.stringify(logs.slice(0, 100)));
+        renderGeneralLogs();
     }
 
-    function filterTable() {
+    function renderGeneralLogs() {
+        const logs = JSON.parse(localStorage.getItem('asgate_general_sales_logs') || '[]');
+        document.getElementById('activityLogs').innerHTML = logs.map(l => `
+            <div class="log-entry">
+                <span class="activity-time-part">${l.meta}</span>
+                <span class="activity-text-part">${l.msg}</span>
+            </div>
+        `).join('');
+    }
+
+    function loadSalesFromStorage() {
+        const saved = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
+        document.getElementById('salesBody').innerHTML = "";
+        saved.forEach(item => renderTableRow(item));
+    }
+
+    function filterSalesTable() {
         const q = document.getElementById('globalSearch').value.toLowerCase();
         document.querySelectorAll('#salesBody tr').forEach(r => {
             r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none";
