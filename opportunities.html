@@ -156,7 +156,7 @@
         .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
         .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
 
-        /* عرض الأعمدة الجديد بناءً على النسب المئوية */
+        /* عرض الأعمدة المحدث */
         .col-select { width: 3%; }
         .col-company { width: 12%; } 
         .col-manager { width: 8%; } 
@@ -370,7 +370,18 @@
                 <input type="text" class="excel-input readonly-input" value="${visitDate}" readonly>
                 <input type="hidden" class="visit-date-val" value="${visitDate}">
             </td>
-            <td><input type="text" class="excel-input" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الفرصة المقترحة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td>
+                <select class="excel-input cur-serv-select" data-old="${v.curServ || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الفرصة المقترحة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();">
+                    <option value="" ${v.curServ === '' ? 'selected' : ''}></option>
+                    <option value="جوال" ${v.curServ === 'جوال' ? 'selected' : ''}>جوال</option>
+                    <option value="بيانات" ${v.curServ === 'بيانات' ? 'selected' : ''}>بيانات</option>
+                    <option value="هاتف" ${v.curServ === 'هاتف' ? 'selected' : ''}>هاتف</option>
+                    <option value="فايبر" ${v.curServ === 'فايبر' ? 'selected' : ''}>فايبر</option>
+                    <option value="DIA" ${v.curServ === 'DIA' ? 'selected' : ''}>DIA</option>
+                    <option value="SIP Trunk" ${v.curServ === 'SIP Trunk' ? 'selected' : ''}>SIP Trunk</option>
+                    <option value="IPvpn" ${v.curServ === 'IPvpn' ? 'selected' : ''}>IPvpn</option>
+                </select>
+            </td>
             <td><input type="number" class="excel-input" value="${v.valOpp || ''}" data-old="${v.valOpp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('قيمة الفرصة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats();"></td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
             <td>
@@ -502,7 +513,7 @@
                 email: row.cells[4].querySelector('input').value,
                 record: row.cells[5].querySelector('input').value,
                 visitDate: row.querySelector('.visit-date-val').value,
-                curServ: row.cells[7].querySelector('input').value,
+                curServ: row.querySelector('.cur-serv-select').value,
                 valOpp: row.cells[8].querySelector('input').value,
                 notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '',
                 status: row.querySelector('.status-select').value,
