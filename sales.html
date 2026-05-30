@@ -18,6 +18,7 @@
             --accent-green: #22c55e;
             --btn-disabled: #94a3b8;
             --text-dark: #1e293b;
+            --chat-yellow: #b45309;
         }
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; line-height: 1.2; }
@@ -44,24 +45,12 @@
         .navbar a.active { background-color: var(--nav-active); color: #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
         .container { padding: 0 15px; }
-
-        /* تنسيق البار العلوي المماثل لصفحة الزيارات */
         .action-bar { display: flex; align-items: center; margin: 12px 0; gap: 10px; }
-        
-        .stats-bar {
-            margin-right: auto; display: flex; gap: 10px; align-items: center;
-            background: #fff; padding: 0 15px; border-radius: 8px; height: 35px;
-            border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        .stat-item { font-size: 11px; font-weight: 800; color: #475569; white-space: nowrap; }
-        .stat-val { color: var(--accent-blue); margin-right: 4px; }
-        .stat-val.completed { color: #16a34a; }
-        .stat-val.pending { color: #dc2626; }
 
-        .btn-top { border: none; padding: 0 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; font-size: 12px; height: 35px; }
+        .btn-top { border: none; padding: 7px 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 12px; color: white; transition: 0.3s; }
         .btn-add { background-color: var(--accent-blue); }
-        
-        .search-box { padding: 0 15px; border: 1px solid var(--border-color); border-radius: 8px; width: 250px; height: 32px; font-family: 'Cairo'; font-size: 11px; outline: none; }
+
+        .search-box { padding: 0 15px; border: 1px solid var(--border-color); border-radius: 8px; width: 300px; height: 32px; font-family: 'Cairo'; font-size: 11px; outline: none; }
 
         .table-wrapper { background: var(--white); border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
@@ -78,59 +67,83 @@
             position: relative;
         }
 
-        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); position: relative; }
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; max-height: 45px; font-size: 11px; font-weight: 600; color: var(--text-dark); position: relative; overflow: hidden; }
         tbody tr:nth-child(even) { background-color: var(--zebra-blue); }
         
         .month-separator { height: 24px !important; background: transparent !important; }
         .month-separator td { height: 24px !important; border: none !important; padding: 4px 0 !important; }
         .month-content {
-            background-color: #2e1065; color: white; font-family: 'Cascadia Code', monospace;
-            font-size: 10px; font-weight: bold; width: 50%; margin: 0 auto;
-            border-radius: 5px; display: flex; align-items: center; justify-content: center; height: 100%;
+            background-color: #2e1065;
+            color: white;
+            font-family: 'Cascadia Code', monospace;
+            font-size: 10px; 
+            font-weight: bold;
+            width: 50%; 
+            margin: 0 auto;
+            border-radius: 5px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
         }
 
         .editable { cursor: text; outline: none; transition: 0.2s; min-height: 20px; }
         .editable:focus { background-color: #fff; box-shadow: inset 0 0 0 2px var(--accent-blue); border-radius: 4px; }
 
+        .notes-container {
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
         .notes-preview {
             width: 90%; border: none; background: transparent; font-family: 'Cairo'; font-size: 10px;
             text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700;
             overflow: hidden; white-space: nowrap; text-overflow: ellipsis; display: block; margin: 0 auto;
         }
-        .tooltip-box {
-            position: absolute; bottom: 100%; right: 0; background: #334155; color: #fff;
-            padding: 8px 12px; border-radius: 8px; width: 220px; font-size: 11px;
-            line-height: 1.6; white-space: pre-wrap; text-align: right;
-            opacity: 0; visibility: hidden; transition: 0.2s; z-index: 9999;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3); pointer-events: none;
-        }
-        td:hover .tooltip-box { opacity: 1; visibility: visible; }
 
         .status-select {
-            font-family: 'Cairo'; font-size: 10px; font-weight: 800; padding: 4px; border-radius: 6px;
-            border: 1px solid var(--border-color); background: #fff; cursor: pointer; width: 90%;
+            font-family: 'Cairo';
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 20px;
+            border: 1.5px solid #e2e8f0;
+            background: #f8fafc;
+            width: 95%;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s ease;
+            text-align: center;
+            appearance: none;
         }
-
-        .order-link { color: var(--accent-blue); text-decoration: none; font-weight: 800; border-bottom: 1px dashed var(--accent-blue); cursor: pointer; }
+        
+        .status-select[data-val="مكتمل"] { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+        .status-select[data-val="معلق"] { background: #fef9c3; color: #854d0e; border-color: #fef08a; }
+        .status-select[data-val="مرتجع"] { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+        .status-select[data-val="جاهز"] { background: #e0f2fe; color: #075985; border-color: #bae6fd; }
+        .status-select[data-val="جديد"] { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+        .status-select[data-val="فقدان"] { background: #450a0a; color: #fecaca; border-color: #7f1d1d; }
 
         .log-section { background: #fff; padding: 15px; border-radius: 10px; border: 1px solid var(--border-color); margin-top: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .log-title { font-weight: 800; font-size: 13px; color: var(--nav-bg); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
-        
         .log-entry { margin-bottom: 4px; border-bottom: 1px dashed #f8fafc; padding-bottom: 4px; color: #475569; display: flex; align-items: center; }
-        .activity-time-part { font-size: 10.5px; color: #64748b; }
-        .activity-text-part { font-size: 11.5px; }
+        .activity-header-part { font-size: 11.5px; color: var(--chat-yellow); font-weight: 800; }
+        .activity-time-part { font-size: 10px; font-weight: normal; }
+        .activity-text-part { font-size: 11.5px; color: #475569; }
 
-        .modal { display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
-        .modal-content { background: white; padding: 15px; border-radius: 12px; width: 380px; display: flex; flex-direction: column; }
+        .modal { display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .modal-content { background: white; padding: 18px; border-radius: 12px; width: 440px; height: 480px; display: flex; flex-direction: column; }
+        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
+        .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
         
-        .history-log { flex-grow: 1; max-height: 150px; overflow-y: auto; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px; margin-bottom: 10px; font-size: 11px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
-        .note-area { height: 70px; width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px; font-family: 'Cairo'; resize: none; font-size: 12px; box-sizing: border-box; }
-
         .order-modal-card { background: white; width: 350px; border-radius: 12px; padding: 20px; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); }
         .form-group { margin-bottom: 12px; text-align: right; position: relative; }
         .form-group label { display: block; font-weight: 700; font-size: 11px; color: #64748b; margin-bottom: 4px; }
         .form-group input { width: 100%; padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Cairo'; font-size: 12px; box-sizing: border-box; }
         .modal-results { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #cbd5e1; z-index: 10005; border-radius: 6px; max-height: 120px; overflow-y: auto; display: none; }
+        .modal-results div { padding: 8px; font-size: 11px; cursor: pointer; border-bottom: 1px solid #f8fafc; }
     </style>
 </head>
 <body onload="loadSalesFromStorage(); renderGeneralLogs();">
@@ -145,31 +158,27 @@
 
 <div class="container">
     <div class="action-bar">
-        <input type="text" class="search-box" id="globalSearch" placeholder="🔍 بحث في الجدول..." onkeyup="filterSalesTable()">
-        
-        <div class="stats-bar">
-            <div class="stat-item">قيمة مكتمل: <span id="stat-completed-val" class="stat-val completed">0.00</span></div>
-            <div class="stat-item">قيمة معلق: <span id="stat-pending-val" class="stat-val pending">0.00</span></div>
-        </div>
-
         <button class="btn-top btn-add" onclick="openOrderModal()">+ إنشاء طلب مبيعات جديد</button>
+        <span id="save-status-indicator"></span> 
+        <input type="text" class="search-box" id="globalSearch" placeholder="🔍 بحث في الجدول..." onkeyup="filterSalesTable()">
     </div>
     
     <div class="table-wrapper">
         <table id="salesTable">
             <thead>
                 <tr>
-                    <th style="width: 8%;">رقم الطلب</th>
-                    <th style="width: 12%;">اسم الطلب</th>
+                    <th style="width: 7%;">رقم الطلب</th>
+                    <th style="width: 11%;">اسم الطلب</th>
                     <th style="width: 10%;">تاريخ الإنشاء</th>
-                    <th style="width: 13%;">الشركة</th>
-                    <th style="width: 10%;">السجل الرئيسي</th>
-                    <th style="width: 10%;">السجل الفرعي</th>
-                    <th style="width: 10%;">الحالة</th>
+                    <th style="width: 12%;">الشركة</th>
+                    <th style="width: 9%;">السجل الرئيسي</th>
+                    <th style="width: 9%;">السجل الفرعي</th>
+                    <th style="width: 9%;">الحالة</th>
                     <th style="width: 6%;">مكتمل</th>
                     <th style="width: 6%;">معلق</th>
                     <th style="width: 10%;">ملاحظات</th>
-                    <th style="width: 8%;">الفرصة</th>
+                    <th style="width: 6%;">الفرصة</th>
+                    <th style="width: 5%;">المالك</th>
                 </tr>
             </thead>
             <tbody id="salesBody"></tbody>
@@ -184,12 +193,12 @@
 
 <div id="noteModal" class="modal">
     <div class="modal-content">
-        <div style="font-weight: 800; color: #2e1065; margin-bottom: 10px;">سجل ملاحظات الطلب</div>
+        <div style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right;">سجل ملاحظات الطلب والنتائج</div>
         <div id="historyLog" class="history-log"></div>
-        <textarea id="modalTextArea" class="note-area" placeholder="أضف ملاحظة جديدة..."></textarea>
+        <textarea id="modalTextArea" class="note-area" placeholder="أدخل تفاصيل الملاحظة هنا..."></textarea>
         <div style="display:flex; justify-content: flex-end; gap:8px; margin-top:10px;">
-            <button onclick="closeNote()" style="background:#94a3b8; color:white; border:none; padding:7px 15px; border-radius:6px; cursor:pointer; font-family:Cairo;">إلغاء</button>
-            <button onclick="saveNote()" style="background:#22c55e; color:white; border:none; padding:7px 15px; border-radius:6px; cursor:pointer; font-family:Cairo; font-weight:bold;">حفظ</button>
+            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px;">تراجع</button>
+            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px; font-weight:bold;">حفظ الملاحظة</button>
         </div>
     </div>
 </div>
@@ -216,20 +225,17 @@
 <script>
     let currentActivePreview = null;
 
-    // تحديث الإحصائيات العلوية بناءً على البيانات
-    function updateTopStats() {
-        const saved = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
-        let totalCompleted = 0;
-        let totalPending = 0;
+    function getTodayFormatted() {
+        const d = new Date();
+        return d.toISOString().split('T')[0];
+    }
 
-        saved.forEach(item => {
-            const sums = calculateOrderSums(item.id);
-            totalCompleted += sums.completed;
-            totalPending += sums.pending;
-        });
-
-        document.getElementById('stat-completed-val').innerText = totalCompleted.toLocaleString('en-US', {minimumFractionDigits: 2});
-        document.getElementById('stat-pending-val').innerText = totalPending.toLocaleString('en-US', {minimumFractionDigits: 2});
+    function generateStyledHeader() {
+        const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+        const d = new Date();
+        const dateStr = getTodayFormatted();
+        const timeFormatted = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+        return `<span class="activity-header-part">👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${dateStr}  <span class="activity-time-part">${timeFormatted}</span>&nbsp;&nbsp;</span>`;
     }
 
     function autoSave() {
@@ -243,10 +249,10 @@
             crSub: r.cells[5].innerText,
             status: r.cells[6].querySelector('select').value,
             notes: r.cells[9].querySelector('.notes-preview').getAttribute('data-full-notes'),
-            oppNum: r.cells[10].innerText
+            oppNum: r.cells[10].innerText,
+            owner: r.cells[11].innerText
         }));
         localStorage.setItem('asgate_sales_db', JSON.stringify(salesData));
-        updateTopStats();
     }
 
     function openOrderModal() { document.getElementById('orderModal').style.display = 'flex'; }
@@ -288,19 +294,22 @@
         const comp = document.getElementById('mComp').value;
         const type = document.getElementById('mType').value || '-';
         if (!comp) return alert("اختر شركة أولاً");
+        
         const data = {
             id: Math.floor(1000 + Math.random() * 8999),
             type: type,
-            date: new Date().toLocaleDateString('en-GB'),
+            date: getTodayFormatted(),
             comp: comp,
-            cr: document.getElementById('mCr.value'),
+            cr: document.getElementById('mCr').value,
             crSub: document.getElementById('mCrSub').value,
             status: "جديد",
             notes: "",
-            oppNum: ""
+            oppNum: "",
+            owner: "أحمد"
         };
+
         checkMonthTransition(data.date);
-        renderTableRow(data);
+        renderTableRow(data, true); // true تعني الإضافة في الأعلى
         autoSave();
         addGeneralLog("اسم الطلب", "", type, comp, `إنشاء طلب مبيعات جديد برقم #${data.id}`);
         closeOrderModal();
@@ -309,10 +318,10 @@
     function checkMonthTransition(newDateStr) {
         const saved = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
         if (saved.length === 0) return;
-        const lastOrderDateStr = saved[saved.length - 1].date;
-        const lastParts = lastOrderDateStr.split('/');
-        const newParts = newDateStr.split('/');
-        if (lastParts[1] !== newParts[1] || lastParts[2] !== newParts[2]) {
+        const lastOrderDateStr = saved[0].date; // نقارن مع الأول لأنه الأحدث
+        const lastParts = lastOrderDateStr.split('-');
+        const newParts = newDateStr.split('-');
+        if (lastParts[1] !== newParts[1] || lastParts[0] !== newParts[0]) {
             insertMonthSeparator();
         }
     }
@@ -321,90 +330,135 @@
         const tbody = document.getElementById('salesBody');
         const row = tbody.insertRow(0);
         row.className = "month-separator";
-        row.innerHTML = `<td colspan="11"><div class="month-content">بالتوفيق في الشهر القادم ان شاء الله</div></td>`;
+        row.innerHTML = `<td colspan="12"><div class="month-content">بالتوفيق في الشهر القادم ان شاء الله</div></td>`;
     }
 
-    function renderTableRow(obj) {
+    function renderTableRow(obj, atTop = false) {
         const tbody = document.getElementById('salesBody');
         const sums = calculateOrderSums(obj.id);
-        const row = tbody.insertRow(0);
+        const row = atTop ? tbody.insertRow(0) : tbody.insertRow(-1);
         const statusOptions = ["مكتمل", "معلق", "مرتجع", "جاهز", "جديد", "فقدان"];
+        const lastNoteText = getLastNoteOnly(obj.notes || "");
+        
         row.innerHTML = `
             <td><a href="order_details.html?id=${obj.id}" class="order-link">#${obj.id}</a></td>
-            <td class="editable" contenteditable="true" data-old="${obj.type || ''}" onfocus="this.setAttribute('data-old', this.innerText.trim())" onblur="if(this.getAttribute('data-old') !== this.innerText.trim()) { addGeneralLog('اسم الطلب', this.getAttribute('data-old'), this.innerText.trim(), this.closest('tr').cells[3].innerText, 'تعديل اسم الطلب #' + this.closest('tr').cells[0].innerText.replace('#','')); this.setAttribute('data-old', this.innerText.trim()); autoSave(); }">${obj.type}</td>
+            <td class="editable" contenteditable="true" 
+                onblur="updateField(this, 'اسم الطلب', 1, '${obj.comp}', ${obj.id})">${obj.type}</td>
             <td style="color:#64748b;">${obj.date}</td>
             <td>${obj.comp}</td>
             <td>${obj.cr}</td>
             <td>${obj.crSub}</td>
             <td>
-                <select class="status-select" data-old="${obj.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addGeneralLog('الحالة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[3].innerText, 'تغيير حالة الطلب #' + this.closest('tr').cells[0].innerText.replace('#','')); this.setAttribute('data-old', this.value); autoSave();">
+                <select class="status-select" data-val="${obj.status}"
+                        onfocus="this.setAttribute('data-old', this.value)" 
+                        onchange="this.setAttribute('data-val', this.value); addGeneralLog('الحالة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[3].innerText, 'تغيير حالة الطلب #' + ${obj.id}); autoSave();">
                     ${statusOptions.map(opt => `<option value="${opt}" ${obj.status === opt ? 'selected' : ''}>${opt}</option>`).join('')}
                 </select>
             </td>
             <td style="color:#16a34a; font-weight:800;">${sums.completed.toFixed(2)}</td>
             <td style="color:#dc2626; font-weight:800;">${sums.pending.toFixed(2)}</td>
             <td>
-                <div class="notes-preview" onclick="openNote(this)" data-full-notes="${obj.notes || ''}">${obj.notes ? 'عرض السجل...' : 'أضف ملاحظة'}</div>
-                <div class="tooltip-box">${obj.notes || 'لا توجد ملاحظات'}</div>
+                <div class="notes-container">
+                    <div class="notes-preview" onclick="openNote(this)" data-full-notes='${(obj.notes || '').replace(/'/g, "&apos;")}'>${lastNoteText}</div>
+                </div>
             </td>
-            <td class="editable" contenteditable="true" data-old="${obj.oppNum || ''}" onfocus="this.setAttribute('data-old', this.innerText.trim())" onblur="if(this.getAttribute('data-old') !== this.innerText.trim()) { addGeneralLog('الفرصة', this.getAttribute('data-old'), this.innerText.trim(), this.closest('tr').cells[3].innerText, 'تعديل رقم الفرصة للطلب #' + this.closest('tr').cells[0].innerText.replace('#','')); this.setAttribute('data-old', this.innerText.trim()); autoSave(); }">${obj.oppNum || ''}</td>
+            <td class="editable" contenteditable="true" 
+                onblur="updateField(this, 'الفرصة', 10, '${obj.comp}', ${obj.id})">${obj.oppNum || ''}</td>
+            <td style="color:#64748b; font-weight:bold;">${obj.owner || 'أحمد'}</td>
         `;
+    }
+
+    function updateField(el, fieldLabel, cellIdx, comp, orderId) {
+        const oldVal = el.getAttribute('data-old') || "";
+        const newVal = el.innerText.trim();
+        if(oldVal !== newVal) {
+            addGeneralLog(fieldLabel, oldVal, newVal, comp, `تعديل ${fieldLabel} للطلب #${orderId}`);
+            el.setAttribute('data-old', newVal);
+            autoSave();
+        }
+    }
+
+    function getLastNoteOnly(fullText) {
+        if (!fullText || fullText.trim() === "") return 'إضافة ملاحظة...';
+        const arr = fullText.split('\n--------------------\n');
+        const lastEntry = arr[arr.length - 1];
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = lastEntry;
+        const textPart = tempDiv.querySelector('.activity-text-part');
+        return textPart ? textPart.innerText : 'عرض السجل...';
     }
 
     function openNote(el) {
         currentActivePreview = el;
-        const notes = el.getAttribute('data-full-notes') || "";
-        document.getElementById('historyLog').innerHTML = notes || "لا يوجد سجل سابق.";
-        document.getElementById('modalTextArea').value = "";
+        const rawNotes = el.getAttribute('data-full-notes') || "";
+        const historyLog = document.getElementById('historyLog');
+        if (rawNotes.trim() !== "") {
+            historyLog.innerHTML = rawNotes.split('\n--------------------\n').map(entry => `<div class="activity-item" style="border-bottom:1px solid #e2e8f0; padding:5px 0;">${entry}</div>`).join('');
+        } else {
+            historyLog.innerHTML = '<div style="text-align:center; color:#94a3b8; margin-top:20px;">لا توجد ملاحظات سابقة</div>';
+        }
         document.getElementById('noteModal').style.display = "flex";
+        document.getElementById('modalTextArea').focus();
     }
 
     function saveNote() {
         const newText = document.getElementById('modalTextArea').value.trim();
         if (newText && currentActivePreview) {
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('en-GB');
-            const header = `👤 (أحمد) 🗓️ ${dateStr}: `;
             let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
-            let updated = oldNotes + (oldNotes ? "\n" : "") + header + newText;
-            currentActivePreview.setAttribute('data-full-notes', updated);
-            currentActivePreview.parentElement.querySelector('.tooltip-box').innerText = updated;
-            currentActivePreview.innerText = "عرض السجل...";
+            let newEntry = `${generateStyledHeader()}<span class="activity-text-part">${newText}</span>`;
+            let updatedFullNotes = oldNotes === "" ? newEntry : oldNotes + "\n--------------------\n" + newEntry;
+            currentActivePreview.setAttribute('data-full-notes', updatedFullNotes);
+            currentActivePreview.innerText = newText;
+            const orderId = currentActivePreview.closest('tr').cells[0].innerText;
+            const compName = currentActivePreview.closest('tr').cells[3].innerText;
             autoSave();
-            addGeneralLog("الملاحظات", "فارغ", "ملاحظة جديدة", currentActivePreview.closest('tr').cells[3].innerText, `إضافة ملاحظة جديدة للطلب ${currentActivePreview.closest('tr').cells[0].innerText}`);
+            addGeneralLog("الملاحظات", "...", newText, compName, `إضافة ملاحظة جديدة للطلب ${orderId}`);
         }
         closeNote();
     }
 
-    function closeNote() { document.getElementById('noteModal').style.display = "none"; }
+    function closeNote() { document.getElementById('noteModal').style.display = "none"; document.getElementById('modalTextArea').value = ""; }
 
     function loadSalesFromStorage() {
-        const saved = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
+        let saved = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
         const tbody = document.getElementById('salesBody');
         tbody.innerHTML = "";
+        
+        // الترتيب: الأحدث تاريخاً ورقم طلب في الأعلى
+        saved.sort((a, b) => {
+            if (b.date !== a.date) return b.date.localeCompare(a.date);
+            return b.id - a.id;
+        });
+
         let lastMonth = "";
         saved.forEach((item, index) => {
-            const currentMonth = item.date.split('/')[1] + '/' + item.date.split('/')[2];
-            if (index > 0 && lastMonth !== currentMonth) insertMonthSeparator();
-            renderTableRow(item);
+            const currentMonth = item.date.split('-')[1] + '-' + item.date.split('-')[0];
+            if (index > 0 && lastMonth !== currentMonth) {
+                insertMonthSeparator();
+            }
+            renderTableRow(item, false); // false لأننا نرسم القائمة مرتبة أصلاً
             lastMonth = currentMonth;
         });
-        updateTopStats();
     }
 
     function filterSalesTable() {
         const q = document.getElementById('globalSearch').value.toLowerCase();
         document.querySelectorAll('#salesBody tr').forEach(r => {
-            if(!r.classList.contains('month-separator')) r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none";
+            if(!r.classList.contains('month-separator')) {
+                r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none";
+            }
         });
     }
 
     function addGeneralLog(fieldName, oldVal, newVal, companyName, actionTextBase) {
         const logs = JSON.parse(localStorage.getItem('asgate_general_sales_logs') || '[]');
-        const now = new Date();
-        const fullMeta = `👤 (أحمد)  🗓️ ${now.toLocaleDateString('en-GB')}  ${now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}  ➡️ : `;
-        let fullActionText = actionTextBase.includes("إنشاء طلب") ? `${actionTextBase} ( ${companyName} )` : `${actionTextBase} من ${oldVal || "فارغ"} الى ${newVal || "فارغ"}  ( ${companyName} )`;
-        logs.unshift({ meta: fullMeta, msg: fullActionText });
+        const headerHTML = generateStyledHeader();
+        const cleanOld = (!oldVal || oldVal.trim() === "") ? "فارغ" : oldVal;
+        const cleanNew = (!newVal || newVal.trim() === "") ? "فارغ" : newVal;
+        const cleanCompany = (!companyName || companyName.trim() === "") ? "شركة غير محددة" : companyName;
+        let fullActionText = actionTextBase.includes("إنشاء طلب") ? `${actionTextBase} ( ${cleanCompany} )` : `${actionTextBase} من [${cleanOld}] الى [${cleanNew}]  ( ${cleanCompany} )`;
+        const fullLogHTML = `${headerHTML}<span class="activity-text-part">${fullActionText}</span>`;
+        logs.unshift(fullLogHTML);
         if(logs.length > 100) logs.pop();
         localStorage.setItem('asgate_general_sales_logs', JSON.stringify(logs));
         renderGeneralLogs();
@@ -413,7 +467,7 @@
     function renderGeneralLogs() {
         const logs = JSON.parse(localStorage.getItem('asgate_general_sales_logs') || '[]');
         const container = document.getElementById('activityLogs');
-        if(container) container.innerHTML = logs.map(l => `<div class="log-entry"><span class="activity-time-part">${l.meta}</span> <span class="activity-text-part">${l.msg}</span></div>`).join('');
+        if(container) container.innerHTML = logs.map(l => `<div class="log-entry">${l}</div>`).join('');
     }
 </script>
 </body>
