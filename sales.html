@@ -14,298 +14,331 @@
             --bg-color: #f4f7f9;
             --white: #ffffff;
             --accent-blue: #3b82f6;
-            --accent-green-active: #22c55e;
+            --accent-green: #22c55e;
             --border-soft: #cbd5e1;
             --text-dark: #1e293b;
             --dark-yellow: #c29103;
-            --chat-yellow: #b45309;
         }
 
-        html, body { 
-            height: 100%; margin: 0; padding: 0; overflow: hidden; 
-            background-color: var(--bg-color); font-family: 'Cairo', sans-serif; 
-            font-size: 13px; line-height: 1.2; color: var(--text-dark); 
-        }
-
-        .dashboard-container { display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; }
+        html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: var(--bg-color); font-family: 'Cairo', sans-serif; }
 
         /* Navbar */
         .navbar { 
-            background: var(--nav-shiny-navy); display: flex; align-items: center; padding: 0 20px; margin: 10px 10px 5px 10px; 
-            border-radius: 12px; height: 37px; flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.1); border: 1px solid #1e293b;
+            background: var(--nav-shiny-navy); display: flex; align-items: center; 
+            padding: 0 20px; margin: 10px; border-radius: 12px; height: 38px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 1px solid #1e293b;
         }
-        .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; height: 26px; line-height: 26px; display: inline-block; transition: 0.3s; }
-        .navbar a.active { background-color: var(--nav-active); color: #0f172a; border-radius: 6px; }
+        .navbar a { 
+            color: var(--white); text-decoration: none; padding: 0 15px; font-weight: 700; 
+            font-size: 12px; border-radius: 6px; transition: 0.3s; line-height: 28px;
+        }
+        .navbar a.active { background-color: var(--nav-active); color: #0f172a; }
 
-        .main-content { flex: 1; display: flex; flex-direction: column; padding: 0 15px; min-height: 0; }
+        .main-layout { display: flex; height: calc(100% - 70px); padding: 0 10px 10px 10px; gap: 10px; box-sizing: border-box; }
+
+        /* Right Side: Table & Actions */
+        .content-area { flex: 1; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+
+        /* Analysis & Action Bar */
+        .top-cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .card { background: white; border-radius: 10px; border: 1px solid var(--border-soft); padding: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .card-title { font-weight: 800; font-size: 13px; color: var(--nav-bg); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+
+        .btn-add { background: var(--accent-blue); color: white; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; font-family: 'Cairo'; font-size: 12px; }
+        .search-box { flex: 1; padding: 0 15px; border: 1px solid var(--border-soft); border-radius: 6px; height: 35px; font-family: 'Cairo'; font-size: 12px; outline: none; }
+
+        /* Table Design */
+        .table-container { flex: 1; background: white; border-radius: 10px; border: 1px solid var(--border-soft); overflow: auto; position: relative; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; min-width: 900px; }
+        th { background: var(--header-shiny-purple); color: white; position: sticky; top: 0; z-index: 10; font-size: 11px; padding: 10px 5px; font-weight: 800; }
+        td { border-bottom: 1px solid #f1f5f9; padding: 6px 4px; text-align: center; font-size: 11px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         
-        /* Action Bar - Matching Visits */
-        .action-bar { display: flex; align-items: center; margin: 10px 0; gap: 10px; flex-shrink: 0; }
-        .btn-top { border: none; padding: 0 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; font-size: 12px; height: 35px; }
-        .btn-add { background-color: var(--accent-blue); }
-
-        .search-wrapper { position: relative; width: 15%; display: flex; align-items: center; }
-        .search-input { width: 100%; height: 30px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--border-soft); background: #fff; font-family: 'Cairo'; font-size: 12px; font-weight: 700; outline: none; }
-
-        /* Stats Bar - Matching Visits */
-        .stats-bar {
-            margin-right: auto; display: flex; gap: 10px; align-items: center;
-            background: #fff; padding: 0 10px; border-radius: 5px; height: 25px;
-            border: 1px solid var(--border-soft); box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        /* Status Buttons */
+        .status-btn { 
+            padding: 4px 8px; border-radius: 5px; font-size: 10px; font-weight: 800; border: 1px solid rgba(0,0,0,0.1); cursor: pointer; width: 80px;
         }
-        .stat-item { font-size: 10px; font-weight: 800; color: #475569; white-space: nowrap; }
-        .stat-val { color: var(--accent-blue); margin-right: 3px; }
+        .st-جديد { background: #e0f2fe; color: #0369a1; }
+        .st-مكتمل { background: #dcfce7; color: #15803d; }
+        .st-معلق { background: #fef9c3; color: #a16207; }
+        .st-مرتجع { background: #fee2e2; color: #b91c1c; }
 
-        /* Bulk Action Dropdown */
-        .bulk-action-wrapper { position: relative; display: flex; align-items: center; margin-right: 5px; }
-        .btn-bulk-trigger { 
-            height: 25px; padding: 0 12px; border-radius: 5px; border: 1px solid var(--border-soft);
-            background: #fff; color: var(--text-dark); font-family: 'Cairo'; font-size: 11px; font-weight: 800;
-            cursor: pointer; display: flex; align-items: center; gap: 5px;
+        /* Notes & Tooltip */
+        .notes-cell { cursor: pointer; color: var(--accent-blue); position: relative; }
+        .tooltip { 
+            visibility: hidden; position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
+            background: #334155; color: white; padding: 10px; border-radius: 8px; width: 200px;
+            white-space: normal; z-index: 100; font-weight: 400; font-size: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-        .dropdown-menu { 
-            display: none; position: absolute; left: 0; top: 28px; background: white; border: 1px solid var(--border-soft); 
-            border-radius: 6px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 1000; min-width: 110px; padding: 4px;
-        }
-        .dropdown-menu button { width: 100%; padding: 6px 10px; border: none; background: none; font-family: 'Cairo'; font-size: 10.5px; text-align: right; cursor: pointer; border-radius: 4px; }
-        .dropdown-menu button:hover { background: #f1f5f9; color: var(--accent-blue); }
-        .show { display: block; }
+        .notes-cell:hover .tooltip { visibility: visible; }
 
-        /* Table Style */
-        .table-wrapper { background: white; border-radius: 10px; overflow-y: auto; border: 1px solid var(--border-soft); flex: 1; min-height: 0; }
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th { background: var(--header-shiny-purple); color: white; padding: 12px 5px; font-size: 11px; font-weight: 800; position: sticky; top: 0; z-index: 50; border-bottom: 2px solid #2e1065; }
-        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; font-size: 11px; font-weight: 600; }
-        tbody tr:nth-child(even) { background-color: #eff6ff; }
+        /* Left Side: Activity Logs */
+        .side-panel { width: 320px; background: white; border-radius: 10px; border: 1px solid var(--border-soft); display: flex; flex-direction: column; overflow: hidden; }
+        .panel-header { background: #f8fafc; padding: 12px; font-weight: 800; font-size: 13px; border-bottom: 1px solid var(--border-soft); }
+        .log-list { flex: 1; overflow-y: auto; padding: 10px; }
+        .log-item { margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px dashed #e2e8f0; line-height: 1.5; }
+        .log-meta { font-size: 10px; color: #64748b; font-weight: bold; margin-bottom: 2px; }
+        .log-msg { font-size: 11px; color: var(--text-dark); }
 
-        /* Status & Inputs */
-        .excel-input { width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; background: transparent; font-size: 11.5px; font-weight: inherit; }
-        .status-select { font-family: 'Cairo'; font-size: 10.5px; font-weight: 800; padding: 4px; border-radius: 6px; border: 1px solid var(--border-soft); background: #fff; cursor: pointer; }
-        .select-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent-blue); }
-
-        /* Notes Preview - Matching Visits */
-        .notes-preview { 
-            width: 90%; border: none; background: transparent; font-family: 'Cairo'; font-size: 10px; 
-            text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700; 
-            overflow: hidden; white-space: nowrap; text-overflow: ellipsis; display: block; margin: 0 auto; 
-        }
-
-        /* Activity Log - Matching Visits */
-        .activity-log-section { 
-            margin: 15px 0 10px 0; padding: 12px 18px; background: #ffffff; border-radius: 10px; 
-            border: 1px solid var(--border-soft); box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
-            flex-shrink: 0; height: 140px; display: flex; flex-direction: column; box-sizing: border-box;
-        }
-        .activity-log-title { color: var(--dark-yellow); font-size: 13.5px; font-weight: 800; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; }
-        .activity-list { flex: 1; overflow-y: auto; }
-        .activity-item { margin-bottom: 4px; border-bottom: 1px dashed #f8fafc; padding-bottom: 4px; display: flex; align-items: center; }
-        .activity-header-part { font-size: 11.5px; color: var(--chat-yellow); font-weight: 800; }
-        .activity-text-part { font-size: 11.5px; color: #475569; }
-
-        /* Modal - Matching Visits */
-        .modal { display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
-        .modal-content { background: white; padding: 15px; border-radius: 12px; width: 380px; display: flex; flex-direction: column; }
-        .history-log { flex-grow: 1; max-height: 150px; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 6px; padding: 10px; margin-bottom: 10px; font-size: 11px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
-        .note-area { height: 70px; width: 100%; border: 1px solid var(--border-soft); border-radius: 6px; padding: 8px; font-family: 'Cairo'; resize: none; font-size: 12px; }
+        /* Modals */
+        .modal { display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+        .modal-card { background: white; padding: 20px; border-radius: 12px; width: 400px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        input, select, textarea { width: 100%; padding: 8px; margin: 5px 0 15px 0; border: 1px solid var(--border-soft); border-radius: 6px; font-family: 'Cairo'; box-sizing: border-box; }
+        
+        .month-sep { background: #2e1065 !important; color: white; font-size: 10px; height: 24px; pointer-events: none; }
     </style>
 </head>
-<body onload="loadSalesFromStorage(); renderGeneralLogs();">
+<body onload="initSales()">
 
-<div class="dashboard-container">
-    <nav class="navbar">
-        <a href="index.html">الرئيسية</a>
-        <a href="visits.html">الزيارات</a>
-        <a href="opportunities.html">الفرص البيعية</a>
-        <a href="customers.html">العملاء</a>
-        <a href="sales.html" class="active">المبيعات</a>
-    </nav>
+<nav class="navbar">
+    <a href="index.html">الرئيسية</a>
+    <a href="visits.html">الزيارات</a>
+    <a href="opportunities.html">الفرص البيعية</a>
+    <a href="customers.html">العملاء</a>
+    <a href="sales.html" class="active">المبيعات</a>
+</nav>
 
-    <div class="main-content">
-        <div class="action-bar">
-            <button class="btn-top btn-add" onclick="insertNewRow()">+ إنشاء طلب مبيعات جديد</button>
-            <div class="search-wrapper">
-                <input type="text" id="globalSearch" class="search-input" placeholder="بحث في المبيعات 🔍" onkeyup="filterSalesTable()">
-            </div>
-            
-            <div class="stats-bar">
-                <div class="stat-item">إجمالي الطلبات: <span id="stat-total" class="stat-val">0</span></div>
-                <div class="stat-item">المدفوعة: <span id="stat-paid" class="stat-val">0</span></div>
-            </div>
-
-            <div class="bulk-action-wrapper">
-                <button class="btn-bulk-trigger" onclick="toggleDropdown(event, this)">إجراء ▾</button>
-                <div class="dropdown-menu">
-                    <button onclick="handleBulk('حذف')">حذف المحدد</button>
-                    <button onclick="handleBulk('تصدير')">تصدير بيانات</button>
+<div class="main-layout">
+    <div class="content-area">
+        <div class="top-cards-grid">
+            <div class="card">
+                <div class="card-title">🚀 الإجراءات</div>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn-add" onclick="openOrderModal()">+ طلب مبيعات جديد</button>
+                    <input type="text" id="globalSearch" class="search-box" placeholder="ابحث برقم الطلب أو الشركة..." onkeyup="filterSales()">
                 </div>
             </div>
+            <div class="card">
+                <div class="card-title">📊 تحليل سريع (هذا الشهر)</div>
+                <div id="quickStats" style="font-size: 11px; display: flex; justify-content: space-around; align-items: center; height: 35px;">
+                    </div>
+            </div>
         </div>
-        
-        <div class="table-wrapper">
+
+        <div class="table-container">
             <table id="salesTable">
                 <thead>
                     <tr>
-                        <th style="width: 35px;"><input type="checkbox" onclick="toggleAllCheckboxes(this)"></th>
-                        <th style="width: 80px;">رقم الطلب</th>
-                        <th style="width: 150px;">اسم الطلب</th>
-                        <th style="width: 100px;">تاريخ الإنشاء</th>
-                        <th style="width: 150px;">الشركة</th>
-                        <th style="width: 100px;">الحالة</th>
-                        <th style="width: 80px;">مكتمل</th>
-                        <th style="width: 80px;">معلق</th>
+                        <th style="width: 30px;"><input type="checkbox" onclick="toggleAll(this)"></th>
+                        <th style="width: 60px;">رقم الطلب</th>
+                        <th style="width: 120px;">اسم الطلب</th>
+                        <th style="width: 130px;">الشركة</th>
+                        <th style="width: 80px;">التاريخ</th>
+                        <th style="width: 90px;">الحالة</th>
+                        <th style="width: 70px;">مكتمل</th>
+                        <th style="width: 70px;">معلق</th>
                         <th style="width: 100px;">الملاحظات</th>
-                        <th style="width: 80px;">الفرصة</th>
+                        <th style="width: 60px;">الفرصة</th>
                     </tr>
                 </thead>
                 <tbody id="salesBody"></tbody>
             </table>
         </div>
+    </div>
 
-        <div class="activity-log-section">
-            <div class="activity-log-title">📋 سجل نشاط المبيعات</div>
-            <div id="activityLogs" class="activity-list"></div>
-        </div>
+    <div class="side-panel">
+        <div class="panel-header">📋 سجل نشاط المبيعات</div>
+        <div id="activityLogs" class="log-list"></div>
     </div>
 </div>
 
 <div id="noteModal" class="modal">
-    <div class="modal-content">
-        <div style="font-weight: 800; color: #2e1065; margin-bottom: 10px;">سجل ملاحظات الطلب</div>
-        <div id="historyLog" class="history-log"></div>
-        <textarea id="modalTextArea" class="note-area" placeholder="أضف ملاحظة جديدة..."></textarea>
-        <div style="display:flex; justify-content: flex-end; gap:8px; margin-top:10px;">
-            <button onclick="closeNote()" style="background:#94a3b8; color:white; border:none; padding:7px 15px; border-radius:6px; cursor:pointer;">إلغاء</button>
-            <button onclick="saveNote()" style="background:#22c55e; color:white; border:none; padding:7px 15px; border-radius:6px; cursor:pointer; font-weight:bold;">حفظ</button>
+    <div class="modal-card">
+        <div style="font-weight: 800; margin-bottom: 10px;">إضافة ملاحظة للطلب</div>
+        <textarea id="modalTextArea" style="height: 100px;" placeholder="اكتب الملاحظة هنا..."></textarea>
+        <div style="display:flex; gap:10px; justify-content: flex-end;">
+            <button onclick="closeModal('noteModal')" style="padding:8px 15px; border-radius:6px; border:none; cursor:pointer;">إلغاء</button>
+            <button onclick="saveNote()" style="background:var(--accent-green); color:white; padding:8px 15px; border-radius:6px; border:none; cursor:pointer; font-weight:bold;">حفظ الملاحظة</button>
+        </div>
+    </div>
+</div>
+
+<div id="orderModal" class="modal">
+    <div class="modal-card">
+        <div style="font-weight: 800; margin-bottom: 15px; text-align: center;">إنشاء طلب مبيعات جديد</div>
+        <label style="font-size: 11px; font-weight: bold;">اسم الشركة</label>
+        <input type="text" id="mComp" placeholder="ادخل اسم الشركة">
+        <label style="font-size: 11px; font-weight: bold;">اسم الطلب</label>
+        <input type="text" id="mType" placeholder="مثال: توريد أجهزة مكتبية">
+        <div style="display:flex; gap:10px;">
+            <button onclick="closeModal('orderModal')" style="flex:1; padding:10px; border:none; border-radius:6px; cursor:pointer;">إلغاء</button>
+            <button onclick="addNewOrder()" style="flex:1; padding:10px; background:var(--nav-bg); color:white; border:none; border-radius:6px; cursor:pointer; font-weight:bold;">إضافة</button>
         </div>
     </div>
 </div>
 
 <script>
-    let currentActivePreview = null;
-    const STORAGE_KEY = 'asgate_sales_db_v2';
-    const LOGS_KEY = 'asgate_sales_logs_v2';
+    let currentOrderId = null;
 
-    function toggleAllCheckboxes(source) {
-        document.querySelectorAll('.select-check').forEach(chk => chk.checked = source.checked);
+    function initSales() {
+        renderTable();
+        renderLogs();
+        updateStats();
     }
 
-    function toggleDropdown(e, btn) {
-        e.stopPropagation();
-        const menu = btn.nextElementSibling;
-        menu.classList.toggle('show');
+    function renderTable() {
+        const data = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
+        const tbody = document.getElementById('salesBody');
+        tbody.innerHTML = '';
+        
+        let lastMonth = '';
+        data.reverse().forEach(item => {
+            const currentMonth = item.date.split('/')[1];
+            if (lastMonth && lastMonth !== currentMonth) {
+                const sep = tbody.insertRow();
+                sep.className = 'month-sep';
+                sep.innerHTML = `<td colspan="10" style="text-align:center;">بالتوفيق في الشهر الجديد إن شاء الله 🚀</td>`;
+            }
+
+            const row = tbody.insertRow();
+            const sums = calculateSums(item.id);
+            
+            row.innerHTML = `
+                <td><input type="checkbox" class="row-check"></td>
+                <td><a href="order_details.html?id=${item.id}" style="color:var(--accent-blue); font-weight:bold; text-decoration:none;">#${item.id}</a></td>
+                <td contenteditable="true" onblur="updateField(${item.id}, 'type', this.innerText)">${item.type}</td>
+                <td>${item.comp}</td>
+                <td style="color:#64748b;">${item.date}</td>
+                <td>
+                    <button class="status-btn st-${item.status}" onclick="cycleStatus(${item.id}, this)">${item.status}</button>
+                </td>
+                <td style="color:var(--accent-green); font-weight:800;">${sums.completed}</td>
+                <td style="color:#dc2626; font-weight:800;">${sums.pending}</td>
+                <td class="notes-cell" onclick="openNote(${item.id})">
+                    ${item.notes ? item.notes.split('\n').pop().substring(0, 15) + '...' : 'أضف ملاحظة'}
+                    <div class="tooltip">${item.notes || 'لا توجد ملاحظات سابقة'}</div>
+                </td>
+                <td contenteditable="true" onblur="updateField(${item.id}, 'oppNum', this.innerText)">${item.oppNum || '-'}</td>
+            `;
+            lastMonth = currentMonth;
+        });
     }
 
-    function generateStyledHeader() {
-        const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-        return `<span class="activity-header-part">👤 (أحمد)  🗓️ ${days[now.getDay()]} ${now.toLocaleDateString('en-GB')} ${timeStr} ➡️ : </span>`;
+    function calculateSums(orderId) {
+        // هذه الوظيفة تفترض وجود قاعدة بيانات للمنتجات مربوطة برقم الطلب
+        const productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+        const products = productsDb[orderId] || [];
+        let comp = 0, pend = 0;
+        products.forEach(p => {
+            const val = (p.qty || 0) * (p.price || 0);
+            if(p.status === 'مكتمل') comp += val;
+            else pend += val;
+        });
+        return { completed: comp.toFixed(2), pending: pend.toFixed(2) };
     }
 
-    function addGeneralLog(msg) {
-        const logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
-        logs.unshift({ header: generateStyledHeader(), msg: msg });
-        localStorage.setItem(LOGS_KEY, JSON.stringify(logs.slice(0, 50)));
-        renderGeneralLogs();
+    function cycleStatus(id, btn) {
+        const states = ["جديد", "معلق", "مكتمل", "مرتجع"];
+        let current = states.indexOf(btn.innerText);
+        let next = states[(current + 1) % states.length];
+        
+        updateField(id, 'status', next);
+        btn.innerText = next;
+        btn.className = `status-btn st-${next}`;
+        addLog(`تغيير حالة الطلب #${id}`, `إلى ${next}`);
     }
 
-    function renderGeneralLogs() {
-        const logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
-        document.getElementById('activityLogs').innerHTML = logs.map(l => `<div class="activity-item">${l.header} <span class="activity-text-part">${l.msg}</span></div>`).join('');
-    }
-
-    function openNote(el) {
-        currentActivePreview = el;
-        const notes = el.getAttribute('data-full-notes') || "";
-        document.getElementById('historyLog').innerHTML = notes;
-        document.getElementById('noteModal').style.display = "flex";
+    function openNote(id) {
+        currentOrderId = id;
+        document.getElementById('noteModal').style.display = 'flex';
     }
 
     function saveNote() {
         const txt = document.getElementById('modalTextArea').value.trim();
-        if (txt && currentActivePreview) {
-            let old = currentActivePreview.getAttribute('data-full-notes') || "";
-            let updated = (old ? old + "\n" : "") + generateStyledHeader() + " " + txt;
-            currentActivePreview.setAttribute('data-full-notes', updated);
-            currentActivePreview.innerText = "عرض السجل...";
-            addGeneralLog(`إضافة ملاحظة للطلب #${currentActivePreview.closest('tr').cells[1].innerText}: ${txt}`);
-            autoSave();
+        if(txt) {
+            const data = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
+            const idx = data.findIndex(i => i.id == currentOrderId);
+            const dateStr = new Date().toLocaleDateString('en-GB');
+            const entry = `👤 (أحمد) 🗓️ ${dateStr}: ${txt}`;
+            
+            data[idx].notes = (data[idx].notes || '') + '\n' + entry;
+            localStorage.setItem('asgate_sales_db', JSON.stringify(data));
+            addLog(`إضافة ملاحظة للطلب #${currentOrderId}`, txt);
+            renderTable();
         }
-        closeNote();
+        closeModal('noteModal');
     }
 
-    function closeNote() { document.getElementById('noteModal').style.display = "none"; document.getElementById('modalTextArea').value = ""; }
+    function addNewOrder() {
+        const comp = document.getElementById('mComp').value;
+        const type = document.getElementById('mType').value;
+        if(!comp) return alert("يرجى كتابة اسم الشركة");
 
-    function renderTableRow(obj) {
-        const tbody = document.getElementById('salesBody');
-        const row = prependRow(tbody);
-        const statusOptions = ["جديد", "مدفوع", "معلق", "ملغي"];
-        
-        row.innerHTML = `
-            <td><input type="checkbox" class="select-check"></td>
-            <td>#${obj.id}</td>
-            <td><input type="text" class="excel-input" value="${obj.type}" onchange="autoSave()"></td>
-            <td>${obj.date}</td>
-            <td><input type="text" class="excel-input" value="${obj.comp}" onchange="autoSave()"></td>
-            <td>
-                <select class="status-select" onchange="addGeneralLog('تحديث حالة الطلب #' + ${obj.id} + ' إلى ' + this.value); autoSave();">
-                    ${statusOptions.map(opt => `<option value="${opt}" ${obj.status === opt ? 'selected' : ''}>${opt}</option>`).join('')}
-                </select>
-            </td>
-            <td style="color:green;">0.00</td>
-            <td style="color:red;">0.00</td>
-            <td><div class="notes-preview" onclick="openNote(this)" data-full-notes="${obj.notes || ''}">${obj.notes ? 'عرض السجل...' : 'أضف ملاحظة'}</div></td>
-            <td><input type="text" class="excel-input" value="${obj.oppNum || ''}" onchange="autoSave()"></td>
-        `;
-        updateStats();
+        const newOrder = {
+            id: Math.floor(1000 + Math.random() * 9000),
+            comp: comp,
+            type: type || 'طلب جديد',
+            date: new Date().toLocaleDateString('en-GB'),
+            status: 'جديد',
+            notes: '',
+            oppNum: ''
+        };
+
+        const data = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
+        data.push(newOrder);
+        localStorage.setItem('asgate_sales_db', JSON.stringify(data));
+        addLog("إنشاء طلب جديد", `شركة: ${comp}`);
+        initSales();
+        closeModal('orderModal');
     }
 
-    function prependRow(tbody) { return tbody.insertRow(0); }
+    function addLog(action, msg) {
+        const logs = JSON.parse(localStorage.getItem('asgate_sales_logs') || '[]');
+        const now = new Date();
+        const time = now.toLocaleTimeString('ar-SA', {hour:'2-digit', minute:'2-digit'});
+        logs.unshift({
+            meta: `👤 أحمد | 🗓️ ${now.toLocaleDateString('en-GB')} | 🕒 ${time}`,
+            action: action,
+            msg: msg
+        });
+        localStorage.setItem('asgate_sales_logs', JSON.stringify(logs.slice(0, 50)));
+        renderLogs();
+    }
 
-    function insertNewRow() {
-        const newObj = { id: Math.floor(1000 + Math.random()*9000), type: '', date: new Date().toLocaleDateString('en-GB'), comp: '', status: 'جديد', notes: '', oppNum: '' };
-        renderTableRow(newObj);
-        addGeneralLog('تم إنشاء طلب مبيعات جديد');
-        autoSave();
+    function renderLogs() {
+        const logs = JSON.parse(localStorage.getItem('asgate_sales_logs') || '[]');
+        document.getElementById('activityLogs').innerHTML = logs.map(l => `
+            <div class="log-item">
+                <div class="log-meta">${l.meta}</div>
+                <div class="log-msg"><b>${l.action}:</b> ${l.msg}</div>
+            </div>
+        `).join('');
+    }
+
+    function updateField(id, field, val) {
+        const data = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
+        const idx = data.findIndex(i => i.id == id);
+        if(idx !== -1) {
+            data[idx][field] = val;
+            localStorage.setItem('asgate_sales_db', JSON.stringify(data));
+        }
     }
 
     function updateStats() {
-        const rows = document.querySelectorAll('#salesBody tr');
-        document.getElementById('stat-total').innerText = rows.length;
-        let paid = 0;
-        rows.forEach(r => { if(r.querySelector('select').value === "مدفوع") paid++; });
-        document.getElementById('stat-paid').innerText = paid;
+        const data = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
+        const thisMonth = new Date().getMonth() + 1;
+        const monthData = data.filter(i => parseInt(i.date.split('/')[1]) === thisMonth);
+        
+        document.getElementById('quickStats').innerHTML = `
+            <span>📦 طلبات الشهر: <b>${monthData.length}</b></span>
+            <span style="color:var(--accent-green)">✅ مكتمل: <b>${monthData.filter(i=>i.status==='مكتمل').length}</b></span>
+            <span style="color:#dc2626">⏳ معلق: <b>${monthData.filter(i=>i.status==='معلق').length}</b></span>
+        `;
     }
 
-    function autoSave() {
-        const rows = Array.from(document.querySelectorAll('#salesBody tr')).map(r => ({
-            id: r.cells[1].innerText.replace('#', ''),
-            type: r.cells[2].querySelector('input').value,
-            date: r.cells[3].innerText,
-            comp: r.cells[4].querySelector('input').value,
-            status: r.cells[5].querySelector('select').value,
-            notes: r.cells[8].querySelector('.notes-preview').getAttribute('data-full-notes'),
-            oppNum: r.cells[9].querySelector('input').value
-        }));
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(rows));
-        updateStats();
-    }
-
-    function loadSalesFromStorage() {
-        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-        saved.reverse().forEach(item => renderTableRow(item));
-        renderGeneralLogs();
-    }
-
-    function filterSalesTable() {
+    function filterSales() {
         const q = document.getElementById('globalSearch').value.toLowerCase();
-        document.querySelectorAll('#salesBody tr').forEach(r => {
-            r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none";
+        const rows = document.querySelectorAll('#salesBody tr:not(.month-sep)');
+        rows.forEach(r => {
+            r.style.display = r.innerText.toLowerCase().includes(q) ? '' : 'none';
         });
     }
 
-    window.onclick = () => document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+    function toggleAll(src) {
+        document.querySelectorAll('.row-check').forEach(c => c.checked = src.checked);
+    }
+
+    function openOrderModal() { document.getElementById('orderModal').style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 </script>
 </body>
 </html>
