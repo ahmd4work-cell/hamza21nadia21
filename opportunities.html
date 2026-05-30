@@ -156,12 +156,20 @@
         .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
         .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
 
-        /* عرض الأعمدة */
-        .col-select { width: 50px; }
-        .col-company { width: 11%; } .col-manager { width: 8%; } .col-mobile { width: 8%; } 
-        .col-email { width: 9%; } .col-record { width: 8%; } .col-date { width: 9%; } 
-        .col-service { width: 11%; } .col-value { width: 7%; } .col-notes { width: 11%; } .col-status { width: 6%; }
-        .col-edit { width: 7%; } .col-owner { width: 10%; }
+        /* عرض الأعمدة الجديد بناءً على النسب المئوية */
+        .col-select { width: 3%; }
+        .col-company { width: 12%; } 
+        .col-manager { width: 8%; } 
+        .col-mobile { width: 8%; } 
+        .col-email { width: 8%; } 
+        .col-record { width: 8%; } 
+        .col-date { width: 8%; } 
+        .col-service { width: 8%; } 
+        .col-value { width: 8%; } 
+        .col-notes { width: 8%; } 
+        .col-status { width: 5%; }
+        .col-edit { width: 8%; } 
+        .col-owner { width: 8%; }
     </style>
 </head>
 <body onload="loadSavedData()">
