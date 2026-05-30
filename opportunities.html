@@ -184,18 +184,19 @@
             
             <div class="stats-bar">
                 <div class="stat-item">إجمالي الفرص: <span id="stat-total" class="stat-val">0</span></div>
-                <div class="stat-item">فرص الشهر: <span id="stat-month" class="stat-val">0</span></div>
+                <div class="stat-item">فرص الشهر الحالي: <span id="stat-month" class="stat-val">0</span></div>
                 <div class="stat-item">فرص اليوم: <span id="stat-today" class="stat-val">0</span></div>
-                <div class="stat-item">ناجحة: <span id="stat-success" class="stat-val">0</span></div>
+                <div class="stat-item"> | قيمة الفرص: <span id="stat-total-val" class="stat-val">0</span></div>
+                <div class="stat-item">قيمة فرص الشهر: <span id="stat-month-val" class="stat-val">0</span></div>
             </div>
 
             <div class="bulk-action-wrapper">
                 <button class="btn-bulk-trigger" onclick="toggleDropdown(event, this)">إجراء ▾</button>
                 <div class="dropdown-menu">
-                    <button onclick="handleBulkAction('تحويل المحدد')">تحويل المحدد</button>
-                    <button onclick="handleBulkAction('تصدير المحدد')">تصدير المحدد</button>
-                    <button onclick="handleBulkAction('طباعة المحدد')">طباعة المحدد</button>
-                    <button class="del-btn" onclick="handleBulkAction('حذف المحدد')">حذف المحدد</button>
+                    <button onclick="handleBulkAction('تحويل')">تحويل</button>
+                    <button onclick="handleBulkAction('تصدير')">تصدير</button>
+                    <button onclick="handleBulkAction('طباعة')">طباعة</button>
+                    <button class="del-btn" onclick="handleBulkAction('حذف')">حذف</button>
                 </div>
             </div>
         </div>
@@ -282,21 +283,29 @@
         const rows = document.querySelectorAll('#tableBody .main-row');
         const today = getTodayFormatted();
         const currentMonth = today.substring(0, 7);
-        let total = rows.length, tDay = 0, tMonth = 0, tSuccess = 0;
+        let total = rows.length, tDay = 0, tMonth = 0, totalVal = 0, monthVal = 0;
+        
         rows.forEach(row => {
             const dateInput = row.querySelector('.visit-date-val');
-            const statusSelect = row.querySelector('.status-select');
-            if(dateInput && statusSelect) {
+            const oppValInput = row.cells[8].querySelector('input');
+            const oppVal = parseFloat(oppValInput.value) || 0;
+            
+            if(dateInput) {
                 const date = dateInput.value;
-                const status = statusSelect.value;
                 if (date === today) tDay++;
-                if (date.startsWith(currentMonth)) tMonth++;
+                if (date.startsWith(currentMonth)) {
+                    tMonth++;
+                    monthVal += oppVal;
+                }
             }
+            totalVal += oppVal;
         });
+        
         document.getElementById('stat-total').innerText = total;
         document.getElementById('stat-today').innerText = tDay;
         document.getElementById('stat-month').innerText = tMonth;
-        document.getElementById('stat-success').innerText = tSuccess;
+        document.getElementById('stat-total-val').innerText = totalVal.toLocaleString();
+        document.getElementById('stat-month-val').innerText = monthVal.toLocaleString();
     }
 
     function reorderRows() {
@@ -353,7 +362,7 @@
                 <input type="hidden" class="visit-date-val" value="${visitDate}">
             </td>
             <td><input type="text" class="excel-input" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الفرصة المقترحة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${v.valOpp || ''}" data-old="${v.valOpp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('قيمة الفرصة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="number" class="excel-input" value="${v.valOpp || ''}" data-old="${v.valOpp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('قيمة الفرصة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats();"></td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
             <td>
                 <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الحالة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats(); reorderRows();">
@@ -445,22 +454,10 @@
         if(!isOpen) menu.classList.add('show');
     }
 
-    function deleteRow(btn, rowId) {
-        const row = document.getElementById(rowId);
-        const companyName = row.cells[1].querySelector('input').value;
-        if(confirm('هل أنت متأكد من الحذف؟')) {
-            addToActivityLog('إجراء', '', '', companyName);
-            row.remove();
-            if(document.getElementById('sub-' + rowId)) document.getElementById('sub-' + rowId).remove();
-            saveAllDataSilently();
-            updateStats();
-        }
-    }
-
     function handleBulkAction(action) {
         const selected = document.querySelectorAll('.select-check:checked');
         if (selected.length === 0) return alert('حدد صفاً أولاً');
-        if (action === 'حذف المحدد' && confirm('تأكيد الحذف؟')) {
+        if (action === 'حذف' && confirm('تأكيد الحذف؟')) {
             selected.forEach(chk => {
                 const row = chk.closest('tr');
                 const id = row.id;
@@ -471,6 +468,8 @@
             });
             saveAllDataSilently();
             updateStats();
+        } else {
+            alert('تم تنفيذ ' + action + ' على ' + selected.length + ' من الصفوف');
         }
     }
 
