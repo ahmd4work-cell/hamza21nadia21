@@ -97,14 +97,6 @@
         
         tbody tr:nth-child(even) { background-color: #eff6ff; }
         
-        .month-separator { height: 24px !important; background: transparent !important; }
-        .month-separator td { height: 24px !important; border: none !important; padding: 4px 0 !important; }
-        .month-content {
-            background-color: #2e1065; color: white; font-family: 'Cascadia Code', monospace;
-            font-size: 10px; font-weight: bold; width: 50%; margin: 0 auto;
-            border-radius: 5px; display: flex; align-items: center; justify-content: center; height: 100%;
-        }
-
         .excel-input { 
             width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; 
             background: transparent; font-size: 11.5px; color: inherit; font-weight: inherit; 
@@ -142,6 +134,8 @@
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-content { background: white; padding: 18px; border-radius: 12px; width: 440px; height: 480px; display: flex; flex-direction: column; }
         .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
+        
+        /* التعديل هنا: محاذاة النص لليمين لتبدأ الرسالة من البداية عند ضغط Enter */
         .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
         
         .order-modal-card { background: white; width: 350px; border-radius: 12px; padding: 20px; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); }
@@ -335,7 +329,7 @@
     }
 
     function autoSave() {
-        const rows = document.querySelectorAll('#salesBody tr:not(.month-separator)');
+        const rows = document.querySelectorAll('#salesBody tr');
         const salesData = Array.from(rows).map(r => ({
             id: r.cells[1].innerText.replace('#', ''),
             type: r.cells[2].innerText,
