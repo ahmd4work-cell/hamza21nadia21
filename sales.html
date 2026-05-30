@@ -52,14 +52,13 @@
 
         .excel-input { width: 95%; border: none; text-align: center; font-family: 'Cairo'; background: transparent; font-weight: 600; outline: none; }
 
-        /* تعديل الملاحظات لتصبح معاينة قابلة للنقر */
+        /* نظام الملاحظات فقط */
         .notes-preview { 
             width: 95%; height: 20px; border: none; background: transparent; font-family: 'Cairo'; 
             font-size: 11px; text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700; 
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; margin: 0 auto; 
         }
 
-        /* تنسيق النافذة المنبثقة (المودال) */
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-content { background: white; padding: 18px; border-radius: 12px; width: 440px; height: 480px; display: flex; flex-direction: column; }
         .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
@@ -116,7 +115,7 @@
 
 <div id="noteModal" class="modal">
     <div class="modal-content">
-        <div style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right;">سجل متابعة الطلب والملاحظات</div>
+        <div style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right;">سجل ملاحظات الطلب</div>
         <div id="historyLog" class="history-log"></div>
         <textarea id="modalTextArea" class="note-area" placeholder="أدخل الملاحظة هنا..."></textarea>
         <div style="display:flex; justify-content: flex-end; gap:8px; margin-top:10px;">
@@ -130,9 +129,7 @@
     let currentActivePreview = null;
     const STORAGE_KEY = 'asgate_sales_main_v12';
 
-    function getTodayFormatted() {
-        return new Date().toISOString().split('T')[0];
-    }
+    function getTodayFormatted() { return new Date().toISOString().split('T')[0]; }
 
     function generateStyledHeader() {
         const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
@@ -189,7 +186,6 @@
         renderActivityLog();
     }
 
-    /* دوال نظام الملاحظات التراكمي */
     function getLastNoteOnly(fullText) {
         if (!fullText || fullText.trim() === "") return 'إضافة ملاحظة...';
         const arr = fullText.split('\n--------------------\n');
@@ -223,7 +219,6 @@
             let updatedFullNotes = oldNotes === "" ? newEntry : oldNotes + "\n--------------------\n" + newEntry;
             currentActivePreview.setAttribute('data-full-notes', updatedFullNotes);
             currentActivePreview.innerText = newText;
-            
             const companyName = currentActivePreview.closest('tr').cells[0].querySelector('input').value;
             addToActivityLog(newText, companyName);
             saveAll();
@@ -238,7 +233,7 @@
 
     function addToActivityLog(msg, company) {
         const logs = JSON.parse(localStorage.getItem('asgate_sales_activity_logs') || '[]');
-        const entry = `${generateStyledHeader()} <span class="activity-text-part">ملاحظة جديدة: ${msg} (لشركة: ${company || 'غير محددة'})</span>`;
+        const entry = `${generateStyledHeader()} <span class="activity-text-part">ملاحظة: ${msg} (الشركة: ${company || 'غير محدد'})</span>`;
         logs.unshift(entry);
         localStorage.setItem('asgate_sales_activity_logs', JSON.stringify(logs.slice(0, 50)));
         renderActivityLog();
