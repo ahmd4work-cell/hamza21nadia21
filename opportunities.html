@@ -58,8 +58,8 @@
         .stat-item { font-size: 10px; font-weight: 800; color: #475569; white-space: nowrap; }
         .stat-val { color: var(--accent-blue); margin-right: 3px; }
 
-        /* تنسيق زر الإجراء الجديد بجانب الإحصائيات */
-        .bulk-action-wrapper { position: relative; display: flex; align-items: center; }
+        /* تنسيق حاوية زر الإجراء ليكون على اليسار */
+        .bulk-action-wrapper { position: relative; display: flex; align-items: center; margin-right: 5px; }
         .btn-bulk-trigger { 
             height: 25px; padding: 0 12px; border-radius: 5px; border: 1px solid var(--border-soft);
             background: #fff; color: var(--text-dark); font-family: 'Cairo'; font-size: 11px; font-weight: 800;
@@ -131,7 +131,7 @@
             top: 35px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; 
             box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 1000; min-width: 110px; padding: 4px;
         }
-        /* تعديل موقع دروب داون شريط الأدوات ليكون لليمين قليلاً */
+        /* القائمة المنسدلة لزر إجراء العلوي */
         .bulk-action-wrapper .dropdown-menu { left: 0; transform: none; top: 28px; }
 
         .dropdown-menu button { 
@@ -193,6 +193,13 @@
                 <input type="text" id="searchInput" class="search-input" placeholder="بحث 🔍" onkeyup="filterTable()">
             </div>
             
+            <div class="stats-bar">
+                <div class="stat-item">إجمالي الفرص: <span id="stat-total" class="stat-val">0</span></div>
+                <div class="stat-item">فرص الشهر: <span id="stat-month" class="stat-val">0</span></div>
+                <div class="stat-item">فرص اليوم: <span id="stat-today" class="stat-val">0</span></div>
+                <div class="stat-item">ناجحة: <span id="stat-success" class="stat-val">0</span></div>
+            </div>
+
             <div class="bulk-action-wrapper">
                 <button class="btn-bulk-trigger" onclick="toggleDropdown(event, this)">إجراء ▾</button>
                 <div class="dropdown-menu">
@@ -201,13 +208,6 @@
                     <button onclick="handleBulkAction('طباعة المحدد')">طباعة المحدد</button>
                     <button class="del-btn" onclick="handleBulkAction('حذف المحدد')">حذف المحدد</button>
                 </div>
-            </div>
-
-            <div class="stats-bar">
-                <div class="stat-item">إجمالي الفرص: <span id="stat-total" class="stat-val">0</span></div>
-                <div class="stat-item">فرص الشهر: <span id="stat-month" class="stat-val">0</span></div>
-                <div class="stat-item">فرص اليوم: <span id="stat-today" class="stat-val">0</span></div>
-                <div class="stat-item">ناجحة: <span id="stat-success" class="stat-val">0</span></div>
             </div>
         </div>
         
