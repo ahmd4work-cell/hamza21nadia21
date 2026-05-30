@@ -85,7 +85,7 @@
         .inner-table { width: 65%; background: white; border: 1px solid var(--border-soft); border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden; }
         .inner-table th { background: var(--accent-blue); color: #fff; height: 24px; font-size: 9.5px; border-left: 1px solid rgba(255,255,255,0.2); }
         .inner-table td { height: 28px; border: 1px solid #edf2f7; padding: 0; }
-        .inner-table input { width: 100%; height: 100%; border: none; text-align: center; font-family: 'Cairo'; font-size: 10.5px; outline: none; background: transparent; }
+        .inner-table input, .inner-table select { width: 100%; height: 100%; border: none; text-align: center; font-family: 'Cairo'; font-size: 10.5px; outline: none; background: transparent; }
         
         .sub-action-btn { 
             width: 22px; height: 22px; border: none; border-radius: 4px; cursor: pointer; 
@@ -248,8 +248,8 @@
 
 <script>
     let currentActivePreview = null;
-    const STORAGE_KEY = 'asgate_visits_final_v50'; 
-    const LOGS_KEY = 'asgate_visits_logs_v50';
+    const STORAGE_KEY = 'asgate_visits_final_v60'; 
+    const LOGS_KEY = 'asgate_visits_logs_v60';
 
     function getTodayFormatted() {
         const d = new Date();
@@ -386,8 +386,19 @@
     function addProductRow(rowId, data = {}) {
         const tbody = document.querySelector(`#sub-${rowId} .product-body`);
         const row = tbody.insertRow();
+        const types = ['جوال', 'بيانات', 'هاتف', 'فايبر', 'DIA', 'SIP Trunk', 'Ipvpn'];
+        
+        let typeOptions = `<option value=""></option>`;
+        types.forEach(t => {
+            typeOptions += `<option value="${t}" ${data.type === t ? 'selected' : ''}>${t}</option>`;
+        });
+
         row.innerHTML = `
-            <td><input type="text" value="${data.type || ''}" onchange="saveAllDataSilently()"></td>
+            <td>
+                <select onchange="saveAllDataSilently()">
+                    ${typeOptions}
+                </select>
+            </td>
             <td><input type="text" value="${data.desc || ''}" onchange="saveAllDataSilently()"></td>
             <td><input type="text" value="${data.qty || ''}" onchange="saveAllDataSilently()"></td>
             <td><input type="text" value="${data.sub || ''}" onchange="saveAllDataSilently()"></td>
@@ -441,7 +452,14 @@
             if(subRow) {
                 subRow.querySelectorAll('.product-body tr').forEach(pRow => {
                     const inputs = pRow.querySelectorAll('input');
-                    products.push({ type: inputs[0].value, desc: inputs[1].value, qty: inputs[2].value, sub: inputs[3].value, total: inputs[4].value });
+                    const selects = pRow.querySelectorAll('select');
+                    products.push({ 
+                        type: selects[0].value, 
+                        desc: inputs[0].value, 
+                        qty: inputs[1].value, 
+                        sub: inputs[2].value, 
+                        total: inputs[3].value 
+                    });
                 });
             }
 
