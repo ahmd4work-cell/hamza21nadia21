@@ -45,21 +45,21 @@
         .search-box { width: 200px; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border-color); font-family: 'Cairo'; }
 
         .table-container { background: white; border-radius: 10px; overflow: hidden; border: 1px solid var(--border-color); }
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th { background: var(--header-shiny-purple); color: white; padding: 10px; font-size: 12px; position: sticky; top: 0; }
-        td { border-bottom: 1px solid #f1f5f9; text-align: center; padding: 8px; font-size: 12px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: var(--header-shiny-purple); color: white; padding: 10px; font-size: 12px; }
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; padding: 8px; font-size: 12px; font-weight: 600; }
         tr:nth-child(even) { background: var(--zebra-blue); }
 
         .excel-input { width: 95%; border: none; text-align: center; font-family: 'Cairo'; background: transparent; font-weight: 600; outline: none; }
 
-        /* نظام الملاحظات المطور - خلية المعاينة */
+        /* تعديل الملاحظات لتصبح معاينة قابلة للنقر */
         .notes-preview { 
             width: 95%; height: 20px; border: none; background: transparent; font-family: 'Cairo'; 
             font-size: 11px; text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700; 
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; margin: 0 auto; 
         }
 
-        /* تنسيق المودال (النافذة المنبثقة) */
+        /* تنسيق النافذة المنبثقة (المودال) */
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-content { background: white; padding: 18px; border-radius: 12px; width: 440px; height: 480px; display: flex; flex-direction: column; }
         .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
@@ -86,7 +86,7 @@
 
 <div class="container">
     <div class="action-bar">
-        <button class="btn-add" onclick="addRow()">+ إضافة فاتورة</button>
+        <button class="btn-add" onclick="addRow()">+ إضافة طلب</button>
         <input type="text" id="search" class="search-box" placeholder="بحث..." onkeyup="filterTable()">
     </div>
 
@@ -95,12 +95,13 @@
             <thead>
                 <tr>
                     <th style="width: 15%;">الشركة</th>
-                    <th style="width: 10%;">رقم الفاتورة</th>
-                    <th style="width: 10%;">المبلغ</th>
                     <th style="width: 10%;">التاريخ</th>
-                    <th style="width: 30%;">ملاحظات التحصيل/التنفيذ</th>
-                    <th style="width: 10%;">الحالة</th>
-                    <th style="width: 15%;">إجراء</th>
+                    <th style="width: 10%;">الوقت</th>
+                    <th style="width: 10%;">مبلغ الطلب</th>
+                    <th style="width: 10%;">طريقة الدفع</th>
+                    <th style="width: 25%;">الملاحظات</th>
+                    <th style="width: 10%;">بواسطة</th>
+                    <th style="width: 10%;">إجراء</th>
                 </tr>
             </thead>
             <tbody id="salesBody"></tbody>
@@ -115,9 +116,9 @@
 
 <div id="noteModal" class="modal">
     <div class="modal-content">
-        <div style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right;">سجل متابعة الفاتورة والملاحظات</div>
+        <div style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right;">سجل متابعة الطلب والملاحظات</div>
         <div id="historyLog" class="history-log"></div>
-        <textarea id="modalTextArea" class="note-area" placeholder="أدخل تفاصيل الملاحظة هنا..."></textarea>
+        <textarea id="modalTextArea" class="note-area" placeholder="أدخل الملاحظة هنا..."></textarea>
         <div style="display:flex; justify-content: flex-end; gap:8px; margin-top:10px;">
             <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px;">تراجع</button>
             <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px; font-weight:bold;">حفظ الملاحظة</button>
@@ -127,7 +128,7 @@
 
 <script>
     let currentActivePreview = null;
-    const STORAGE_KEY = 'asgate_sales_data_main';
+    const STORAGE_KEY = 'asgate_sales_main_v12';
 
     function getTodayFormatted() {
         return new Date().toISOString().split('T')[0];
@@ -140,7 +141,6 @@
         return `<span class="activity-header-part">👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${getTodayFormatted()}  <span class="activity-time-part">${time}</span>&nbsp;&nbsp;</span>`;
     }
 
-    // إضافة صف مع الحفاظ على توزيع الأعمدة الأصلي
     function addRow(data = {}, prepend = true) {
         const tbody = document.getElementById('salesBody');
         const row = prepend ? tbody.insertRow(0) : tbody.insertRow();
@@ -149,23 +149,19 @@
 
         row.innerHTML = `
             <td><input type="text" class="excel-input" value="${data.company || ''}" onchange="saveAll()"></td>
-            <td><input type="text" class="excel-input" value="${data.invNo || ''}" onchange="saveAll()"></td>
-            <td><input type="number" class="excel-input" value="${data.amount || ''}" onchange="saveAll()"></td>
             <td><input type="date" class="excel-input" value="${data.date || getTodayFormatted()}" onchange="saveAll()"></td>
+            <td><input type="time" class="excel-input" value="${data.time || ''}" onchange="saveAll()"></td>
+            <td><input type="number" class="excel-input" value="${data.amount || ''}" onchange="saveAll()"></td>
+            <td><input type="text" class="excel-input" value="${data.payment || ''}" onchange="saveAll()"></td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}'>${lastNote}</div></td>
-            <td>
-                <select class="excel-input" onchange="saveAll()">
-                    <option value="معلق" ${data.status === 'معلق' ? 'selected' : ''}>معلق</option>
-                    <option value="تم الدفع" ${data.status === 'تم الدفع' ? 'selected' : ''}>تم الدفع</option>
-                </select>
-            </td>
+            <td><input type="text" class="excel-input" value="${data.by || 'أحمد'}" onchange="saveAll()"></td>
             <td><button onclick="deleteRow(this)" style="color:red; border:none; background:none; cursor:pointer; font-weight:bold;">حذف</button></td>
         `;
         if (prepend) saveAll();
     }
 
     function deleteRow(btn) {
-        if(confirm('هل تريد الحذف؟')) {
+        if(confirm('حذف هذا الطلب؟')) {
             btn.closest('tr').remove();
             saveAll();
         }
@@ -176,11 +172,12 @@
         document.querySelectorAll('#salesBody tr').forEach(tr => {
             rows.push({
                 company: tr.cells[0].querySelector('input').value,
-                invNo: tr.cells[1].querySelector('input').value,
-                amount: tr.cells[2].querySelector('input').value,
-                date: tr.cells[3].querySelector('input').value,
-                notes: tr.cells[4].querySelector('.notes-preview').getAttribute('data-full-notes') || '',
-                status: tr.cells[5].querySelector('select').value
+                date: tr.cells[1].querySelector('input').value,
+                time: tr.cells[2].querySelector('input').value,
+                amount: tr.cells[3].querySelector('input').value,
+                payment: tr.cells[4].querySelector('input').value,
+                notes: tr.cells[5].querySelector('.notes-preview').getAttribute('data-full-notes') || '',
+                by: tr.cells[6].querySelector('input').value
             });
         });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(rows));
@@ -192,7 +189,7 @@
         renderActivityLog();
     }
 
-    /* نظام الملاحظات نسخة طبق الأصل من الزيارات */
+    /* دوال نظام الملاحظات التراكمي */
     function getLastNoteOnly(fullText) {
         if (!fullText || fullText.trim() === "") return 'إضافة ملاحظة...';
         const arr = fullText.split('\n--------------------\n');
@@ -240,15 +237,15 @@
     }
 
     function addToActivityLog(msg, company) {
-        const logs = JSON.parse(localStorage.getItem('asgate_sales_logs_history') || '[]');
-        const entry = `${generateStyledHeader()} <span class="activity-text-part">إضافة ملاحظة: ${msg} (لشركة: ${company || 'جديدة'})</span>`;
+        const logs = JSON.parse(localStorage.getItem('asgate_sales_activity_logs') || '[]');
+        const entry = `${generateStyledHeader()} <span class="activity-text-part">ملاحظة جديدة: ${msg} (لشركة: ${company || 'غير محددة'})</span>`;
         logs.unshift(entry);
-        localStorage.setItem('asgate_sales_logs_history', JSON.stringify(logs.slice(0, 50)));
+        localStorage.setItem('asgate_sales_activity_logs', JSON.stringify(logs.slice(0, 50)));
         renderActivityLog();
     }
 
     function renderActivityLog() {
-        const logs = JSON.parse(localStorage.getItem('asgate_sales_logs_history') || '[]');
+        const logs = JSON.parse(localStorage.getItem('asgate_sales_activity_logs') || '[]');
         const container = document.getElementById('activityLogs');
         if(container) container.innerHTML = logs.map(l => `<div class="activity-item">${l}</div>`).join('');
     }
@@ -256,8 +253,7 @@
     function filterTable() {
         const q = document.getElementById('search').value.toLowerCase();
         document.querySelectorAll('#salesBody tr').forEach(tr => {
-            const match = tr.cells[0].querySelector('input').value.toLowerCase().includes(q) || 
-                          tr.cells[1].querySelector('input').value.toLowerCase().includes(q);
+            const match = tr.cells[0].querySelector('input').value.toLowerCase().includes(q);
             tr.style.display = match ? '' : 'none';
         });
     }
