@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASGate - سجل الزيارات</title>
+    <title>ASGate - سجل الزيارات المطور</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -39,7 +39,7 @@
 
         .main-content { flex: 1; display: flex; flex-direction: column; padding: 0 15px; min-height: 0; }
         
-        .action-bar { display: flex; align-items: center; margin: 10px 0; gap: 15px; flex-shrink: 0; }
+        .action-bar { display: flex; align-items: center; margin: 10px 0; gap: 10px; flex-shrink: 0; }
         .btn-top { border: none; padding: 0 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; font-size: 12px; height: 35px; }
         .btn-add { background-color: var(--accent-blue); }
 
@@ -57,6 +57,15 @@
         }
         .stat-item { font-size: 10px; font-weight: 800; color: #475569; white-space: nowrap; }
         .stat-val { color: var(--accent-blue); margin-right: 3px; }
+
+        .bulk-action-wrapper { position: relative; display: flex; align-items: center; margin-right: 5px; }
+        .btn-bulk-trigger { 
+            height: 25px; padding: 0 12px; border-radius: 5px; border: 1px solid var(--border-soft);
+            background: #fff; color: var(--text-dark); font-family: 'Cairo'; font-size: 11px; font-weight: 800;
+            cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: 0.2s;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .btn-bulk-trigger:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
 
         .table-wrapper { 
             background: white; border-radius: 10px; overflow-y: auto; border: 1px solid var(--border-soft); 
@@ -80,21 +89,9 @@
 
         .select-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent-blue); }
 
-        .action-cell { position: relative; overflow: visible !important; }
-        
-        .dots-btn, .header-dots-btn { 
-            cursor: pointer; font-size: 10px; color: #475569; background: #fff; 
-            border: 1px solid #cbd5e1; border-radius: 4px; padding: 4px 10px; 
-            font-family: 'Cairo'; font-weight: 700; transition: 0.2s;
-            display: inline-flex; align-items: center; gap: 4px; line-height: 1;
-        }
-        .header-dots-btn { background: rgba(255,255,255,0.1); color: white; border-color: rgba(255,255,255,0.3); font-size: 11px; width: 85px; justify-content: center; }
-        .header-dots-btn:hover { background: white; color: var(--header-shiny-purple); }
-        .dots-btn:hover { background: #f8fafc; border-color: var(--accent-blue); color: var(--accent-blue); }
-
         .dropdown-menu { 
-            display: none; position: absolute; left: 50%; transform: translateX(-50%); 
-            top: 35px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; 
+            display: none; position: absolute; left: 0; 
+            top: 28px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; 
             box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 1000; min-width: 110px; padding: 4px;
         }
         .dropdown-menu button { 
@@ -130,11 +127,12 @@
         .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
         .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
 
+        /* الأعمدة وتوزيع العرض */
         .col-select { width: 35px; }
         .col-company { width: 12%; } .col-manager { width: 8%; } .col-mobile { width: 8%; } 
         .col-email { width: 9%; } .col-record { width: 8%; } .col-date { width: 10%; } 
         .col-service { width: 12%; } .col-notes { width: 13%; } .col-status { width: 7%; }
-        .col-edit { width: 8%; } .col-action { width: 100px; }
+        .col-edit { width: 8%; }
     </style>
 </head>
 <body onload="loadSavedData()">
@@ -161,6 +159,16 @@
                 <div class="stat-item">زيارات اليوم: <span id="stat-today" class="stat-val">0</span></div>
                 <div class="stat-item">ناجحة: <span id="stat-success" class="stat-val">0</span></div>
             </div>
+
+            <div class="bulk-action-wrapper">
+                <button class="btn-bulk-trigger" onclick="toggleDropdown(event, this)">إجراء ▾</button>
+                <div class="dropdown-menu">
+                    <button onclick="handleBulkAction('تحويل للمبيعات')">تحويل للمبيعات</button>
+                    <button onclick="handleBulkAction('تصدير Excel')">تصدير Excel</button>
+                    <button onclick="handleBulkAction('طباعة')">طباعة</button>
+                    <button class="del-btn" onclick="handleBulkAction('حذف المحدد')">حذف المحدد</button>
+                </div>
+            </div>
         </div>
         
         <div class="table-wrapper">
@@ -178,15 +186,6 @@
                         <th class="col-notes">ملاحظات الزيارة</th>
                         <th class="col-status">الحالة</th>
                         <th class="col-edit">آخر تعديل</th>
-                        <th class="col-action" style="position: relative; overflow: visible;">
-                            <button class="header-dots-btn" onclick="toggleDropdown(event, this)">إجراء •••</button>
-                            <div class="dropdown-menu">
-                                <button onclick="handleBulkAction('تحويل المحدد')">تحويل المحدد</button>
-                                <button onclick="handleBulkAction('تصدير المحدد')">تصدير المحدد</button>
-                                <button onclick="handleBulkAction('طباعة المحدد')">طباعة المحدد</button>
-                                <button class="del-btn" onclick="handleBulkAction('حذف المحدد')">حذف المحدد</button>
-                            </div>
-                        </th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -194,7 +193,7 @@
         </div>
 
         <div class="activity-log-section">
-            <div class="activity-log-title">📋 سجل النشاط</div>
+            <div class="activity-log-title">📋 سجل نشاط الزيارات</div>
             <div id="activityList" class="activity-list"></div>
         </div>
     </div>
@@ -202,7 +201,7 @@
 
 <div id="noteModal" class="modal">
     <div class="modal-content">
-        <div style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right;">سجل متابعة الزيارة والنتائج</div>
+        <div style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">سجل ملاحظات الطلب والنتائج</div>
         <div id="historyLog" class="history-log"></div>
         <textarea id="modalTextArea" class="note-area" placeholder="أدخل تفاصيل الملاحظة هنا..."></textarea>
         <div style="display:flex; justify-content: flex-end; gap:8px; margin-top:10px;">
@@ -214,7 +213,8 @@
 
 <script>
     let currentActivePreview = null;
-    const STORAGE_KEY = 'asgate_visits_final_v26'; // تحديث المفتاح لضمان العمل على نسخة نظيفة
+    const STORAGE_KEY = 'asgate_visits_final_v31'; 
+    const LOGS_KEY = 'asgate_visit_logs_v31';
 
     function getTodayFormatted() {
         const d = new Date();
@@ -234,23 +234,18 @@
         const val1 = oldVal && oldVal.trim() !== "" ? oldVal : "فارغ";
         const val2 = newVal && newVal.trim() !== "" ? newVal : "فارغ";
         
-        let actionText = "";
-        if (fieldName === "إجراء") {
-            actionText = `حذف زيارة شركة ( ${cleanCompany} )`;
-        } else {
-            actionText = `تعديل ${fieldName} من [${val1}] إلى [${val2}] في ( ${cleanCompany} )`;
-        }
-
+        let actionText = fieldName === "إجراء" ? `حذف زيارة شركة ( ${cleanCompany} )` : `تعديل ${fieldName} من [${val1}] إلى [${val2}] في ( ${cleanCompany} )`;
         const fullLogHTML = `${headerHTML}<span class="activity-text-part">${actionText}</span>`;
-        let logs = JSON.parse(localStorage.getItem('asgate_activity_logs_v26') || '[]');
+        
+        let logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
         logs.unshift(fullLogHTML);
-        localStorage.setItem('asgate_activity_logs_v26', JSON.stringify(logs.slice(0, 100)));
+        localStorage.setItem(LOGS_KEY, JSON.stringify(logs.slice(0, 100)));
         renderActivityLog();
     }
 
     function renderActivityLog() {
         const list = document.getElementById('activityList');
-        const logs = JSON.parse(localStorage.getItem('asgate_activity_logs_v26') || '[]');
+        const logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
         list.innerHTML = logs.map(log => `<div class="activity-item">${log}</div>`).join('');
     }
 
@@ -282,19 +277,19 @@
 
         row.innerHTML = `
             <td><input type="checkbox" class="select-check"></td>
-            <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الشركة', this.getAttribute('data-old'), this.value, this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المسؤول', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الموبايل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الإيميل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('السجل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'الشركة')"></td>
+            <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'المسؤول')"></td>
+            <td><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'الموبايل')"></td>
+            <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'الإيميل')"></td>
+            <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'السجل')"></td>
             <td>
                 <input type="text" class="excel-input readonly-input" value="${visitDate}" readonly>
                 <input type="hidden" class="visit-date-val" value="${visitDate}">
             </td>
-            <td><input type="text" class="excel-input" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الخدمة الحالية', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
-            <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}-${Math.random()}">${lastNoteText}</div></td>
+            <td><input type="text" class="excel-input" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'الخدمة الحالية')"></td>
+            <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
             <td>
-                <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الحالة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats();">
+                <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'الحالة'); updateStats();">
                     <option value="" ${v.status === '' ? 'selected' : ''}></option>
                     <option value="مهتم" ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option>
                     <option value="50%" ${v.status === '50%' ? 'selected' : ''}>50%</option>
@@ -305,16 +300,16 @@
                 <input type="text" class="excel-input readonly-input edit-date-display" value="${v.editDate || ''}" readonly>
                 <input type="hidden" class="edit-date-val" value="${v.editDate || ''}">
             </td>
-            <td class="action-cell">
-                <button class="dots-btn" onclick="toggleDropdown(event, this)">الإجراء ▾</button>
-                <div class="dropdown-menu">
-                    <button onclick="alert('تعديل فردي')">تعديل</button>
-                    <button onclick="alert('تحويل فردي')">تحويل</button>
-                    <button class="del-btn" onclick="deleteRow(this)">حذف</button>
-                </div>
-            </td>
         `;
         updateStats();
+    }
+
+    function handleFieldChange(input, fieldName) {
+        const row = input.closest('tr');
+        const companyName = row.cells[1].querySelector('input').value;
+        addToActivityLog(fieldName, input.getAttribute('data-old'), input.value, companyName);
+        updateEditDateField(row);
+        saveAllDataSilently();
     }
 
     function toggleAllCheckboxes(source) {
@@ -331,10 +326,8 @@
 
     function handleBulkAction(action) {
         const selected = document.querySelectorAll('.select-check:checked');
-        if (selected.length === 0) {
-            alert('يرجى تحديد صف واحد على الأقل.');
-            return;
-        }
+        if (selected.length === 0) return alert('يرجى تحديد صف واحد على الأقل.');
+        
         if (action === 'حذف المحدد') {
             if(confirm(`هل أنت متأكد من حذف ${selected.length} صفوف؟`)) {
                 selected.forEach(chk => {
@@ -357,23 +350,11 @@
         row.querySelector('.edit-date-val').value = today;
     }
 
-    function deleteRow(btn) {
-        const row = btn.closest('tr');
-        const companyName = row.cells[1].querySelector('input').value;
-        if(confirm('هل أنت متأكد؟')) {
-            addToActivityLog('إجراء', '', '', companyName);
-            row.remove();
-            saveAllDataSilently();
-            updateStats();
-        }
-    }
-
     function insertNewRow() { renderRow({}, true); saveAllDataSilently(); }
 
     function saveAllDataSilently() {
         const data = [];
         document.querySelectorAll('#tableBody tr').forEach(row => {
-            const preview = row.querySelector('.notes-preview');
             data.push({
                 comp: row.cells[1].querySelector('input').value,
                 mgr: row.cells[2].querySelector('input').value,
@@ -382,7 +363,7 @@
                 record: row.cells[5].querySelector('input').value,
                 visitDate: row.querySelector('.visit-date-val').value,
                 curServ: row.cells[7].querySelector('input').value,
-                notes: preview.getAttribute('data-full-notes') || '',
+                notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '',
                 status: row.querySelector('.status-select').value,
                 editDate: row.querySelector('.edit-date-val').value
             });
@@ -422,7 +403,7 @@
         
         if (rawNotes.trim() !== "") {
             historyLog.innerHTML = rawNotes.split('\n--------------------\n')
-                .map(entry => `<div class="activity-item" style="border-bottom:1px solid #e2e8f0; padding:5px 0;">${entry}</div>`)
+                .map(entry => `<div class="activity-item" style="border-bottom:1px solid #f1f5f9; padding:8px 0;">${entry}</div>`)
                 .join('');
         } else {
             historyLog.innerHTML = '<div style="text-align:center; color:#94a3b8; margin-top:20px;">لا توجد ملاحظات سابقة</div>';
@@ -444,7 +425,6 @@
             
             const companyName = currentActivePreview.closest('tr').cells[1].querySelector('input').value;
             addToActivityLog('ملاحظات الزيارة', '...', newText, companyName);
-            
             updateEditDateField(currentActivePreview.closest('tr'));
             saveAllDataSilently();
         }
@@ -457,7 +437,7 @@
     }
 
     window.onclick = (e) => {
-        if (!e.target.matches('.dots-btn') && !e.target.matches('.header-dots-btn')) {
+        if (!e.target.matches('.btn-bulk-trigger')) {
             document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
         }
     };
