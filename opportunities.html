@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASGate - الفرص البيعية</title>
+    <title>ASGate - الفرص البيعية المطورة</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -77,13 +77,30 @@
         
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; max-height: 45px; font-size: 11px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; }
         
+        /* تصميم حقل التاريخ المتوقع الأفقي */
+        .date-scroll-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            gap: 2px;
+        }
+        .date-arrow {
+            cursor: pointer;
+            color: var(--accent-blue);
+            font-weight: bold;
+            font-size: 14px;
+            user-select: none;
+            padding: 0 2px;
+        }
+        .date-arrow:hover { color: var(--nav-active); }
+
         .sub-table-row { display: none; background-color: #f8fafc; }
         .sub-table-container { padding: 8px 12% 12px 5%; } 
         .inner-table { width: 65%; background: white; border: 1px solid var(--border-soft); border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden; }
         .inner-table th { background: var(--accent-blue); color: #fff; height: 24px; font-size: 9.5px; border-left: 1px solid rgba(255,255,255,0.2); }
         .inner-table td { height: 28px; border: 1px solid #edf2f7; padding: 0; }
-        .inner-table input, .inner-table select { width: 100%; height: 100%; border: none; text-align: center; font-family: 'Cairo'; font-size: 10.5px; outline: none; background: transparent; }
-        .inner-table select { text-align-last: center; cursor: pointer; }
         
         .sub-action-btn { 
             width: 22px; height: 22px; border: none; border-radius: 4px; cursor: pointer; 
@@ -91,15 +108,9 @@
             transition: 0.2s;
         }
         .btn-plus { background: #22c55e; color: white; }
-        .btn-plus:hover { background: #16a34a; }
         .btn-minus { background: #fee2e2; color: #ef4444; }
-        .btn-minus:hover { background: #fecaca; }
 
-        .toggle-arrow { 
-            cursor: pointer; font-size: 13px; color: var(--accent-blue); margin-right: 5px; 
-            display: inline-block; transition: transform 0.2s; vertical-align: middle;
-            font-weight: bold;
-        }
+        .toggle-arrow { cursor: pointer; font-size: 13px; color: var(--accent-blue); margin-right: 5px; font-weight: bold; }
         .arrow-open { transform: rotate(90deg); }
 
         tbody tr.main-row:nth-child(4n+1) { background-color: #eff6ff; }
@@ -110,20 +121,18 @@
             height: 100%; overflow: hidden; text-overflow: ellipsis; 
         }
 
-        .select-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent-blue); vertical-align: middle; }
+        .select-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent-blue); }
 
         .dropdown-menu { 
             display: none; position: absolute; left: 0; 
             top: 28px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; 
             box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 1000; min-width: 110px; padding: 4px;
         }
-
         .dropdown-menu button { 
             width: 100%; padding: 6px 10px; border: none; background: none; font-family: 'Cairo'; 
             font-size: 10.5px; text-align: right; cursor: pointer; color: #475569; font-weight: 700; 
             border-radius: 4px; transition: 0.2s; display: block;
         }
-        .dropdown-menu button:hover { background: #f1f5f9; color: var(--accent-blue); }
         .dropdown-menu .del-btn:hover { background: #fee2e2; color: #ef4444; }
         .show { display: block; }
 
@@ -142,15 +151,14 @@
         .activity-list { flex: 1; overflow-y: auto; font-size: 11.5px; line-height: 1.6; }
         .activity-item { margin-bottom: 4px; border-bottom: 1px dashed #f8fafc; padding-bottom: 4px; color: #475569; display: flex; align-items: center; }
         
-        .activity-header-part { font-size: 11.5px; color: var(--chat-yellow); font-weight: 800; display: inline-block; }
+        .activity-header-part { font-size: 11.5px; color: var(--chat-yellow); font-weight: 800; }
         .activity-time-part { font-size: 11.5px; font-weight: 800; }
         .activity-text-part { font-size: 11.5px; color: #475569; display: block; text-align: right; white-space: pre-wrap; margin-top: 2px; }
 
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-content { background: white; padding: 18px; border-radius: 12px; width: 440px; height: 480px; display: flex; flex-direction: column; }
-        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; direction: rtl; }
-        .history-log .activity-item { display: block; margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
-        .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; direction: rtl; }
+        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; direction: rtl; }
+        .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; text-align: right; box-sizing: border-box; direction: rtl; }
 
         .col-select { width: 3%; }
         .col-company { width: 11%; } 
@@ -163,7 +171,7 @@
         .col-val { width: 8%; } 
         .col-notes { width: 11%; } 
         .col-status { width: 8%; }
-        .col-edit { width: 7%; } 
+        .col-edit { width: 10%; } /* تم توسيع الحقل قليلاً ليتناسب مع الأسهم */
         .col-owner { width: 7%; }
     </style>
 </head>
@@ -251,8 +259,8 @@
 
 <script>
     let currentActivePreview = null;
-    const STORAGE_KEY = 'asgate_opportunities_final_v33'; 
-    const LOGS_KEY = 'asgate_opportunities_logs_v33';
+    const STORAGE_KEY = 'asgate_opportunities_final_v34'; 
+    const LOGS_KEY = 'asgate_opportunities_logs_v34';
 
     function getTodayFormatted() {
         const d = new Date();
@@ -264,8 +272,7 @@
         const d = new Date();
         const hours = String(d.getHours()).padStart(2, '0');
         const minutes = String(d.getMinutes()).padStart(2, '0');
-        const time24 = `${hours}:${minutes}`;
-        return `<span class="activity-header-part">👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${getTodayFormatted()}  <span class="activity-time-part">${time24}</span></span>`;
+        return `<span class="activity-header-part">👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${getTodayFormatted()}  <span class="activity-time-part">${hours}:${minutes}</span></span>`;
     }
 
     function addToActivityLog(fieldName, oldVal, newVal, companyName) {
@@ -273,14 +280,7 @@
         const cleanCompany = (companyName && companyName.trim() !== "") ? companyName : "شركة جديدة";
         const v1 = (oldVal && oldVal.toString().trim() !== "") ? oldVal : "فارغ";
         const v2 = (newVal && newVal.toString().trim() !== "") ? newVal : "فارغ";
-        
-        let actionText = "";
-        if (fieldName === "إجراء") {
-            actionText = `${oldVal} لفرصة شركة ( ${cleanCompany} )`;
-        } else {
-            actionText = `تعديل ${fieldName} من [${v1}] إلى [${v2}] في ( ${cleanCompany} )`;
-        }
-        
+        let actionText = fieldName === "إجراء" ? `${oldVal} لفرصة شركة ( ${cleanCompany} )` : `تعديل ${fieldName} من [${v1}] إلى [${v2}] في ( ${cleanCompany} )`;
         const fullLogHTML = `${headerHTML}<span class="activity-text-part">${actionText}</span>`;
         let logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
         logs.unshift(fullLogHTML);
@@ -294,53 +294,17 @@
         list.innerHTML = logs.map(log => `<div class="activity-item">${log}</div>`).join('');
     }
 
-    function updateStats() {
-        const rows = document.querySelectorAll('#tableBody .main-row');
-        const today = getTodayFormatted();
-        const currentMonth = today.substring(0, 7);
-        let total = rows.length, tDay = 0, tMonth = 0, valTotal = 0, valMonth = 0;
-        rows.forEach(row => {
-            const dateInput = row.querySelector('.visit-date-val');
-            const oppValInput = row.querySelector('.opp-value-input');
-            const oppVal = oppValInput ? parseFloat(oppValInput.value) || 0 : 0;
-            valTotal += oppVal;
-            if(dateInput) {
-                const date = dateInput.value;
-                if (date === today) tDay++;
-                if (date.startsWith(currentMonth)) { tMonth++; valMonth += oppVal; }
-            }
-        });
-        document.getElementById('stat-total').innerText = total;
-        document.getElementById('stat-today').innerText = tDay;
-        document.getElementById('stat-month').innerText = tMonth;
-        document.getElementById('stat-value-total').innerText = valTotal.toLocaleString();
-        document.getElementById('stat-value-month').innerText = valMonth.toLocaleString();
-    }
-
-    function reorderRows() {
-        const tbody = document.getElementById('tableBody');
-        const rows = Array.from(tbody.querySelectorAll('.main-row'));
-        rows.sort((a, b) => {
-            const statusA = a.querySelector('.status-select').value;
-            const statusB = b.querySelector('.status-select').value;
-            const dateA = a.querySelector('.expected-date-input').value || '9999-99-99';
-            const dateB = b.querySelector('.expected-date-input').value || '9999-99-99';
-            
-            const getRank = (status) => {
-                if (status === 'مهتم') return 4;
-                if (status === 'تأجيل') return 3;
-                if (status === 'مكتمل') return 2;
-                if (status === 'فقدان') return 1;
-                return 0;
-            };
-            if (getRank(statusB) !== getRank(statusA)) return getRank(statusB) - getRank(statusA);
-            return dateA.localeCompare(dateB);
-        });
-        rows.forEach(mainRow => {
-            const subRow = document.getElementById('sub-' + mainRow.id);
-            tbody.appendChild(mainRow);
-            if(subRow) tbody.appendChild(subRow);
-        });
+    function changeExpectedDate(inputEl, days) {
+        const oldVal = inputEl.value;
+        const date = new Date(oldVal);
+        date.setDate(date.getDate() + days);
+        const newVal = date.toISOString().split('T')[0];
+        inputEl.value = newVal;
+        
+        const companyName = inputEl.closest('tr').cells[1].querySelector('input').value;
+        addToActivityLog('التاريخ المتوقع', oldVal, newVal, companyName);
+        saveAllDataSilently();
+        reorderRows();
     }
 
     function renderRow(v = {}, prepend = false) {
@@ -364,20 +328,17 @@
                 <input type="checkbox" class="select-check">
                 <span class="toggle-arrow" onclick="toggleSubTable('${rowId}')">▶</span>
             </td>
-            <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الشركة', this.dataset.old, this.value, this.value); saveAllDataSilently(); updateStats();"></td>
-            <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المسؤول', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الموبايل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الإيميل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('السجل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
-            <td>
-                <input type="text" class="excel-input readonly-input" value="${visitDate}" readonly>
-                <input type="hidden" class="visit-date-val" value="${visitDate}">
-            </td>
-            <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الخدمة الحالية', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
-            <td><input type="number" class="excel-input opp-value-input" value="${v.oppValue || ''}" data-old="${v.oppValue || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('قيمة الفرصة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); updateStats();"></td>
+            <td><input type="text" class="excel-input" value="${v.comp || ''}" onchange="saveAllDataSilently(); updateStats();"></td>
+            <td><input type="text" class="excel-input" value="${v.mgr || ''}" onchange="saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.mob || ''}" onchange="saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.email || ''}" onchange="saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.record || ''}" onchange="saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input readonly-input" value="${visitDate}" readonly><input type="hidden" class="visit-date-val" value="${visitDate}"></td>
+            <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" onchange="saveAllDataSilently();"></td>
+            <td><input type="number" class="excel-input opp-value-input" value="${v.oppValue || ''}" onchange="saveAllDataSilently(); updateStats();"></td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
             <td>
-                <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الحالة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); updateStats(); reorderRows();">
+                <select class="excel-input status-select" onchange="saveAllDataSilently(); updateStats(); reorderRows();">
                     <option value="" ${v.status === '' ? 'selected' : ''}></option>
                     <option value="مهتم" ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option>
                     <option value="تأجيل" ${v.status === 'تأجيل' ? 'selected' : ''}>تأجيل</option>
@@ -385,8 +346,14 @@
                     <option value="فقدان" ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option>
                 </select>
             </td>
-            <td><input type="date" class="excel-input expected-date-input" value="${expectedDate}" data-old="${expectedDate}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('التاريخ المتوقع', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); reorderRows();"></td>
-            <td><input type="text" class="excel-input" value="${v.owner || 'أحمد'}" data-old="${v.owner || 'أحمد'}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المالك', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
+            <td>
+                <div class="date-scroll-container">
+                    <span class="date-arrow" onclick="changeExpectedDate(this.nextElementSibling, -1)">◀</span>
+                    <input type="date" class="excel-input expected-date-input" value="${expectedDate}" onchange="saveAllDataSilently(); reorderRows();">
+                    <span class="date-arrow" onclick="changeExpectedDate(this.previousElementSibling, 1)">▶</span>
+                </div>
+            </td>
+            <td><input type="text" class="excel-input" value="${v.owner || 'أحمد'}" onchange="saveAllDataSilently();"></td>
         `;
 
         subRow.innerHTML = `<td colspan="13"><div class="sub-table-container"><table class="inner-table"><thead><tr><th>نوع المنتج</th><th>تفاصيل المنتج</th><th>العدد</th><th>الاشتراك</th><th>الإجمالي</th><th style="width:65px">إجراء</th></tr></thead><tbody class="product-body"></tbody></table></div></td>`;
@@ -490,6 +457,48 @@
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
 
+    function updateStats() {
+        const rows = document.querySelectorAll('#tableBody .main-row');
+        const today = getTodayFormatted();
+        const currentMonth = today.substring(0, 7);
+        let total = rows.length, tDay = 0, tMonth = 0, valTotal = 0, valMonth = 0;
+        rows.forEach(row => {
+            const dateInput = row.querySelector('.visit-date-val');
+            const oppValInput = row.querySelector('.opp-value-input');
+            const oppVal = oppValInput ? parseFloat(oppValInput.value) || 0 : 0;
+            valTotal += oppVal;
+            if(dateInput) {
+                const date = dateInput.value;
+                if (date === today) tDay++;
+                if (date.startsWith(currentMonth)) { tMonth++; valMonth += oppVal; }
+            }
+        });
+        document.getElementById('stat-total').innerText = total;
+        document.getElementById('stat-today').innerText = tDay;
+        document.getElementById('stat-month').innerText = tMonth;
+        document.getElementById('stat-value-total').innerText = valTotal.toLocaleString();
+        document.getElementById('stat-value-month').innerText = valMonth.toLocaleString();
+    }
+
+    function reorderRows() {
+        const tbody = document.getElementById('tableBody');
+        const rows = Array.from(tbody.querySelectorAll('.main-row'));
+        rows.sort((a, b) => {
+            const statusA = a.querySelector('.status-select').value;
+            const statusB = b.querySelector('.status-select').value;
+            const dateA = a.querySelector('.expected-date-input').value || '9999-99-99';
+            const dateB = b.querySelector('.expected-date-input').value || '9999-99-99';
+            const getRank = (s) => (s === 'مهتم' ? 4 : s === 'تأجيل' ? 3 : s === 'مكتمل' ? 2 : s === 'فقدان' ? 1 : 0);
+            if (getRank(statusB) !== getRank(statusA)) return getRank(statusB) - getRank(statusA);
+            return dateA.localeCompare(dateB);
+        });
+        rows.forEach(mainRow => {
+            const subRow = document.getElementById('sub-' + mainRow.id);
+            tbody.appendChild(mainRow);
+            if(subRow) tbody.appendChild(subRow);
+        });
+    }
+
     function loadSavedData() {
         const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
         const tbody = document.getElementById('tableBody');
@@ -502,17 +511,13 @@
     function insertNewRow() { 
         renderRow({}, true); 
         saveAllDataSilently(); 
-        const companyName = "جديدة";
-        addToActivityLog("إجراء", "إضافة فرصة", "", companyName);
+        addToActivityLog("إجراء", "إضافة فرصة", "", "جديدة");
     }
 
     function filterTable() {
         const q = document.getElementById('searchInput').value.toLowerCase();
         document.querySelectorAll('.main-row').forEach(row => {
-            const text = row.innerText.toLowerCase();
-            const subRow = document.getElementById('sub-' + row.id);
-            row.style.display = text.includes(q) ? "" : "none";
-            if(subRow) subRow.style.display = "none";
+            row.style.display = row.innerText.toLowerCase().includes(q) ? "" : "none";
         });
     }
 
