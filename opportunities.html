@@ -152,7 +152,6 @@
         .history-log .activity-item { display: block; margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
         .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; direction: rtl; }
 
-        /* عرض الأعمدة */
         .col-select { width: 3%; }
         .col-company { width: 11%; } 
         .col-manager { width: 7%; } 
@@ -252,8 +251,8 @@
 
 <script>
     let currentActivePreview = null;
-    const STORAGE_KEY = 'asgate_opportunities_final_v32'; 
-    const LOGS_KEY = 'asgate_opportunities_logs_v32';
+    const STORAGE_KEY = 'asgate_opportunities_final_v33'; 
+    const LOGS_KEY = 'asgate_opportunities_logs_v33';
 
     function getTodayFormatted() {
         const d = new Date();
@@ -271,10 +270,17 @@
 
     function addToActivityLog(fieldName, oldVal, newVal, companyName) {
         const headerHTML = generateStyledHeader();
-        const cleanCompany = companyName && companyName.trim() !== "" ? companyName : "شركة جديدة";
-        const val1 = oldVal && oldVal.trim() !== "" ? oldVal : "فارغ";
-        const val2 = newVal && newVal.trim() !== "" ? newVal : "فارغ";
-        let actionText = fieldName === "إجراء" ? `حذف فرصة شركة ( ${cleanCompany} )` : `تعديل ${fieldName} من [${val1}] إلى [${val2}] في ( ${cleanCompany} )`;
+        const cleanCompany = (companyName && companyName.trim() !== "") ? companyName : "شركة جديدة";
+        const v1 = (oldVal && oldVal.toString().trim() !== "") ? oldVal : "فارغ";
+        const v2 = (newVal && newVal.toString().trim() !== "") ? newVal : "فارغ";
+        
+        let actionText = "";
+        if (fieldName === "إجراء") {
+            actionText = `${oldVal} لفرصة شركة ( ${cleanCompany} )`;
+        } else {
+            actionText = `تعديل ${fieldName} من [${v1}] إلى [${v2}] في ( ${cleanCompany} )`;
+        }
+        
         const fullLogHTML = `${headerHTML}<span class="activity-text-part">${actionText}</span>`;
         let logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
         logs.unshift(fullLogHTML);
@@ -327,11 +333,8 @@
                 if (status === 'فقدان') return 1;
                 return 0;
             };
-
-            if (getRank(statusB) !== getRank(statusA)) {
-                return getRank(statusB) - getRank(statusA);
-            }
-            return dateA.localeCompare(dateB); // تصاعدي حسب التاريخ للأهم
+            if (getRank(statusB) !== getRank(statusA)) return getRank(statusB) - getRank(statusA);
+            return dateA.localeCompare(dateB);
         });
         rows.forEach(mainRow => {
             const subRow = document.getElementById('sub-' + mainRow.id);
@@ -361,20 +364,20 @@
                 <input type="checkbox" class="select-check">
                 <span class="toggle-arrow" onclick="toggleSubTable('${rowId}')">▶</span>
             </td>
-            <td><input type="text" class="excel-input" value="${v.comp || ''}" onchange="addToActivityLog('الشركة', '', this.value, this.value); saveAllDataSilently(); updateStats();"></td>
-            <td><input type="text" class="excel-input" value="${v.mgr || ''}" onchange="saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${v.mob || ''}" onchange="saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${v.email || ''}" onchange="saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${v.record || ''}" onchange="saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الشركة', this.dataset.old, this.value, this.value); saveAllDataSilently(); updateStats();"></td>
+            <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المسؤول', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الموبايل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الإيميل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('السجل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
             <td>
                 <input type="text" class="excel-input readonly-input" value="${visitDate}" readonly>
                 <input type="hidden" class="visit-date-val" value="${visitDate}">
             </td>
-            <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" onchange="saveAllDataSilently();"></td>
-            <td><input type="number" class="excel-input opp-value-input" value="${v.oppValue || ''}" onchange="saveAllDataSilently(); updateStats();"></td>
+            <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الخدمة الحالية', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><input type="number" class="excel-input opp-value-input" value="${v.oppValue || ''}" data-old="${v.oppValue || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('قيمة الفرصة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); updateStats();"></td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
             <td>
-                <select class="excel-input status-select" onchange="saveAllDataSilently(); updateStats(); reorderRows();">
+                <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الحالة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); updateStats(); reorderRows();">
                     <option value="" ${v.status === '' ? 'selected' : ''}></option>
                     <option value="مهتم" ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option>
                     <option value="تأجيل" ${v.status === 'تأجيل' ? 'selected' : ''}>تأجيل</option>
@@ -382,8 +385,8 @@
                     <option value="فقدان" ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option>
                 </select>
             </td>
-            <td><input type="date" class="excel-input expected-date-input" value="${expectedDate}" onchange="saveAllDataSilently(); reorderRows();"></td>
-            <td><input type="text" class="excel-input" value="${v.owner || 'أحمد'}" onchange="saveAllDataSilently();"></td>
+            <td><input type="date" class="excel-input expected-date-input" value="${expectedDate}" data-old="${expectedDate}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('التاريخ المتوقع', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); reorderRows();"></td>
+            <td><input type="text" class="excel-input" value="${v.owner || 'أحمد'}" data-old="${v.owner || 'أحمد'}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المالك', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
         `;
 
         subRow.innerHTML = `<td colspan="13"><div class="sub-table-container"><table class="inner-table"><thead><tr><th>نوع المنتج</th><th>تفاصيل المنتج</th><th>العدد</th><th>الاشتراك</th><th>الإجمالي</th><th style="width:65px">إجراء</th></tr></thead><tbody class="product-body"></tbody></table></div></td>`;
@@ -439,13 +442,19 @@
             selected.forEach(chk => {
                 const row = chk.closest('tr');
                 const id = row.id;
-                addToActivityLog('إجراء', '', '', row.cells[1].querySelector('input').value);
+                const companyName = row.cells[1].querySelector('input').value;
+                addToActivityLog('إجراء', 'حذف', '', companyName);
                 row.remove();
                 if(document.getElementById('sub-' + id)) document.getElementById('sub-' + id).remove();
             });
             saveAllDataSilently();
             updateStats();
         } else {
+            selected.forEach(chk => {
+                const row = chk.closest('tr');
+                const companyName = row.cells[1].querySelector('input').value;
+                addToActivityLog('إجراء', action, '', companyName);
+            });
             alert('تم تنفيذ ' + action + ' على ' + selected.length + ' من الصفوف');
         }
     }
@@ -490,7 +499,12 @@
         updateStats();
     }
 
-    function insertNewRow() { renderRow({}, true); saveAllDataSilently(); }
+    function insertNewRow() { 
+        renderRow({}, true); 
+        saveAllDataSilently(); 
+        const companyName = "جديدة";
+        addToActivityLog("إجراء", "إضافة فرصة", "", companyName);
+    }
 
     function filterTable() {
         const q = document.getElementById('searchInput').value.toLowerCase();
@@ -502,7 +516,6 @@
         });
     }
 
-    // وظائف الملاحظات
     function getLastNoteOnly(fullText) {
         if (!fullText || fullText.trim() === "") return 'إضافة ملاحظة...';
         const arr = fullText.split('\n--------------------\n');
