@@ -226,7 +226,7 @@
                         <th class="col-record">السجل</th>
                         <th class="col-date">تاريخ الزيارة</th>
                         <th class="col-service">الخدمة الحالية</th>
-                        <th class="col-val">قيمة الفرصة</th>
+                        <th class="col-val">قيمة الزيارة</th>
                         <th class="col-notes">ملاحظات الزيارة</th>
                         <th class="col-status">الحالة</th>
                         <th class="col-edit">آخر تعديل</th>
@@ -326,15 +326,15 @@
         let valTotal = 0, valMonth = 0;
         rows.forEach(row => {
             const dateInput = row.querySelector('.visit-date-val');
-            const oppValInput = row.querySelector('.opp-value-input');
-            const oppVal = oppValInput ? parseFloat(oppValInput.value) || 0 : 0;
-            valTotal += oppVal;
+            const visitValInput = row.querySelector('.opp-value-input');
+            const visitVal = visitValInput ? parseFloat(visitValInput.value) || 0 : 0;
+            valTotal += visitVal;
             if(dateInput) {
                 const date = dateInput.value;
                 if (date === today) tDay++;
                 if (date.startsWith(currentMonth)) {
                     tMonth++;
-                    valMonth += oppVal;
+                    valMonth += visitVal;
                 }
             }
         });
@@ -396,7 +396,7 @@
                 <input type="hidden" class="visit-date-val" value="${visitDate}">
             </td>
             <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الخدمة الحالية', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
-            <td><input type="number" class="excel-input opp-value-input" value="${v.oppValue || ''}" data-old="${v.oppValue || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('قيمة الفرصة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats();"></td>
+            <td><input type="number" class="excel-input opp-value-input" value="${v.oppValue || '0'}" readonly></td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
             <td>
                 <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الحالة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats(); reorderRows();">
@@ -431,13 +431,45 @@
         const tbody = document.querySelector(`#sub-${rowId} .product-body`);
         const row = tbody.insertRow();
         row.innerHTML = `
-            <td><select onchange="saveAllDataSilently()"><option value=""></option><option value="جوال" ${data.type === 'جوال' ? 'selected' : ''}>جوال</option><option value="بيانات" ${data.type === 'بيانات' ? 'selected' : ''}>بيانات</option><option value="هاتف" ${data.type === 'هاتف' ? 'selected' : ''}>هاتف</option><option value="فايبر" ${data.type === 'فايبر' ? 'selected' : ''}>فايبر</option><option value="DIA" ${data.type === 'DIA' ? 'selected' : ''}>DIA</option><option value="SIP Trunk" ${data.type === 'SIP Trunk' ? 'selected' : ''}>SIP Trunk</option><option value="IPvpn" ${data.type === 'IPvpn' ? 'selected' : ''}>IPvpn</option></select></td>
+            <td><select onchange="calculateProductRow(this, '${rowId}')"><option value=""></option><option value="جوال" ${data.type === 'جوال' ? 'selected' : ''}>جوال</option><option value="بيانات" ${data.type === 'بيانات' ? 'selected' : ''}>بيانات</option><option value="هاتف" ${data.type === 'هاتف' ? 'selected' : ''}>هاتف</option><option value="فايبر" ${data.type === 'فايبر' ? 'selected' : ''}>فايبر</option><option value="DIA" ${data.type === 'DIA' ? 'selected' : ''}>DIA</option><option value="SIP Trunk" ${data.type === 'SIP Trunk' ? 'selected' : ''}>SIP Trunk</option><option value="IPvpn" ${data.type === 'IPvpn' ? 'selected' : ''}>IPvpn</option></select></td>
             <td><input type="text" value="${data.desc || ''}" onchange="saveAllDataSilently()"></td>
-            <td><input type="text" value="${data.qty || ''}" onchange="saveAllDataSilently()"></td>
-            <td><input type="text" value="${data.sub || ''}" onchange="saveAllDataSilently()"></td>
-            <td><input type="text" value="${data.total || ''}" onchange="saveAllDataSilently()"></td>
-            <td><div style="display:flex; justify-content:center; gap:5px;"><button class="sub-action-btn btn-plus" onclick="addProductRow('${rowId}')">+</button><button class="sub-action-btn btn-minus" onclick="if(this.closest('tbody').rows.length > 1) { this.closest('tr').remove(); saveAllDataSilently(); }">×</button></div></td>
+            <td><input type="number" class="p-qty" value="${data.qty || ''}" oninput="calculateProductRow(this, '${rowId}')"></td>
+            <td><input type="number" class="p-sub" value="${data.sub || ''}" oninput="calculateProductRow(this, '${rowId}')"></td>
+            <td><input type="number" class="p-total" value="${data.total || '0'}" readonly></td>
+            <td><div style="display:flex; justify-content:center; gap:5px;"><button class="sub-action-btn btn-plus" onclick="addProductRow('${rowId}')">+</button><button class="sub-action-btn btn-minus" onclick="removeProductRow(this, '${rowId}')">×</button></div></td>
         `;
+    }
+
+    function calculateProductRow(el, rowId) {
+        const tr = el.closest('tr');
+        const qty = parseFloat(tr.querySelector('.p-qty').value) || 0;
+        const sub = parseFloat(tr.querySelector('.p-sub').value) || 0;
+        const totalInput = tr.querySelector('.p-total');
+        totalInput.value = (qty * sub);
+        
+        calculateMainVisitValue(rowId);
+        saveAllDataSilently();
+    }
+
+    function removeProductRow(btn, rowId) {
+        const tbody = btn.closest('tbody');
+        if(tbody.rows.length > 1) {
+            btn.closest('tr').remove();
+            calculateMainVisitValue(rowId);
+            saveAllDataSilently();
+        }
+    }
+
+    function calculateMainVisitValue(rowId) {
+        const subRow = document.getElementById('sub-' + rowId);
+        const mainRow = document.getElementById(rowId);
+        let totalVisit = 0;
+        subRow.querySelectorAll('.p-total').forEach(input => {
+            totalVisit += parseFloat(input.value) || 0;
+        });
+        const mainValInput = mainRow.querySelector('.opp-value-input');
+        mainValInput.value = totalVisit;
+        updateStats();
     }
 
     function toggleAllCheckboxes(source) { document.querySelectorAll('.select-check').forEach(chk => chk.checked = source.checked); }
