@@ -260,6 +260,7 @@
     let currentActivePreview = null;
     const STORAGE_KEY = 'asgate_visits_final_v31'; 
     const LOGS_KEY = 'asgate_visits_logs_v31';
+    const OPPORTUNITIES_KEY = 'asgate_opportunities_final_v31'; // مفتاح صفحة الفرص
 
     function getTodayFormatted() {
         const d = new Date();
@@ -399,7 +400,7 @@
             <td><input type="number" class="excel-input opp-value-input" value="${v.oppValue || '0'}" readonly></td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
             <td>
-                <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الحالة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats(); reorderRows();">
+                <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleStatusChange(this, '${rowId}')">
                     <option value="" ${v.status === '' ? 'selected' : ''}></option>
                     <option value="تأهيل لفرصة" ${v.status === 'تأهيل لفرصة' ? 'selected' : ''}>تأهيل لفرصة</option>
                     <option value="متابعة" ${v.status === 'متابعة' ? 'selected' : ''}>متابعة</option>
@@ -418,6 +419,84 @@
         if (v.products && v.products.length > 0) { v.products.forEach(p => addProductRow(rowId, p)); } else { addProductRow(rowId); }
         updateStats();
         if(!prepend) reorderRows();
+    }
+
+    // دالة التعامل مع تغيير الحالة ونظام النقل
+    function handleStatusChange(selectEl, rowId) {
+        const newVal = selectEl.value;
+        const oldVal = selectEl.getAttribute('data-old');
+        const companyName = selectEl.closest('tr').cells[1].querySelector('input').value;
+
+        if (newVal === "تأهيل لفرصة") {
+            if (confirm("هل أنت متأكد من نقل الزيارة إلى الفرص البيعية؟")) {
+                transferToOpportunities(rowId);
+                return; // الخروج لأن الصف سيُحذف
+            } else {
+                selectEl.value = oldVal; // التراجع في حال الرفض
+                return;
+            }
+        }
+
+        // الحالات العادية
+        addToActivityLog('الحالة', oldVal, newVal, companyName);
+        updateEditDateField(selectEl.closest('tr'));
+        saveAllDataSilently();
+        updateStats();
+        reorderRows();
+        selectEl.setAttribute('data-old', newVal);
+    }
+
+    // دالة النقل الفعلية
+    function transferToOpportunities(rowId) {
+        const row = document.getElementById(rowId);
+        const subRow = document.getElementById('sub-' + rowId);
+        
+        // تجميع المنتجات من الجدول الفرعي
+        const products = [];
+        subRow.querySelectorAll('.product-body tr').forEach(pRow => {
+            const inputs = pRow.querySelectorAll('input, select');
+            products.push({
+                type: inputs[0].value,
+                desc: inputs[1].value,
+                qty: inputs[2].value,
+                sub: inputs[3].value,
+                total: inputs[4].value
+            });
+        });
+
+        // تجميع بيانات الزيارة بالكامل
+        const visitData = {
+            comp: row.cells[1].querySelector('input').value,
+            mgr: row.cells[2].querySelector('input').value,
+            mob: row.cells[3].querySelector('input').value,
+            email: row.cells[4].querySelector('input').value,
+            record: row.cells[5].querySelector('input').value,
+            oppDate: getTodayFormatted(), // تاريخ النقل يصبح تاريخ الفرصة
+            curServ: row.querySelector('.cur-serv-val').value,
+            oppValue: row.querySelector('.opp-value-input').value,
+            notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '',
+            status: "مهتم", // تعيين حالة افتراضية في صفحة الفرص
+            editDate: row.querySelector('.edit-date-val').value,
+            owner: row.cells[12].querySelector('input').value,
+            products: products
+        };
+
+        // حفظ البيانات في الفرص البيعية (Local Storage)
+        let opps = JSON.parse(localStorage.getItem(OPPORTUNITIES_KEY) || '[]');
+        opps.unshift(visitData);
+        localStorage.setItem(OPPORTUNITIES_KEY, JSON.stringify(opps));
+
+        // إضافة سجل نشاط للنقل
+        addToActivityLog('إجراء', '', '', `نقل إلى الفرص: ${visitData.comp}`);
+
+        // حذف الصف من صفحة الزيارات
+        row.remove();
+        if(subRow) subRow.remove();
+        
+        saveAllDataSilently();
+        updateStats();
+        
+        alert("تم نقل الزيارة بنجاح إلى صفحة الفرص البيعية.");
     }
 
     function toggleSubTable(rowId) {
@@ -442,16 +521,12 @@
 
     function calculateProductRow(el, rowId) {
         const tr = el.closest('tr');
-        
         let qty = parseFloat(tr.querySelector('.p-qty').value) || 0;
         let sub = parseFloat(tr.querySelector('.p-sub').value) || 0;
-        
         if (qty < 0) { qty = 0; tr.querySelector('.p-qty').value = 0; }
         if (sub < 0) { sub = 0; tr.querySelector('.p-sub').value = 0; }
-
         const totalInput = tr.querySelector('.p-total');
         totalInput.value = (qty * sub);
-        
         calculateMainVisitValue(rowId);
         saveAllDataSilently();
     }
@@ -468,6 +543,7 @@
     function calculateMainVisitValue(rowId) {
         const subRow = document.getElementById('sub-' + rowId);
         const mainRow = document.getElementById(rowId);
+        if (!mainRow) return;
         let totalVisit = 0;
         subRow.querySelectorAll('.p-total').forEach(input => {
             totalVisit += parseFloat(input.value) || 0;
