@@ -50,14 +50,10 @@
             font-family: 'Cairo'; font-size: 12px; font-weight: 700; outline: none;
         }
 
-        .stats-bar {
-            margin-right: auto; display: flex; gap: 10px; align-items: center;
-            background: #fff; padding: 0 10px; border-radius: 5px; height: 25px;
-            border: 1px solid var(--border-soft); box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        .stats-bar-visit { margin-right: auto; display: flex; gap: 15px; align-items: center; background: #fff; padding: 0 15px; border-radius: 5px; height: 25px; border: 1px solid var(--border-soft); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .stats-bar-visit { margin-right: auto; display: flex; gap: 12px; align-items: center; background: #fff; padding: 0 15px; border-radius: 5px; height: 25px; border: 1px solid var(--border-soft); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .stat-item { font-size: 10px; font-weight: 800; color: #475569; white-space: nowrap; }
         .stat-val { color: var(--accent-blue); margin-right: 3px; }
+        .stat-divider { color: #cbd5e1; font-weight: normal; margin: 0 2px; }
 
         .bulk-action-wrapper { position: relative; display: flex; align-items: center; margin-right: 5px; }
         .btn-bulk-trigger { 
@@ -114,7 +110,6 @@
             height: 100%; overflow: hidden; text-overflow: ellipsis; 
         }
 
-        /* تنسيق مخصص لحقل آخر تعديل لفصل خط التاريخ عن الوقت وتقليل حجم خط الوقت */
         .edit-date-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; line-height: 1.3; }
         .edit-date-d { font-size: 11px; font-weight: 600; color: inherit; }
         .edit-date-t { font-size: 9.5px; font-weight: 700; color: #64748b; }
@@ -154,7 +149,7 @@
         .activity-item { margin-bottom: 4px; border-bottom: 1px dashed #f8fafc; padding-bottom: 4px; color: #475569; display: flex; align-items: center; }
         
         .activity-header-part { font-size: 11.5px; color: var(--chat-yellow); font-weight: 800; display: inline-block; }
-        .activity-time-part { font-size: 10px; font-weight: normal; }
+        .activity-time-part { font-size: 11.5px; font-weight: 800; }
         .activity-text-part { font-size: 11.5px; color: #475569; display: block; text-align: right; white-space: pre-wrap; margin-top: 2px; }
 
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
@@ -166,17 +161,18 @@
         .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; direction: rtl; }
 
         .col-select { width: 3%; }
-        .col-company { width: 12%; } 
-        .col-manager { width: 8%; } 
-        .col-mobile { width: 8%; } 
-        .col-email { width: 8%; } 
-        .col-record { width: 8%; } 
+        .col-company { width: 11%; } 
+        .col-manager { width: 7%; } 
+        .col-mobile { width: 7%; } 
+        .col-email { width: 7%; } 
+        .col-record { width: 7%; } 
         .col-date { width: 8%; } 
-        .col-service { width: 10%; } 
+        .col-service { width: 9%; } 
+        .col-val { width: 8%; } 
         .col-notes { width: 11%; } 
         .col-status { width: 8%; }
-        .col-edit { width: 8%; } 
-        .col-owner { width: 8%; }
+        .col-edit { width: 7%; } 
+        .col-owner { width: 7%; }
     </style>
 </head>
 <body onload="loadSavedData()">
@@ -201,6 +197,9 @@
                 <div class="stat-item">إجمالي الزيارات: <span id="stat-total" class="stat-val">0</span></div>
                 <div class="stat-item">زيارات الشهر الحالي: <span id="stat-month" class="stat-val">0</span></div>
                 <div class="stat-item">زيارات اليوم: <span id="stat-today" class="stat-val">0</span></div>
+                <div class="stat-divider">|</div>
+                <div class="stat-item">قيمة الزيارات: <span id="stat-value-total" class="stat-val">0</span></div>
+                <div class="stat-item">قيمة زيارات الشهر: <span id="stat-value-month" class="stat-val">0</span></div>
             </div>
 
             <div class="bulk-action-wrapper">
@@ -227,6 +226,7 @@
                         <th class="col-record">السجل</th>
                         <th class="col-date">تاريخ الزيارة</th>
                         <th class="col-service">الخدمة الحالية</th>
+                        <th class="col-val">قيمة الفرصة</th>
                         <th class="col-notes">ملاحظات الزيارة</th>
                         <th class="col-status">الحالة</th>
                         <th class="col-edit">آخر تعديل</th>
@@ -238,7 +238,7 @@
         </div>
 
         <div class="activity-log-section">
-            <div class="activity-log-title">📋 سجل نشاط الزيارات البيعية</div>
+            <div class="activity-log-title">📋 سجل نشاط الزيارات</div>
             <div id="activityList" class="activity-list"></div>
         </div>
     </div>
@@ -258,21 +258,19 @@
 
 <script>
     let currentActivePreview = null;
-    const STORAGE_KEY = 'asgate_visits_final_v30'; 
-    const LOGS_KEY = 'asgate_visits_logs_v30';
+    const STORAGE_KEY = 'asgate_visits_final_v31'; 
+    const LOGS_KEY = 'asgate_visits_logs_v31';
 
     function getTodayFormatted() {
         const d = new Date();
         return d.toISOString().split('T')[0];
     }
 
-    // تعديل منطق الحفظ ليعمل بنظام 24 ساعة ويقسم النص لعرض الوقت بخط أصغر
     function updateEditDateField(row) {
         if (!row) return;
         const d = new Date();
         const dateFormatted = d.toISOString().split('T')[0];
         
-        // جلب الوقت بنظام 24 ساعة (بدون AM/PM)
         const hours = String(d.getHours()).padStart(2, '0');
         const minutes = String(d.getMinutes()).padStart(2, '0');
         const time24 = `${hours}:${minutes}`;
@@ -288,7 +286,6 @@
         if (hiddenInput) hiddenInput.value = fullDateTime;
     }
 
-    // توليد مظهر العرض داخل جدول البيانات المخزن أو عند بناء خلية آخر تعديل
     function parseEditDateHTML(fullDateTime) {
         if (!fullDateTime || !fullDateTime.includes(' ')) return `<span class="edit-date-d">${fullDateTime || ''}</span><span class="edit-date-t"></span>`;
         const parts = fullDateTime.split(' ');
@@ -300,8 +297,11 @@
     function generateStyledHeader() {
         const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
         const d = new Date();
-        const timeFormatted = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-        return `<span class="activity-header-part">👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${getTodayFormatted()}  <span class="activity-time-part">${timeFormatted}</span></span>`;
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        const time24 = `${hours}:${minutes}`;
+        
+        return `<span class="activity-header-part">👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${getTodayFormatted()}  <span class="activity-time-part">${time24}</span></span>`;
     }
 
     function addToActivityLog(fieldName, oldVal, newVal, companyName) {
@@ -327,21 +327,32 @@
         const rows = document.querySelectorAll('#tableBody .main-row');
         const today = getTodayFormatted();
         const currentMonth = today.substring(0, 7);
+        
         let total = rows.length, tDay = 0, tMonth = 0;
+        let valTotal = 0, valMonth = 0;
         
         rows.forEach(row => {
             const dateInput = row.querySelector('.visit-date-val');
+            const oppValInput = row.querySelector('.opp-value-input');
+            const oppVal = oppValInput ? parseFloat(oppValInput.value) || 0 : 0;
             
+            valTotal += oppVal;
+
             if(dateInput) {
                 const date = dateInput.value;
                 if (date === today) tDay++;
-                if (date.startsWith(currentMonth)) tMonth++;
+                if (date.startsWith(currentMonth)) {
+                    tMonth++;
+                    valMonth += oppVal;
+                }
             }
         });
         
         document.getElementById('stat-total').innerText = total;
         document.getElementById('stat-today').innerText = tDay;
         document.getElementById('stat-month').innerText = tMonth;
+        document.getElementById('stat-value-total').innerText = valTotal.toLocaleString();
+        document.getElementById('stat-value-month').innerText = valMonth.toLocaleString();
     }
 
     function reorderRows() {
@@ -401,6 +412,9 @@
             <td>
                 <input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الخدمة الحالية', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();">
             </td>
+            <td>
+                <input type="number" class="excel-input opp-value-input" value="${v.oppValue || ''}" data-old="${v.oppValue || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('قيمة الفرصة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats();">
+            </td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
             <td>
                 <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الحالة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats(); reorderRows();">
@@ -417,7 +431,7 @@
         `;
 
         subRow.innerHTML = `
-            <td colspan="12">
+            <td colspan="13">
                 <div class="sub-table-container">
                     <table class="inner-table">
                         <thead>
@@ -539,10 +553,11 @@
                 record: row.cells[5].querySelector('input').value,
                 visitDate: row.querySelector('.visit-date-val').value,
                 curServ: row.querySelector('.cur-serv-val').value,
+                oppValue: row.querySelector('.opp-value-input').value,
                 notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '',
                 status: row.querySelector('.status-select').value,
                 editDate: row.querySelector('.edit-date-val').value,
-                owner: row.cells[11].querySelector('input').value,
+                owner: row.cells[12].querySelector('input').value,
                 products: products
             });
         });
@@ -562,7 +577,7 @@
     function filterTable() {
         const q = document.getElementById('searchInput').value.toLowerCase();
         document.querySelectorAll('.main-row').forEach(r => {
-            const match = [1,2,3,4,5,11].some(idx => r.cells[idx].querySelector('input').value.toLowerCase().includes(q));
+            const match = [1,2,3,4,5,12].some(idx => r.cells[idx].querySelector('input').value.toLowerCase().includes(q));
             r.style.display = match ? "" : "none";
             const sub = document.getElementById('sub-' + r.id);
             if(sub) sub.style.display = 'none';
