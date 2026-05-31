@@ -107,6 +107,7 @@
             background: transparent; font-size: 11.5px; color: inherit; font-weight: inherit; 
             height: 100%; overflow: hidden; text-overflow: ellipsis; 
         }
+        .readonly-opp-val { color: #1e3a8a !important; font-weight: 800 !important; cursor: not-allowed; }
 
         .select-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent-blue); vertical-align: middle; }
 
@@ -150,7 +151,6 @@
         .history-log .activity-item { display: block; margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
         .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; direction: rtl; }
 
-        /* تنسيق زر الموقع الجغرافي */
         .location-btn {
             background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;
             padding: 3px 8px; border-radius: 4px; font-family: 'Cairo';
@@ -160,13 +160,12 @@
         .location-btn:hover { background: #dbeafe; color: #1d4ed8; }
         .no-location { color: #94a3b8; font-size: 10.5px; font-style: italic; }
 
-        /* درجات ألوان التنبيه للتاريخ المتوقع */
         .date-overdue { background-color: #ffeeeb !important; color: #dc2626 !important; font-weight: 800 !important; border-radius: 4px; }
         .date-today { background-color: #f0fdf4 !important; color: #16a34a !important; font-weight: 800 !important; border-radius: 4px; }
 
         .col-select { width: 3%; }
         .col-company { width: 11%; } 
-        .col-location { width: 6%; } /* حجم مناسب لعمود الموقع الجديد */
+        .col-location { width: 6%; } 
         .col-manager { width: 7%; } 
         .col-mobile { width: 7%; } 
         .col-email { width: 7%; } 
@@ -225,7 +224,7 @@
                     <tr>
                         <th class="col-select"><input type="checkbox" onclick="toggleAllCheckboxes(this)"></th>
                         <th class="col-company">الشركة</th>
-                        <th class="col-location">الموقع</th> <!-- عمود الموقع الجديد -->
+                        <th class="col-location">الموقع</th> 
                         <th class="col-manager">المسؤول</th>
                         <th class="col-mobile">الموبايل</th>
                         <th class="col-email">الإيميل</th>
@@ -331,7 +330,6 @@
         document.getElementById('stat-value-month').innerText = valMonth.toLocaleString();
     }
 
-    // دالة لتحديث لون خانة التاريخ المتوقع بناءً على حالتها الحالية واليوم
     function applyDateAlerts() {
         const today = getTodayFormatted();
         document.querySelectorAll('.main-row').forEach(row => {
@@ -342,16 +340,13 @@
             const targetDate = dateInput.value;
             const currentStatus = statusSelect.value;
 
-            // إزالة الكلاسات القديمة أولاً
             dateInput.classList.remove('date-overdue', 'date-today');
-
-            // إذا تم الإغلاق أو الفقدان، لا نضع تنبيهات لونية
             if (currentStatus === 'مكتمل' || currentStatus === 'فقدان') return;
 
             if (targetDate && targetDate < today) {
-                dateInput.classList.add('date-overdue'); // منتهية ولم تغلق بعد
+                dateInput.classList.add('date-overdue');
             } else if (targetDate === today) {
-                dateInput.classList.add('date-today'); // موعدها اليوم
+                dateInput.classList.add('date-today');
             }
         });
     }
@@ -383,7 +378,41 @@
             tbody.appendChild(mainRow);
             if(subRow) tbody.appendChild(subRow);
         });
-        applyDateAlerts(); // تحديث ألوان التنبيهات بمجرد إعادة الترتيب
+        applyDateAlerts();
+    }
+
+    // دالة تقوم بحساب أسطر المنتجات لفرصة محددة وتحديث إجمالي العمود الرئيسي تلقائياً
+    function calculateOpportunityTotal(rowId) {
+        const subRow = document.getElementById('sub-' + rowId);
+        if (!subRow) return;
+
+        let grandTotal = 0;
+        subRow.querySelectorAll('.product-body tr').forEach(pRow => {
+            const qtyInput = pRow.querySelector('.prod-qty');
+            const subInput = pRow.querySelector('.prod-sub');
+            const totalInput = pRow.querySelector('.prod-total');
+
+            // التأكد من منع القيم السالبة وتصفير الخانات الفارغة
+            let qty = parseFloat(qtyInput.value);
+            if (isNaN(qty) || qty < 0) { qty = 0; qtyInput.value = qty; }
+            
+            let sub = parseFloat(subInput.value);
+            if (isNaN(sub) || sub < 0) { sub = 0; subInput.value = sub; }
+
+            const rowTotal = qty * sub;
+            totalInput.value = rowTotal > 0 ? rowTotal : '';
+            grandTotal += rowTotal;
+        });
+
+        const mainRow = document.getElementById(rowId);
+        if (mainRow) {
+            const oppValueInput = mainRow.querySelector('.opp-value-input');
+            if (oppValueInput) {
+                oppValueInput.value = grandTotal > 0 ? grandTotal : '';
+            }
+        }
+        saveAllDataSilently();
+        updateStats();
     }
 
     function renderRow(v = {}, prepend = false) {
@@ -402,7 +431,6 @@
         const notes = v.notes || '';
         const lastNoteText = getLastNoteOnly(notes);
         
-        // تجهيز زر الموقع الجغرافي إن وُجد رابط، وإلا تظهر عبارة "لا يوجد" مؤقتاً لحين ربطه بصفحة الزيارات
         const locationUrl = v.locationUrl || '';
         let locationTdHTML = `<span class="no-location">لا يوجد</span>`;
         if (locationUrl && locationUrl.trim() !== '') {
@@ -428,7 +456,7 @@
                 <input type="hidden" class="visit-date-val" value="${visitDate}">
             </td>
             <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الخدمة الحالية', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
-            <td><input type="number" class="excel-input opp-value-input" value="${v.oppValue || ''}" data-old="${v.oppValue || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('قيمة الفرصة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); updateStats();"></td>
+            <td><input type="number" class="excel-input opp-value-input readonly-opp-val" value="${v.oppValue || ''}" readonly></td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
             <td>
                 <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الحالة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); updateStats(); reorderRows();">
@@ -446,6 +474,9 @@
         subRow.innerHTML = `<td colspan="14"><div class="sub-table-container"><table class="inner-table"><thead><tr><th>نوع المنتج</th><th>تفاصيل المنتج</th><th>العدد</th><th>الاشتراك</th><th>الإجمالي</th><th style="width:65px">إجراء</th></tr></thead><tbody class="product-body"></tbody></table></div></td>`;
         if (v.products && v.products.length > 0) v.products.forEach(p => addProductRow(rowId, p));
         else addProductRow(rowId);
+
+        // حساب قيم الإجماليات الابتدائية بناءً على البيانات المحملة
+        calculateOpportunityTotal(rowId);
 
         updateStats();
         if(!prepend) reorderRows();
@@ -470,10 +501,10 @@
                 <option value="فايبر" ${data.type === 'فايبر' ? 'selected' : ''}>فايبر</option>
             </select></td>
             <td><input type="text" value="${data.desc || ''}" onchange="saveAllDataSilently()"></td>
-            <td><input type="text" value="${data.qty || ''}" onchange="saveAllDataSilently()"></td>
-            <td><input type="text" value="${data.sub || ''}" onchange="saveAllDataSilently()"></td>
-            <td><input type="text" value="${data.total || ''}" onchange="saveAllDataSilently()"></td>
-            <td><div style="display:flex; justify-content:center; gap:5px;"><button class="sub-action-btn btn-plus" onclick="addProductRow('${rowId}')">+</button><button class="sub-action-btn btn-minus" onclick="if(this.closest('tbody').rows.length > 1) { this.closest('tr').remove(); saveAllDataSilently(); }">×</button></div></td>
+            <td><input type="number" class="prod-qty" min="0" value="${data.qty || ''}" oninput="calculateOpportunityTotal('${rowId}')"></td>
+            <td><input type="number" class="prod-sub" min="0" value="${data.sub || ''}" oninput="calculateOpportunityTotal('${rowId}')"></td>
+            <td><input type="number" class="prod-total" value="${data.total || ''}" readonly style="color:#475569; font-weight:700; cursor:not-allowed;"></td>
+            <td><div style="display:flex; justify-content:center; gap:5px;"><button class="sub-action-btn btn-plus" onclick="addProductRow('${rowId}')">+</button><button class="sub-action-btn btn-minus" onclick="if(this.closest('tbody').rows.length > 1) { this.closest('tr').remove(); calculateOpportunityTotal('${rowId}'); }">×</button></div></td>
         `;
     }
 
@@ -481,8 +512,8 @@
         document.querySelectorAll('.select-check').forEach(chk => chk.checked = source.checked);
     }
 
-    function toggleDropdown(e, btn) {
-        e.stopPropagation();
+    function toggleDropdown(event, btn) {
+        event.stopPropagation();
         const menu = btn.nextElementSibling;
         const isOpen = menu.classList.contains('show');
         document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
@@ -522,12 +553,18 @@
             if(subRow) {
                 subRow.querySelectorAll('.product-body tr').forEach(pRow => {
                     const inputs = pRow.querySelectorAll('input, select');
-                    products.push({ type: inputs[0].value, desc: inputs[1].value, qty: inputs[2].value, sub: inputs[3].value, total: inputs[4].value });
+                    products.push({ 
+                        type: inputs[0].value, 
+                        desc: inputs[1].value, 
+                        qty: inputs[2].value, 
+                        sub: inputs[3].value, 
+                        total: inputs[4].value 
+                    });
                 });
             }
             data.push({
                 comp: row.cells[1].querySelector('input').value,
-                locationUrl: row.querySelector('.location-url-val').value, // حفظ اللوكيشن
+                locationUrl: row.querySelector('.location-url-val').value, 
                 mgr: row.cells[3].querySelector('input').value,
                 mob: row.cells[4].querySelector('input').value,
                 email: row.cells[5].querySelector('input').value,
