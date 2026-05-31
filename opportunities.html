@@ -253,6 +253,7 @@
     let currentActivePreview = null;
     const STORAGE_KEY = 'asgate_opportunities_final_v33'; 
     const LOGS_KEY = 'asgate_opportunities_logs_v33';
+    const INCOMING_KEY = 'asgate_opportunities_final_v31'; // المفتاح القادم من صفحة الزيارات
 
     function getTodayFormatted() {
         const d = new Date();
@@ -490,11 +491,32 @@
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
 
+    // --- دالة الربط الجديدة لاستقبال البيانات من الزيارات ---
+    function checkIncomingOpportunities() {
+        const incomingData = localStorage.getItem(INCOMING_KEY);
+        if (incomingData) {
+            const newOpps = JSON.parse(incomingData);
+            newOpps.forEach(opp => {
+                // إضافة البيانات المستلمة كفرصة جديدة في أعلى الجدول
+                renderRow(opp, true);
+                addToActivityLog("إجراء", "تأهيل من زيارة", "", opp.comp);
+            });
+            // حفظ البيانات في مخزن الفرص الحالي
+            saveAllDataSilently();
+            // مسح البيانات المستلمة لعدم تكرارها عند التحديث
+            localStorage.removeItem(INCOMING_KEY);
+        }
+    }
+
     function loadSavedData() {
         const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = "";
         saved.forEach(v => renderRow(v));
+        
+        // التحقق من وجود فرص قادمة من صفحة الزيارات فور التحميل
+        checkIncomingOpportunities();
+
         renderActivityLog();
         updateStats();
     }
@@ -541,27 +563,21 @@
             let newEntry = `${generateStyledHeader()}<span class="activity-text-part">${newText}</span>`;
             let updatedFullNotes = oldNotes === "" ? newEntry : oldNotes + "\n--------------------\n" + newEntry;
             currentActivePreview.setAttribute('data-full-notes', updatedFullNotes);
-            
-            // تحديث النص المعروض في الجدول وحفظ البيانات بدون نشر النشاط في السجل العام
             currentActivePreview.innerText = newText;
             saveAllDataSilently();
+            addToActivityLog("ملاحظة", "إضافة", newText, currentActivePreview.closest('tr').cells[1].querySelector('input').value);
         }
         closeNote();
     }
 
-    function closeNote() {
-        document.getElementById('noteModal').style.display = "none";
-        document.getElementById('modalTextArea').value = "";
-        currentActivePreview = null;
-    }
+    function closeNote() { document.getElementById('noteModal').style.display = "none"; document.getElementById('modalTextArea').value = ""; }
 
-    // إغلاق المودال عند النقر خارجه
-    window.onclick = function(event) {
-        const modal = document.getElementById('noteModal');
-        if (event.target === modal) {
-            closeNote();
+    window.onclick = (e) => {
+        if (!e.target.matches('.btn-bulk-trigger')) {
+            document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
         }
-    }
+    };
 </script>
+
 </body>
 </html>
