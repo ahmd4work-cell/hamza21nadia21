@@ -148,13 +148,17 @@
         .activity-list { flex: 1; overflow-y: auto; font-size: 11.5px; line-height: 1.6; }
         .activity-item { margin-bottom: 4px; border-bottom: 1px dashed #f8fafc; padding-bottom: 4px; color: #475569; display: flex; align-items: center; }
         
-        .activity-header-part { font-size: 11.5px; color: var(--chat-yellow); font-weight: 800; }
+        .activity-header-part { font-size: 11.5px; color: var(--chat-yellow); font-weight: 800; display: inline-block; }
         .activity-time-part { font-size: 10px; font-weight: normal; }
-        .activity-text-part { font-size: 11.5px; color: #475569; }
+        .activity-text-part { font-size: 11.5px; color: #475569; display: block; text-align: right; white-space: pre-wrap; margin-top: 2px; }
 
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-content { background: white; padding: 18px; border-radius: 12px; width: 440px; height: 480px; display: flex; flex-direction: column; }
         .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; direction: rtl; }
+        
+        /* جعل عناصر الملاحظات السابقة تظهر على أسطر منفصلة داخل المربع التفاعلي */
+        .history-log .activity-item { display: block; margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
+
         .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; direction: rtl; }
 
         .col-select { width: 3%; }
@@ -276,7 +280,7 @@
         const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
         const d = new Date();
         const timeFormatted = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-        return `<span class="activity-header-part">👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${getTodayFormatted()}  <span class="activity-time-part">${timeFormatted}</span>&nbsp;&nbsp;</span>`;
+        return `<span class="activity-header-part">👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${getTodayFormatted()}  <span class="activity-time-part">${timeFormatted}</span></span>`;
     }
 
     function addToActivityLog(fieldName, oldVal, newVal, companyName) {
@@ -562,6 +566,7 @@
         const txt = document.getElementById('modalTextArea').value.trim();
         if (txt && currentActivePreview) {
             let old = currentActivePreview.getAttribute('data-full-notes') || "";
+            // تم تفعيل فصل نص الرسالة وإجبارها على البدء من سطر جديد تماماً أسفل العنوان والوقت
             let entry = `${generateStyledHeader()}<span class="activity-text-part">${txt}</span>`;
             let updated = old === "" ? entry : old + "\n--------------------\n" + entry;
             
@@ -578,6 +583,7 @@
 
     function closeNote() {
         document.getElementById('noteModal').style.display = "none";
+        document.getElementById('modalTextArea').value = ""; // تنظيف المربع بعد الإغلاق
         currentActivePreview = null;
     }
 
