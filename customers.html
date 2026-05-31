@@ -118,9 +118,13 @@
         .activity-log-title { color: var(--dark-yellow); font-size: 13.5px; font-weight: 800; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; flex-shrink: 0; }
         .activity-list { flex: 1; overflow-y: auto; font-size: 11.5px; line-height: 1.6; }
         
-        /* جعل العنوان والنص بجانب بعضهما في سطر واحد يبدأ من اليمين */
+        /* تنسيق عناصر سجل النشاط السفلي (العنوان بجانبه النص) */
         .activity-item { margin-bottom: 4px; border-bottom: 1px dashed #f8fafc; padding-bottom: 4px; color: #475569; display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; text-align: right; width: 100%; justify-content: flex-start; }
         
+        /* تنسيق عناصر صندوق الملاحظات المنبثق (العنوان وتحته النص يبدأ من أول السطر) */
+        .modal-activity-item { margin-bottom: 10px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; text-align: right; display: flex; flex-direction: column; align-items: flex-start; width: 100%; }
+        .modal-activity-item .activity-text-part { margin-top: 4px; margin-right: 0; display: block; width: 100%; font-weight: 600; color: #334155; }
+
         .activity-header-part { font-size: 11.5px; color: var(--chat-yellow); font-weight: 800; display: inline-block; white-space: nowrap; }
         .activity-time-part { font-size: 10px; font-weight: normal; }
         .activity-text-part { font-size: 11.5px; color: #475569; display: inline-block; margin-right: 5px; }
@@ -400,7 +404,8 @@
     function openNote(el) {
         currentActivePreview = el;
         const raw = el.getAttribute('data-full-notes') || "";
-        document.getElementById('historyLog').innerHTML = raw.split('\n--------------------\n').map(e => `<div class="activity-item">${e}</div>`).join('');
+        // هنا يتم عرض عناصر نافذة الملاحظات بالتنسيق الجديد (العنوان وتحته النص مباشرة)
+        document.getElementById('historyLog').innerHTML = raw.split('\n--------------------\n').map(e => `<div class="modal-activity-item">${e}</div>`).join('');
         document.getElementById('noteModal').style.display = "flex";
         document.getElementById('modalTextArea').focus();
     }
