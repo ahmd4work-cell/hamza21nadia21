@@ -381,7 +381,6 @@
         applyDateAlerts();
     }
 
-    // دالة تقوم بحساب أسطر المنتجات لفرصة محددة وتحديث إجمالي العمود الرئيسي تلقائياً
     function calculateOpportunityTotal(rowId) {
         const subRow = document.getElementById('sub-' + rowId);
         if (!subRow) return;
@@ -392,7 +391,6 @@
             const subInput = pRow.querySelector('.prod-sub');
             const totalInput = pRow.querySelector('.prod-total');
 
-            // التأكد من منع القيم السالبة وتصفير الخانات الفارغة
             let qty = parseFloat(qtyInput.value);
             if (isNaN(qty) || qty < 0) { qty = 0; qtyInput.value = qty; }
             
@@ -475,7 +473,6 @@
         if (v.products && v.products.length > 0) v.products.forEach(p => addProductRow(rowId, p));
         else addProductRow(rowId);
 
-        // حساب قيم الإجماليات الابتدائية بناءً على البيانات المحملة
         calculateOpportunityTotal(rowId);
 
         updateStats();
@@ -498,7 +495,11 @@
                 <option value="" ${data.type === '' ? 'selected' : ''}></option>
                 <option value="جوال" ${data.type === 'جوال' ? 'selected' : ''}>جوال</option>
                 <option value="بيانات" ${data.type === 'بيانات' ? 'selected' : ''}>بيانات</option>
+                <option value="هاتف" ${data.type === 'هاتف' ? 'selected' : ''}>هاتف</option>
                 <option value="فايبر" ${data.type === 'فايبر' ? 'selected' : ''}>فايبر</option>
+                <option value="DIA" ${data.type === 'DIA' ? 'selected' : ''}>DIA</option>
+                <option value="SIP Trunk" ${data.type === 'SIP Trunk' ? 'selected' : ''}>SIP Trunk</option>
+                <option value="Ipvpn" ${data.type === 'Ipvpn' ? 'selected' : ''}>Ipvpn</option>
             </select></td>
             <td><input type="text" value="${data.desc || ''}" onchange="saveAllDataSilently()"></td>
             <td><input type="number" class="prod-qty" min="0" value="${data.qty || ''}" oninput="calculateOpportunityTotal('${rowId}')"></td>
