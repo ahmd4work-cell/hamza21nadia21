@@ -135,9 +135,9 @@
         }
         .activity-log-title { color: var(--dark-yellow); font-size: 13.5px; font-weight: 800; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; flex-shrink: 0; }
         .activity-list { flex: 1; overflow-y: auto; font-size: 11.5px; line-height: 1.6; }
-        .activity-item { margin-bottom: 4px; border-bottom: 1px dashed #f8fafc; padding-bottom: 4px; color: #475569; display: flex; align-items: center; }
-        .activity-header-part { font-size: 11.5px; color: var(--chat-yellow); font-weight: 800; }
-        .activity-text-part { font-size: 11.5px; color: #475569; }
+        .activity-item { margin-bottom: 4px; border-bottom: 1px dashed #f8fafc; padding-bottom: 4px; color: #475569; display: flex; flex-direction: column; align-items: flex-start; }
+        .activity-header-part { font-size: 11.5px; color: var(--chat-yellow); font-weight: 800; display: inline-block; }
+        .activity-text-part { font-size: 11.5px; color: #475569; display: block; width: 100%; text-align: right; }
 
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-content { background: white; padding: 18px; border-radius: 12px; width: 440px; height: 480px; display: flex; flex-direction: column; }
@@ -263,8 +263,9 @@
     function generateStyledHeader() {
         const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
         const d = new Date();
-        const timeFormatted = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-        return `<span class="activity-header-part">👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${getTodayFormatted()}  <span class="activity-time-part">${timeFormatted}</span>&nbsp;&nbsp;</span>`;
+        // تعديل الوقت ليعتمد نظام الـ 24 ساعة بالكامل (hour12: false)
+        const timeFormatted = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+        return `<span class="activity-header-part">👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${getTodayFormatted()}  <span class="activity-time-part">${timeFormatted}</span></span><br>`;
     }
 
     function toggleDropdown(e, btn) {
