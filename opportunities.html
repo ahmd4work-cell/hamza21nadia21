@@ -40,25 +40,23 @@
         .main-content { flex: 1; display: flex; flex-direction: column; padding: 0 15px; min-height: 0; }
          
         .action-bar { display: flex; align-items: center; margin: 10px 0; gap: 10px; flex-shrink: 0; }
-        .btn-top { border: none; padding: 0 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; font-size: 12px; height: 35px; }
-        .btn-add { background-color: var(--accent-blue); }
-
-        .search-wrapper { position: relative; width: 15%; display: flex; align-items: center; }
+        
+        .search-wrapper { position: relative; width: 18%; display: flex; align-items: center; }
         .search-input {
-            width: 100%; height: 30px; padding: 0 10px; border-radius: 8px;
+            width: 100%; height: 35px; padding: 0 10px; border-radius: 8px;
             border: 1px solid var(--border-soft); background: #fff;
             font-family: 'Cairo'; font-size: 12px; font-weight: 700; outline: none;
         }
 
-        .stats-bar-visit { margin-right: auto; display: flex; gap: 12px; align-items: center; background: #fff; padding: 0 15px; border-radius: 5px; height: 25px; border: 1px solid var(--border-soft); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .stat-item { font-size: 10px; font-weight: 800; color: #475569; white-space: nowrap; }
+        .stats-bar-visit { margin-right: auto; display: flex; gap: 12px; align-items: center; background: #fff; padding: 0 15px; border-radius: 5px; height: 35px; border: 1px solid var(--border-soft); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .stat-item { font-size: 11px; font-weight: 800; color: #475569; white-space: nowrap; }
         .stat-val { color: var(--accent-blue); margin-right: 3px; }
         .stat-divider { color: #cbd5e1; font-weight: normal; margin: 0 2px; }
 
         .bulk-action-wrapper { position: relative; display: flex; align-items: center; margin-right: 5px; }
         .btn-bulk-trigger { 
-            height: 25px; padding: 0 12px; border-radius: 5px; border: 1px solid var(--border-soft);
-            background: #fff; color: var(--text-dark); font-family: 'Cairo'; font-size: 11px; font-weight: 800;
+            height: 35px; padding: 0 15px; border-radius: 5px; border: 1px solid var(--border-soft);
+            background: #fff; color: var(--text-dark); font-family: 'Cairo'; font-size: 12px; font-weight: 800;
             cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: 0.2s;
             display: flex; align-items: center; gap: 5px;
         }
@@ -114,7 +112,7 @@
 
         .dropdown-menu { 
             display: none; position: absolute; left: 0; 
-            top: 28px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; 
+            top: 38px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; 
             box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 1000; min-width: 110px; padding: 4px;
         }
 
@@ -163,7 +161,7 @@
         .col-val { width: 8%; } 
         .col-notes { width: 11%; } 
         .col-status { width: 8%; }
-        .col-edit { width: 7%; } 
+        .col-edit { width: 8%; } 
         .col-owner { width: 7%; }
     </style>
 </head>
@@ -180,9 +178,9 @@
 
     <div class="main-content">
         <div class="action-bar">
-            <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة فرصة بيعية جديدة</button>
+            <!-- تم حذف زر إضافة فرصة يدوياً لضمان التأهيل الإجباري من صفحة الزيارات فقط -->
             <div class="search-wrapper">
-                <input type="text" id="searchInput" class="search-input" placeholder="بحث 🔍" onkeyup="filterTable()">
+                <input type="text" id="searchInput" class="search-input" placeholder="بحث باسم الشركة أو المسؤول... 🔍" onkeyup="filterTable()">
             </div>
              
             <div class="stats-bar-visit">
@@ -217,7 +215,7 @@
                         <th class="col-mobile">الموبايل</th>
                         <th class="col-email">الإيميل</th>
                         <th class="col-record">السجل</th>
-                        <th class="col-date">تاريخ الفرصة</th>
+                        <th class="col-date">تاريخ الزيارة الأصلية</th>
                         <th class="col-service">الخدمة الحالية</th>
                         <th class="col-val">قيمة الفرصة</th>
                         <th class="col-notes">ملاحظات الفرصة</th>
@@ -253,7 +251,7 @@
     let currentActivePreview = null;
     const STORAGE_KEY = 'asgate_opportunities_final_v33'; 
     const LOGS_KEY = 'asgate_opportunities_logs_v33';
-    const INCOMING_KEY = 'asgate_opportunities_final_v31'; // المفتاح القادم من صفحة الزيارات
+    const INCOMING_KEY = 'asgate_opportunities_final_v31'; 
 
     function getTodayFormatted() {
         const d = new Date();
@@ -318,15 +316,22 @@
         document.getElementById('stat-value-month').innerText = valMonth.toLocaleString();
     }
 
+    // تم تعديل الدالة لتعطي الأولوية القصوى للأقرب في التاريخ المتوقع للإغلاق
     function reorderRows() {
         const tbody = document.getElementById('tableBody');
         const rows = Array.from(tbody.querySelectorAll('.main-row'));
         rows.sort((a, b) => {
+            const dateA = a.querySelector('.expected-date-input').value || '9999-12-31';
+            const dateB = b.querySelector('.expected-date-input').value || '9999-12-31';
+            
+            // أولاً: الترتيب التصاعدي حسب التاريخ المتوقع الأقرب
+            if (dateA !== dateB) {
+                return dateA.localeCompare(dateB);
+            }
+
+            // ثانياً: إذا تساوت التواريخ، يتم الترتيب حسب أهمية الحالة
             const statusA = a.querySelector('.status-select').value;
             const statusB = b.querySelector('.status-select').value;
-            const dateA = a.querySelector('.expected-date-input').value || '9999-99-99';
-            const dateB = b.querySelector('.expected-date-input').value || '9999-99-99';
-            
             const getRank = (status) => {
                 if (status === 'مهتم') return 4;
                 if (status === 'تأجيل') return 3;
@@ -334,8 +339,7 @@
                 if (status === 'فقدان') return 1;
                 return 0;
             };
-            if (getRank(statusB) !== getRank(statusA)) return getRank(statusB) - getRank(statusA);
-            return dateA.localeCompare(dateB);
+            return getRank(statusB) - getRank(statusA);
         });
         rows.forEach(mainRow => {
             const subRow = document.getElementById('sub-' + mainRow.id);
@@ -355,7 +359,8 @@
         subRow.id = 'sub-' + rowId;
 
         const today = getTodayFormatted();
-        const visitDate = v.visitDate || today;
+        // الحفاظ على تاريخ الزيارة الأصلي القادم من المجلد دون أي تعديل عليه
+        const visitDate = v.visitDate || today; 
         const expectedDate = v.expectedDate || today;
         const notes = v.notes || '';
         const lastNoteText = getLastNoteOnly(notes);
@@ -371,7 +376,7 @@
             <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الإيميل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
             <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('السجل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
             <td>
-                <input type="text" class="excel-input readonly-input" value="${visitDate}" readonly>
+                <input type="text" class="excel-input readonly-input" value="${visitDate}" readonly style="color:#64748b; font-weight:700;">
                 <input type="hidden" class="visit-date-val" value="${visitDate}">
             </td>
             <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الخدمة الحالية', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
@@ -491,20 +496,18 @@
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
 
-    // --- دالة الربط الجديدة لاستقبال البيانات من الزيارات ---
     function checkIncomingOpportunities() {
         const incomingData = localStorage.getItem(INCOMING_KEY);
         if (incomingData) {
             const newOpps = JSON.parse(incomingData);
             newOpps.forEach(opp => {
-                // إضافة البيانات المستلمة كفرصة جديدة في أعلى الجدول
+                // يتم إضافة الفرصة وتأخذ تلقائياً تاريخ الزيارة الأصلية المرسل مع الكائن
                 renderRow(opp, true);
                 addToActivityLog("إجراء", "تأهيل من زيارة", "", opp.comp);
             });
-            // حفظ البيانات في مخزن الفرص الحالي
             saveAllDataSilently();
-            // مسح البيانات المستلمة لعدم تكرارها عند التحديث
             localStorage.removeItem(INCOMING_KEY);
+            reorderRows(); // إعادة ترتيب فوري بناء على تاريخ الإغلاق المتوقع
         }
     }
 
@@ -514,18 +517,11 @@
         tbody.innerHTML = "";
         saved.forEach(v => renderRow(v));
         
-        // التحقق من وجود فرص قادمة من صفحة الزيارات فور التحميل
         checkIncomingOpportunities();
 
         renderActivityLog();
         updateStats();
-    }
-
-    function insertNewRow() { 
-        renderRow({}, true); 
-        saveAllDataSilently(); 
-        const companyName = "جديدة";
-        addToActivityLog("إجراء", "إضافة فرصة", "", companyName);
+        reorderRows();
     }
 
     function filterTable() {
