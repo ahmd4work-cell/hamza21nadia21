@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASGate - سجل الزيارات المطور</title>
+    <title>ASGate - الفرص البيعية</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -67,20 +67,6 @@
         }
         .btn-bulk-trigger:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
 
-        .dropdown-menu { 
-            display: none; position: absolute; left: 0; 
-            top: 28px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; 
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 1000; min-width: 110px; padding: 4px;
-        }
-        .dropdown-menu button { 
-            width: 100%; padding: 6px 10px; border: none; background: none; font-family: 'Cairo'; 
-            font-size: 10.5px; text-align: right; cursor: pointer; color: #475569; font-weight: 700; 
-            border-radius: 4px; transition: 0.2s; display: block;
-        }
-        .dropdown-menu button:hover { background: #f1f5f9; color: var(--accent-blue); }
-        .dropdown-menu .del-btn:hover { background: #fee2e2; color: #ef4444; }
-        .show { display: block; }
-
         .table-wrapper { 
             background: white; border-radius: 10px; overflow-y: auto; border: 1px solid var(--border-soft); 
             flex: 1; min-height: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.02); position: relative;
@@ -93,7 +79,33 @@
         }
         
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; max-height: 45px; font-size: 11px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; }
-        tbody tr:nth-child(even) { background-color: #eff6ff; }
+        
+        .sub-table-row { display: none; background-color: #f8fafc; }
+        .sub-table-container { padding: 8px 12% 12px 5%; } 
+        .inner-table { width: 65%; background: white; border: 1px solid var(--border-soft); border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden; }
+        .inner-table th { background: var(--accent-blue); color: #fff; height: 24px; font-size: 9.5px; border-left: 1px solid rgba(255,255,255,0.2); }
+        .inner-table td { height: 28px; border: 1px solid #edf2f7; padding: 0; }
+        .inner-table input, .inner-table select { width: 100%; height: 100%; border: none; text-align: center; font-family: 'Cairo'; font-size: 10.5px; outline: none; background: transparent; }
+        .inner-table select { text-align-last: center; cursor: pointer; }
+        
+        .sub-action-btn { 
+            width: 22px; height: 22px; border: none; border-radius: 4px; cursor: pointer; 
+            font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center;
+            transition: 0.2s;
+        }
+        .btn-plus { background: #22c55e; color: white; }
+        .btn-plus:hover { background: #16a34a; }
+        .btn-minus { background: #fee2e2; color: #ef4444; }
+        .btn-minus:hover { background: #fecaca; }
+
+        .toggle-arrow { 
+            cursor: pointer; font-size: 13px; color: var(--accent-blue); margin-right: 5px; 
+            display: inline-block; transition: transform 0.2s; vertical-align: middle;
+            font-weight: bold;
+        }
+        .arrow-open { transform: rotate(90deg); }
+
+        tbody tr.main-row:nth-child(4n+1) { background-color: #eff6ff; }
 
         .excel-input { 
             width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; 
@@ -101,7 +113,42 @@
             height: 100%; overflow: hidden; text-overflow: ellipsis; 
         }
 
-        .select-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent-blue); }
+        /* تنسيقات ملونة مخصصة للقوائم المنسدلة للحالات */
+        .status-select {
+            font-weight: bold;
+            border-radius: 4px;
+            padding: 2px;
+            text-align-last: center;
+        }
+        .status-interested { color: #16a34a; background-color: #f0fdf4; }
+        .status-followup { color: #2563eb; background-color: #eff6ff; }
+        .status-not-interested { color: #d97706; background-color: #fffbeb; }
+        .status-loss { color: #dc2626; background-color: #fef2f2; }
+
+        .select-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent-blue); vertical-align: middle; }
+
+        .action-cell { position: relative; overflow: visible !important; }
+        
+        .dropdown-menu { 
+            display: none; position: absolute; left: 0; 
+            top: 28px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; 
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 1000; min-width: 110px; padding: 4px;
+        }
+
+        .dropdown-menu button { 
+            width: 100%; padding: 6px 10px; border: none; background: none; font-family: 'Cairo'; 
+            font-size: 10.5px; text-align: right; cursor: pointer; color: #475569; font-weight: 700; 
+            border-radius: 4px; transition: 0.2s; display: block;
+        }
+        .dropdown-menu button:hover { background: #f1f5f9; color: var(--accent-blue); }
+        .dropdown-menu .del-btn:hover { background: #fee2e2; color: #ef4444; }
+        .show { display: block; }
+
+        .notes-preview { 
+            width: 95%; height: 20px; border: none; background: transparent; font-family: 'Cairo'; 
+            font-size: 11px; text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700; 
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; margin: 0 auto; 
+        }
 
         .activity-log-section { 
             margin: 15px 0 10px 0; padding: 12px 18px; background: #ffffff; border-radius: 10px; 
@@ -118,15 +165,24 @@
 
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-content { background: white; padding: 18px; border-radius: 12px; width: 440px; height: 480px; display: flex; flex-direction: column; }
-        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
-        .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
+        
+        /* ضبط محاذاة سجل المتابعة وحقل النص إلى اليمين */
+        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; direction: rtl; }
+        .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; direction: rtl; }
 
-        /* توزيع الأعمدة المحدث */
-        .col-select { width: 35px; }
-        .col-company { width: 12%; } .col-manager { width: 8%; } .col-mobile { width: 8%; } 
-        .col-email { width: 9%; } .col-record { width: 8%; } .col-date { width: 10%; } 
-        .col-service { width: 10%; } .col-notes { width: 12%; } .col-status { width: 8%; }
-        .col-edit { width: 8%; } .col-owner { width: 7%; }
+        .col-select { width: 3%; }
+        .col-company { width: 12%; } 
+        .col-manager { width: 8%; } 
+        .col-mobile { width: 8%; } 
+        .col-email { width: 8%; } 
+        .col-record { width: 8%; } 
+        .col-date { width: 8%; } 
+        .col-service { width: 8%; } 
+        .col-value { width: 8%; } 
+        .col-notes { width: 8%; } 
+        .col-status { width: 7%; } /* زيادة طفيفة لاستيعاب النصوص الجديدة */
+        .col-edit { width: 8%; } 
+        .col-owner { width: 8%; }
     </style>
 </head>
 <body onload="loadSavedData()">
@@ -134,39 +190,41 @@
 <div class="dashboard-container">
     <nav class="navbar">
         <a href="index.html">الرئيسية</a>
-        <a href="visits.html" class="active">الزيارات</a>
-        <a href="opportunities.html">الفرص البيعية</a>
+        <a href="visits.html">الزيارات</a>
+        <a href="opportunities.html" class="active">الفرص البيعية</a>
         <a href="customers.html">العملاء</a>
         <a href="sales.html">المبيعات</a>
     </nav>
 
     <div class="main-content">
         <div class="action-bar">
-            <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة زيارة جديدة</button>
+            <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة فرصة بيعية جديدة</button>
             <div class="search-wrapper">
                 <input type="text" id="searchInput" class="search-input" placeholder="بحث 🔍" onkeyup="filterTable()">
             </div>
             
             <div class="stats-bar">
-                <div class="stat-item">إجمالي الزيارات: <span id="stat-total" class="stat-val">0</span></div>
-                <div class="stat-item">زيارات الشهر: <span id="stat-month" class="stat-val">0</span></div>
-                <div class="stat-item">زيارات اليوم: <span id="stat-today" class="stat-val">0</span></div>
-                <div class="stat-item">مهتم: <span id="stat-success" class="stat-val">0</span></div>
+                <div class="stat-item">إجمالي الفرص: <span id="stat-total" class="stat-val">0</span></div>
+                <div class="stat-item">فرص الشهر الحالي: <span id="stat-month" class="stat-val">0</span></div>
+                <div class="stat-item">فرص اليوم: <span id="stat-today" class="stat-val">0</span></div>
+                <div class="stat-item"> | قيمة الفرص: <span id="stat-total-val" class="stat-val">0</span></div>
+                <div class="stat-item">قيمة فرص الشهر: <span id="stat-month-val" class="stat-val">0</span></div>
             </div>
 
             <div class="bulk-action-wrapper">
                 <button class="btn-bulk-trigger" onclick="toggleDropdown(event, this)">إجراء ▾</button>
                 <div class="dropdown-menu">
-                    <button onclick="handleBulkAction('تحويل للمبيعات')">تحويل للمبيعات</button>
-                    <button onclick="handleBulkAction('تصدير Excel')">تصدير Excel</button>
+                    <button onclick="handleBulkAction('تغيير المالك')">تغيير المالك</button>
+                    <button onclick="handleBulkAction('تعديل')">تعديل</button>
+                    <button onclick="handleBulkAction('تصدير')">تصدير</button>
                     <button onclick="handleBulkAction('طباعة')">طباعة</button>
-                    <button class="del-btn" onclick="handleBulkAction('حذف المحدد')">حذف المحدد</button>
+                    <button class="del-btn" onclick="handleBulkAction('حذف')">حذف</button>
                 </div>
             </div>
         </div>
         
         <div class="table-wrapper">
-            <table>
+            <table id="mainTable">
                 <thead>
                     <tr>
                         <th class="col-select"><input type="checkbox" onclick="toggleAllCheckboxes(this)"></th>
@@ -175,9 +233,10 @@
                         <th class="col-mobile">الموبايل</th>
                         <th class="col-email">الإيميل</th>
                         <th class="col-record">السجل</th>
-                        <th class="col-date">تاريخ الزيارة</th>
-                        <th class="col-service">الخدمة الحالية</th>
-                        <th class="col-notes">ملاحظات الزيارة</th>
+                        <th class="col-date">تاريخ الفرصة</th>
+                        <th class="col-service">الفرصة المقترحة</th>
+                        <th class="col-value">قيمة الفرصة</th>
+                        <th class="col-notes">ملاحظات الفرصة</th>
                         <th class="col-status">الحالة</th>
                         <th class="col-edit">آخر تعديل</th>
                         <th class="col-owner">المالك</th>
@@ -188,7 +247,7 @@
         </div>
 
         <div class="activity-log-section">
-            <div class="activity-log-title">📋 سجل نشاط الزيارات</div>
+            <div class="activity-log-title">📋 سجل نشاط الفرص البيعية</div>
             <div id="activityList" class="activity-list"></div>
         </div>
     </div>
@@ -196,7 +255,7 @@
 
 <div id="noteModal" class="modal">
     <div class="modal-content">
-        <div style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">سجل ملاحظات الطلب والنتائج</div>
+        <div style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right;">سجل متابعة الفرصة والنتائج</div>
         <div id="historyLog" class="history-log"></div>
         <textarea id="modalTextArea" class="note-area" placeholder="أدخل تفاصيل الملاحظة هنا..."></textarea>
         <div style="display:flex; justify-content: flex-end; gap:8px; margin-top:10px;">
@@ -208,12 +267,37 @@
 
 <script>
     let currentActivePreview = null;
-    const STORAGE_KEY = 'asgate_visits_final_v32'; 
-    const LOGS_KEY = 'asgate_visit_logs_v32';
+    const STORAGE_KEY = 'asgate_opportunities_final_v30'; 
+    const LOGS_KEY = 'asgate_opp_activity_logs_v30';
 
     function getTodayFormatted() {
         const d = new Date();
         return d.toISOString().split('T')[0];
+    }
+
+    // دالة لتحديث حقل تاريخ آخر تعديل تلقائياً بشكل منظم
+    function updateEditDateField(row) {
+        if (!row) return;
+        const d = new Date();
+        const dateFormatted = d.toISOString().split('T')[0];
+        const timeFormatted = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+        const fullDateTime = `${dateFormatted} ${timeFormatted}`;
+        
+        const displayInput = row.querySelector('.edit-date-display');
+        const hiddenInput = row.querySelector('.edit-date-val');
+        
+        if (displayInput) displayInput.value = fullDateTime;
+        if (hiddenInput) hiddenInput.value = fullDateTime;
+    }
+
+    // دالة لتغيير ألوان الحالات بشكل ديناميكي
+    function applyStatusStyle(selectEl) {
+        const val = selectEl.value;
+        selectEl.classList.remove('status-interested', 'status-followup', 'status-not-interested', 'status-loss');
+        if (val === 'مهتم') selectEl.classList.add('status-interested');
+        if (val === 'متابعة') selectEl.classList.add('status-followup');
+        if (val === 'غير مهتم') selectEl.classList.add('status-not-interested');
+        if (val === 'فقدان') selectEl.classList.add('status-loss');
     }
 
     function generateStyledHeader() {
@@ -228,10 +312,8 @@
         const cleanCompany = companyName && companyName.trim() !== "" ? companyName : "شركة جديدة";
         const val1 = oldVal && oldVal.trim() !== "" ? oldVal : "فارغ";
         const val2 = newVal && newVal.trim() !== "" ? newVal : "فارغ";
-        
-        let actionText = fieldName === "إجراء" ? `حذف زيارة شركة ( ${cleanCompany} )` : `تعديل ${fieldName} من [${val1}] إلى [${val2}] في ( ${cleanCompany} )`;
+        let actionText = fieldName === "إجراء" ? `حذف فرصة شركة ( ${cleanCompany} )` : `تعديل ${fieldName} من [${val1}] إلى [${val2}] في ( ${cleanCompany} )`;
         const fullLogHTML = `${headerHTML}<span class="activity-text-part">${actionText}</span>`;
-        
         let logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
         logs.unshift(fullLogHTML);
         localStorage.setItem(LOGS_KEY, JSON.stringify(logs.slice(0, 100)));
@@ -245,46 +327,97 @@
     }
 
     function updateStats() {
-        const rows = document.querySelectorAll('#tableBody tr');
+        const rows = document.querySelectorAll('#tableBody .main-row');
         const today = getTodayFormatted();
         const currentMonth = today.substring(0, 7);
-        let total = rows.length, tDay = 0, tMonth = 0, tSuccess = 0;
+        let total = rows.length, tDay = 0, tMonth = 0, totalVal = 0, monthVal = 0;
+        
         rows.forEach(row => {
-            const date = row.querySelector('.visit-date-val').value;
-            const status = row.querySelector('.status-select').value;
-            if (date === today) tDay++;
-            if (date.startsWith(currentMonth)) tMonth++;
-            if (status === 'مهتم') tSuccess++;
+            const dateInput = row.querySelector('.visit-date-val');
+            const oppValInput = row.cells[8].querySelector('input');
+            const oppVal = parseFloat(oppValInput.value) || 0;
+            
+            if(dateInput) {
+                const date = dateInput.value;
+                if (date === today) tDay++;
+                if (date.startsWith(currentMonth)) {
+                    tMonth++;
+                    monthVal += oppVal;
+                }
+            }
+            totalVal += oppVal;
         });
+        
         document.getElementById('stat-total').innerText = total;
         document.getElementById('stat-today').innerText = tDay;
         document.getElementById('stat-month').innerText = tMonth;
-        document.getElementById('stat-success').innerText = tSuccess;
+        document.getElementById('stat-total-val').innerText = totalVal.toLocaleString();
+        document.getElementById('stat-month-val').innerText = monthVal.toLocaleString();
+    }
+
+    // تحسين دالة الترتيب بناءً على الحالات الأربعة المطلوبة
+    function reorderRows() {
+        const tbody = document.getElementById('tableBody');
+        const rows = Array.from(tbody.querySelectorAll('.main-row'));
+        
+        rows.sort((a, b) => {
+            const statusA = a.querySelector('.status-select').value;
+            const statusB = b.querySelector('.status-select').value;
+            const getRank = (status) => {
+                if (status === 'مهتم') return 2;
+                if (status === 'متابعة') return 1;
+                if (status === 'غير مهتم') return 0;
+                if (status === 'فقدان') return -1;
+                return -2; // في حال كانت فارغة
+            };
+            return getRank(statusB) - getRank(statusA);
+        });
+
+        rows.forEach(mainRow => {
+            const subRow = document.getElementById('sub-' + mainRow.id);
+            tbody.appendChild(mainRow);
+            if(subRow) tbody.appendChild(subRow);
+        });
     }
 
     function renderRow(v = {}, prepend = false) {
         const tbody = document.getElementById('tableBody');
-        const row = prepend ? tbody.insertRow(0) : tbody.insertRow();
+        const rowId = 'row-' + Date.now() + Math.random().toString(36).substr(2, 5);
+        
+        const mainRow = prepend ? tbody.insertRow(0) : tbody.insertRow();
+        mainRow.className = 'main-row';
+        mainRow.id = rowId;
+        
+        const subRow = prepend ? tbody.insertRow(1) : tbody.insertRow();
+        subRow.className = 'sub-table-row';
+        subRow.id = 'sub-' + rowId;
+
         const today = getTodayFormatted();
         const visitDate = v.visitDate || today;
         const notes = v.notes || '';
         const lastNoteText = getLastNoteOnly(notes);
 
-        row.innerHTML = `
-            <td><input type="checkbox" class="select-check"></td>
-            <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'الشركة')"></td>
-            <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'المسؤول')"></td>
-            <td><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'الموبايل')"></td>
-            <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'الإيميل')"></td>
-            <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'السجل')"></td>
+        mainRow.innerHTML = `
+            <td class="col-select">
+                <input type="checkbox" class="select-check">
+                <span class="toggle-arrow" onclick="toggleSubTable('${rowId}')">▶</span>
+            </td>
+            <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الشركة', this.getAttribute('data-old'), this.value, this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats();"></td>
+            <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المسؤول', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الموبايل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الإيميل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('السجل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
             <td>
                 <input type="text" class="excel-input readonly-input" value="${visitDate}" readonly>
                 <input type="hidden" class="visit-date-val" value="${visitDate}">
             </td>
-            <td><input type="text" class="excel-input" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'الخدمة الحالية')"></td>
+            <td>
+                <input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الفرصة المقترحة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();">
+            </td>
+            <td><input type="number" class="excel-input" value="${v.valOpp || ''}" data-old="${v.valOpp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('قيمة الفرصة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats();"></td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
             <td>
-                <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'الحالة'); updateStats();">
+                <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="applyStatusStyle(this); addToActivityLog('الحالة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats(); reorderRows();">
                     <option value="" ${v.status === '' ? 'selected' : ''}></option>
                     <option value="مهتم" ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option>
                     <option value="متابعة" ${v.status === 'متابعة' ? 'selected' : ''}>متابعة</option>
@@ -292,21 +425,82 @@
                     <option value="فقدان" ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option>
                 </select>
             </td>
-            <td>
-                <input type="text" class="excel-input readonly-input edit-date-display" value="${v.editDate || ''}" readonly>
-                <input type="hidden" class="edit-date-val" value="${v.editDate || ''}">
-            </td>
-            <td><input type="text" class="excel-input" value="${v.owner || 'أحمد'}" data-old="${v.owner || 'أحمد'}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleFieldChange(this, 'المالك')"></td>
+            <td><input type="text" class="excel-input readonly-input edit-date-display" value="${v.editDate || ''}" readonly><input type="hidden" class="edit-date-val" value="${v.editDate || ''}"></td>
+            <td><input type="text" class="excel-input" value="${v.owner || ''}" data-old="${v.owner || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المالك', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
         `;
+
+        subRow.innerHTML = `
+            <td colspan="13">
+                <div class="sub-table-container">
+                    <table class="inner-table">
+                        <thead>
+                            <tr>
+                                <th>نوع المنتج</th>
+                                <th>تفاصيل المنتج</th>
+                                <th>العدد</th>
+                                <th>الاشتراك</th>
+                                <th>الإجمالي</th>
+                                <th style="width:65px">إجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody class="product-body"></tbody>
+                    </table>
+                </div>
+            </td>
+        `;
+
+        if (v.products && v.products.length > 0) {
+            v.products.forEach(p => addProductRow(rowId, p));
+        } else {
+            addProductRow(rowId); 
+        }
+
+        // تفعيل تلوين القائمة المنسدلة للحالة فور تحميل السطر
+        applyStatusStyle(mainRow.querySelector('.status-select'));
+
         updateStats();
+        if(!prepend) reorderRows();
     }
 
-    function handleFieldChange(input, fieldName) {
-        const row = input.closest('tr');
-        const companyName = row.cells[1].querySelector('input').value;
-        addToActivityLog(fieldName, input.getAttribute('data-old'), input.value, companyName);
-        updateEditDateField(row);
-        saveAllDataSilently();
+    function toggleSubTable(rowId) {
+        const subRow = document.getElementById('sub-' + rowId);
+        const arrow = document.querySelector(`#${rowId} .toggle-arrow`);
+        if (subRow.style.display === 'table-row') {
+            subRow.style.display = 'none';
+            arrow.classList.remove('arrow-open');
+        } else {
+            subRow.style.display = 'table-row';
+            arrow.classList.add('arrow-open');
+        }
+    }
+
+    function addProductRow(rowId, data = {}) {
+        const tbody = document.querySelector(`#sub-${rowId} .product-body`);
+        const row = tbody.insertRow();
+        row.innerHTML = `
+            <td>
+                <select onchange="saveAllDataSilently()">
+                    <option value="" ${data.type === '' ? 'selected' : ''}></option>
+                    <option value="جوال" ${data.type === 'جوال' ? 'selected' : ''}>جوال</option>
+                    <option value="بيانات" ${data.type === 'بيانات' ? 'selected' : ''}>بيانات</option>
+                    <option value="هاتف" ${data.type === 'هاتف' ? 'selected' : ''}>هاتف</option>
+                    <option value="فايبر" ${data.type === 'فايبر' ? 'selected' : ''}>فايبر</option>
+                    <option value="DIA" ${data.type === 'DIA' ? 'selected' : ''}>DIA</option>
+                    <option value="SIP Trunk" ${data.type === 'SIP Trunk' ? 'selected' : ''}>SIP Trunk</option>
+                    <option value="IPvpn" ${data.type === 'IPvpn' ? 'selected' : ''}>IPvpn</option>
+                </select>
+            </td>
+            <td><input type="text" value="${data.desc || ''}" onchange="saveAllDataSilently()"></td>
+            <td><input type="text" value="${data.qty || ''}" onchange="saveAllDataSilently()"></td>
+            <td><input type="text" value="${data.sub || ''}" onchange="saveAllDataSilently()"></td>
+            <td><input type="text" value="${data.total || ''}" onchange="saveAllDataSilently()"></td>
+            <td>
+                <div style="display:flex; justify-content:center; gap:5px; align-items:center;">
+                    <button class="sub-action-btn btn-plus" onclick="addProductRow('${rowId}')">+</button>
+                    <button class="sub-action-btn btn-minus" onclick="if(this.closest('tbody').rows.length > 1) { this.closest('tr').remove(); saveAllDataSilently(); }">×</button>
+                </div>
+            </td>
+        `;
     }
 
     function toggleAllCheckboxes(source) {
@@ -323,35 +517,36 @@
 
     function handleBulkAction(action) {
         const selected = document.querySelectorAll('.select-check:checked');
-        if (selected.length === 0) return alert('يرجى تحديد صف واحد على الأقل.');
-        
-        if (action === 'حذف المحدد') {
-            if(confirm(`هل أنت متأكد من حذف ${selected.length} صفوف؟`)) {
-                selected.forEach(chk => {
-                    const row = chk.closest('tr');
-                    const companyName = row.cells[1].querySelector('input').value;
-                    addToActivityLog('إجراء', '', '', companyName);
-                    row.remove();
-                });
-                saveAllDataSilently();
-                updateStats();
-            }
+        if (selected.length === 0) return alert('حدد صفاً أولاً');
+        if (action === 'حذف' && confirm('تأكيد الحذف؟')) {
+            selected.forEach(chk => {
+                const row = chk.closest('tr');
+                const id = row.id;
+                const companyName = row.cells[1].querySelector('input').value;
+                addToActivityLog('إجراء', '', '', companyName);
+                row.remove();
+                if(document.getElementById('sub-' + id)) document.getElementById('sub-' + id).remove();
+            });
+            saveAllDataSilently();
+            updateStats();
         } else {
-            alert(`تم تنفيذ: ${action} لـ ${selected.length} صف.`);
+            alert('تم تنفيذ ' + action + ' على ' + selected.length + ' من الصفوف');
         }
     }
 
-    function updateEditDateField(row) {
-        const today = getTodayFormatted();
-        row.querySelector('.edit-date-display').value = today;
-        row.querySelector('.edit-date-val').value = today;
-    }
-
-    function insertNewRow() { renderRow({}, true); saveAllDataSilently(); }
-
     function saveAllDataSilently() {
         const data = [];
-        document.querySelectorAll('#tableBody tr').forEach(row => {
+        document.querySelectorAll('.main-row').forEach(row => {
+            const id = row.id;
+            const products = [];
+            const subRow = document.getElementById('sub-' + id);
+            if(subRow) {
+                subRow.querySelectorAll('.product-body tr').forEach(pRow => {
+                    const inputs = pRow.querySelectorAll('input, select');
+                    products.push({ type: inputs[0].value, desc: inputs[1].value, qty: inputs[2].value, sub: inputs[3].value, total: inputs[4].value });
+                });
+            }
+
             data.push({
                 comp: row.cells[1].querySelector('input').value,
                 mgr: row.cells[2].querySelector('input').value,
@@ -359,11 +554,13 @@
                 email: row.cells[4].querySelector('input').value,
                 record: row.cells[5].querySelector('input').value,
                 visitDate: row.querySelector('.visit-date-val').value,
-                curServ: row.cells[7].querySelector('input').value,
+                curServ: row.querySelector('.cur-serv-val').value,
+                valOpp: row.cells[8].querySelector('input').value,
                 notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '',
                 status: row.querySelector('.status-select').value,
                 editDate: row.querySelector('.edit-date-val').value,
-                owner: row.cells[11].querySelector('input').value
+                owner: row.cells[12].querySelector('input').value,
+                products: products
             });
         });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -372,73 +569,71 @@
     function loadSavedData() {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) JSON.parse(saved).forEach(item => renderRow(item));
+        reorderRows();
         renderActivityLog();
         updateStats();
     }
 
+    function insertNewRow() { renderRow({}, true); saveAllDataSilently(); }
+
     function filterTable() {
         const q = document.getElementById('searchInput').value.toLowerCase();
-        document.querySelectorAll('#tableBody tr').forEach(r => {
-            const match = [1,2,3,4,5,11].some(idx => r.cells[idx].querySelector('input').value.toLowerCase().includes(q));
+        document.querySelectorAll('.main-row').forEach(r => {
+            const match = [1,2,3,4,5,12].some(idx => r.cells[idx].querySelector('input').value.toLowerCase().includes(q));
             r.style.display = match ? "" : "none";
+            const sub = document.getElementById('sub-' + r.id);
+            if(sub) sub.style.display = 'none';
         });
     }
 
     function getLastNoteOnly(fullText) {
-        if (!fullText || fullText.trim() === "") return 'إضافة ملاحظة...';
+        if (!fullText) return 'إضافة ملاحظة...';
         const arr = fullText.split('\n--------------------\n');
-        const lastEntry = arr[arr.length - 1];
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = lastEntry;
-        const textPart = tempDiv.querySelector('.activity-text-part');
-        return textPart ? textPart.innerText : 'إضافة ملاحظة...';
+        const last = arr[arr.length - 1];
+        const temp = document.createElement('div');
+        temp.innerHTML = last;
+        const txt = temp.querySelector('.activity-text-part');
+        return txt ? txt.innerText : 'إضافة ملاحظة...';
     }
 
     function openNote(el) {
         currentActivePreview = el;
-        const rawNotes = el.getAttribute('data-full-notes') || "";
-        const historyLog = document.getElementById('historyLog');
-        
-        if (rawNotes.trim() !== "") {
-            historyLog.innerHTML = rawNotes.split('\n--------------------\n')
-                .map(entry => `<div class="activity-item" style="border-bottom:1px solid #f1f5f9; padding:8px 0;">${entry}</div>`)
-                .join('');
-        } else {
-            historyLog.innerHTML = '<div style="text-align:center; color:#94a3b8; margin-top:20px;">لا توجد ملاحظات سابقة</div>';
-        }
-        
+        const raw = el.getAttribute('data-full-notes') || "";
+        document.getElementById('historyLog').innerHTML = raw.split('\n--------------------\n').map(e => `<div class="activity-item">${e}</div>`).join('');
         document.getElementById('noteModal').style.display = "flex";
+        document.getElementById('modalTextArea').value = ""; // تفريغ حقل الكتابة لإدخال جديد
         document.getElementById('modalTextArea').focus();
     }
 
     function saveNote() {
-        const newText = document.getElementById('modalTextArea').value.trim();
-        if (newText && currentActivePreview) {
-            let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
-            let newEntry = `${generateStyledHeader()}<span class="activity-text-part">${newText}</span>`;
-            let updatedFullNotes = oldNotes === "" ? newEntry : oldNotes + "\n--------------------\n" + newEntry;
+        const txt = document.getElementById('modalTextArea').value.trim();
+        if (txt && currentActivePreview) {
+            let old = currentActivePreview.getAttribute('data-full-notes') || "";
+            let entry = `${generateStyledHeader()}<span class="activity-text-part">${txt}</span>`;
+            let updated = old === "" ? entry : old + "\n--------------------\n" + entry;
             
-            currentActivePreview.setAttribute('data-full-notes', updatedFullNotes);
-            currentActivePreview.innerText = newText;
+            currentActivePreview.setAttribute('data-full-notes', updated);
+            currentActivePreview.innerText = txt;
             
-            const companyName = currentActivePreview.closest('tr').cells[1].querySelector('input').value;
-            addToActivityLog('ملاحظات الزيارة', '...', newText, companyName);
-            updateEditDateField(currentActivePreview.closest('tr'));
+            // تحديث حقل تاريخ آخر تعديل تلقائياً عند حفظ الملاحظة
+            const targetRow = currentActivePreview.closest('tr');
+            updateEditDateField(targetRow);
+            
             saveAllDataSilently();
+            closeNote();
         }
-        closeNote();
     }
 
-    function closeNote() { 
-        document.getElementById('noteModal').style.display = "none"; 
-        document.getElementById('modalTextArea').value = ""; 
+    function closeNote() {
+        document.getElementById('noteModal').style.display = "none";
+        currentActivePreview = null;
     }
 
-    window.onclick = (e) => {
-        if (!e.target.matches('.btn-bulk-trigger')) {
-            document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
-        }
-    };
+    // إغلاق القوائم المنسدلة عند الضغط في أي مكان خارجها
+    window.onclick = function() {
+        document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+    }
 </script>
+
 </body>
 </html>
