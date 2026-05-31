@@ -114,6 +114,11 @@
             height: 100%; overflow: hidden; text-overflow: ellipsis; 
         }
 
+        /* تنسيق مخصص لحقل آخر تعديل لفصل خط التاريخ عن الوقت وتقليل حجم خط الوقت */
+        .edit-date-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; line-height: 1.3; }
+        .edit-date-d { font-size: 11px; font-weight: 600; color: inherit; }
+        .edit-date-t { font-size: 9.5px; font-weight: 700; color: #64748b; }
+
         .select-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent-blue); vertical-align: middle; }
 
         .action-cell { position: relative; overflow: visible !important; }
@@ -156,7 +161,6 @@
         .modal-content { background: white; padding: 18px; border-radius: 12px; width: 440px; height: 480px; display: flex; flex-direction: column; }
         .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; direction: rtl; }
         
-        /* جعل عناصر الملاحظات السابقة تظهر على أسطر منفصلة داخل المربع التفاعلي */
         .history-log .activity-item { display: block; margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
 
         .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; direction: rtl; }
@@ -262,18 +266,35 @@
         return d.toISOString().split('T')[0];
     }
 
+    // تعديل منطق الحفظ ليعمل بنظام 24 ساعة ويقسم النص لعرض الوقت بخط أصغر
     function updateEditDateField(row) {
         if (!row) return;
         const d = new Date();
         const dateFormatted = d.toISOString().split('T')[0];
-        const timeFormatted = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-        const fullDateTime = `${dateFormatted} ${timeFormatted}`;
         
-        const displayInput = row.querySelector('.edit-date-display');
+        // جلب الوقت بنظام 24 ساعة (بدون AM/PM)
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        const time24 = `${hours}:${minutes}`;
+        
+        const fullDateTime = `${dateFormatted} ${time24}`;
+        
+        const container = row.querySelector('.edit-date-container');
         const hiddenInput = row.querySelector('.edit-date-val');
         
-        if (displayInput) displayInput.value = fullDateTime;
+        if (container) {
+            container.innerHTML = `<span class="edit-date-d">${dateFormatted}</span><span class="edit-date-t">${time24}</span>`;
+        }
         if (hiddenInput) hiddenInput.value = fullDateTime;
+    }
+
+    // توليد مظهر العرض داخل جدول البيانات المخزن أو عند بناء خلية آخر تعديل
+    function parseEditDateHTML(fullDateTime) {
+        if (!fullDateTime || !fullDateTime.includes(' ')) return `<span class="edit-date-d">${fullDateTime || ''}</span><span class="edit-date-t"></span>`;
+        const parts = fullDateTime.split(' ');
+        const datePart = parts[0];
+        const timePart = parts[1];
+        return `<span class="edit-date-d">${datePart}</span><span class="edit-date-t">${timePart}</span>`;
     }
 
     function generateStyledHeader() {
@@ -361,6 +382,7 @@
         const visitDate = v.visitDate || today;
         const notes = v.notes || '';
         const lastNoteText = getLastNoteOnly(notes);
+        const editDateHTML = parseEditDateHTML(v.editDate || '');
 
         mainRow.innerHTML = `
             <td class="col-select">
@@ -387,7 +409,10 @@
                     <option value="فقدان" ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option>
                 </select>
             </td>
-            <td><input type="text" class="excel-input readonly-input edit-date-display" value="${v.editDate || ''}" readonly><input type="hidden" class="edit-date-val" value="${v.editDate || ''}"></td>
+            <td>
+                <div class="edit-date-container">${editDateHTML}</div>
+                <input type="hidden" class="edit-date-val" value="${v.editDate || ''}">
+            </td>
             <td><input type="text" class="excel-input" value="${v.owner || ''}" data-old="${v.owner || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المالك', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
         `;
 
@@ -566,7 +591,6 @@
         const txt = document.getElementById('modalTextArea').value.trim();
         if (txt && currentActivePreview) {
             let old = currentActivePreview.getAttribute('data-full-notes') || "";
-            // تم تفعيل فصل نص الرسالة وإجبارها على البدء من سطر جديد تماماً أسفل العنوان والوقت
             let entry = `${generateStyledHeader()}<span class="activity-text-part">${txt}</span>`;
             let updated = old === "" ? entry : old + "\n--------------------\n" + entry;
             
@@ -583,7 +607,7 @@
 
     function closeNote() {
         document.getElementById('noteModal').style.display = "none";
-        document.getElementById('modalTextArea').value = ""; // تنظيف المربع بعد الإغلاق
+        document.getElementById('modalTextArea').value = ""; 
         currentActivePreview = null;
     }
 
