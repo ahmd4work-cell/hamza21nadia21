@@ -50,9 +50,10 @@
             font-family: 'Cairo'; font-size: 12px; font-weight: 700; outline: none;
         }
 
-        .stats-bar-visit { margin-right: auto; display: flex; gap: 15px; align-items: center; background: #fff; padding: 0 15px; border-radius: 5px; height: 25px; border: 1px solid var(--border-soft); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .stats-bar-visit { margin-right: auto; display: flex; gap: 12px; align-items: center; background: #fff; padding: 0 15px; border-radius: 5px; height: 25px; border: 1px solid var(--border-soft); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .stat-item { font-size: 10px; font-weight: 800; color: #475569; white-space: nowrap; }
         .stat-val { color: var(--accent-blue); margin-right: 3px; }
+        .stat-divider { color: #cbd5e1; font-weight: normal; margin: 0 2px; }
 
         .bulk-action-wrapper { position: relative; display: flex; align-items: center; margin-right: 5px; }
         .btn-bulk-trigger { 
@@ -159,18 +160,20 @@
 
         .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; direction: rtl; }
 
+        /* تعديل توزيع عرض الأعمدة لتناسب العمود الجديد */
         .col-select { width: 3%; }
-        .col-company { width: 12%; } 
-        .col-manager { width: 8%; } 
-        .col-mobile { width: 8%; } 
-        .col-email { width: 8%; } 
-        .col-record { width: 8%; } 
+        .col-company { width: 11%; } 
+        .col-manager { width: 7%; } 
+        .col-mobile { width: 7%; } 
+        .col-email { width: 7%; } 
+        .col-record { width: 7%; } 
         .col-date { width: 8%; } 
-        .col-service { width: 10%; } 
+        .col-service { width: 9%; } 
+        .col-val { width: 8%; } /* العمود الجديد */
         .col-notes { width: 11%; } 
         .col-status { width: 8%; }
-        .col-edit { width: 8%; } 
-        .col-owner { width: 8%; }
+        .col-edit { width: 7%; } 
+        .col-owner { width: 7%; }
     </style>
 </head>
 <body onload="loadSavedData()">
@@ -195,6 +198,9 @@
                 <div class="stat-item">إجمالي الفرص: <span id="stat-total" class="stat-val">0</span></div>
                 <div class="stat-item">فرص الشهر الحالي: <span id="stat-month" class="stat-val">0</span></div>
                 <div class="stat-item">فرص اليوم: <span id="stat-today" class="stat-val">0</span></div>
+                <div class="stat-divider">|</div>
+                <div class="stat-item">قيمة الفرص: <span id="stat-value-total" class="stat-val">0</span></div>
+                <div class="stat-item">قيمة فرص الشهر: <span id="stat-value-month" class="stat-val">0</span></div>
             </div>
 
             <div class="bulk-action-wrapper">
@@ -221,6 +227,7 @@
                         <th class="col-record">السجل</th>
                         <th class="col-date">تاريخ الفرصة</th>
                         <th class="col-service">الخدمة الحالية</th>
+                        <th class="col-val">قيمة الفرصة</th>
                         <th class="col-notes">ملاحظات الفرصة</th>
                         <th class="col-status">الحالة</th>
                         <th class="col-edit">آخر تعديل</th>
@@ -252,8 +259,8 @@
 
 <script>
     let currentActivePreview = null;
-    const STORAGE_KEY = 'asgate_opportunities_final_v30'; 
-    const LOGS_KEY = 'asgate_opportunities_logs_v30';
+    const STORAGE_KEY = 'asgate_opportunities_final_v31'; 
+    const LOGS_KEY = 'asgate_opportunities_logs_v31';
 
     function getTodayFormatted() {
         const d = new Date();
@@ -318,21 +325,32 @@
         const rows = document.querySelectorAll('#tableBody .main-row');
         const today = getTodayFormatted();
         const currentMonth = today.substring(0, 7);
+        
         let total = rows.length, tDay = 0, tMonth = 0;
+        let valTotal = 0, valMonth = 0;
         
         rows.forEach(row => {
             const dateInput = row.querySelector('.visit-date-val');
+            const oppValInput = row.querySelector('.opp-value-input');
+            const oppVal = oppValInput ? parseFloat(oppValInput.value) || 0 : 0;
             
+            valTotal += oppVal;
+
             if(dateInput) {
                 const date = dateInput.value;
                 if (date === today) tDay++;
-                if (date.startsWith(currentMonth)) tMonth++;
+                if (date.startsWith(currentMonth)) {
+                    tMonth++;
+                    valMonth += oppVal;
+                }
             }
         });
         
         document.getElementById('stat-total').innerText = total;
         document.getElementById('stat-today').innerText = tDay;
         document.getElementById('stat-month').innerText = tMonth;
+        document.getElementById('stat-value-total').innerText = valTotal.toLocaleString();
+        document.getElementById('stat-value-month').innerText = valMonth.toLocaleString();
     }
 
     function reorderRows() {
@@ -392,6 +410,9 @@
             <td>
                 <input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الخدمة الحالية', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();">
             </td>
+            <td>
+                <input type="number" class="excel-input opp-value-input" value="${v.oppValue || ''}" data-old="${v.oppValue || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('قيمة الفرصة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats();">
+            </td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
             <td>
                 <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الحالة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats(); reorderRows();">
@@ -408,7 +429,7 @@
         `;
 
         subRow.innerHTML = `
-            <td colspan="12">
+            <td colspan="13">
                 <div class="sub-table-container">
                     <table class="inner-table">
                         <thead>
@@ -530,10 +551,11 @@
                 record: row.cells[5].querySelector('input').value,
                 visitDate: row.querySelector('.visit-date-val').value,
                 curServ: row.querySelector('.cur-serv-val').value,
+                oppValue: row.querySelector('.opp-value-input').value,
                 notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '',
                 status: row.querySelector('.status-select').value,
                 editDate: row.querySelector('.edit-date-val').value,
-                owner: row.cells[11].querySelector('input').value,
+                owner: row.cells[12].querySelector('input').value,
                 products: products
             });
         });
@@ -553,7 +575,7 @@
     function filterTable() {
         const q = document.getElementById('searchInput').value.toLowerCase();
         document.querySelectorAll('.main-row').forEach(r => {
-            const match = [1,2,3,4,5,11].some(idx => r.cells[idx].querySelector('input').value.toLowerCase().includes(q));
+            const match = [1,2,3,4,5,12].some(idx => r.cells[idx].querySelector('input').value.toLowerCase().includes(q));
             r.style.display = match ? "" : "none";
             const sub = document.getElementById('sub-' + r.id);
             if(sub) sub.style.display = 'none';
