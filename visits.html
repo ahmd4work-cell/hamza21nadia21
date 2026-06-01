@@ -411,7 +411,7 @@
             <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المسؤول', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
             <td>
                 <div class="mobile-cell-wrapper">
-                    <a class="whatsapp-icon" onclick="openWhatsApp(this)">🟢</a>
+                    <a class="whatsapp-icon" onclick="openWhatsApp(this)"><i class="fab fa-whatsapp"></i></a>
                     <input type="text" class="excel-input mobile-input" value="${v.mob || ''}" data-old="${v.mob || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الموبايل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();">
                 </div>
             </td>
