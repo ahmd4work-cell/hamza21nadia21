@@ -1,115 +1,625 @@
 <!DOCTYPE html>
-<html dir="rtl" lang="ar">
+<html dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>ASGate - نظام الزيارات</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASGate - الزيارات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --p: #4c1d95; --s: #3b82f6; --bg: #f4f7f9; }
-        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding: 20px; font-size: 13px; }
-        .bar { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; }
-        .card { background: white; border-radius: 10px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        table { width: 100%; border-collapse: collapse; background: white; }
-        th { background: var(--p); color: white; padding: 10px; font-size: 11px; }
-        td { border-bottom: 1px solid #eee; padding: 8px; text-align: center; }
-        .in-cell { width: 95%; border: 1px solid #ddd; border-radius: 4px; padding: 4px; font-family: 'Cairo'; }
-        .wa-btn { color: #22c55e; text-decoration: none; font-weight: bold; font-size: 11px; display: block; margin-top: 4px; }
-        .stats { background: #fff; padding: 10px; border-radius: 8px; margin-left: auto; border: 1px solid #ccc; }
+        :root {
+            --nav-shiny-navy: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+            --header-shiny-purple: linear-gradient(180deg, #4c1d95 0%, #2e1065 100%);
+            --nav-bg: #0f172a;
+            --nav-active: #a78bfa;
+            --bg-color: #f4f7f9;
+            --white: #ffffff;
+            --accent-blue: #3b82f6;
+            --accent-green-active: #22c55e;
+            --border-soft: #cbd5e1;
+            --text-dark: #1e293b;
+            --dark-yellow: #c29103;
+            --chat-yellow: #b45309;
+        }
+
+        html, body { 
+            height: 100%; margin: 0; padding: 0; overflow: hidden; 
+            background-color: var(--bg-color); font-family: 'Cairo', sans-serif; 
+            font-size: 13px; line-height: 1.2; color: var(--text-dark); 
+        }
+
+        .dashboard-container { display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; }
+
+        .navbar { 
+            background: var(--nav-shiny-navy); display: flex; align-items: center; padding: 0 20px; margin: 10px 10px 5px 10px; 
+            border-radius: 12px; height: 37px; flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.1); border: 1px solid #1e293b;
+        }
+        .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; height: 26px; line-height: 26px; display: inline-block; transition: 0.3s; }
+        .navbar a.active { background-color: var(--nav-active); color: #0f172a; border-radius: 6px; }
+
+        .main-content { flex: 1; display: flex; flex-direction: column; padding: 0 15px; min-height: 0; }
+        
+        .action-bar { display: flex; align-items: center; margin: 10px 0; gap: 10px; flex-shrink: 0; }
+        .btn-top { border: none; padding: 0 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; font-size: 12px; height: 35px; }
+        .btn-add { background-color: var(--accent-blue); }
+
+        .search-wrapper { position: relative; width: 15%; display: flex; align-items: center; }
+        .search-input {
+            width: 100%; height: 30px; padding: 0 10px; border-radius: 8px;
+            border: 1px solid var(--border-soft); background: #fff;
+            font-family: 'Cairo'; font-size: 12px; font-weight: 700; outline: none;
+        }
+
+        .stats-bar-visit { margin-right: auto; display: flex; gap: 12px; align-items: center; background: #fff; padding: 0 15px; border-radius: 5px; height: 25px; border: 1px solid var(--border-soft); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .stat-item { font-size: 10px; font-weight: 800; color: #475569; white-space: nowrap; }
+        .stat-val { color: var(--accent-blue); margin-right: 3px; }
+        .stat-divider { color: #cbd5e1; font-weight: normal; margin: 0 2px; }
+
+        .bulk-action-wrapper { position: relative; display: flex; align-items: center; margin-right: 5px; }
+        .btn-bulk-trigger { 
+            height: 25px; padding: 0 12px; border-radius: 5px; border: 1px solid var(--border-soft);
+            background: #fff; color: var(--text-dark); font-family: 'Cairo'; font-size: 11px; font-weight: 800;
+            cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: 0.2s;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .btn-bulk-trigger:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+
+        .table-wrapper { 
+            background: white; border-radius: 10px; overflow-y: auto; border: 1px solid var(--border-soft); 
+            flex: 1; min-height: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.02); position: relative;
+        }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        
+        th { 
+            background: var(--header-shiny-purple); color: white; padding: 0 5px; font-size: 11px; font-weight: 800; 
+            text-align: center; border-bottom: 2px solid #2e1065; position: sticky; top: 0; z-index: 50; height: 40px;
+        }
+        
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; max-height: 45px; font-size: 11px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; }
+        
+        .sub-table-row { display: none; background-color: #f8fafc; }
+        .sub-table-container { padding: 8px 12% 12px 5%; } 
+        .inner-table { width: 65%; background: white; border: 1px solid var(--border-soft); border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden; }
+        .inner-table th { background: var(--accent-blue); color: #fff; height: 24px; font-size: 9.5px; border-left: 1px solid rgba(255,255,255,0.2); }
+        .inner-table td { height: 28px; border: 1px solid #edf2f7; padding: 0; }
+        .inner-table input, .inner-table select { width: 100%; height: 100%; border: none; text-align: center; font-family: 'Cairo'; font-size: 10.5px; outline: none; background: transparent; }
+        .inner-table select { text-align-last: center; cursor: pointer; }
+        
+        .sub-action-btn { 
+            width: 22px; height: 22px; border: none; border-radius: 4px; cursor: pointer; 
+            font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center;
+            transition: 0.2s;
+        }
+        .btn-plus { background: #22c55e; color: white; }
+        .btn-plus:hover { background: #16a34a; }
+        .btn-minus { background: #fee2e2; color: #ef4444; }
+        .btn-minus:hover { background: #fecaca; }
+
+        .toggle-arrow { 
+            cursor: pointer; font-size: 13px; color: var(--accent-blue); margin-right: 5px; 
+            display: inline-block; transition: transform 0.2s; vertical-align: middle;
+            font-weight: bold;
+        }
+        .arrow-open { transform: rotate(90deg); }
+
+        tbody tr.main-row:nth-child(4n+1) { background-color: #eff6ff; }
+
+        .excel-input { 
+            width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; 
+            background: transparent; font-size: 11.5px; color: inherit; font-weight: inherit; 
+            height: 100%; overflow: hidden; text-overflow: ellipsis; 
+        }
+
+        .edit-date-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; line-height: 1.3; }
+        .edit-date-d { font-size: 11px; font-weight: 600; color: inherit; }
+        .edit-date-t { font-size: 9.5px; font-weight: 700; color: #64748b; }
+
+        .select-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent-blue); vertical-align: middle; }
+
+        .action-cell { position: relative; overflow: visible !important; }
+        
+        .dropdown-menu { 
+            display: none; position: absolute; left: 0; 
+            top: 28px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; 
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 1000; min-width: 110px; padding: 4px;
+        }
+
+        .dropdown-menu button { 
+            width: 100%; padding: 6px 10px; border: none; background: none; font-family: 'Cairo'; 
+            font-size: 10.5px; text-align: right; cursor: pointer; color: #475569; font-weight: 700; 
+            border-radius: 4px; transition: 0.2s; display: block;
+        }
+        .dropdown-menu button:hover { background: #f1f5f9; color: var(--accent-blue); }
+        .dropdown-menu .del-btn:hover { background: #fee2e2; color: #ef4444; }
+        .show { display: block; }
+
+        .notes-preview { 
+            width: 95%; height: 20px; border: none; background: transparent; font-family: 'Cairo'; 
+            font-size: 11px; text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700; 
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; margin: 0 auto; 
+        }
+
+        .activity-log-section { 
+            margin: 15px 0 10px 0; padding: 12px 18px; background: #ffffff; border-radius: 10px; 
+            border: 1px solid var(--border-soft); box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
+            flex-shrink: 0; height: 140px; display: flex; flex-direction: column; box-sizing: border-box;
+        }
+        .activity-log-title { color: var(--dark-yellow); font-size: 13.5px; font-weight: 800; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; flex-shrink: 0; }
+        .activity-list { flex: 1; overflow-y: auto; font-size: 11.5px; line-height: 1.6; }
+        .activity-item { margin-bottom: 4px; border-bottom: 1px dashed #f8fafc; padding-bottom: 4px; color: #475569; display: flex; align-items: center; }
+        
+        .activity-header-part { font-size: 11.5px; color: var(--chat-yellow); font-weight: 800; display: inline-block; }
+        .activity-time-part { font-size: 11.5px; font-weight: 800; }
+        .activity-text-part { font-size: 11.5px; color: #475569; display: block; text-align: right; white-space: pre-wrap; margin-top: 2px; }
+
+        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .modal-content { background: white; padding: 18px; border-radius: 12px; width: 440px; height: 480px; display: flex; flex-direction: column; }
+        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; direction: rtl; }
+        
+        .history-log .activity-item { display: block; margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
+
+        .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; direction: rtl; }
+
+        .col-select { width: 3%; }
+        .col-company { width: 11%; } 
+        .col-manager { width: 7%; } 
+        .col-mobile { width: 7%; } 
+        .col-email { width: 7%; } 
+        .col-record { width: 7%; } 
+        .col-date { width: 8%; } 
+        .col-service { width: 9%; } 
+        .col-val { width: 8%; } 
+        .col-notes { width: 11%; } 
+        .col-status { width: 8%; }
+        .col-edit { width: 7%; } 
+        .col-owner { width: 7%; }
     </style>
 </head>
-<body>
+<body onload="loadSavedData()">
 
-<div class="card">
-    <div class="bar">
-        <button onclick="addRow()" style="background:var(--s); color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">+ إضافة زيارة</button>
-        <input type="text" id="search" placeholder="بحث سريع..." onkeyup="filter()" style="padding:7px; border-radius:5px; border:1px solid #ccc;">
-        <div class="stats">
-            إجمالي الزيارات: <span id="count">0</span> | القيمة الكلية: <span id="totalVal">0</span>
+<div class="dashboard-container">
+    <nav class="navbar">
+        <a href="index.html">الرئيسية</a>
+        <a href="visits.html" class="active">الزيارات</a>
+        <a href="opportunities.html">الفرص البيعية</a>
+        <a href="customers.html">العملاء</a>
+        <a href="sales.html">المبيعات</a>
+    </nav>
+
+    <div class="main-content">
+        <div class="action-bar">
+            <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة زيارة جديدة</button>
+            <div class="search-wrapper">
+                <input type="text" id="searchInput" class="search-input" placeholder="بحث 🔍" onkeyup="filterTable()">
+            </div>
+            
+            <div class="stats-bar-visit">
+                <div class="stat-item">إجمالي الزيارات: <span id="stat-total" class="stat-val">0</span></div>
+                <div class="stat-item">زيارات الشهر الحالي: <span id="stat-month" class="stat-val">0</span></div>
+                <div class="stat-item">زيارات اليوم: <span id="stat-today" class="stat-val">0</span></div>
+                <div class="stat-divider">|</div>
+                <div class="stat-item">قيمة الزيارات: <span id="stat-value-total" class="stat-val">0</span></div>
+                <div class="stat-item">قيمة زيارات الشهر: <span id="stat-value-month" class="stat-val">0</span></div>
+            </div>
+
+            <div class="bulk-action-wrapper">
+                <button class="btn-bulk-trigger" onclick="toggleDropdown(event, this)">إجراء ▾</button>
+                <div class="dropdown-menu">
+                    <button onclick="handleBulkAction('تغيير المالك')">تغيير المالك</button>
+                    <button onclick="handleBulkAction('تعديل')">تعديل</button>
+                    <button onclick="handleBulkAction('تصدير')">تصدير</button>
+                    <button onclick="handleBulkAction('طباعة')">طباعة</button>
+                    <button class="del-btn" onclick="handleBulkAction('حذف')">حذف</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-wrapper">
+            <table id="mainTable">
+                <thead>
+                    <tr>
+                        <th class="col-select"><input type="checkbox" onclick="toggleAllCheckboxes(this)"></th>
+                        <th class="col-company">الشركة</th>
+                        <th class="col-manager">المسؤول</th>
+                        <th class="col-mobile">الموبايل</th>
+                        <th class="col-email">الإيميل</th>
+                        <th class="col-record">السجل</th>
+                        <th class="col-date">تاريخ الزيارة</th>
+                        <th class="col-service">الخدمة الحالية</th>
+                        <th class="col-val">قيمة الزيارة</th>
+                        <th class="col-notes">ملاحظات الزيارة</th>
+                        <th class="col-status">الحالة</th>
+                        <th class="col-edit">آخر تعديل</th>
+                        <th class="col-owner">المالك</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+
+        <div class="activity-log-section">
+            <div class="activity-log-title">📋 سجل نشاط الزيارات</div>
+            <div id="activityList" class="activity-list"></div>
         </div>
     </div>
+</div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>الشركة</th><th>الموقع</th><th>المسؤول</th><th>الموبايل</th><th>التاريخ</th><th>القيمة</th><th>الحالة</th><th>المالك</th><th>إجراء</th>
-            </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-    </table>
+<div id="noteModal" class="modal">
+    <div class="modal-content">
+        <div style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right;">سجل متابعة الزيارة والنتائج</div>
+        <div id="historyLog" class="history-log"></div>
+        <textarea id="modalTextArea" class="note-area" placeholder="أدخل تفاصيل الملاحظة هنا..."></textarea>
+        <div style="display:flex; justify-content: flex-end; gap:8px; margin-top:10px;">
+            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px;">تراجع</button>
+            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px; font-weight:bold;">حفظ الملاحظة</button>
+        </div>
+    </div>
 </div>
 
 <script>
-    const KEY = 'asgate_v31_final';
+    let currentActivePreview = null;
+    const STORAGE_KEY = 'asgate_visits_final_v31'; 
+    const LOGS_KEY = 'asgate_visits_logs_v31';
+    const OPPORTUNITIES_KEY = 'asgate_opportunities_final_v31'; // مفتاح صفحة الفرص
 
-    function addRow(data = {}) {
-        const tr = document.createElement('tr');
-        tr.className = 'row-item';
-        const waLink = data.mob ? `https://wa.me/${data.mob.startsWith('0') ? '966' + data.mob.substring(1) : '966' + data.mob}` : '#';
-        
-        tr.innerHTML = `
-            <td><input type="text" class="in-cell" value="${data.comp || ''}" onchange="save()"></td>
-            <td><input type="text" class="in-cell" value="${data.loc || ''}" onchange="save()"></td>
-            <td><input type="text" class="in-cell" value="${data.mgr || ''}" onchange="save()"></td>
-            <td>
-                <input type="text" class="in-cell" value="${data.mob || ''}" onchange="save()">
-                <a href="${waLink}" target="_blank" class="wa-btn" style="${data.mob ? '' : 'display:none'}">🟢 واتساب</a>
-            </td>
-            <td><input type="date" class="in-cell" value="${data.date || ''}" onchange="save()"></td>
-            <td><input type="number" class="in-cell val-field" value="${data.val || 0}" onchange="save()"></td>
-            <td>
-                <select class="in-cell" onchange="save()">
-                    <option value="">--</option>
-                    <option value="متابعة" ${data.status=='متابعة'?'selected':''}>متابعة</option>
-                    <option value="تأهيل" ${data.status=='تأهيل'?'selected':''}>تأهيل لفرصة</option>
-                </select>
-            </td>
-            <td><input type="text" class="in-cell" value="${data.owner || ''}" onchange="save()"></td>
-            <td><button onclick="this.parentElement.parentElement.remove(); save();" style="color:red; border:none; background:none; cursor:pointer;">حذف</button></td>
-        `;
-        document.getElementById('tbody').prepend(tr);
-        save();
+    function getTodayFormatted() {
+        const d = new Date();
+        return d.toISOString().split('T')[0];
     }
 
-    function save() {
-        const rows = [];
-        document.querySelectorAll('.row-item').forEach(tr => {
-            const ins = tr.querySelectorAll('.in-cell');
-            rows.push({
-                comp: ins[0].value, loc: ins[1].value, mgr: ins[2].value, 
-                mob: ins[3].value, date: ins[4].value, val: ins[5].value,
-                status: ins[6].value, owner: ins[7].value
-            });
-            // تحديث رابط الواتساب فوراً
-            const wa = tr.querySelector('.wa-btn');
-            const phone = ins[3].value;
-            if(phone) {
-                wa.href = `https://wa.me/${phone.startsWith('0') ? '966' + phone.substring(1) : '966' + phone}`;
-                wa.style.display = 'block';
-            }
-        });
-        localStorage.setItem(KEY, JSON.stringify(rows));
-        updateStats();
+    function updateEditDateField(row) {
+        if (!row) return;
+        const d = new Date();
+        const dateFormatted = d.toISOString().split('T')[0];
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        const time24 = `${hours}:${minutes}`;
+        const fullDateTime = `${dateFormatted} ${time24}`;
+        const container = row.querySelector('.edit-date-container');
+        const hiddenInput = row.querySelector('.edit-date-val');
+        if (container) {
+            container.innerHTML = `<span class="edit-date-d">${dateFormatted}</span><span class="edit-date-t">${time24}</span>`;
+        }
+        if (hiddenInput) hiddenInput.value = fullDateTime;
+    }
+
+    function parseEditDateHTML(fullDateTime) {
+        if (!fullDateTime || !fullDateTime.includes(' ')) return `<span class="edit-date-d">${fullDateTime || ''}</span><span class="edit-date-t"></span>`;
+        const parts = fullDateTime.split(' ');
+        const datePart = parts[0];
+        const timePart = parts[1];
+        return `<span class="edit-date-d">${datePart}</span><span class="edit-date-t">${timePart}</span>`;
+    }
+
+    function generateStyledHeader() {
+        const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+        const d = new Date();
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        const time24 = `${hours}:${minutes}`;
+        return `<span class="activity-header-part">👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${getTodayFormatted()}  <span class="activity-time-part">${time24}</span></span>`;
+    }
+
+    function addToActivityLog(fieldName, oldVal, newVal, companyName) {
+        const headerHTML = generateStyledHeader();
+        const cleanCompany = companyName && companyName.trim() !== "" ? companyName : "شركة جديدة";
+        const val1 = oldVal && oldVal.trim() !== "" ? oldVal : "فارغ";
+        const val2 = newVal && newVal.trim() !== "" ? newVal : "فارغ";
+        let actionText = fieldName === "إجراء" ? `حذف زيارة شركة ( ${cleanCompany} )` : `تعديل ${fieldName} من [${val1}] إلى [${val2}] في ( ${cleanCompany} )`;
+        const fullLogHTML = `${headerHTML}<span class="activity-text-part">${actionText}</span>`;
+        let logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
+        logs.unshift(fullLogHTML);
+        localStorage.setItem(LOGS_KEY, JSON.stringify(logs.slice(0, 100)));
+        renderActivityLog();
+    }
+
+    function renderActivityLog() {
+        const list = document.getElementById('activityList');
+        const logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
+        list.innerHTML = logs.map(log => `<div class="activity-item">${log}</div>`).join('');
     }
 
     function updateStats() {
-        const rows = JSON.parse(localStorage.getItem(KEY) || '[]');
-        let total = 0;
-        rows.forEach(r => total += parseFloat(r.val) || 0);
-        document.getElementById('count').innerText = rows.length;
-        document.getElementById('totalVal').innerText = total.toLocaleString();
+        const rows = document.querySelectorAll('#tableBody .main-row');
+        const today = getTodayFormatted();
+        const currentMonth = today.substring(0, 7);
+        let total = rows.length, tDay = 0, tMonth = 0;
+        let valTotal = 0, valMonth = 0;
+        rows.forEach(row => {
+            const dateInput = row.querySelector('.visit-date-val');
+            const visitValInput = row.querySelector('.opp-value-input');
+            const visitVal = visitValInput ? parseFloat(visitValInput.value) || 0 : 0;
+            valTotal += visitVal;
+            if(dateInput) {
+                const date = dateInput.value;
+                if (date === today) tDay++;
+                if (date.startsWith(currentMonth)) {
+                    tMonth++;
+                    valMonth += visitVal;
+                }
+            }
+        });
+        document.getElementById('stat-total').innerText = total;
+        document.getElementById('stat-today').innerText = tDay;
+        document.getElementById('stat-month').innerText = tMonth;
+        document.getElementById('stat-value-total').innerText = valTotal.toLocaleString();
+        document.getElementById('stat-value-month').innerText = valMonth.toLocaleString();
     }
 
-    function filter() {
-        const q = document.getElementById('search').value.toLowerCase();
-        document.querySelectorAll('.row-item').forEach(r => {
-            r.style.display = r.innerText.toLowerCase().includes(q) ? '' : 'none';
+    function reorderRows() {
+        const tbody = document.getElementById('tableBody');
+        const rows = Array.from(tbody.querySelectorAll('.main-row'));
+        rows.sort((a, b) => {
+            const dateA = a.querySelector('.visit-date-val').value || '';
+            const dateB = b.querySelector('.visit-date-val').value || '';
+            return dateB.localeCompare(dateA);
+        });
+        rows.forEach(mainRow => {
+            const subRow = document.getElementById('sub-' + mainRow.id);
+            tbody.appendChild(mainRow);
+            if(subRow) tbody.appendChild(subRow);
         });
     }
 
-    // تحميل البيانات عند الفتح
-    window.onload = () => {
-        const saved = JSON.parse(localStorage.getItem(KEY) || '[]');
-        saved.reverse().forEach(addRow);
+    function insertNewRow() {
+        renderRow({}, true);
+        saveAllDataSilently();
+    }
+
+    function renderRow(v = {}, prepend = false) {
+        const tbody = document.getElementById('tableBody');
+        const rowId = 'row-' + Date.now() + Math.random().toString(36).substr(2, 5);
+        const mainRow = prepend ? tbody.insertRow(0) : tbody.insertRow();
+        mainRow.className = 'main-row';
+        mainRow.id = rowId;
+        const subRow = prepend ? tbody.insertRow(1) : tbody.insertRow();
+        subRow.className = 'sub-table-row';
+        subRow.id = 'sub-' + rowId;
+
+        const today = getTodayFormatted();
+        const visitDate = v.visitDate || today;
+        const notes = v.notes || '';
+        const lastNoteText = getLastNoteOnly(notes);
+        const editDateHTML = parseEditDateHTML(v.editDate || '');
+
+        mainRow.innerHTML = `
+            <td class="col-select">
+                <input type="checkbox" class="select-check">
+                <span class="toggle-arrow" onclick="toggleSubTable('${rowId}')">▶</span>
+            </td>
+            <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الشركة', this.getAttribute('data-old'), this.value, this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats();"></td>
+            <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المسؤول', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الموبايل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الإيميل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('السجل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td>
+                <input type="text" class="excel-input readonly-input" value="${visitDate}" readonly>
+                <input type="hidden" class="visit-date-val" value="${visitDate}">
+            </td>
+            <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الخدمة الحالية', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="number" class="excel-input opp-value-input" value="${v.oppValue || '0'}" readonly></td>
+            <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
+            <td>
+                <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleStatusChange(this, '${rowId}')">
+                    <option value="" ${v.status === '' ? 'selected' : ''}></option>
+                    <option value="تأهيل لفرصة" ${v.status === 'تأهيل لفرصة' ? 'selected' : ''}>تأهيل لفرصة</option>
+                    <option value="متابعة" ${v.status === 'متابعة' ? 'selected' : ''}>متابعة</option>
+                    <option value="غير مهتم" ${v.status === 'غير مهتم' ? 'selected' : ''}>غير مهتم</option>
+                    <option value="فقدان" ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option>
+                </select>
+            </td>
+            <td>
+                <div class="edit-date-container">${editDateHTML}</div>
+                <input type="hidden" class="edit-date-val" value="${v.editDate || ''}">
+            </td>
+            <td><input type="text" class="excel-input" value="${v.owner || ''}" data-old="${v.owner || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المالك', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
+        `;
+
+        subRow.innerHTML = `<td colspan="13"><div class="sub-table-container"><table class="inner-table"><thead><tr><th>نوع المنتج</th><th>تفاصيل المنتج</th><th>العدد</th><th>الاشتراك</th><th>الإجمالي</th><th style="width:65px">إجراء</th></tr></thead><tbody class="product-body"></tbody></table></div></td>`;
+        if (v.products && v.products.length > 0) { v.products.forEach(p => addProductRow(rowId, p)); } else { addProductRow(rowId); }
+        updateStats();
+        if(!prepend) reorderRows();
+    }
+
+    // دالة التعامل مع تغيير الحالة ونظام النقل
+    function handleStatusChange(selectEl, rowId) {
+        const newVal = selectEl.value;
+        const oldVal = selectEl.getAttribute('data-old');
+        const companyName = selectEl.closest('tr').cells[1].querySelector('input').value;
+
+        if (newVal === "تأهيل لفرصة") {
+            if (confirm("هل أنت متأكد من نقل الزيارة إلى الفرص البيعية؟")) {
+                transferToOpportunities(rowId);
+                return; // الخروج لأن الصف سيُحذف
+            } else {
+                selectEl.value = oldVal; // التراجع في حال الرفض
+                return;
+            }
+        }
+
+        // الحالات العادية
+        addToActivityLog('الحالة', oldVal, newVal, companyName);
+        updateEditDateField(selectEl.closest('tr'));
+        saveAllDataSilently();
+        updateStats();
+        reorderRows();
+        selectEl.setAttribute('data-old', newVal);
+    }
+
+    // دالة النقل الفعلية
+    function transferToOpportunities(rowId) {
+        const row = document.getElementById(rowId);
+        const subRow = document.getElementById('sub-' + rowId);
+        
+        // تجميع المنتجات من الجدول الفرعي
+        const products = [];
+        subRow.querySelectorAll('.product-body tr').forEach(pRow => {
+            const inputs = pRow.querySelectorAll('input, select');
+            products.push({
+                type: inputs[0].value,
+                desc: inputs[1].value,
+                qty: inputs[2].value,
+                sub: inputs[3].value,
+                total: inputs[4].value
+            });
+        });
+
+        // تجميع بيانات الزيارة بالكامل
+        const visitData = {
+            comp: row.cells[1].querySelector('input').value,
+            mgr: row.cells[2].querySelector('input').value,
+            mob: row.cells[3].querySelector('input').value,
+            email: row.cells[4].querySelector('input').value,
+            record: row.cells[5].querySelector('input').value,
+            oppDate: getTodayFormatted(), // تاريخ النقل يصبح تاريخ الفرصة
+            curServ: row.querySelector('.cur-serv-val').value,
+            oppValue: row.querySelector('.opp-value-input').value,
+            notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '',
+            status: "مهتم", // تعيين حالة افتراضية في صفحة الفرص
+            editDate: row.querySelector('.edit-date-val').value,
+            owner: row.cells[12].querySelector('input').value,
+            products: products
+        };
+
+        // حفظ البيانات في الفرص البيعية (Local Storage)
+        let opps = JSON.parse(localStorage.getItem(OPPORTUNITIES_KEY) || '[]');
+        opps.unshift(visitData);
+        localStorage.setItem(OPPORTUNITIES_KEY, JSON.stringify(opps));
+
+        // إضافة سجل نشاط للنقل
+        addToActivityLog('إجراء', '', '', `نقل إلى الفرص: ${visitData.comp}`);
+
+        // حذف الصف من صفحة الزيارات
+        row.remove();
+        if(subRow) subRow.remove();
+        
+        saveAllDataSilently();
+        updateStats();
+        
+        alert("تم نقل الزيارة بنجاح إلى صفحة الفرص البيعية.");
+    }
+
+    function toggleSubTable(rowId) {
+        const subRow = document.getElementById('sub-' + rowId);
+        const arrow = document.querySelector(`#${rowId} .toggle-arrow`);
+        if (subRow.style.display === 'table-row') { subRow.style.display = 'none'; arrow.classList.remove('arrow-open'); } 
+        else { subRow.style.display = 'table-row'; arrow.classList.add('arrow-open'); }
+    }
+
+    function addProductRow(rowId, data = {}) {
+        const tbody = document.querySelector(`#sub-${rowId} .product-body`);
+        const row = tbody.insertRow();
+        row.innerHTML = `
+            <td><select onchange="calculateProductRow(this, '${rowId}')"><option value=""></option><option value="جوال" ${data.type === 'جوال' ? 'selected' : ''}>جوال</option><option value="بيانات" ${data.type === 'بيانات' ? 'selected' : ''}>بيانات</option><option value="هاتف" ${data.type === 'هاتف' ? 'selected' : ''}>هاتف</option><option value="فايبر" ${data.type === 'فايبر' ? 'selected' : ''}>فايبر</option><option value="DIA" ${data.type === 'DIA' ? 'selected' : ''}>DIA</option><option value="SIP Trunk" ${data.type === 'SIP Trunk' ? 'selected' : ''}>SIP Trunk</option><option value="IPvpn" ${data.type === 'IPvpn' ? 'selected' : ''}>IPvpn</option></select></td>
+            <td><input type="text" value="${data.desc || ''}" onchange="saveAllDataSilently()"></td>
+            <td><input type="number" class="p-qty" min="0" value="${data.qty || ''}" oninput="calculateProductRow(this, '${rowId}')"></td>
+            <td><input type="number" class="p-sub" min="0" value="${data.sub || ''}" oninput="calculateProductRow(this, '${rowId}')"></td>
+            <td><input type="number" class="p-total" value="${data.total || '0'}" readonly></td>
+            <td><div style="display:flex; justify-content:center; gap:5px;"><button class="sub-action-btn btn-plus" onclick="addProductRow('${rowId}')">+</button><button class="sub-action-btn btn-minus" onclick="removeProductRow(this, '${rowId}')">×</button></div></td>
+        `;
+    }
+
+    function calculateProductRow(el, rowId) {
+        const tr = el.closest('tr');
+        let qty = parseFloat(tr.querySelector('.p-qty').value) || 0;
+        let sub = parseFloat(tr.querySelector('.p-sub').value) || 0;
+        if (qty < 0) { qty = 0; tr.querySelector('.p-qty').value = 0; }
+        if (sub < 0) { sub = 0; tr.querySelector('.p-sub').value = 0; }
+        const totalInput = tr.querySelector('.p-total');
+        totalInput.value = (qty * sub);
+        calculateMainVisitValue(rowId);
+        saveAllDataSilently();
+    }
+
+    function removeProductRow(btn, rowId) {
+        const tbody = btn.closest('tbody');
+        if(tbody.rows.length > 1) {
+            btn.closest('tr').remove();
+            calculateMainVisitValue(rowId);
+            saveAllDataSilently();
+        }
+    }
+
+    function calculateMainVisitValue(rowId) {
+        const subRow = document.getElementById('sub-' + rowId);
+        const mainRow = document.getElementById(rowId);
+        if (!mainRow) return;
+        let totalVisit = 0;
+        subRow.querySelectorAll('.p-total').forEach(input => {
+            totalVisit += parseFloat(input.value) || 0;
+        });
+        const mainValInput = mainRow.querySelector('.opp-value-input');
+        mainValInput.value = totalVisit;
+        updateStats();
+    }
+
+    function toggleAllCheckboxes(source) { document.querySelectorAll('.select-check').forEach(chk => chk.checked = source.checked); }
+    function toggleDropdown(e, btn) { e.stopPropagation(); const menu = btn.nextElementSibling; document.querySelectorAll('.dropdown-menu').forEach(m => { if(m !== menu) m.classList.remove('show'); }); menu.classList.toggle('show'); }
+
+    function handleBulkAction(action) {
+        const selected = document.querySelectorAll('.select-check:checked');
+        if (selected.length === 0) return alert('حدد صفاً أولاً');
+        if (action === 'حذف' && confirm('تأكيد الحذف؟')) {
+            selected.forEach(chk => { const row = chk.closest('tr'); const id = row.id; addToActivityLog('إجراء', '', '', row.cells[1].querySelector('input').value); row.remove(); if(document.getElementById('sub-' + id)) document.getElementById('sub-' + id).remove(); });
+            saveAllDataSilently(); updateStats();
+        } else { alert('تم تنفيذ ' + action); }
+    }
+
+    function saveAllDataSilently() {
+        const data = [];
+        document.querySelectorAll('.main-row').forEach(row => {
+            const id = row.id; const products = []; const subRow = document.getElementById('sub-' + id);
+            if(subRow) { subRow.querySelectorAll('.product-body tr').forEach(pRow => { const inputs = pRow.querySelectorAll('input, select'); products.push({ type: inputs[0].value, desc: inputs[1].value, qty: inputs[2].value, sub: inputs[3].value, total: inputs[4].value }); }); }
+            data.push({ comp: row.cells[1].querySelector('input').value, mgr: row.cells[2].querySelector('input').value, mob: row.cells[3].querySelector('input').value, email: row.cells[4].querySelector('input').value, record: row.cells[5].querySelector('input').value, visitDate: row.querySelector('.visit-date-val').value, curServ: row.querySelector('.cur-serv-val').value, oppValue: row.querySelector('.opp-value-input').value, notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '', status: row.querySelector('.status-select').value, editDate: row.querySelector('.edit-date-val').value, owner: row.cells[12].querySelector('input').value, products: products });
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function loadSavedData() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) { JSON.parse(saved).forEach(v => renderRow(v)); }
+        renderActivityLog(); updateStats();
+    }
+
+    function filterTable() {
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        document.querySelectorAll('.main-row').forEach(row => {
+            const text = row.innerText.toLowerCase();
+            const subRow = document.getElementById('sub-' + row.id);
+            if (text.includes(q)) { row.style.display = 'table-row'; } 
+            else { row.style.display = 'none'; if(subRow) subRow.style.display = 'none'; }
+        });
+    }
+
+    function openNote(previewEl) {
+        currentActivePreview = previewEl;
+        const rawNotes = previewEl.getAttribute('data-full-notes') || "";
+        document.getElementById('historyLog').innerHTML = rawNotes.split('\n--------------------\n').map(entry => `<div class="activity-item">${entry}</div>`).join('');
+        document.getElementById('noteModal').style.display = "flex";
+        document.getElementById('modalTextArea').focus();
+    }
+
+    function saveNote() {
+        const newText = document.getElementById('modalTextArea').value.trim();
+        if (newText && currentActivePreview) {
+            let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
+            let newEntry = `${generateStyledHeader()}<span class="activity-text-part">${newText}</span>`;
+            let updatedFullNotes = oldNotes === "" ? newEntry : oldNotes + "\n--------------------\n" + newEntry;
+            currentActivePreview.setAttribute('data-full-notes', updatedFullNotes);
+            currentActivePreview.innerText = newText;
+            saveAllDataSilently();
+            addToActivityLog("ملاحظة", "إضافة", newText, currentActivePreview.closest('tr').cells[1].querySelector('input').value);
+        }
+        closeNote();
+    }
+
+    function closeNote() { document.getElementById('noteModal').style.display = "none"; document.getElementById('modalTextArea').value = ""; }
+    function getLastNoteOnly(fullNotes) { if(!fullNotes) return ""; const parts = fullNotes.split('\n--------------------\n'); const last = parts[parts.length - 1]; const tempDiv = document.createElement('div'); tempDiv.innerHTML = last; return tempDiv.querySelector('.activity-text-part')?.innerText || tempDiv.innerText || ""; }
+
+    window.onclick = (e) => {
+        if (!e.target.matches('.btn-bulk-trigger')) {
+            document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+        }
     };
 </script>
 </body>
