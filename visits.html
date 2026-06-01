@@ -160,12 +160,11 @@
 
         .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; direction: rtl; }
 
-        /* تعديل توزيع عرض الأعمدة لإضافة العنوان */
         .col-select { width: 3%; }
         .col-company { width: 10%; } 
-        .col-address { width: 9%; } /* العمود الجديد */
+        .col-address { width: 9%; } 
         .col-manager { width: 7%; } 
-        .col-mobile { width: 7%; } 
+        .col-mobile { width: 8%; } 
         .col-email { width: 7%; } 
         .col-record { width: 6%; } 
         .col-date { width: 8%; } 
@@ -175,10 +174,14 @@
         .col-status { width: 7%; }
         .col-edit { width: 6%; } 
         .col-owner { width: 5%; }
+
+        /* ستايل الواتساب */
+        .mobile-cell-wrapper { display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 5px; }
+        .whatsapp-icon { color: #25d366; text-decoration: none; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; align-items: center; }
+        .whatsapp-icon:hover { transform: scale(1.2); }
     </style>
 </head>
 <body onload="loadSavedData()">
-
 <div class="dashboard-container">
     <nav class="navbar">
         <a href="index.html">الرئيسية</a>
@@ -222,7 +225,8 @@
                     <tr>
                         <th class="col-select"><input type="checkbox" onclick="toggleAllCheckboxes(this)"></th>
                         <th class="col-company">الشركة</th>
-                        <th class="col-address">العنوان</th> <th class="col-manager">المسؤول</th>
+                        <th class="col-address">العنوان</th>
+                        <th class="col-manager">المسؤول</th>
                         <th class="col-mobile">الموبايل</th>
                         <th class="col-email">الإيميل</th>
                         <th class="col-record">السجل</th>
@@ -263,6 +267,19 @@
     const STORAGE_KEY = 'asgate_visits_final_v31'; 
     const LOGS_KEY = 'asgate_visits_logs_v31';
     const OPPORTUNITIES_KEY = 'asgate_opportunities_final_v31'; 
+
+    function openWhatsApp(el) {
+        const input = el.closest('div').querySelector('.mobile-input');
+        let phone = input.value.trim();
+        if(!phone) return;
+        // معالجة الصفر في البداية
+        if(phone.startsWith('0')) {
+            phone = '966' + phone.substring(1);
+        } else if(!phone.startsWith('966') && phone.length === 9) {
+            phone = '966' + phone;
+        }
+        window.open(`https://wa.me/${phone}`, '_blank');
+    }
 
     function getTodayFormatted() {
         const d = new Date();
@@ -392,7 +409,12 @@
             <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الشركة', this.getAttribute('data-old'), this.value, this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats();"></td>
             <td><input type="text" class="excel-input" value="${v.address || ''}" data-old="${v.address || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('العنوان', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
             <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المسؤول', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الموبايل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td>
+                <div class="mobile-cell-wrapper">
+                    <a class="whatsapp-icon" onclick="openWhatsApp(this)">🟢</a>
+                    <input type="text" class="excel-input mobile-input" value="${v.mob || ''}" data-old="${v.mob || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الموبايل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();">
+                </div>
+            </td>
             <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الإيميل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
             <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('السجل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
             <td>
@@ -467,7 +489,7 @@
             comp: row.cells[1].querySelector('input').value,
             address: row.cells[2].querySelector('input').value,
             mgr: row.cells[3].querySelector('input').value,
-            mob: row.cells[4].querySelector('input').value,
+            mob: row.querySelector('.mobile-input').value,
             email: row.cells[5].querySelector('input').value,
             record: row.cells[6].querySelector('input').value,
             oppDate: getTodayFormatted(),
@@ -570,7 +592,7 @@
                 comp: row.cells[1].querySelector('input').value, 
                 address: row.cells[2].querySelector('input').value, 
                 mgr: row.cells[3].querySelector('input').value, 
-                mob: row.cells[4].querySelector('input').value, 
+                mob: row.querySelector('.mobile-input').value, 
                 email: row.cells[5].querySelector('input').value, 
                 record: row.cells[6].querySelector('input').value, 
                 visitDate: row.querySelector('.visit-date-val').value, 
