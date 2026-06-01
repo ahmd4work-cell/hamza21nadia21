@@ -160,19 +160,21 @@
 
         .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; direction: rtl; }
 
+        /* تعديل توزيع عرض الأعمدة لإضافة العنوان */
         .col-select { width: 3%; }
-        .col-company { width: 11%; } 
+        .col-company { width: 10%; } 
+        .col-address { width: 9%; } /* العمود الجديد */
         .col-manager { width: 7%; } 
         .col-mobile { width: 7%; } 
         .col-email { width: 7%; } 
-        .col-record { width: 7%; } 
+        .col-record { width: 6%; } 
         .col-date { width: 8%; } 
-        .col-service { width: 9%; } 
-        .col-val { width: 8%; } 
-        .col-notes { width: 11%; } 
-        .col-status { width: 8%; }
-        .col-edit { width: 7%; } 
-        .col-owner { width: 7%; }
+        .col-service { width: 8%; } 
+        .col-val { width: 7%; } 
+        .col-notes { width: 10%; } 
+        .col-status { width: 7%; }
+        .col-edit { width: 6%; } 
+        .col-owner { width: 5%; }
     </style>
 </head>
 <body onload="loadSavedData()">
@@ -220,7 +222,7 @@
                     <tr>
                         <th class="col-select"><input type="checkbox" onclick="toggleAllCheckboxes(this)"></th>
                         <th class="col-company">الشركة</th>
-                        <th class="col-manager">المسؤول</th>
+                        <th class="col-address">العنوان</th> <th class="col-manager">المسؤول</th>
                         <th class="col-mobile">الموبايل</th>
                         <th class="col-email">الإيميل</th>
                         <th class="col-record">السجل</th>
@@ -260,7 +262,7 @@
     let currentActivePreview = null;
     const STORAGE_KEY = 'asgate_visits_final_v31'; 
     const LOGS_KEY = 'asgate_visits_logs_v31';
-    const OPPORTUNITIES_KEY = 'asgate_opportunities_final_v31'; // مفتاح صفحة الفرص
+    const OPPORTUNITIES_KEY = 'asgate_opportunities_final_v31'; 
 
     function getTodayFormatted() {
         const d = new Date();
@@ -388,6 +390,7 @@
                 <span class="toggle-arrow" onclick="toggleSubTable('${rowId}')">▶</span>
             </td>
             <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الشركة', this.getAttribute('data-old'), this.value, this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats();"></td>
+            <td><input type="text" class="excel-input" value="${v.address || ''}" data-old="${v.address || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('العنوان', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
             <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المسؤول', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
             <td><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الموبايل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
             <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الإيميل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
@@ -415,13 +418,12 @@
             <td><input type="text" class="excel-input" value="${v.owner || ''}" data-old="${v.owner || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المالك', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
         `;
 
-        subRow.innerHTML = `<td colspan="13"><div class="sub-table-container"><table class="inner-table"><thead><tr><th>نوع المنتج</th><th>تفاصيل المنتج</th><th>العدد</th><th>الاشتراك</th><th>الإجمالي</th><th style="width:65px">إجراء</th></tr></thead><tbody class="product-body"></tbody></table></div></td>`;
+        subRow.innerHTML = `<td colspan="14"><div class="sub-table-container"><table class="inner-table"><thead><tr><th>نوع المنتج</th><th>تفاصيل المنتج</th><th>العدد</th><th>الاشتراك</th><th>الإجمالي</th><th style="width:65px">إجراء</th></tr></thead><tbody class="product-body"></tbody></table></div></td>`;
         if (v.products && v.products.length > 0) { v.products.forEach(p => addProductRow(rowId, p)); } else { addProductRow(rowId); }
         updateStats();
         if(!prepend) reorderRows();
     }
 
-    // دالة التعامل مع تغيير الحالة ونظام النقل
     function handleStatusChange(selectEl, rowId) {
         const newVal = selectEl.value;
         const oldVal = selectEl.getAttribute('data-old');
@@ -430,14 +432,13 @@
         if (newVal === "تأهيل لفرصة") {
             if (confirm("هل أنت متأكد من نقل الزيارة إلى الفرص البيعية؟")) {
                 transferToOpportunities(rowId);
-                return; // الخروج لأن الصف سيُحذف
+                return; 
             } else {
-                selectEl.value = oldVal; // التراجع في حال الرفض
+                selectEl.value = oldVal; 
                 return;
             }
         }
 
-        // الحالات العادية
         addToActivityLog('الحالة', oldVal, newVal, companyName);
         updateEditDateField(selectEl.closest('tr'));
         saveAllDataSilently();
@@ -446,12 +447,10 @@
         selectEl.setAttribute('data-old', newVal);
     }
 
-    // دالة النقل الفعلية
     function transferToOpportunities(rowId) {
         const row = document.getElementById(rowId);
         const subRow = document.getElementById('sub-' + rowId);
         
-        // تجميع المنتجات من الجدول الفرعي
         const products = [];
         subRow.querySelectorAll('.product-body tr').forEach(pRow => {
             const inputs = pRow.querySelectorAll('input, select');
@@ -464,32 +463,29 @@
             });
         });
 
-        // تجميع بيانات الزيارة بالكامل
         const visitData = {
             comp: row.cells[1].querySelector('input').value,
-            mgr: row.cells[2].querySelector('input').value,
-            mob: row.cells[3].querySelector('input').value,
-            email: row.cells[4].querySelector('input').value,
-            record: row.cells[5].querySelector('input').value,
-            oppDate: getTodayFormatted(), // تاريخ النقل يصبح تاريخ الفرصة
+            address: row.cells[2].querySelector('input').value,
+            mgr: row.cells[3].querySelector('input').value,
+            mob: row.cells[4].querySelector('input').value,
+            email: row.cells[5].querySelector('input').value,
+            record: row.cells[6].querySelector('input').value,
+            oppDate: getTodayFormatted(),
             curServ: row.querySelector('.cur-serv-val').value,
             oppValue: row.querySelector('.opp-value-input').value,
             notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '',
-            status: "مهتم", // تعيين حالة افتراضية في صفحة الفرص
+            status: "مهتم",
             editDate: row.querySelector('.edit-date-val').value,
-            owner: row.cells[12].querySelector('input').value,
+            owner: row.cells[13].querySelector('input').value,
             products: products
         };
 
-        // حفظ البيانات في الفرص البيعية (Local Storage)
         let opps = JSON.parse(localStorage.getItem(OPPORTUNITIES_KEY) || '[]');
         opps.unshift(visitData);
         localStorage.setItem(OPPORTUNITIES_KEY, JSON.stringify(opps));
 
-        // إضافة سجل نشاط للنقل
         addToActivityLog('إجراء', '', '', `نقل إلى الفرص: ${visitData.comp}`);
 
-        // حذف الصف من صفحة الزيارات
         row.remove();
         if(subRow) subRow.remove();
         
@@ -570,7 +566,22 @@
         document.querySelectorAll('.main-row').forEach(row => {
             const id = row.id; const products = []; const subRow = document.getElementById('sub-' + id);
             if(subRow) { subRow.querySelectorAll('.product-body tr').forEach(pRow => { const inputs = pRow.querySelectorAll('input, select'); products.push({ type: inputs[0].value, desc: inputs[1].value, qty: inputs[2].value, sub: inputs[3].value, total: inputs[4].value }); }); }
-            data.push({ comp: row.cells[1].querySelector('input').value, mgr: row.cells[2].querySelector('input').value, mob: row.cells[3].querySelector('input').value, email: row.cells[4].querySelector('input').value, record: row.cells[5].querySelector('input').value, visitDate: row.querySelector('.visit-date-val').value, curServ: row.querySelector('.cur-serv-val').value, oppValue: row.querySelector('.opp-value-input').value, notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '', status: row.querySelector('.status-select').value, editDate: row.querySelector('.edit-date-val').value, owner: row.cells[12].querySelector('input').value, products: products });
+            data.push({ 
+                comp: row.cells[1].querySelector('input').value, 
+                address: row.cells[2].querySelector('input').value, 
+                mgr: row.cells[3].querySelector('input').value, 
+                mob: row.cells[4].querySelector('input').value, 
+                email: row.cells[5].querySelector('input').value, 
+                record: row.cells[6].querySelector('input').value, 
+                visitDate: row.querySelector('.visit-date-val').value, 
+                curServ: row.querySelector('.cur-serv-val').value, 
+                oppValue: row.querySelector('.opp-value-input').value, 
+                notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '', 
+                status: row.querySelector('.status-select').value, 
+                editDate: row.querySelector('.edit-date-val').value, 
+                owner: row.cells[13].querySelector('input').value, 
+                products: products 
+            });
         });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
