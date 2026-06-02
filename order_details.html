@@ -262,7 +262,31 @@
             }
         }
 
-        // دالة تجميع بيانات الجدول للنشر في السجل
+        // دالة اللصق الذكي لتوزيع البيانات من إكسيل على الصفوف
+        function handleSmartPaste(e, fieldName, startIdx) {
+            e.preventDefault();
+            const clipboardData = e.clipboardData || window.clipboardData;
+            const pastedText = clipboardData.getData('text');
+            const rows = pastedText.split(/\r\n|\n|\r/).filter(line => line.trim() !== "");
+            
+            if (rows.length > 0) {
+                let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+                let items = db[currentOrderId] || [];
+                
+                rows.forEach((value, i) => {
+                    let targetIdx = startIdx + i;
+                    if (items[targetIdx]) {
+                        items[targetIdx][fieldName] = value.trim();
+                        items[targetIdx].updatedAt = Date.now();
+                    }
+                });
+                
+                localStorage.setItem('asgate_products_db', JSON.stringify(db));
+                addLog(`تم لصق عدد (${rows.length}) قيم في عمود [${fieldName}] من الإكسيل`, null, false);
+                renderProducts();
+            }
+        }
+
         function getProductsDetailsText() {
             const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             const items = db[currentOrderId] || [];
@@ -359,9 +383,9 @@
                 const locked = ["مكتمل", "تم التوثيق", "معلق"].includes(p.status);
                 
                 let dynamic = (p.type === "جوال" || p.type === "بيانات") ? `
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'serial',this.innerText)">${p.serial||''}</td>
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'mobile',this.innerText)">${p.mobile||''}</td>
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'user',this.innerText)">${p.user||''}</td>` : `
+                    <td contenteditable="true" onpaste="handleSmartPaste(event, 'serial', ${p.originalIndex})" onblur="updateField(${p.originalIndex},'serial',this.innerText)">${p.serial||''}</td>
+                    <td contenteditable="true" onpaste="handleSmartPaste(event, 'mobile', ${p.originalIndex})" onblur="updateField(${p.originalIndex},'mobile',this.innerText)">${p.mobile||''}</td>
+                    <td contenteditable="true" onpaste="handleSmartPaste(event, 'user', ${p.originalIndex})" onblur="updateField(${p.originalIndex},'user',this.innerText)">${p.user||''}</td>` : `
                     <td contenteditable="true" onblur="updateField(${p.originalIndex},'sai',this.innerText)">${p.sai||''}</td>
                     <td contenteditable="true" onblur="updateField(${p.originalIndex},'coords',this.innerText)">${p.coords||''}</td>
                     <td contenteditable="true" onblur="updateField(${p.originalIndex},'city',this.innerText)">${p.city||''}</td>`;
