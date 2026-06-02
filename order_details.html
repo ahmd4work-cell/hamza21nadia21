@@ -207,9 +207,13 @@
             <h3>إضافة منتج جديد</h3>
             <label style="font-size: 11px; font-weight: bold; color: #64748b;">نوع المنتج</label>
             <select id="p_type" onchange="handleTypeChange()">
-                <option value="خدمة متنقلة">خدمة متنقلة</option>
-                <option value="هاتف وانترنت">هاتف وانترنت</option>
-                <option value="داتا">داتا</option>
+                <option value="جوال">جوال</option>
+                <option value="بيانات">بيانات</option>
+                <option value="هاتف">هاتف</option>
+                <option value="فايبر">فايبر</option>
+                <option value="DIA">DIA</option>
+                <option value="SIP Trunk">SIP Trunk</option>
+                <option value="Ipvpn">Ipvpn</option>
             </select>
             <input type="text" id="p_name" placeholder="تفاصيل المنتج (مثال: باقة 200 جيجا)">
             <div class="input-row">
@@ -280,7 +284,6 @@
             const dateStr = now.toLocaleDateString('en-GB');
             const timeStr = now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', hour12: true});
             
-            // الهيدر المطلوب باللون الأصفر الغامق
             const meta = `👤 (أحمد) 🗓️ ${dayName} ${dateStr} <span class="log-time">${timeStr}</span> ➡️ :`;
             
             logs.unshift({ orderId: currentOrderId, meta, msg, file: fileObj, isFile });
@@ -320,7 +323,7 @@
                 return (b.updatedAt || 0) - (a.updatedAt || 0);
             });
             
-            updateTableHeaders(items.length > 0 ? items[0].type : "خدمة متنقلة");
+            updateTableHeaders(items.length > 0 ? items[0].type : "جوال");
             const tbody = document.getElementById('productsBody');
             tbody.innerHTML = '';
             
@@ -330,7 +333,7 @@
                 let sClass = p.status === "مكتمل" ? "status-mektamel" : (p.status === "تم التوثيق" ? "status-tawtheeq" : (p.status === "معلق" ? "status-moallaq" : (p.status === "مرتجع" ? "status-mortaja" : "")));
                 const locked = ["مكتمل", "تم التوثيق", "معلق"].includes(p.status);
                 
-                let dynamic = (p.type === "خدمة متنقلة") ? `
+                let dynamic = (p.type === "جوال" || p.type === "بيانات") ? `
                     <td contenteditable="true" onblur="updateField(${p.originalIndex},'serial',this.innerText,false)">${p.serial||''}</td>
                     <td contenteditable="true" onblur="updateField(${p.originalIndex},'mobile',this.innerText,false)">${p.mobile||''}</td>
                     <td contenteditable="true" onblur="updateField(${p.originalIndex},'user',this.innerText,false)">${p.user||''}</td>` : `
@@ -353,7 +356,7 @@
 
         function updateTableHeaders(type) {
             const header = document.getElementById('dynamicHeader');
-            let dynamic = (type === "خدمة متنقلة") ? `<th>رقم السريال</th><th>رقم الخدمة</th><th>المستخدم</th>` : `<th>رقم الكبينة</th><th>الإحداثيات</th><th>المدينة</th>`;
+            let dynamic = (type === "جوال" || type === "بيانات") ? `<th>رقم السريال</th><th>رقم الخدمة</th><th>المستخدم</th>` : `<th>رقم الكبينة</th><th>الإحداثيات</th><th>المدينة</th>`;
             header.innerHTML = `<th style="width: 30px;"><input type="checkbox" onclick="toggleAll(this)"></th><th style="width:100px;">نوع المنتج</th><th>تفاصيل المنتج</th><th style="width:50px;">العدد</th><th style="width:80px;">الاشتراك</th><th style="width:80px;">الإجمالي</th>${dynamic}<th style="width:90px;">الحالة</th><th style="width:80px;">التاريخ</th><th>ملاحظة</th>`;
         }
 
@@ -361,7 +364,6 @@
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             let item = db[currentOrderId][idx];
             if (item[f] !== v.trim()) {
-                // تم إيقاف تسجيل النشاط هنا بناء على طلبك (النشاط للحالة فقط)
                 item[f] = v.trim(); item.updatedAt = Date.now();
                 localStorage.setItem('asgate_products_db', JSON.stringify(db));
                 if(['status','qty','sub'].includes(f)) syncSumsToSales();
@@ -372,14 +374,10 @@
         function changeStatus(idx, s) {
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             let item = db[currentOrderId][idx];
-            const oldStatus = item.status;
             
             if (["مكتمل", "تم التوثيق", "معلق"].includes(s) && !confirm("تنبيه: سيتم قفل هذا الصف. هل أنت متأكد؟")) { renderProducts(); return; }
             
-            // رقم الخدمة لاستخدامه في السجل
             const serviceNum = item.mobile || item.sai || "غير محدد";
-            
-            // تسجيل النشاط فقط عند تغيير الحالة وبالصيغة المطلوبة
             addLog(`تعديل الحالة الى ( ${s} ) رقم الخدمة ( ${serviceNum} )`, null, false);
             
             item.status = s;
@@ -407,15 +405,16 @@
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             if(!db[currentOrderId]) db[currentOrderId] = [];
             
-            if(isAuto && type === "خدمة متنقلة" && serial !== "") {
+            const hasSerial = ["جوال", "بيانات"].includes(type);
+
+            if(isAuto && hasSerial && serial !== "") {
                 for(let i=0; i<qty; i++){ 
                     db[currentOrderId].push({ type, name, qty:1, sub, serial, status:"جديد", date:new Date().toLocaleDateString('en-GB'), updatedAt:Date.now() });
                     serial = serial.replace(/(\d+)(?!.*\d)/, n => (BigInt(n)+1n).toString().padStart(n.length, '0')); 
                 }
             } else { 
-                db[currentOrderId].push({ type, name, qty, sub, serial:(type==="خدمة متنقلة"?serial:""), status:"جديد", date:new Date().toLocaleDateString('en-GB'), updatedAt:Date.now() }); 
+                db[currentOrderId].push({ type, name, qty, sub, serial:(hasSerial?serial:""), status:"جديد", date:new Date().toLocaleDateString('en-GB'), updatedAt:Date.now() }); 
             }
-            // لم يتم طلب تسجيل إضافة منتج في السجل، لذا تم إزالته
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
             syncSumsToSales(); renderProducts(); closeModal();
         }
@@ -437,9 +436,38 @@
         }
 
         function toggleAll(s) { document.querySelectorAll('.row-checkbox:not(:disabled)').forEach(c => c.checked = s.checked); calculateTotals(); }
-        function openModal() { document.getElementById('productModal').style.display = 'flex'; handleTypeChange(); }
-        function closeModal() { document.getElementById('productModal').style.display = 'none'; }
-        function handleTypeChange() {} // دالة فارغة للحفاظ على التوافق
+        
+        function openModal() { 
+            document.getElementById('productModal').style.display = 'flex'; 
+            handleTypeChange(); 
+        }
+        
+        function closeModal() { 
+            document.getElementById('productModal').style.display = 'none'; 
+            document.getElementById('p_name').value = '';
+            document.getElementById('p_qty').value = '1';
+            document.getElementById('p_serial').value = '';
+            document.getElementById('p_sub').value = '';
+            document.getElementById('auto_serial').checked = false;
+        }
+        
+        function handleTypeChange() {
+            const type = document.getElementById('p_type').value;
+            const serialInput = document.getElementById('p_serial');
+            const autoCheckbox = document.getElementById('auto_serial');
+            
+            if (type === "جوال" || type === "بيانات") {
+                serialInput.disabled = false;
+                autoCheckbox.disabled = false;
+                serialInput.style.backgroundColor = "";
+            } else {
+                serialInput.disabled = true;
+                autoCheckbox.disabled = true;
+                serialInput.value = "";
+                autoCheckbox.checked = false;
+                serialInput.style.backgroundColor = "#e2e8f0";
+            }
+        } 
         
         function exportToExcel() {
             const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
