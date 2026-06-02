@@ -98,7 +98,7 @@
         .log-header-line { display: flex; align-items: center; width: 100%; }
         .log-meta { color: var(--log-meta-gold); font-weight: 800; font-size: 10px; }
         .log-time { font-size: 10px; } 
-        .log-msg { color: var(--text-dark); font-weight: 700; margin-right: 5px; font-size: 11px; white-space: pre-line; width: 100%; }
+        .log-msg { color: var(--text-dark); font-weight: 700; margin-right: 5px; font-size: 11px; white-space: pre-line; }
         .log-msg-file { color: var(--log-file-darkred) !important; font-weight: 800; font-size: 11px; }
         
         .log-product-details { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 10px; margin-top: 4px; width: 100%; box-sizing: border-box; font-size: 10.5px; color: #334155; line-height: 1.4; white-space: pre-line; }
@@ -262,52 +262,45 @@
             }
         }
 
-        // دالة تجميع بيانات المنتجات والجدول ونشرها كتقرير منسق
+        // دالة تجميع بيانات الجدول للنشر في السجل
         function getProductsDetailsText() {
             const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             const items = db[currentOrderId] || [];
-            if (items.length === 0) return "📦 لا توجد منتجات حالية مضافة في الجدول.";
+            if (items.length === 0) return "📦 الجدول لا يحتوي على منتجات حالياً.";
             
-            let text = "📦 تفاصيل المنتجات بالجدول:\n";
+            let text = "📦 تفاصيل المنتجات الحالية بالجدول:\n";
             items.forEach((p, idx) => {
-                text += `• [منتج ${idx + 1}] النوع: ${p.type} | تفاصيل المنتج: ${p.name} | العدد: ${p.qty} | الاشتراك: ${p.sub} ر.س | الحالة: ${p.status}`;
-                
+                text += `• [${idx + 1}] النوع: ${p.type} | التفاصيل: ${p.name} | العدد: ${p.qty} | الحالة: ${p.status}`;
                 if (p.type === "جوال" || p.type === "بيانات") {
-                    text += ` | رقم السريال: ${p.serial || '-'} | رقم الخدمة: ${p.mobile || '-'} | المستخدم: ${p.user || '-'}`;
+                    text += ` | سريال: ${p.serial || '-'} | خدمة: ${p.mobile || '-'} | مستخدم: ${p.user || '-'}`;
                 } else {
-                    text += ` | رقم الكبينة: ${p.sai || '-'} | الإحداثيات: ${p.coords || '-'} | المدينة: ${p.city || '-'}`;
+                    text += ` | كبينة: ${p.sai || '-'} | إحداثيات: ${p.coords || '-'} | مدينة: ${p.city || '-'}`;
                 }
-                
-                text += ` | ملاحظة: ${p.note || '-'}`;
+                if (p.note) text += ` | ملاحظة: ${p.note}`;
                 text += "\n";
             });
             return text;
         }
 
         function processTextOnly() {
-            const msgInput = document.getElementById('logMsg');
-            const msg = msgInput.value.trim();
+            const msg = document.getElementById('logMsg').value.trim();
             const tableDetails = getProductsDetailsText();
             const combinedMsg = msg ? `${msg}\n${tableDetails}` : tableDetails;
-            
             addLog(combinedMsg, null, false);
-            msgInput.value = '';
+            document.getElementById('logMsg').value = '';
         }
 
         function processFileAndSend() {
             const fileInput = document.getElementById('logFile');
-            const msgInput = document.getElementById('logMsg');
             const file = fileInput.files[0];
             if(!file) return;
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                const fileData = e.target.result;
                 const tableDetails = getProductsDetailsText();
-                const combinedMsg = `📎 أرفق ملف باسم ( ${file.name} )\n${tableDetails}`;
-                addLog(combinedMsg, { name: file.name, data: fileData }, true);
+                const combinedMsg = `📎 تم إرفاق ملف: ( ${file.name} )\n${tableDetails}`;
+                addLog(combinedMsg, { name: file.name, data: e.target.result }, true);
                 fileInput.value = '';
-                msgInput.value = '';
             };
             reader.readAsDataURL(file);
         }
@@ -316,11 +309,7 @@
             let logs = JSON.parse(localStorage.getItem('asgate_logs') || '[]');
             const now = new Date();
             const days = ['الأحد', 'الأثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-            const dayName = days[now.getDay()];
-            const dateStr = now.toLocaleDateString('en-GB');
-            const timeStr = now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
-            
-            const meta = `👤 (أحمد) 🗓️ ${dayName} ${dateStr} <span class="log-time">${timeStr}</span> `;
+            const meta = `👤 (أحمد) 🗓️ ${days[now.getDay()]} ${now.toLocaleDateString('en-GB')} <span class="log-time">${now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', second:'2-digit'})}</span> `;
             
             logs.unshift({ orderId: currentOrderId, meta, msg, file: fileObj, isFile });
             localStorage.setItem('asgate_logs', JSON.stringify(logs.slice(0, 100)));
@@ -330,33 +319,22 @@
         function renderLogs() {
             const logs = JSON.parse(localStorage.getItem('asgate_logs') || '[]');
             const container = document.getElementById('activityLogs');
-            container.innerHTML = '';
-            
-            const filteredLogs = logs.filter(l => String(l.orderId) === String(currentOrderId));
-            
-            filteredLogs.forEach(l => {
-                const textParts = l.msg.split('\n📦');
-                const mainMessage = textParts[0];
-                const productsPart = textParts[1] ? '📦' + textParts[1] : '';
-
-                const logEntry = document.createElement('div');
-                logEntry.className = 'log-entry';
-
-                let fileBtn = '';
-                if (l.file) {
-                    fileBtn = `<a class="file-attachment" onclick="downloadFile('${l.file.data}', '${l.file.name}')">📥 تحميل</a>`;
-                }
-
-                logEntry.innerHTML = `
-                    <div class="log-header-line">
-                        <span class="log-meta">${l.meta}</span> 
-                        <span class="log-msg ${l.isFile ? 'log-msg-file' : ''}">${mainMessage}</span>
-                        ${fileBtn}
-                    </div>
-                    ${productsPart ? `<div class="log-product-details">${productsPart.replace(/\n/g, '<br>')}</div>` : ''}
-                `;
-                container.appendChild(logEntry);
-            });
+            container.innerHTML = logs
+                .filter(l => String(l.orderId) === String(currentOrderId))
+                .map(l => {
+                    const textParts = l.msg.split('\n📦');
+                    const mainMessage = textParts[0];
+                    const productsPart = textParts[1] ? '📦' + textParts[1] : '';
+                    return `
+                        <div class="log-entry">
+                            <div class="log-header-line">
+                                <span class="log-meta">${l.meta}</span> 
+                                <span class="log-msg ${l.isFile ? 'log-msg-file' : ''}">${mainMessage}</span>
+                                ${l.file ? `<a class="file-attachment" onclick="downloadFile('${l.file.data}', '${l.file.name}')">📥 تحميل</a>` : ''}
+                            </div>
+                            ${productsPart ? `<div class="log-product-details">${productsPart.replace(/\n/g, '<br>')}</div>` : ''}
+                        </div>`;
+                }).join('');
         }
 
         function downloadFile(data, name) {
@@ -369,13 +347,7 @@
         function renderProducts(filtered = null) {
             const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             let items = (filtered || db[currentOrderId] || []).map((p, i) => ({...p, originalIndex: i}));
-            
-            items.sort((a, b) => {
-                if (a.status === "فقدان" && b.status !== "فقدان") return 1;
-                if (a.status !== "فقدان" && b.status === "فقدان") return -1;
-                if (a.status === "فقدان" && b.status === "فقدان") return (a.updatedAt || 0) - (b.updatedAt || 0);
-                return (b.updatedAt || 0) - (a.updatedAt || 0);
-            });
+            items.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
             
             updateTableHeaders(items.length > 0 ? items[0].type : "جوال");
             const tbody = document.getElementById('productsBody');
@@ -383,27 +355,29 @@
             
             items.forEach((p) => {
                 const subVal = parseFloat(p.sub) || 0;
-                const lineTotal = (parseInt(p.qty) || 0) * subVal;
                 let sClass = p.status === "مكتمل" ? "status-mektamel" : (p.status === "تم التوثيق" ? "status-tawtheeq" : (p.status === "معلق" ? "status-moallaq" : (p.status === "مرتجع" ? "status-mortaja" : "")));
                 const locked = ["مكتمل", "تم التوثيق", "معلق"].includes(p.status);
                 
                 let dynamic = (p.type === "جوال" || p.type === "بيانات") ? `
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'serial',this.innerText,false)">${p.serial||''}</td>
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'mobile',this.innerText,false)">${p.mobile||''}</td>
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'user',this.innerText,false)">${p.user||''}</td>` : `
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'sai',this.innerText,false)">${p.sai||''}</td>
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'coords',this.innerText,false)">${p.coords||''}</td>
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'city',this.innerText,false)">${p.city||''}</td>`;
+                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'serial',this.innerText)">${p.serial||''}</td>
+                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'mobile',this.innerText)">${p.mobile||''}</td>
+                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'user',this.innerText)">${p.user||''}</td>` : `
+                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'sai',this.innerText)">${p.sai||''}</td>
+                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'coords',this.innerText)">${p.coords||''}</td>
+                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'city',this.innerText)">${p.city||''}</td>`;
 
                 tbody.innerHTML += `<tr class="${locked?'row-locked':''}">
                     <td><input type="checkbox" class="row-checkbox" data-index="${p.originalIndex}" onchange="calculateTotals()" ${locked?'disabled':''}></td>
-                    <td>${p.type}</td><td contenteditable="true" onblur="updateField(${p.originalIndex},'name',this.innerText,false)">${p.name}</td>
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'qty',this.innerText,false)">${p.qty}</td>
-                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'sub',this.innerText,false)">${subVal.toFixed(2)}</td>
-                    <td style="color:var(--header-green);font-weight:800;">${lineTotal.toFixed(2)}</td>${dynamic}
+                    <td>${p.type}</td>
+                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'name',this.innerText)">${p.name}</td>
+                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'qty',this.innerText)">${p.qty}</td>
+                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'sub',this.innerText)">${subVal.toFixed(2)}</td>
+                    <td style="color:var(--header-green);font-weight:800;">${(p.qty * subVal).toFixed(2)}</td>
+                    ${dynamic}
                     <td><select class="status-select ${sClass}" onchange="changeStatus(${p.originalIndex},this.value)">
                         ${statusOptions.map(s=>`<option value="${s}" ${p.status===s?'selected':''}>${s}</option>`).join('')}</select></td>
-                    <td style="font-size:10px">${p.date}</td><td contenteditable="true" onblur="updateField(${p.originalIndex},'note',this.innerText,false)">${p.note||''}</td></tr>`;
+                    <td style="font-size:10px">${p.date}</td>
+                    <td contenteditable="true" onblur="updateField(${p.originalIndex},'note',this.innerText)">${p.note||''}</td></tr>`;
             });
             calculateTotals();
         }
@@ -414,13 +388,15 @@
             header.innerHTML = `<th style="width: 30px;"><input type="checkbox" onclick="toggleAll(this)"></th><th style="width:100px;">نوع المنتج</th><th>تفاصيل المنتج</th><th style="width:50px;">العدد</th><th style="width:80px;">الاشتراك</th><th style="width:80px;">الإجمالي</th>${dynamic}<th style="width:90px;">الحالة</th><th style="width:80px;">التاريخ</th><th>ملاحظة</th>`;
         }
 
-        function updateField(idx, f, v, log = false) {
+        function updateField(idx, f, v) {
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             let item = db[currentOrderId][idx];
-            if (item[f] !== v.trim()) {
+            if (item[f] != v.trim()) {
+                const fieldNames = {name:'تفاصيل المنتج', qty:'العدد', serial:'السريال', mobile:'رقم الخدمة', user:'المستخدم', note:'الملاحظة', sub:'الاشتراك'};
+                addLog(`تحديث ${fieldNames[f] || f} إلى ( ${v.trim()} ) للمنتج رقم ${idx+1}`, null, false);
                 item[f] = v.trim(); item.updatedAt = Date.now();
                 localStorage.setItem('asgate_products_db', JSON.stringify(db));
-                if(['status','qty','sub'].includes(f)) syncSumsToSales();
+                if(['qty','sub'].includes(f)) syncSumsToSales();
                 renderProducts();
             }
         }
@@ -429,34 +405,33 @@
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             let item = db[currentOrderId][idx];
             if (["مكتمل", "تم التوثيق", "معلق"].includes(s) && !confirm("تنبيه: سيتم قفل هذا الصف. هل أنت متأكد؟")) { renderProducts(); return; }
-            const serviceNum = item.mobile || item.sai || "غير محدد";
-            addLog(`تعديل الحالة الى ( ${s} ) رقم الخدمة ( ${serviceNum} )`, null, false);
-            item.status = s;
-            item.updatedAt = Date.now();
+            addLog(`تعديل الحالة إلى ( ${s} ) للمنتج رقم ${idx+1} [${item.name}]`, null, false);
+            item.status = s; item.updatedAt = Date.now();
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
-            syncSumsToSales();
-            renderProducts();
+            syncSumsToSales(); renderProducts();
         }
 
         function syncSumsToSales() {
             const items = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
-            let tot = 0; items.forEach(p => tot += (parseInt(p.qty)||0)*(parseFloat(p.sub)||0));
+            let tot = items.reduce((acc, p) => acc + (p.qty * p.sub), 0);
             document.getElementById('orderTotalSum').innerText = tot.toFixed(2) + " ر.س";
         }
 
         function calculateTotals() {
             const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
-            let q=0,s=0,t=0; db.forEach(p=>{ q+=parseInt(p.qty)||0; s+=parseFloat(p.sub)||0; t+=(parseInt(p.qty)||0)*(parseFloat(p.sub)||0); });
+            let q=0, s=0, t=0; 
+            db.forEach(p=>{ q+=parseInt(p.qty)||0; s+=parseFloat(p.sub)||0; t+=(p.qty*p.sub); });
             document.getElementById('f_count').innerText=db.length; document.getElementById('f_qty').innerText=q; document.getElementById('f_sub').innerText=s.toFixed(2); document.getElementById('f_total').innerText=t.toFixed(2);
         }
 
         function saveProduct() {
-            const type = document.getElementById('p_type').value, name = document.getElementById('p_name').value || "بدون تفاصيل", qty = parseInt(document.getElementById('p_qty').value) || 1, sub = document.getElementById('p_sub').value || 0;
+            const type = document.getElementById('p_type').value, name = document.getElementById('p_name').value || "بدون تفاصيل", qty = parseInt(document.getElementById('p_qty').value) || 1, sub = parseFloat(document.getElementById('p_sub').value) || 0;
             let serial = document.getElementById('p_serial').value || "", isAuto = document.getElementById('auto_serial').checked;
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             if(!db[currentOrderId]) db[currentOrderId] = [];
             
             const hasSerial = ["جوال", "بيانات"].includes(type);
+            addLog(`إضافة منتج جديد: نوع (${type})، تفاصيل (${name})، عدد (${qty})`, null, false);
 
             if(isAuto && hasSerial && serial !== "") {
                 for(let i=0; i<qty; i++){ 
@@ -475,6 +450,7 @@
             if(chks.length===0 || !confirm("حذف العناصر المختارة؟")) return;
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             const idxs = Array.from(chks).map(c => parseInt(c.dataset.index));
+            addLog(`تم حذف (${idxs.length}) منتجات من الجدول`, null, false);
             db[currentOrderId] = db[currentOrderId].filter((_, i) => !idxs.includes(i));
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
             syncSumsToSales(); renderProducts();
@@ -492,13 +468,11 @@
         
         function handleTypeChange() {
             const type = document.getElementById('p_type').value;
-            const serialInput = document.getElementById('p_serial');
-            const autoCheckbox = document.getElementById('auto_serial');
-            if (type === "جوال" || type === "بيانات") {
-                serialInput.disabled = false; autoCheckbox.disabled = false; serialInput.style.backgroundColor = "";
-            } else {
-                serialInput.disabled = true; autoCheckbox.disabled = true; serialInput.value = ""; autoCheckbox.checked = false; serialInput.style.backgroundColor = "#e2e8f0";
-            }
+            const serialInput = document.getElementById('p_serial'), autoCheckbox = document.getElementById('auto_serial');
+            const isMobile = (type === "جوال" || type === "بيانات");
+            serialInput.disabled = !isMobile; autoCheckbox.disabled = !isMobile;
+            serialInput.style.backgroundColor = isMobile ? "" : "#e2e8f0";
+            if(!isMobile) { serialInput.value = ""; autoCheckbox.checked = false; }
         } 
         
         function exportToExcel() {
