@@ -124,6 +124,9 @@
         .no-arrows::-webkit-inner-spin-button, .no-arrows::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         .no-arrows { -moz-appearance: textfield; }
 
+        /* ستايل إضافي لعرض اسم الملف المختار بجانب زر الإرفاق */
+        .file-preview-text { font-size: 11px; color: var(--accent-blue); font-weight: bold; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: 5px; }
+
         @media print {
             .navbar, .sticky-top-section, .btn, .search-wrapper, .modal, .log-section, .log-input-container { display: none !important; }
             .table-wrapper { border: none; box-shadow: none; }
@@ -194,9 +197,10 @@
             <span class="log-title">سجل النشاط والتواصل</span>
             <div class="log-input-container">
                 <input type="text" id="logMsg" class="log-text-input" placeholder="اكتب ملاحظة يدوية هنا (اختياري)...">
-                <input type="file" id="logFile" style="display:none" onchange="processFileAndSend()">
+                <input type="file" id="logFile" style="display:none" onchange="handleFileSelection(this)">
+                <span id="logFileNamePreview" class="file-preview-text"></span>
                 <button class="btn btn-attach-log" onclick="document.getElementById('logFile').click()" title="إرفاق ملف">📎</button>
-                <button class="btn btn-send-log" onclick="processTextOnly()">إرسال</button>
+                <button class="btn btn-send-log" onclick="processTextAndFile()">إرسال</button>
             </div>
             <div id="activityLogs"></div>
         </div>
@@ -232,6 +236,10 @@
     <script>
         let currentOrderId = new URLSearchParams(window.location.search).get('id');
         const statusOptions = ["جديد", "مكتمل", "تم التوثيق", "معلق", "جاهز", "مرتجع", "فقدان"];
+        
+        // متغيرات مؤقتة للملف المرفق
+        let attachedFileData = null;
+        let attachedFileName = "";
 
         function loadOrderDetails() {
             if (!currentOrderId) return;
@@ -248,28 +256,42 @@
             }
         }
 
-        function processTextOnly() {
-            const msg = document.getElementById('logMsg').value.trim();
-            if(!msg) return;
-            addLog(msg, null, false);
-            document.getElementById('logMsg').value = '';
-        }
+        function handleFileSelection(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            if (file.size > 2 * 1024 * 1024) {
+                alert("حجم الملف كبير جداً! الحد الأقصى المسموح به هو 2 ميجابايت.");
+                input.value = "";
+                return;
+            }
 
-        function processFileAndSend() {
-            const fileInput = document.getElementById('logFile');
-            const msgInput = document.getElementById('logMsg');
-            const file = fileInput.files[0];
-            if(!file) return;
-
+            attachedFileName = file.name;
             const reader = new FileReader();
-            reader.onload = function(e) {
-                const fileData = e.target.result;
-                const msg = `ارفق ملف باسم ( ${file.name} )`;
-                addLog(msg, { name: file.name, data: fileData }, true);
-                fileInput.value = '';
-                msgInput.value = '';
+            reader.onload = function (e) {
+                attachedFileData = e.target.result;
+                document.getElementById('logFileNamePreview').innerText = `✔ ${file.name}`;
             };
             reader.readAsDataURL(file);
+        }
+
+        function processTextAndFile() {
+            const msg = document.getElementById('logMsg').value.trim();
+            if (!msg && !attachedFileData) return;
+
+            let finalMsg = msg;
+            if (attachedFileData) {
+                finalMsg = msg ? `ارفق ملف باسم ( ${attachedFileName} ) - الملاحظة: ${msg}` : `ارفق ملف باسم ( ${attachedFileName} )`;
+            }
+
+            addLog(finalMsg, attachedFileData ? { name: attachedFileName, data: attachedFileData } : null, !!attachedFileData);
+            
+            // تصفير المدخلات
+            document.getElementById('logMsg').value = '';
+            document.getElementById('logFile').value = '';
+            document.getElementById('logFileNamePreview').innerText = '';
+            attachedFileData = null;
+            attachedFileName = "";
         }
 
         function addLog(msg, fileObj, isFile) {
@@ -280,7 +302,6 @@
             const dateStr = now.toLocaleDateString('en-GB');
             const timeStr = now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', hour12: true});
             
-            // الهيدر المطلوب باللون الأصفر الغامق
             const meta = `👤 (أحمد) 🗓️ ${dayName} ${dateStr} <span class="log-time">${timeStr}</span> ➡️ :`;
             
             logs.unshift({ orderId: currentOrderId, meta, msg, file: fileObj, isFile });
@@ -361,7 +382,6 @@
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             let item = db[currentOrderId][idx];
             if (item[f] !== v.trim()) {
-                // تم إيقاف تسجيل النشاط هنا بناء على طلبك (النشاط للحالة فقط)
                 item[f] = v.trim(); item.updatedAt = Date.now();
                 localStorage.setItem('asgate_products_db', JSON.stringify(db));
                 if(['status','qty','sub'].includes(f)) syncSumsToSales();
@@ -374,12 +394,10 @@
             let item = db[currentOrderId][idx];
             const oldStatus = item.status;
             
-            if (["مكتمل", "تم التوثيق", "معلق"].includes(s) && !confirm("تنبيه: سيتم قفل هذا الصف. هل أنت متأكد؟")) { renderProducts(); return; }
+            if (["مكتمل", "تم التوثيق", "معلق"].includes(s) && !confirm("تنبيه: سيتم قفل هذا صف. هل أنت متأكد؟")) { renderProducts(); return; }
             
-            // رقم الخدمة لاستخدامه في السجل
             const serviceNum = item.mobile || item.sai || "غير محدد";
             
-            // تسجيل النشاط فقط عند تغيير الحالة وبالصيغة المطلوبة
             addLog(`تعديل الحالة الى ( ${s} ) رقم الخدمة ( ${serviceNum} )`, null, false);
             
             item.status = s;
@@ -415,7 +433,6 @@
             } else { 
                 db[currentOrderId].push({ type, name, qty, sub, serial:(type==="خدمة متنقلة"?serial:""), status:"جديد", date:new Date().toLocaleDateString('en-GB'), updatedAt:Date.now() }); 
             }
-            // لم يتم طلب تسجيل إضافة منتج في السجل، لذا تم إزالته
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
             syncSumsToSales(); renderProducts(); closeModal();
         }
@@ -439,7 +456,7 @@
         function toggleAll(s) { document.querySelectorAll('.row-checkbox:not(:disabled)').forEach(c => c.checked = s.checked); calculateTotals(); }
         function openModal() { document.getElementById('productModal').style.display = 'flex'; handleTypeChange(); }
         function closeModal() { document.getElementById('productModal').style.display = 'none'; }
-        function handleTypeChange() {} // دالة فارغة للحفاظ على التوافق
+        function handleTypeChange() {} 
         
         function exportToExcel() {
             const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
