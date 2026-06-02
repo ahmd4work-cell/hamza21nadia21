@@ -94,11 +94,18 @@
 
         .log-section { background: #fff; padding: 15px; border-radius: 10px; border: 1px solid var(--border-color); margin-top: 20px; position: relative; }
         .log-title { font-weight: 800; font-size: 12px; color: var(--nav-bg); margin-bottom: 12px; display: block; }
+        
         .log-input-container { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid var(--light-border); }
         .log-text-input { flex-grow: 1; border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px; font-family: 'Cairo'; font-size: 11px; outline: none; }
+        
         .log-entry { font-size: 11px; padding: 8px 10px; border-bottom: 1px solid #f1f5f9; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+        .log-header-line { display: flex; align-items: center; width: 100%; }
         .log-meta { color: var(--log-meta-gold); font-weight: 800; font-size: 10px; }
+        .log-time { font-size: 10px; } 
         .log-msg { color: var(--text-dark); font-weight: 700; margin-right: 5px; font-size: 11px; white-space: pre-line; }
+        .log-msg-file { color: var(--log-file-darkred) !important; font-weight: 800; font-size: 11px; }
+        
+        .log-product-details { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 10px; margin-top: 4px; width: 100%; box-sizing: border-box; font-size: 10.5px; color: #334155; line-height: 1.4; white-space: pre-line; }
         .file-attachment { display: inline-flex; align-items: center; background: #fee2e2; padding: 2px 8px; border-radius: 4px; color: var(--log-file-darkred); text-decoration: none; font-weight: 800; cursor: pointer; border: 1px solid #fca5a5; font-size: 10px; margin-right: 10px; }
 
         .btn { border: none; padding: 0 15px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 11px; color: white; display: flex; align-items: center; gap: 5px; box-sizing: border-box; }
@@ -185,6 +192,7 @@
         </div>
     </div>
 
+    <!-- Modal -->
     <div id="productModal" class="modal">
         <div class="modal-content">
             <h3>إضافة منتج جديد</h3>
@@ -245,15 +253,96 @@
                 let items = db[currentOrderId] || [];
                 rows.forEach((value, i) => {
                     let targetIdx = startIdx + i;
-                    // لا يسمح باللصق في الصفوف المغلقة
                     if (items[targetIdx] && !["مكتمل", "تم التوثيق", "معلق"].includes(items[targetIdx].status)) {
                         items[targetIdx][fieldName] = value.trim();
                         items[targetIdx].updatedAt = Date.now();
                     }
                 });
                 localStorage.setItem('asgate_products_db', JSON.stringify(db));
+                addLog(`تم لصق عدد (${rows.length}) قيم في عمود [${fieldName}] من الإكسيل`, null, false);
                 renderProducts();
             }
+        }
+
+        function getProductsDetailsText() {
+            const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+            const items = db[currentOrderId] || [];
+            if (items.length === 0) return "📦 الجدول لا يحتوي على منتجات حالياً.";
+            
+            let text = "📦 تفاصيل المنتجات الحالية بالجدول:\n";
+            items.forEach((p, idx) => {
+                text += `• [${idx + 1}] النوع: ${p.type} | التفاصيل: ${p.name} | العدد: ${p.qty} | الحالة: ${p.status}`;
+                if (p.type === "جوال" || p.type === "بيانات") {
+                    text += ` | سريال: ${p.serial || '-'} | خدمة: ${p.mobile || '-'} | مستخدم: ${p.user || '-'}`;
+                } else {
+                    text += ` | كبينة: ${p.sai || '-'} | إحداثيات: ${p.coords || '-'} | مدينة: ${p.city || '-'}`;
+                }
+                if (p.note) text += ` | ملاحظة: ${p.note}`;
+                text += "\n";
+            });
+            return text;
+        }
+
+        function processTextOnly() {
+            const msg = document.getElementById('logMsg').value.trim();
+            const tableDetails = getProductsDetailsText();
+            const combinedMsg = msg ? `${msg}\n${tableDetails}` : tableDetails;
+            addLog(combinedMsg, null, false);
+            document.getElementById('logMsg').value = '';
+        }
+
+        function processFileAndSend() {
+            const fileInput = document.getElementById('logFile');
+            const file = fileInput.files[0];
+            if(!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const tableDetails = getProductsDetailsText();
+                const combinedMsg = `📎 تم إرفاق ملف: ( ${file.name} )\n${tableDetails}`;
+                addLog(combinedMsg, { name: file.name, data: e.target.result }, true);
+                fileInput.value = '';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function addLog(msg, fileObj, isFile) {
+            let logs = JSON.parse(localStorage.getItem('asgate_logs') || '[]');
+            const now = new Date();
+            const days = ['الأحد', 'الأثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+            const meta = `👤 (أحمد) 🗓️ ${days[now.getDay()]} ${now.toLocaleDateString('en-GB')} <span class="log-time">${now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', second:'2-digit'})}</span> `;
+            
+            logs.unshift({ orderId: currentOrderId, meta, msg, file: fileObj, isFile });
+            localStorage.setItem('asgate_logs', JSON.stringify(logs.slice(0, 100)));
+            renderLogs();
+        }
+
+        function renderLogs() {
+            const logs = JSON.parse(localStorage.getItem('asgate_logs') || '[]');
+            const container = document.getElementById('activityLogs');
+            container.innerHTML = logs
+                .filter(l => String(l.orderId) === String(currentOrderId))
+                .map(l => {
+                    const textParts = l.msg.split('\n📦');
+                    const mainMessage = textParts[0];
+                    const productsPart = textParts[1] ? '📦' + textParts[1] : '';
+                    return `
+                        <div class="log-entry">
+                            <div class="log-header-line">
+                                <span class="log-meta">${l.meta}</span> 
+                                <span class="log-msg ${l.isFile ? 'log-msg-file' : ''}">${mainMessage}</span>
+                                ${l.file ? `<a class="file-attachment" onclick="downloadFile('${l.file.data}', '${l.file.name}')">📥 تحميل</a>` : ''}
+                            </div>
+                            ${productsPart ? `<div class="log-product-details">${productsPart.replace(/\n/g, '<br>')}</div>` : ''}
+                        </div>`;
+                }).join('');
+        }
+
+        function downloadFile(data, name) {
+            const link = document.createElement('a');
+            link.href = data;
+            link.download = name;
+            link.click();
         }
 
         function renderProducts(filtered = null) {
@@ -309,9 +398,10 @@
         function updateField(idx, f, v) {
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             let item = db[currentOrderId][idx];
-            // السماح بتعديل الملاحظة دائماً، أما باقي الحقول تشترط عدم قفل الصف
             if (f === 'note' || !["مكتمل", "تم التوثيق", "معلق"].includes(item.status)) {
                 if (item[f] != v.trim()) {
+                    const fieldNames = {name:'تفاصيل المنتج', qty:'العدد', serial:'السريال', mobile:'رقم الخدمة', user:'المستخدم', note:'الملاحظة', sub:'الاشتراك', sai:'رقم الكبينة', coords:'الإحداثيات', city:'المدينة'};
+                    addLog(`تحديث ${fieldNames[f] || f} إلى ( ${v.trim()} ) للمنتج رقم ${idx+1}`, null, false);
                     item[f] = v.trim(); item.updatedAt = Date.now();
                     localStorage.setItem('asgate_products_db', JSON.stringify(db));
                     if(['qty','sub'].includes(f)) syncSumsToSales();
@@ -323,7 +413,8 @@
         function changeStatus(idx, s) {
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             let item = db[currentOrderId][idx];
-            if (["مكتمل", "تم التوثيق", "معلق"].includes(s) && !confirm("تنبيه: سيتم قفل هذا الصف ومنع الحذف أو التعديل. هل أنت متأكد؟")) { renderProducts(); return; }
+            if (["مكتمل", "تم التوثيق", "معلق"].includes(s) && !confirm("تنبيه: سيتم قفل هذا صف ومنع الحذف أو التعديل. هل أنت متأكد؟")) { renderProducts(); return; }
+            addLog(`تعديل الحالة إلى ( ${s} ) للمنتج رقم ${idx+1} [${item.name}]`, null, false);
             item.status = s; item.updatedAt = Date.now();
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
             syncSumsToSales(); renderProducts();
@@ -333,7 +424,6 @@
             const chks = document.querySelectorAll('.row-checkbox:checked');
             if(chks.length===0) return;
             
-            // فلترة العناصر: منع حذف أي عنصر حالته "مغلق"
             const validIdxs = Array.from(chks)
                 .filter(c => c.dataset.locked === "false")
                 .map(c => parseInt(c.dataset.index));
@@ -346,12 +436,12 @@
             if(!confirm(`سيتم حذف (${validIdxs.length}) منتجات غير مغلقة. هل أنت متأكد؟`)) return;
 
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+            addLog(`تم حذف (${validIdxs.length}) منتجات من الجدول`, null, false);
             db[currentOrderId] = db[currentOrderId].filter((_, i) => !validIdxs.includes(i));
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
             syncSumsToSales(); renderProducts();
         }
 
-        // الوظائف المساعدة الأساسية للحفاظ على استقرار الصفحة
         function syncSumsToSales() {
             const items = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
             let tot = items.reduce((acc, p) => acc + (p.qty * p.sub), 0);
@@ -371,6 +461,9 @@
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             if(!db[currentOrderId]) db[currentOrderId] = [];
             const hasSerial = ["جوال", "بيانات"].includes(type);
+            
+            addLog(`إضافة منتج جديد: نوع (${type})، تفاصيل (${name})، عدد (${qty})`, null, false);
+
             if(isAuto && hasSerial && serial !== "") {
                 for(let i=0; i<qty; i++){ 
                     db[currentOrderId].push({ type, name, qty:1, sub, serial, status:"جديد", date:new Date().toLocaleDateString('en-GB'), updatedAt:Date.now() });
@@ -392,35 +485,12 @@
         function toggleAll(s) { document.querySelectorAll('.row-checkbox:not(:disabled)').forEach(c => c.checked = s.checked); calculateTotals(); }
         function openModal() { document.getElementById('productModal').style.display = 'flex'; handleTypeChange(); }
         function closeModal() { document.getElementById('productModal').style.display = 'none'; }
+        
         function handleTypeChange() {
             const type = document.getElementById('p_type').value;
             const isMobile = (type === "جوال" || type === "بيانات");
             document.getElementById('p_serial').disabled = !isMobile;
             document.getElementById('auto_serial').disabled = !isMobile;
-        }
-
-        function addLog(msg, fileObj, isFile) {
-            let logs = JSON.parse(localStorage.getItem('asgate_logs') || '[]');
-            const now = new Date();
-            const meta = `👤 (أحمد) 🗓️ ${now.toLocaleDateString('en-GB')} ${now.toLocaleTimeString('en-GB')}`;
-            logs.unshift({ orderId: currentOrderId, meta, msg, file: fileObj, isFile });
-            localStorage.setItem('asgate_logs', JSON.stringify(logs.slice(0, 100)));
-            renderLogs();
-        }
-
-        function renderLogs() {
-            const logs = JSON.parse(localStorage.getItem('asgate_logs') || '[]');
-            const container = document.getElementById('activityLogs');
-            container.innerHTML = logs.filter(l => String(l.orderId) === String(currentOrderId))
-                .map(l => `<div class="log-entry"><span class="log-meta">${l.meta}</span> <span class="log-msg">${l.msg}</span></div>`).join('');
-        }
-
-        function exportToExcel() {
-            const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
-            const ws = XLSX.utils.json_to_sheet(db);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Details");
-            XLSX.writeFile(wb, `Order_${currentOrderId}.xlsx`);
         }
     </script>
 </body>
