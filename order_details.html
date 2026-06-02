@@ -98,11 +98,10 @@
         .log-header-line { display: flex; align-items: center; width: 100%; }
         .log-meta { color: var(--log-meta-gold); font-weight: 800; font-size: 10px; }
         .log-time { font-size: 10px; } 
-        .log-msg { color: var(--text-dark); font-weight: 700; margin-right: 5px; font-size: 11px; }
+        .log-msg { color: var(--text-dark); font-weight: 700; margin-right: 5px; font-size: 11px; white-space: pre-line; width: 100%; }
         .log-msg-file { color: var(--log-file-darkred) !important; font-weight: 800; font-size: 11px; }
         
-        /* تصميم تفاصيل المنتجات المرفقة داخل سجلات النشاط */
-        .log-product-details { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 10px; margin-top: 4px; width: 100%; box-sizing: border-box; font-size: 10.5px; color: #334155; line-height: 1.4; }
+        .log-product-details { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 10px; margin-top: 4px; width: 100%; box-sizing: border-box; font-size: 10.5px; color: #334155; line-height: 1.4; white-space: pre-line; }
 
         .file-attachment { display: inline-flex; align-items: center; background: #fee2e2; padding: 2px 8px; border-radius: 4px; color: var(--log-file-darkred); text-decoration: none; font-weight: 800; cursor: pointer; border: 1px solid #fca5a5; font-size: 10px; margin-right: 10px; }
 
@@ -166,7 +165,7 @@
             </div>
 
             <div class="action-bar">
-                <button class="btn btn-add" onclick="openModal()">+ إضافة منتج</button>
+                <button class="btn btn-add" onclick="openModal()">+ إضافة منتج جديد</button>
                 <div class="search-wrapper">
                     <input type="text" id="liveSearch" class="search-input" placeholder="بحث بالسريال أو المستخدم..." onkeyup="applyFilters()">
                 </div>
@@ -263,34 +262,36 @@
             }
         }
 
-        // دالة تقوم بتجميع بيانات المنتجات الحالية في نص منسق وجاهز للنشر
+        // دالة تجميع بيانات المنتجات والجدول ونشرها كتقرير منسق
         function getProductsDetailsText() {
             const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             const items = db[currentOrderId] || [];
-            if (items.length === 0) return "📦 لا توجد منتجات مضافة في الجدول حالياً.";
+            if (items.length === 0) return "📦 لا توجد منتجات حالية مضافة في الجدول.";
             
-            let text = "📦 تفاصيل المنتجات الحالية بالجدول:\n";
+            let text = "📦 تفاصيل المنتجات بالجدول:\n";
             items.forEach((p, idx) => {
-                text += `• [المنتج ${idx + 1}] النوع: ${p.type} | التفاصيل: ${p.name} | العدد: ${p.qty} | الاشتراك: ${p.sub} ر.س | الحالة: ${p.status}`;
+                text += `• [منتج ${idx + 1}] النوع: ${p.type} | تفاصيل المنتج: ${p.name} | العدد: ${p.qty} | الاشتراك: ${p.sub} ر.س | الحالة: ${p.status}`;
+                
                 if (p.type === "جوال" || p.type === "بيانات") {
-                    text += ` | السريال: ${p.serial || '-'} | رقم الخدمة: ${p.mobile || '-'} | المستخدم: ${p.user || '-'}`;
+                    text += ` | رقم السريال: ${p.serial || '-'} | رقم الخدمة: ${p.mobile || '-'} | المستخدم: ${p.user || '-'}`;
                 } else {
                     text += ` | رقم الكبينة: ${p.sai || '-'} | الإحداثيات: ${p.coords || '-'} | المدينة: ${p.city || '-'}`;
                 }
-                if (p.note) text += ` | ملاحظة: ${p.note}`;
+                
+                text += ` | ملاحظة: ${p.note || '-'}`;
                 text += "\n";
             });
             return text;
         }
 
         function processTextOnly() {
-            const msg = document.getElementById('logMsg').value.trim();
-            // دمج الملاحظة المكتوبة يدوياً مع تفاصيل الجدول والمنتجات بالكامل
+            const msgInput = document.getElementById('logMsg');
+            const msg = msgInput.value.trim();
             const tableDetails = getProductsDetailsText();
             const combinedMsg = msg ? `${msg}\n${tableDetails}` : tableDetails;
             
             addLog(combinedMsg, null, false);
-            document.getElementById('logMsg').value = '';
+            msgInput.value = '';
         }
 
         function processFileAndSend() {
@@ -303,8 +304,8 @@
             reader.onload = function(e) {
                 const fileData = e.target.result;
                 const tableDetails = getProductsDetailsText();
-                const msg = `ارفق ملف باسم ( ${file.name} )\n${tableDetails}`;
-                addLog(msg, { name: file.name, data: fileData }, true);
+                const combinedMsg = `📎 أرفق ملف باسم ( ${file.name} )\n${tableDetails}`;
+                addLog(combinedMsg, { name: file.name, data: fileData }, true);
                 fileInput.value = '';
                 msgInput.value = '';
             };
@@ -319,7 +320,7 @@
             const dateStr = now.toLocaleDateString('en-GB');
             const timeStr = now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
             
-            const meta = `👤 (أحمد) 🗓️ ${dayName} ${dateStr} <span class="log-time">${timeStr}</span>  `;
+            const meta = `👤 (أحمد) 🗓️ ${dayName} ${dateStr} <span class="log-time">${timeStr}</span> `;
             
             logs.unshift({ orderId: currentOrderId, meta, msg, file: fileObj, isFile });
             localStorage.setItem('asgate_logs', JSON.stringify(logs.slice(0, 100)));
@@ -329,25 +330,33 @@
         function renderLogs() {
             const logs = JSON.parse(localStorage.getItem('asgate_logs') || '[]');
             const container = document.getElementById('activityLogs');
-            container.innerHTML = logs
-                .filter(l => String(l.orderId) === String(currentOrderId))
-                .map(l => {
-                    // تقسيم النص لفصل تفاصيل المنتجات المرفقة وعرضها بشكل منظم ومنفصل داخل السجل
-                    const textParts = l.msg.split('\n📦');
-                    const mainMessage = textParts[0];
-                    const productsPart = textParts[1] ? '📦' + textParts[1] : '';
+            container.innerHTML = '';
+            
+            const filteredLogs = logs.filter(l => String(l.orderId) === String(currentOrderId));
+            
+            filteredLogs.forEach(l => {
+                const textParts = l.msg.split('\n📦');
+                const mainMessage = textParts[0];
+                const productsPart = textParts[1] ? '📦' + textParts[1] : '';
 
-                    return `
-                        <div class="log-entry">
-                            <div class="log-header-line">
-                                <span class="log-meta">${l.meta}</span> 
-                                <span class="log-msg ${l.isFile ? 'log-msg-file' : ''}">${mainMessage}</span>
-                                ${l.file ? `<a class="file-attachment" onclick="downloadFile('${l.file.data}', '${l.file.name}')">📥 تحميل</a>` : ''}
-                            </div>
-                            ${productsPart ? `<div class="log-product-details">${productsPart.replace(/\n/g, '<br>')}</div>` : ''}
-                        </div>
-                    `;
-                }).join('');
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry';
+
+                let fileBtn = '';
+                if (l.file) {
+                    fileBtn = `<a class="file-attachment" onclick="downloadFile('${l.file.data}', '${l.file.name}')">📥 تحميل</a>`;
+                }
+
+                logEntry.innerHTML = `
+                    <div class="log-header-line">
+                        <span class="log-meta">${l.meta}</span> 
+                        <span class="log-msg ${l.isFile ? 'log-msg-file' : ''}">${mainMessage}</span>
+                        ${fileBtn}
+                    </div>
+                    ${productsPart ? `<div class="log-product-details">${productsPart.replace(/\n/g, '<br>')}</div>` : ''}
+                `;
+                container.appendChild(logEntry);
+            });
         }
 
         function downloadFile(data, name) {
