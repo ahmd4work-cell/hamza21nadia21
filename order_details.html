@@ -59,7 +59,6 @@
         .search-wrapper { flex-grow: 1; display: flex; justify-content: center; }
         .search-input { width: 300px; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--border-color); font-family: 'Cairo'; font-size: 12px; outline: none; }
         
-        /* زر الإجراء والقائمة المنسدلة */
         .dropdown { position: relative; display: inline-block; }
         .btn-action { background: #64748b; height: 32px; border: none; padding: 0 15px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 11px; color: white; display: flex; align-items: center; gap: 5px; }
         .dropdown-content { display: none; position: absolute; left: 0; background-color: white; min-width: 120px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1600; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); }
@@ -82,7 +81,6 @@
         .table-footer { background-color: #000; color: #fff; height: 37px; font-family: 'Cairo'; }
         .table-footer td { color: #fff; border: none; font-weight: 800; font-size: 12px; height: 37px; line-height: 37px; }
 
-        /* سجل النشاط والتواصل - تعديل الخط والوقت */
         .log-section { 
             background: #fff; 
             padding: 15px; 
@@ -96,11 +94,15 @@
         .log-input-container { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid var(--light-border); }
         .log-text-input { flex-grow: 1; border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px; font-family: 'Cairo'; font-size: 11px; outline: none; }
         
-        .log-entry { font-size: 11px; padding: 6px 10px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; }
+        .log-entry { font-size: 11px; padding: 8px 10px; border-bottom: 1px solid #f1f5f9; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+        .log-header-line { display: flex; align-items: center; width: 100%; }
         .log-meta { color: var(--log-meta-gold); font-weight: 800; font-size: 10px; }
         .log-time { font-size: 10px; } 
         .log-msg { color: var(--text-dark); font-weight: 700; margin-right: 5px; font-size: 11px; }
         .log-msg-file { color: var(--log-file-darkred) !important; font-weight: 800; font-size: 11px; }
+        
+        /* تصميم تفاصيل المنتجات المرفقة داخل سجلات النشاط */
+        .log-product-details { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 10px; margin-top: 4px; width: 100%; box-sizing: border-box; font-size: 10.5px; color: #334155; line-height: 1.4; }
 
         .file-attachment { display: inline-flex; align-items: center; background: #fee2e2; padding: 2px 8px; border-radius: 4px; color: var(--log-file-darkred); text-decoration: none; font-weight: 800; cursor: pointer; border: 1px solid #fca5a5; font-size: 10px; margin-right: 10px; }
 
@@ -261,10 +263,33 @@
             }
         }
 
+        // دالة تقوم بتجميع بيانات المنتجات الحالية في نص منسق وجاهز للنشر
+        function getProductsDetailsText() {
+            const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+            const items = db[currentOrderId] || [];
+            if (items.length === 0) return "📦 لا توجد منتجات مضافة في الجدول حالياً.";
+            
+            let text = "📦 تفاصيل المنتجات الحالية بالجدول:\n";
+            items.forEach((p, idx) => {
+                text += `• [المنتج ${idx + 1}] النوع: ${p.type} | التفاصيل: ${p.name} | العدد: ${p.qty} | الاشتراك: ${p.sub} ر.س | الحالة: ${p.status}`;
+                if (p.type === "جوال" || p.type === "بيانات") {
+                    text += ` | السريال: ${p.serial || '-'} | رقم الخدمة: ${p.mobile || '-'} | المستخدم: ${p.user || '-'}`;
+                } else {
+                    text += ` | رقم الكبينة: ${p.sai || '-'} | الإحداثيات: ${p.coords || '-'} | المدينة: ${p.city || '-'}`;
+                }
+                if (p.note) text += ` | ملاحظة: ${p.note}`;
+                text += "\n";
+            });
+            return text;
+        }
+
         function processTextOnly() {
             const msg = document.getElementById('logMsg').value.trim();
-            if(!msg) return;
-            addLog(msg, null, false);
+            // دمج الملاحظة المكتوبة يدوياً مع تفاصيل الجدول والمنتجات بالكامل
+            const tableDetails = getProductsDetailsText();
+            const combinedMsg = msg ? `${msg}\n${tableDetails}` : tableDetails;
+            
+            addLog(combinedMsg, null, false);
             document.getElementById('logMsg').value = '';
         }
 
@@ -277,7 +302,8 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 const fileData = e.target.result;
-                const msg = `ارفق ملف باسم ( ${file.name} )`;
+                const tableDetails = getProductsDetailsText();
+                const msg = `ارفق ملف باسم ( ${file.name} )\n${tableDetails}`;
                 addLog(msg, { name: file.name, data: fileData }, true);
                 fileInput.value = '';
                 msgInput.value = '';
@@ -291,10 +317,8 @@
             const days = ['الأحد', 'الأثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
             const dayName = days[now.getDay()];
             const dateStr = now.toLocaleDateString('en-GB');
-            // نظام الوقت 24 ساعة
             const timeStr = now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
             
-            // الميتا بدون سهم مع مسافة
             const meta = `👤 (أحمد) 🗓️ ${dayName} ${dateStr} <span class="log-time">${timeStr}</span>  `;
             
             logs.unshift({ orderId: currentOrderId, meta, msg, file: fileObj, isFile });
@@ -307,13 +331,23 @@
             const container = document.getElementById('activityLogs');
             container.innerHTML = logs
                 .filter(l => String(l.orderId) === String(currentOrderId))
-                .map(l => `
-                    <div class="log-entry">
-                        <span class="log-meta">${l.meta}</span> 
-                        <span class="log-msg ${l.isFile ? 'log-msg-file' : ''}">${l.msg}</span>
-                        ${l.file ? `<a class="file-attachment" onclick="downloadFile('${l.file.data}', '${l.file.name}')">📥 تحميل</a>` : ''}
-                    </div>
-                `).join('');
+                .map(l => {
+                    // تقسيم النص لفصل تفاصيل المنتجات المرفقة وعرضها بشكل منظم ومنفصل داخل السجل
+                    const textParts = l.msg.split('\n📦');
+                    const mainMessage = textParts[0];
+                    const productsPart = textParts[1] ? '📦' + textParts[1] : '';
+
+                    return `
+                        <div class="log-entry">
+                            <div class="log-header-line">
+                                <span class="log-meta">${l.meta}</span> 
+                                <span class="log-msg ${l.isFile ? 'log-msg-file' : ''}">${mainMessage}</span>
+                                ${l.file ? `<a class="file-attachment" onclick="downloadFile('${l.file.data}', '${l.file.name}')">📥 تحميل</a>` : ''}
+                            </div>
+                            ${productsPart ? `<div class="log-product-details">${productsPart.replace(/\n/g, '<br>')}</div>` : ''}
+                        </div>
+                    `;
+                }).join('');
         }
 
         function downloadFile(data, name) {
