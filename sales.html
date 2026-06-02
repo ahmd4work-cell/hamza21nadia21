@@ -134,10 +134,17 @@
         .modal-activity-item .activity-text-part { display: block; width: 100%; text-align: right; margin-top: 2px; }
 
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-        .modal-content { background: white; padding: 15px; border-radius: 12px; width: 440px; height: 420px; display: flex; flex-direction: column; gap: 8px; }
+        .modal-content { background: white; padding: 15px; border-radius: 12px; width: 440px; height: 460px; display: flex; flex-direction: column; gap: 8px; }
         .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 10px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
-        .note-area { height: 75px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 8px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
+        .note-area { height: 60px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 8px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
         
+        .file-upload-wrapper { display: flex; align-items: center; gap: 8px; text-align: right; }
+        .file-label { font-size: 11px; font-weight: 700; color: #475569; background: #f1f5f9; border: 1px dashed #cbd5e1; padding: 4px 10px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+        .file-label:hover { background: #e2e8f0; border-color: var(--accent-blue); }
+        .file-input { display: none; }
+        .file-name-preview { font-size: 11px; color: var(--accent-blue); font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 250px; }
+        .file-link { display: inline-block; color: #3b82f6; text-decoration: underline; font-weight: bold; margin-top: 4px; }
+
         .order-modal-card { background: white; width: 350px; border-radius: 12px; padding: 20px; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); }
         .form-group { margin-bottom: 12px; text-align: right; position: relative; }
         .form-group label { display: block; font-weight: 700; font-size: 11px; color: #64748b; margin-bottom: 4px; }
@@ -237,6 +244,13 @@
     <div class="modal-content">
         <div style="font-weight: 800; color: #2e1065; text-align: right; margin-bottom: 2px;">سجل ملاحظات الطلب والنتائج</div>
         <div id="historyLog" class="history-log"></div>
+        
+        <div class="file-upload-wrapper">
+            <label for="modalFileInput" class="file-label">📎 إرفاق ملف</label>
+            <input type="file" id="modalFileInput" class="file-input" onchange="handleFileSelection(this)">
+            <span id="fileNamePreview" class="file-name-preview"></span>
+        </div>
+
         <textarea id="modalTextArea" class="note-area" placeholder="أدخل تفاصيل الملاحظة هنا..."></textarea>
         <div style="display:flex; justify-content: flex-end; gap:8px;">
             <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:6px 14px; border-radius:6px; cursor:pointer; font-family:Cairo; font-size:12px;">تراجع</button>
@@ -266,8 +280,9 @@
 
 <script>
     let currentActivePreview = null;
+    let attachedFileData = null;
+    let attachedFileName = "";
     const LOGS_KEY = 'asgate_general_sales_logs';
-    // مفتاح تخزين العملاء المستخدم في صفحة العملاء
     const CUSTOMERS_STORAGE_KEY = 'asgate_customers_v2_final'; 
 
     function getTodayFormatted() {
@@ -394,16 +409,13 @@
         document.getElementById('mType').value = "";
     }
 
-    // إصلاح وظيفة البحث لتجلب البيانات من مفتاح العملاء الصحيح وتبحث في الحقول الثلاثة
     function searchCustomerInModal(el) {
         const query = el.value.toLowerCase().trim();
         const resDiv = document.getElementById('mResults');
-        // جلب بيانات العملاء من localStorage
         const customers = JSON.parse(localStorage.getItem(CUSTOMERS_STORAGE_KEY) || '[]');
         
         if (query.length < 1) { resDiv.style.display='none'; return; }
 
-        // تصفية العملاء بناءً على اسم الشركة أو السجل الرئيسي أو السجل الفرعي
         const filtered = customers.filter(c => {
             const comp = (c.comp || "").toLowerCase();
             const mainCr = (c.mainRecord || "").toLowerCase();
@@ -466,8 +478,17 @@
         const lastEntry = arr[arr.length - 1];
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = lastEntry;
+        
+        // إذا كانت الملاحظة تحتوي على ملف فقط، نعرض إشعاراً بذلك
         const textPart = tempDiv.querySelector('.activity-text-part');
-        return textPart ? textPart.innerText : 'عرض السجل...';
+        if (textPart) {
+            let pureText = textPart.innerText.replace(/📎 ملف مرفق: .*/g, '').trim();
+            if (pureText === "" && textPart.querySelector('.file-link')) {
+                return '📎 ملف مرفق';
+            }
+            return pureText || 'عرض السجل...';
+        }
+        return 'عرض السجل...';
     }
 
     function openNote(el) {
@@ -476,23 +497,73 @@
         document.getElementById('historyLog').innerHTML = rawNotes.split('\n--------------------\n').map(entry => `<div class="modal-activity-item">${entry}</div>`).join('');
         document.getElementById('noteModal').style.display = "flex";
         document.getElementById('modalTextArea').focus();
+        
+        // إعادة تهيئة حقل الملفات عند فتح النافذة
+        attachedFileData = null;
+        attachedFileName = "";
+        document.getElementById('modalFileInput').value = "";
+        document.getElementById('fileNamePreview').innerText = "";
+    }
+
+    function handleFileSelection(input) {
+        const file = input.files[0];
+        if (!file) return;
+        
+        // منع الملفات الكبيرة جداً للحفاظ على مساحة المقارنة في localStorage
+        if (file.size > 2 * 1024 * 1024) {
+            alert("حجم الملف كبير جداً! الحد الأقصى المسموح به هو 2 ميجابايت.");
+            input.value = "";
+            return;
+        }
+
+        attachedFileName = file.name;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            attachedFileData = e.target.result;
+            document.getElementById('fileNamePreview').innerText = `✔ ${file.name}`;
+        };
+        reader.readAsDataURL(file);
     }
 
     function saveNote() {
         const newText = document.getElementById('modalTextArea').value.trim();
-        if (newText && currentActivePreview) {
+        
+        if ((newText || attachedFileData) && currentActivePreview) {
             let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
-            let newEntry = `${generateStyledHeader()}<span class="activity-text-part">${newText}</span>`;
+            let fileHTML = "";
+            
+            if (attachedFileData) {
+                fileHTML = `<br><a href="${attachedFileData}" download="${attachedFileName}" class="file-link">📎 تحميل الملف المرفق (${attachedFileName})</a>`;
+            }
+
+            let newEntry = `${generateStyledHeader()}<span class="activity-text-part">${newText}${fileHTML}</span>`;
             let updatedFullNotes = oldNotes === "" ? newEntry : oldNotes + "\n--------------------\n" + newEntry;
+            
             currentActivePreview.setAttribute('data-full-notes', updatedFullNotes);
-            currentActivePreview.innerText = newText;
+            
+            // تحديث العرض المصغر في الجدول
+            if (newText) {
+                currentActivePreview.innerText = newText;
+            } else if (attachedFileData) {
+                currentActivePreview.innerText = "📎 ملف مرفق";
+            }
+
             autoSave();
-            addGeneralLog("الملاحظات", "إضافة", newText, currentActivePreview.closest('tr').cells[4].innerText, "إضافة ملاحظة جديدة");
+            
+            let logText = newText ? newText : `إرفاق ملف: ${attachedFileName}`;
+            addGeneralLog("الملاحظات", "إضافة", logText, currentActivePreview.closest('tr').cells[4].innerText, "إضافة ملاحظة جديدة");
         }
         closeNote();
     }
 
-    function closeNote() { document.getElementById('noteModal').style.display = "none"; document.getElementById('modalTextArea').value = ""; }
+    function closeNote() { 
+        document.getElementById('noteModal').style.display = "none"; 
+        document.getElementById('modalTextArea').value = ""; 
+        attachedFileData = null;
+        attachedFileName = "";
+        document.getElementById('modalFileInput').value = "";
+        document.getElementById('fileNamePreview').innerText = "";
+    }
 
     function filterSalesTable() {
         const q = document.getElementById('globalSearch').value.toLowerCase();
@@ -504,7 +575,11 @@
     function addGeneralLog(fieldName, oldVal, newVal, companyName, actionTextBase) {
         const logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
         const headerHTML = generateStyledHeader();
-        const logHTML = `${headerHTML}<span class="activity-text-part">${actionTextBase} - [${newVal}] (${companyName})</span>`;
+        
+        // إزالة وسوم الروابط الطويلة في حال وجود ملف عند التخزين في سجل النشاط العام للاختصار
+        let cleanedVal = String(newVal).replace(/<br><a href=.*/g, ' [ملف مرفق]');
+        
+        const logHTML = `${headerHTML}<span class="activity-text-part">${actionTextBase} - [${cleanedVal}] (${companyName})</span>`;
         logs.unshift(logHTML);
         localStorage.setItem(LOGS_KEY, JSON.stringify(logs.slice(0, 100)));
         renderGeneralLogs();
