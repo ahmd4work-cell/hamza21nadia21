@@ -59,14 +59,16 @@
         .search-wrapper { flex-grow: 1; display: flex; justify-content: center; }
         .search-input { width: 300px; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--border-color); font-family: 'Cairo'; font-size: 12px; outline: none; }
         
-        /* مربع الإحصائيات الجديد */
+        /* حاوية المربعات المتلاصقة للإحصائيات */
+        .stats-container { display: flex; gap: 0px; }
         .stats-box { 
-            background: #fff; border: 1px solid var(--border-color); border-radius: 8px; 
-            padding: 4px 12px; display: flex; gap: 15px; font-size: 11px; font-weight: 800;
-            color: var(--text-dark); box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            background: #fff; border: 1px solid var(--border-color); 
+            padding: 4px 12px; display: flex; gap: 10px; font-size: 11px; font-weight: 800;
+            color: var(--text-dark); box-shadow: 0 1px 2px rgba(0,0,0,0.05); align-items: center;
         }
-        .stats-group { display: flex; align-items: center; gap: 8px; }
-        .stat-label { color: var(--nav-bg); border-left: 2px solid #e2e8f0; padding-left: 8px; }
+        .stats-box.right-box { border-radius: 0 8px 8px 0; border-left: none; }
+        .stats-box.left-box { border-radius: 8px 0 0 8px; }
+        .stat-label { color: var(--nav-bg); padding-left: 5px; }
         .stat-val-green { color: var(--header-green); }
         .stat-val-orange { color: #b45309; }
 
@@ -89,7 +91,6 @@
         
         td { border: 0.5px solid var(--light-border); text-align: center; height: 37px; line-height: 37px; font-size: 13px; font-weight: 500; color: var(--text-dark); padding: 0 5px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
         
-        /* تكبير مربع الاختيار قليلاً */
         .row-checkbox { width: 16px; height: 16px; cursor: pointer; }
 
         .table-footer { background-color: #000; color: #fff; height: 37px; font-family: 'Cairo'; }
@@ -158,16 +159,17 @@
                     <input type="text" id="liveSearch" class="search-input" placeholder="بحث بالسريال أو المستخدم..." onkeyup="applyFilters()">
                 </div>
                 
-                <div class="stats-box">
-                    <div class="stats-group">
+                <!-- مربعات الإحصائيات المتلاصقة والمحدثة للمبالغ -->
+                <div class="stats-container">
+                    <div class="stats-box right-box">
                         <span class="stat-label">الاجمالي</span>
-                        <span>مكتمل: <span id="stat_total_ok" class="stat-val-green">0</span></span>
-                        <span>معلق: <span id="stat_total_wait" class="stat-val-orange">0</span></span>
+                        <span>مكتمل: <span id="stat_total_ok" class="stat-val-green">0.00</span></span>
+                        <span>معلق: <span id="stat_total_wait" class="stat-val-orange">0.00</span></span>
                     </div>
-                    <div class="stats-group">
+                    <div class="stats-box left-box">
                         <span class="stat-label">الشهر</span>
-                        <span>مكتمل: <span id="stat_month_ok" class="stat-val-green">0</span></span>
-                        <span>معلق: <span id="stat_month_wait" class="stat-val-orange">0</span></span>
+                        <span>مكتمل: <span id="stat_month_ok" class="stat-val-green">0.00</span></span>
+                        <span>معلق: <span id="stat_month_wait" class="stat-val-orange">0.00</span></span>
                     </div>
                 </div>
 
@@ -191,8 +193,9 @@
                 <tbody id="productsBody"></tbody>
                 <tfoot>
                     <tr class="table-footer">
+                        <td id="f_selection">0</td> <!-- خلية حساب الصفوف المحددة تبدأ بـ 0 -->
                         <td id="f_count">0</td>
-                        <td colspan="2"></td>
+                        <td></td>
                         <td id="f_qty">0</td>
                         <td id="f_sub">0</td>
                         <td id="f_total">0</td>
@@ -214,6 +217,7 @@
         </div>
     </div>
 
+    <!-- Modal -->
     <div id="productModal" class="modal">
         <div class="modal-content">
             <h3>إضافة منتج جديد</h3>
@@ -312,8 +316,7 @@
         function updateTableHeaders(type) {
             const header = document.getElementById('dynamicHeader');
             let dynamic = (type === "جوال" || type === "بيانات") ? `<th>رقم السريال</th><th>رقم الخدمة</th><th>المستخدم</th>` : `<th>رقم الكبينة</th><th>الإحداثيات</th><th>المدينة</th>`;
-            // تم تعديل "التاريخ" إلى "تاريخ الحالة"
-            header.innerHTML = `<th style="width: 30px;"><input type="checkbox" onclick="toggleAll(this)"></th><th style="width:100px;">نوع المنتج</th><th>تفاصيل المنتج</th><th style="width:50px;">العدد</th><th style="width:80px;">الاشتراك</th><th style="width:80px;">الإجمالي</th>${dynamic}<th style="width:90px;">الحالة</th><th style="width:80px;">تاريخ الحالة</th><th>ملاحظة</th>`;
+            header.innerHTML = `<th style="width: 30px;"><input type="checkbox" id="checkAllBox" onclick="toggleAll(this)"></th><th style="width:100px;">نوع المنتج</th><th>تفاصيل المنتج</th><th style="width:50px;">العدد</th><th style="width:80px;">الاشتراك</th><th style="width:80px;">الإجمالي</th>${dynamic}<th style="width:90px;">الحالة</th><th style="width:80px;">تاريخ الحالة</th><th>ملاحظة</th>`;
         }
 
         function updateStatsBox() {
@@ -322,29 +325,33 @@
             const currentMonth = now.getMonth() + 1;
             const currentYear = now.getFullYear();
 
-            let totalOk = 0, totalWait = 0, monthOk = 0, monthWait = 0;
+            let totalOkAmount = 0, totalWaitAmount = 0, monthOkAmount = 0, monthWaitAmount = 0;
 
             db.forEach(p => {
-                // حساب الإجمالي
-                if (p.status === "مكتمل") totalOk++;
-                if (p.status === "معلق") totalWait++;
+                const qty = parseInt(p.qty) || 0;
+                const sub = parseFloat(p.sub) || 0;
+                const productTotal = qty * sub;
 
-                // حساب الشهر (تنسيق p.date هو DD/MM/YYYY)
+                // حساب إجمالي المبالغ
+                if (p.status === "مكتمل") totalOkAmount += productTotal;
+                if (p.status === "معلق") totalWaitAmount += productTotal;
+
+                // حساب مبالغ الشهر الحالي فقط
                 const parts = (p.date || "").split('/');
                 if (parts.length === 3) {
                     const m = parseInt(parts[1]);
                     const y = parseInt(parts[2]);
                     if (m === currentMonth && y === currentYear) {
-                        if (p.status === "مكتمل") monthOk++;
-                        if (p.status === "معلق") monthWait++;
+                        if (p.status === "مكتمل") monthOkAmount += productTotal;
+                        if (p.status === "معلق") monthWaitAmount += productTotal;
                     }
                 }
             });
 
-            document.getElementById('stat_total_ok').innerText = totalOk;
-            document.getElementById('stat_total_wait').innerText = totalWait;
-            document.getElementById('stat_month_ok').innerText = monthOk;
-            document.getElementById('stat_month_wait').innerText = monthWait;
+            document.getElementById('stat_total_ok').innerText = totalOkAmount.toFixed(2);
+            document.getElementById('stat_total_wait').innerText = totalWaitAmount.toFixed(2);
+            document.getElementById('stat_month_ok').innerText = monthOkAmount.toFixed(2);
+            document.getElementById('stat_month_wait').innerText = monthWaitAmount.toFixed(2);
         }
 
         function updateField(idx, f, v) {
@@ -354,7 +361,6 @@
                 if (item[f] != v.trim()) {
                     item[f] = v.trim(); 
                     item.updatedAt = Date.now();
-                    // تحديث تاريخ الحالة عند تغيير أي حقل مؤثر
                     item.date = new Date().toLocaleDateString('en-GB');
                     localStorage.setItem('asgate_products_db', JSON.stringify(db));
                     if(['qty','sub'].includes(f)) syncSumsToSales();
@@ -369,7 +375,7 @@
             if (["مكتمل", "تم التوثيق", "معلق"].includes(s) && !confirm("تنبيه: سيتم قفل هذا الصف ومنع الحذف أو التعديل. هل أنت متأكد؟")) { renderProducts(); return; }
             item.status = s; 
             item.updatedAt = Date.now();
-            item.date = new Date().toLocaleDateString('en-GB'); // تحديث تاريخ الحالة
+            item.date = new Date().toLocaleDateString('en-GB');
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
             syncSumsToSales(); 
             renderProducts();
@@ -461,7 +467,15 @@
             const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
             let q=0, s=0, t=0; 
             db.forEach(p=>{ q+=parseInt(p.qty)||0; s+=parseFloat(p.sub)||0; t+=(p.qty*p.sub); });
-            document.getElementById('f_count').innerText=db.length; document.getElementById('f_qty').innerText=q; document.getElementById('f_sub').innerText=s.toFixed(2); document.getElementById('f_total').innerText=t.toFixed(2);
+            
+            // حساب الخانات المحددة (Checkbox) فقط
+            const checkedCount = document.querySelectorAll('.row-checkbox:checked').length;
+            document.getElementById('f_selection').innerText = checkedCount;
+
+            document.getElementById('f_count').innerText = db.length; 
+            document.getElementById('f_qty').innerText = q; 
+            document.getElementById('f_sub').innerText = s.toFixed(2); 
+            document.getElementById('f_total').innerText = t.toFixed(2);
         }
 
         function saveProduct() {
@@ -488,7 +502,11 @@
             renderProducts(db.filter(p => (p.serial||'').toLowerCase().includes(q) || (p.user||'').toLowerCase().includes(q)));
         }
 
-        function toggleAll(s) { document.querySelectorAll('.row-checkbox:not(:disabled)').forEach(c => c.checked = s.checked); calculateTotals(); }
+        function toggleAll(s) { 
+            document.querySelectorAll('.row-checkbox').forEach(c => c.checked = s.checked); 
+            calculateTotals(); 
+        }
+        
         function openModal() { document.getElementById('productModal').style.display = 'flex'; handleTypeChange(); }
         function closeModal() { document.getElementById('productModal').style.display = 'none'; }
         function handleTypeChange() {
