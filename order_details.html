@@ -19,8 +19,8 @@
             --light-border: #e2e8f0;
             --warning-yellow: #fef08a;
             --soft-red: #fee2e2;
-            --log-meta-gold: #b45309; /* لون أصفر غامق */
-            --log-file-darkred: #991b1b; /* لون أحمر غامق للملفات */
+            --log-meta-gold: #b45309; 
+            --log-file-darkred: #991b1b; 
         }
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; padding: 0; line-height: 1.2; }
@@ -59,6 +59,14 @@
         .search-wrapper { flex-grow: 1; display: flex; justify-content: center; }
         .search-input { width: 300px; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--border-color); font-family: 'Cairo'; font-size: 12px; outline: none; }
         
+        /* زر الإجراء والقائمة المنسدلة */
+        .dropdown { position: relative; display: inline-block; }
+        .btn-action { background: #64748b; height: 32px; border: none; padding: 0 15px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 11px; color: white; display: flex; align-items: center; gap: 5px; }
+        .dropdown-content { display: none; position: absolute; left: 0; background-color: white; min-width: 120px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1600; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); }
+        .dropdown-content button { color: var(--text-dark); padding: 8px 16px; text-decoration: none; display: block; width: 100%; border: none; background: none; font-family: 'Cairo'; font-size: 11px; text-align: right; cursor: pointer; }
+        .dropdown-content button:hover { background-color: #f1f5f9; }
+        .dropdown:hover .dropdown-content { display: block; }
+
         .table-wrapper { background: white; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: visible; margin-bottom: 20px; }
         table { width: 100%; border-collapse: collapse; min-width: 1100px; font-family: 'Calibri', sans-serif; table-layout: fixed; }
         
@@ -74,34 +82,31 @@
         .table-footer { background-color: #000; color: #fff; height: 37px; font-family: 'Cairo'; }
         .table-footer td { color: #fff; border: none; font-weight: 800; font-size: 12px; height: 37px; line-height: 37px; }
 
-        /* سجل النشاط الثابت الاحترافي */
+        /* سجل النشاط والتواصل - تعديل الخط والوقت */
         .log-section { 
             background: #fff; 
             padding: 15px; 
             border-radius: 10px; 
             border: 1px solid var(--border-color); 
             margin-top: 20px; 
-            position: relative; /* ثابت في مكانه الطبيعي */
+            position: relative; 
         }
-        .log-title { font-weight: 800; font-size: 13px; color: var(--nav-bg); margin-bottom: 12px; display: block; }
+        .log-title { font-weight: 800; font-size: 12px; color: var(--nav-bg); margin-bottom: 12px; display: block; }
         
         .log-input-container { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid var(--light-border); }
-        .log-text-input { flex-grow: 1; border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px; font-family: 'Cairo'; font-size: 12px; outline: none; }
+        .log-text-input { flex-grow: 1; border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px; font-family: 'Cairo'; font-size: 11px; outline: none; }
         
-        .log-entry { font-size: 12px; padding: 6px 10px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; }
-        .log-meta { color: var(--log-meta-gold); font-weight: 800; }
-        .log-time { font-size: 11px; } /* تصغير الساعة درجة واحدة */
-        .log-msg { color: var(--text-dark); font-weight: 700; margin-right: 5px; }
-        .log-msg-file { color: var(--log-file-darkred) !important; font-weight: 800; }
+        .log-entry { font-size: 11px; padding: 6px 10px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; }
+        .log-meta { color: var(--log-meta-gold); font-weight: 800; font-size: 10px; }
+        .log-time { font-size: 10px; } 
+        .log-msg { color: var(--text-dark); font-weight: 700; margin-right: 5px; font-size: 11px; }
+        .log-msg-file { color: var(--log-file-darkred) !important; font-weight: 800; font-size: 11px; }
 
-        .file-attachment { display: inline-flex; align-items: center; background: #fee2e2; padding: 2px 8px; border-radius: 4px; color: var(--log-file-darkred); text-decoration: none; font-weight: 800; cursor: pointer; border: 1px solid #fca5a5; font-size: 11px; margin-right: 10px; }
+        .file-attachment { display: inline-flex; align-items: center; background: #fee2e2; padding: 2px 8px; border-radius: 4px; color: var(--log-file-darkred); text-decoration: none; font-weight: 800; cursor: pointer; border: 1px solid #fca5a5; font-size: 10px; margin-right: 10px; }
 
         .btn { border: none; padding: 0 15px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 11px; color: white; display: flex; align-items: center; gap: 5px; box-sizing: border-box; }
         .btn-add { background: var(--accent-blue); height: 35px; }
-        .btn-export { background: var(--header-green); height: 25px; }
-        .btn-print { background: #64748b; height: 25px; }
-        .btn-delete-multi { background: var(--danger-red); height: 25px; }
-        .btn-send-log { background: var(--nav-bg); height: 32px; }
+        .btn-send-log { background: var(--nav-bg); height: 32px; font-size: 10px; }
         .btn-attach-log { background: #64748b; height: 32px; width: 40px; justify-content: center; padding: 0; }
 
         .status-select { font-family: 'Cairo'; font-size: 10px; font-weight: 700; padding: 2px; border-radius: 6px; width: 95%; cursor: pointer; border: 1px solid var(--border-color); height: 28px; }
@@ -125,7 +130,7 @@
         .no-arrows { -moz-appearance: textfield; }
 
         @media print {
-            .navbar, .sticky-top-section, .btn, .search-wrapper, .modal, .log-section, .log-input-container { display: none !important; }
+            .navbar, .sticky-top-section, .btn, .search-wrapper, .modal, .log-section, .log-input-container, .dropdown { display: none !important; }
             .table-wrapper { border: none; box-shadow: none; }
             table { width: 100%; min-width: 100%; table-layout: auto; }
             th { position: static !important; background-color: #f1f1f1 !important; color: black !important; border: 1px solid #000 !important; }
@@ -163,10 +168,14 @@
                 <div class="search-wrapper">
                     <input type="text" id="liveSearch" class="search-input" placeholder="بحث بالسريال أو المستخدم..." onkeyup="applyFilters()">
                 </div>
-                <div style="display: flex; gap: 8px;">
-                    <button class="btn btn-export" onclick="exportToExcel()">تصدير</button>
-                    <button class="btn btn-print" onclick="window.print()">طباعة</button>
-                    <button class="btn btn-delete-multi" onclick="deleteSelected()">حذف</button>
+                <div class="dropdown">
+                    <button class="btn-action">إجراء ⚙️</button>
+                    <div class="dropdown-content">
+                        <button onclick="alert('تعديل البيانات الأساسية للطلب')">تعديل</button>
+                        <button onclick="exportToExcel()">تصدير Excel</button>
+                        <button onclick="window.print()">طباعة</button>
+                        <button style="color:red;" onclick="deleteSelected()">حذف المختار</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -282,9 +291,11 @@
             const days = ['الأحد', 'الأثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
             const dayName = days[now.getDay()];
             const dateStr = now.toLocaleDateString('en-GB');
-            const timeStr = now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', hour12: true});
+            // نظام الوقت 24 ساعة
+            const timeStr = now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
             
-            const meta = `👤 (أحمد) 🗓️ ${dayName} ${dateStr} <span class="log-time">${timeStr}</span> ➡️ :`;
+            // الميتا بدون سهم مع مسافة
+            const meta = `👤 (أحمد) 🗓️ ${dayName} ${dateStr} <span class="log-time">${timeStr}</span>  `;
             
             logs.unshift({ orderId: currentOrderId, meta, msg, file: fileObj, isFile });
             localStorage.setItem('asgate_logs', JSON.stringify(logs.slice(0, 100)));
@@ -374,12 +385,9 @@
         function changeStatus(idx, s) {
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             let item = db[currentOrderId][idx];
-            
             if (["مكتمل", "تم التوثيق", "معلق"].includes(s) && !confirm("تنبيه: سيتم قفل هذا الصف. هل أنت متأكد؟")) { renderProducts(); return; }
-            
             const serviceNum = item.mobile || item.sai || "غير محدد";
             addLog(`تعديل الحالة الى ( ${s} ) رقم الخدمة ( ${serviceNum} )`, null, false);
-            
             item.status = s;
             item.updatedAt = Date.now();
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
@@ -436,36 +444,17 @@
         }
 
         function toggleAll(s) { document.querySelectorAll('.row-checkbox:not(:disabled)').forEach(c => c.checked = s.checked); calculateTotals(); }
-        
-        function openModal() { 
-            document.getElementById('productModal').style.display = 'flex'; 
-            handleTypeChange(); 
-        }
-        
-        function closeModal() { 
-            document.getElementById('productModal').style.display = 'none'; 
-            document.getElementById('p_name').value = '';
-            document.getElementById('p_qty').value = '1';
-            document.getElementById('p_serial').value = '';
-            document.getElementById('p_sub').value = '';
-            document.getElementById('auto_serial').checked = false;
-        }
+        function openModal() { document.getElementById('productModal').style.display = 'flex'; handleTypeChange(); }
+        function closeModal() { document.getElementById('productModal').style.display = 'none'; }
         
         function handleTypeChange() {
             const type = document.getElementById('p_type').value;
             const serialInput = document.getElementById('p_serial');
             const autoCheckbox = document.getElementById('auto_serial');
-            
             if (type === "جوال" || type === "بيانات") {
-                serialInput.disabled = false;
-                autoCheckbox.disabled = false;
-                serialInput.style.backgroundColor = "";
+                serialInput.disabled = false; autoCheckbox.disabled = false; serialInput.style.backgroundColor = "";
             } else {
-                serialInput.disabled = true;
-                autoCheckbox.disabled = true;
-                serialInput.value = "";
-                autoCheckbox.checked = false;
-                serialInput.style.backgroundColor = "#e2e8f0";
+                serialInput.disabled = true; autoCheckbox.disabled = true; serialInput.value = ""; autoCheckbox.checked = false; serialInput.style.backgroundColor = "#e2e8f0";
             }
         } 
         
