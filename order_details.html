@@ -131,7 +131,7 @@
         .no-arrows { -moz-appearance: textfield; }
 
         @media print {
-            .navbar, .sticky-top-section, .btn, .search-wrapper, .modal, .log-section, .log-input-container, .dropdown { display: none !important; }
+            .navbar, .sticky-top-section, .btn, .search-wrapper, .modal, .log-section, .log-input-container, .dropdown { display: none; }
             .table-wrapper { border: none; box-shadow: none; }
             table { width: 100%; min-width: 100%; table-layout: auto; }
             th { position: static !important; background-color: #f1f1f1 !important; color: black !important; border: 1px solid #000 !important; }
@@ -247,6 +247,17 @@
         let currentOrderId = new URLSearchParams(window.location.search).get('id');
         const statusOptions = ["جديد", "مكتمل", "تم التوثيق", "معلق", "جاهز", "مرتجع", "فقدان"];
 
+        // مصفوفة تحديد أوزان الترتيب حسب طلبك
+        const statusOrderWeight = {
+            "مكتمل": 1,
+            "تم التوثيق": 2,
+            "معلق": 3,
+            "جاهز": 4,
+            "جديد": 5, 
+            "مرتجع": 6,
+            "فقدان": 7
+        };
+
         function loadOrderDetails() {
             if (!currentOrderId) return;
             const sales = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
@@ -262,7 +273,6 @@
             }
         }
 
-        // دالة اللصق الذكي لتوزيع البيانات من إكسيل على الصفوف
         function handleSmartPaste(e, fieldName, startIdx) {
             e.preventDefault();
             const clipboardData = e.clipboardData || window.clipboardData;
@@ -371,7 +381,14 @@
         function renderProducts(filtered = null) {
             const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             let items = (filtered || db[currentOrderId] || []).map((p, i) => ({...p, originalIndex: i}));
-            items.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+            
+            // فرز مخصص معقد: أولاً حسب وزن الحالة، ثم الأحدث تعديلاً بداخل نفس الحالة
+            items.sort((a, b) => {
+                let wA = statusOrderWeight[a.status] || 99;
+                let wB = statusOrderWeight[b.status] || 99;
+                if (wA !== wB) return wA - wB;
+                return (b.updatedAt || 0) - (a.updatedAt || 0);
+            });
             
             updateTableHeaders(items.length > 0 ? items[0].type : "جوال");
             const tbody = document.getElementById('productsBody');
