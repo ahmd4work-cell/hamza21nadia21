@@ -97,15 +97,15 @@
             text-align: center; border-bottom: 2px solid #2e1065; position: sticky; top: 0; z-index: 50; height: 40px;
         }
         
-        /* ضبط الارتفاع الافتراضي لجميع الصفوف إلى 40 بيكسل */
+        /* ضبط الارتفاع الافتراضي 45 بيكسل */
         td { 
             border-bottom: 1px solid #f1f5f9; text-align: center; 
-            height: 40px; 
+            height: 45px; 
             font-size: 11px; font-weight: 600; white-space: nowrap; position: relative; 
             transition: height 0.3s ease;
         }
         
-        /* تقليل الارتفاع إلى 30 بيكسل فقط للصفوف التي حالتها "فقدان" */
+        /* ضبط ارتفاع صفوف "فقدان" 30 بيكسل */
         tr.row-dropped td {
             height: 30px;
         }
@@ -372,7 +372,6 @@
         const statusOptions = ["مكتمل", "معلق", "مرتجع", "جاهز", "جديد", "فقدان"];
         const lastNoteText = getLastNoteOnly(obj.notes || "");
         
-        // التحقق من حالة "فقدان" عند تحميل الجدول لتطبيق الارتفاع 30 بيكسل
         if (obj.status === "فقدان") {
             row.classList.add('row-dropped');
         }
@@ -388,9 +387,7 @@
             <td>
                 <select class="status-select" data-val="${obj.status}"
                         onfocus="this.setAttribute('data-old', this.value)" 
-                        onchange="this.setAttribute('data-val', this.value); 
-                        if(this.value==='فقدان'){this.closest('tr').classList.add('row-dropped');}else{this.closest('tr').classList.remove('row-dropped');} 
-                        if(this.getAttribute('data-old') !== this.value) { addGeneralLog('الحالة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[4].innerText, 'تغيير حالة الطلب #' + ${obj.id}); } autoSave();">
+                        onchange="handleStatusChange(this, ${obj.id})">
                     ${statusOptions.map(opt => `<option value="${opt}" ${obj.status === opt ? 'selected' : ''}>${opt}</option>`).join('')}
                 </select>
             </td>
@@ -400,6 +397,23 @@
             <td contenteditable="true" onfocus="this.setAttribute('data-before', this.innerText.trim())" onblur="updateField(this, 'الفرصة', 11, '${obj.comp}', ${obj.id})">${obj.oppNum || ''}</td>
             <td style="color:#64748b; font-weight:bold;">${obj.owner || 'أحمد'}</td>
         `;
+    }
+
+    function handleStatusChange(select, orderId) {
+        select.setAttribute('data-val', select.value);
+        const row = select.closest('tr');
+        if (select.value === 'فقدان') {
+            row.classList.add('row-dropped');
+        } else {
+            row.classList.remove('row-dropped');
+        }
+        
+        if (select.getAttribute('data-old') !== select.value) {
+            addGeneralLog('الحالة', select.getAttribute('data-old'), select.value, row.cells[4].innerText, 'تغيير حالة الطلب #' + orderId);
+        }
+        autoSave();
+        // إعادة تحميل الجدول لضمان ترتيب صفوف "فقدان" في الأسفل
+        loadSalesFromStorage();
     }
 
     function autoSave() {
@@ -435,23 +449,15 @@
         const query = el.value.toLowerCase().trim();
         const resDiv = document.getElementById('mResults');
         const customers = JSON.parse(localStorage.getItem(CUSTOMERS_STORAGE_KEY) || '[]');
-        
         if (query.length < 1) { resDiv.style.display='none'; return; }
-
         const filtered = customers.filter(c => {
             const comp = (c.comp || "").toLowerCase();
             const mainCr = (c.mainRecord || "").toLowerCase();
             const subCr = (c.subRecord || "").toLowerCase();
             return comp.includes(query) || mainCr.includes(query) || subCr.includes(query);
         });
-
         if (filtered.length > 0) {
-            resDiv.innerHTML = filtered.map(c => `
-                <div onclick="selectCustomer('${(c.comp || "").replace(/'/g, "\\'")}', '${c.mainRecord || ""}', '${c.subRecord || "-"}')">
-                    <strong>${c.comp}</strong> <br>
-                    <small>سجل رئيسي: ${c.mainRecord || "-"} | سجل فرعي: ${c.subRecord || "-"}</small>
-                </div>
-            `).join('');
+            resDiv.innerHTML = filtered.map(c => `<div onclick="selectCustomer('${(c.comp || "").replace(/'/g, "\\'")}', '${c.mainRecord || ""}', '${c.subRecord || "-"}')"><strong>${c.comp}</strong> <br><small>سجل رئيسي: ${c.mainRecord || "-"} | سجل فرعي: ${c.subRecord || "-"}</small></div>`).join('');
             resDiv.style.display = 'block';
         } else { 
             resDiv.innerHTML = '<div style="color:red; cursor:default;">لا يوجد عميل بهذا الاسم أو السجل</div>';
@@ -568,8 +574,16 @@
 
     function loadSalesFromStorage() {
         let saved = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
-        const tbody = document.getElementById('salesBody'); tbody.innerHTML = "";
-        saved.sort((a, b) => b.date.localeCompare(a.date));
+        const tbody = document.getElementById('salesBody');
+        tbody.innerHTML = "";
+        
+        // فرز البيانات: الطلبات العادية بالأعلى (حسب التاريخ) و "فقدان" بالأسفل دائماً
+        saved.sort((a, b) => {
+            if (a.status === "فقدان" && b.status !== "فقدان") return 1;
+            if (a.status !== "فقدان" && b.status === "فقدان") return -1;
+            return b.date.localeCompare(a.date);
+        });
+
         saved.forEach(item => renderTableRow(item));
         updateHeaderStats();
     }
