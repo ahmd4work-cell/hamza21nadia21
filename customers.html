@@ -19,7 +19,6 @@
             --text-dark: #1e293b;
             --dark-yellow: #c29103;
             --chat-yellow: #b45309;
-            --dark-red: #8b0000; /* لون أحمر داكن جديد */
         }
 
         html, body { 
@@ -79,8 +78,7 @@
             text-align: center; border-bottom: 2px solid #2e1065; position: sticky; top: 0; z-index: 50; height: 40px;
         }
         
-        /* تقليل الارتفاع المطلوب إلى 30 بيكسل */
-        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 30px; max-height: 30px; font-size: 11px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; padding: 0 2px; }
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; max-height: 45px; font-size: 11px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; }
         
         tbody tr.main-row:nth-child(4n+1) { background-color: #eff6ff; }
 
@@ -89,11 +87,6 @@
             background: transparent; font-size: 11.5px; color: inherit; font-weight: inherit; 
             height: 100%; overflow: hidden; text-overflow: ellipsis; 
         }
-
-        /* تنسيق حالة فقدان */
-        .status-lost { background-color: var(--dark-red) !important; color: white !important; font-weight: 800; }
-        .row-dropped { background-color: #f1f5f9 !important; color: #94a3b8 !important; opacity: 0.8; }
-
         .readonly-input { color: #64748b; cursor: default; }
         .select-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent-blue); vertical-align: middle; }
 
@@ -143,7 +136,7 @@
         .col-phone { width: 100px; }
         .col-email { width: 130px; }
         .col-type { width: 80px; }
-        .col-status { width: 90px; }
+        .col-status { width: 80px; }
         .col-notes { width: 130px; }
         .col-created { width: 90px; }
         .col-owner { width: 80px; }
@@ -266,19 +259,16 @@
     function updateStats() {
         const rows = document.querySelectorAll('#tableBody .main-row');
         const today = getTodayFormatted();
-        const currentMonth = today.substring(0, 7); 
+        const currentMonth = today.substring(0, 7); // YYYY-MM
         
         let total = rows.length;
         let countToday = 0;
         let countMonth = 0;
 
         rows.forEach(r => {
-            const dateInput = r.querySelector('.created-date-val');
-            if (dateInput) {
-                const dateVal = dateInput.value;
-                if(dateVal === today) countToday++;
-                if(dateVal.startsWith(currentMonth)) countMonth++;
-            }
+            const dateVal = r.querySelector('.created-date-val').value;
+            if(dateVal === today) countToday++;
+            if(dateVal.startsWith(currentMonth)) countMonth++;
         });
 
         document.getElementById('stat-total').innerText = total;
@@ -296,11 +286,6 @@
         const notes = c.notes || '';
         const lastNoteText = getLastNoteOnly(notes);
         const createdAt = c.createdDate || getTodayFormatted();
-
-        // الترتيب المطلوب وتنسيق حالة فقدان
-        const lostClass = c.status === 'فقدان' ? 'status-lost' : '';
-        const droppedClass = c.status === 'فقدان' ? 'row-dropped' : '';
-        if (droppedClass) mainRow.classList.add('row-dropped');
 
         mainRow.innerHTML = `
             <td class="col-select"><input type="checkbox" class="select-check"></td>
@@ -320,11 +305,9 @@
                 </select>
             </td>
             <td>
-                <select class="excel-input ${lostClass}" data-old="${c.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleStatusChange(this)">
-                    <option value="جديد" ${c.status === 'جديد' ? 'selected' : ''}>جديد</option>
+                <select class="excel-input" data-old="${c.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الحالة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();">
                     <option value="نشط" ${c.status === 'نشط' ? 'selected' : ''}>نشط</option>
                     <option value="غير نشط" ${c.status === 'غير نشط' ? 'selected' : ''}>غير نشط</option>
-                    <option value="فقدان" ${c.status === 'فقدان' ? 'selected' : ''}>فقدان</option>
                 </select>
             </td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
@@ -332,26 +315,6 @@
             <td><input type="text" class="excel-input" value="${c.owner || 'أحمد'}" onchange="saveAllDataSilently();"></td>
         `;
         updateStats();
-    }
-
-    // وظيفة معالجة تغيير الحالة
-    function handleStatusChange(selectEl) {
-        const row = selectEl.closest('tr');
-        const companyName = row.cells[2].querySelector('input').value;
-        const oldVal = selectEl.getAttribute('data-old');
-        const newVal = selectEl.value;
-
-        // إزالة الألوان السابقة
-        selectEl.classList.remove('status-lost');
-        row.classList.remove('row-dropped');
-
-        if (newVal === 'فقدان') {
-            selectEl.classList.add('status-lost');
-            row.classList.add('row-dropped');
-        }
-
-        addToActivityLog('الحالة', oldVal, newVal, companyName);
-        saveAllDataSilently();
     }
 
     function toggleAllCheckboxes(source) {
