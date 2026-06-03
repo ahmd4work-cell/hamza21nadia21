@@ -19,6 +19,7 @@
             --text-dark: #1e293b;
             --dark-yellow: #c29103;
             --chat-yellow: #b45309;
+            --status-lost-bg: #7f1d1d;
         }
 
         html, body { 
@@ -96,20 +97,24 @@
             text-align: center; border-bottom: 2px solid #2e1065; position: sticky; top: 0; z-index: 50; height: 40px;
         }
         
-        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; max-height: 45px; font-size: 11px; font-weight: 600; white-space: nowrap; position: relative; }
+        /* الحفاظ على ميزة الارتفاع 30 بيكسل */
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 30px; max-height: 30px; font-size: 11px; font-weight: 600; white-space: nowrap; position: relative; }
         
         tbody tr:nth-child(even) { background-color: #eff6ff; }
         
         .status-select {
-            font-family: 'Cairo'; font-size: 11px; font-weight: 800; padding: 4px 8px;
+            font-family: 'Cairo'; font-size: 11px; font-weight: 800; padding: 2px 8px;
             border-radius: 20px; border: 1.5px solid #e2e8f0; background: #f8fafc;
-            width: 90%; cursor: pointer; outline: none; transition: all 0.3s ease;
+            width: 90%; height: 24px; cursor: pointer; outline: none; transition: all 0.3s ease;
             text-align: center; appearance: none;
         }
         .status-select[data-val="مكتمل"] { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
         .status-select[data-val="معلق"] { background: #fef9c3; color: #854d0e; border-color: #fef08a; }
         .status-select[data-val="مرتجع"] { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
         .status-select[data-val="جاهز"] { background: #e0f2fe; color: #075985; border-color: #bae6fd; }
+        .status-select[data-val="فقدان"] { background: var(--status-lost-bg); color: #ffffff; border-color: #991b1b; }
+        
+        .row-dropped { opacity: 0.5; background-color: #f1f5f9 !important; transition: opacity 0.3s ease; }
 
         .notes-preview { 
             width: 95%; height: 20px; border: none; background: transparent; font-family: 'Cairo'; 
@@ -357,10 +362,14 @@
         const statusOptions = ["مكتمل", "معلق", "مرتجع", "جاهز", "جديد", "فقدان"];
         const lastNoteText = getLastNoteOnly(obj.notes || "");
         
+        if (obj.status === "فقدان") {
+            row.classList.add('row-dropped');
+        }
+        
         row.innerHTML = `
             <td><input type="checkbox" class="select-check"></td>
             <td><a href="order_details.html?id=${obj.id}" class="order-link">#${obj.id}</a></td>
-            <td contenteditable="true" onblur="updateField(this, 'اسم الطلب', 2, '${obj.comp}', ${obj.id})">${obj.type}</td>
+            <td contenteditable="true" onfocus="this.setAttribute('data-before', this.innerText.trim())" onblur="updateField(this, 'اسم الطلب', 2, '${obj.comp}', ${obj.id})">${obj.type}</td>
             <td style="color:#64748b;">${obj.date}</td>
             <td>${obj.comp}</td>
             <td>${obj.cr}</td>
@@ -368,14 +377,14 @@
             <td>
                 <select class="status-select" data-val="${obj.status}"
                         onfocus="this.setAttribute('data-old', this.value)" 
-                        onchange="this.setAttribute('data-val', this.value); addGeneralLog('الحالة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[4].innerText, 'تغيير حالة الطلب #' + ${obj.id}); autoSave();">
+                        onchange="this.setAttribute('data-val', this.value); if(this.value==='فقدان'){this.closest('tr').classList.add('row-dropped');}else{this.closest('tr').classList.remove('row-dropped');} if(this.getAttribute('data-old') !== this.value) { addGeneralLog('الحالة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[4].innerText, 'تغيير حالة الطلب #' + ${obj.id}); } autoSave();">
                     ${statusOptions.map(opt => `<option value="${opt}" ${obj.status === opt ? 'selected' : ''}>${opt}</option>`).join('')}
                 </select>
             </td>
             <td style="color:#16a34a; font-weight:800;">${sums.completed.toFixed(2)}</td>
             <td style="color:#dc2626; font-weight:800;">${sums.pending.toFixed(2)}</td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${(obj.notes || '').replace(/'/g, "&apos;")}'>${lastNoteText}</div></td>
-            <td contenteditable="true" onblur="updateField(this, 'الفرصة', 11, '${obj.comp}', ${obj.id})">${obj.oppNum || ''}</td>
+            <td contenteditable="true" onfocus="this.setAttribute('data-before', this.innerText.trim())" onblur="updateField(this, 'الفرصة', 11, '${obj.comp}', ${obj.id})">${obj.oppNum || ''}</td>
             <td style="color:#64748b; font-weight:bold;">${obj.owner || 'أحمد'}</td>
         `;
     }
@@ -467,8 +476,15 @@
     }
 
     function updateField(el, fieldLabel, cellIdx, comp, orderId) {
+        const oldVal = el.getAttribute('data-before') || "";
         const newVal = el.innerText.trim();
-        addGeneralLog(fieldLabel, "تعديل", newVal, comp, `تعديل ${fieldLabel} للطلب #${orderId}`);
+        
+        // التحقق من حدوث تغيير فعلي في النص قبل النشر في السجل أو الحفظ
+        if (oldVal === newVal) {
+            return; 
+        }
+        
+        addGeneralLog(fieldLabel, oldVal, newVal, comp, `تعديل ${fieldLabel} للطلب #${orderId}`);
         autoSave();
     }
 
@@ -479,7 +495,6 @@
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = lastEntry;
         
-        // إذا كانت الملاحظة تحتوي على ملف فقط، نعرض إشعاراً بذلك
         const textPart = tempDiv.querySelector('.activity-text-part');
         if (textPart) {
             let pureText = textPart.innerText.replace(/📎 ملف مرفق: .*/g, '').trim();
@@ -498,7 +513,6 @@
         document.getElementById('noteModal').style.display = "flex";
         document.getElementById('modalTextArea').focus();
         
-        // إعادة تهيئة حقل الملفات عند فتح النافذة
         attachedFileData = null;
         attachedFileName = "";
         document.getElementById('modalFileInput').value = "";
@@ -509,7 +523,6 @@
         const file = input.files[0];
         if (!file) return;
         
-        // منع الملفات الكبيرة جداً للحفاظ على مساحة المقارنة في localStorage
         if (file.size > 2 * 1024 * 1024) {
             alert("حجم الملف كبير جداً! الحد الأقصى المسموح به هو 2 ميجابايت.");
             input.value = "";
@@ -541,7 +554,6 @@
             
             currentActivePreview.setAttribute('data-full-notes', updatedFullNotes);
             
-            // تحديث العرض المصغر في الجدول
             if (newText) {
                 currentActivePreview.innerText = newText;
             } else if (attachedFileData) {
@@ -576,7 +588,6 @@
         const logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
         const headerHTML = generateStyledHeader();
         
-        // إزالة وسوم الروابط الطويلة في حال وجود ملف عند التخزين في سجل النشاط العام للاختصار
         let cleanedVal = String(newVal).replace(/<br><a href=.*/g, ' [ملف مرفق]');
         
         const logHTML = `${headerHTML}<span class="activity-text-part">${actionTextBase} - [${cleanedVal}] (${companyName})</span>`;
