@@ -95,11 +95,11 @@
 
         tfoot {
             position: sticky;
-            bottom: 140px; 
+            bottom: 100px; /* تم التعديل ليتوافق مع الارتفاع الجديد للسجل */
             z-index: 1350;
         }
 
-        .table-footer { background-color: #000; color: #fff; height: 37px; font-family: 'Cairo'; }
+        .table-footer { background-color: #000; color: #fff; height: 27px; font-family: 'Cairo'; } /* تم التعديل إلى 27 بيكسل */
         
         .table-footer td { 
             background-color: #000 !important;
@@ -107,10 +107,10 @@
             border: none; 
             font-weight: 800; 
             font-size: 12px; 
-            height: 37px; 
-            line-height: 37px; 
+            height: 27px; /* تم التعديل إلى 27 بيكسل */
+            line-height: 27px; /* تم التعديل إلى 27 بيكسل */
             position: sticky;
-            bottom: 140px;
+            bottom: 100px; /* تم التعديل ليتوافق مع الارتفاع الجديد للسجل */
         }
 
         .row-locked { background-color: #f1f5f9 !important; color: #94a3b8 !important; }
@@ -124,18 +124,18 @@
         .status-mortaja { background-color: var(--soft-red) !important; color: #991b1b !important; }
 
         .activity-log-section { 
-            margin: 0; padding: 12px 18px; background: #ffffff; border-radius: 10px; 
+            margin: 0; padding: 8px 18px; background: #ffffff; border-radius: 10px; 
             border: 1px solid var(--border-color); box-shadow: 0 -3px 10px rgba(0,0,0,0.05);
-            flex-shrink: 0; height: 140px; display: flex; flex-direction: column; box-sizing: border-box;
+            flex-shrink: 0; height: 100px; display: flex; flex-direction: column; box-sizing: border-box; /* تم تصغير الارتفاع إلى 100 بيكسل */
             position: sticky; bottom: 0; z-index: 1450;
         }
-        .activity-log-title { color: var(--dark-yellow); font-size: 13.5px; font-weight: 800; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; flex-shrink: 0; }
-        .activity-list { flex: 1; overflow-y: auto; font-size: 10px; line-height: 1.6; } /* تصغير الخط العام للسجل */
-        .activity-item { margin-bottom: 4px; border-bottom: 1px dashed #f8fafc; padding-bottom: 4px; color: #475569; display: flex; align-items: center; text-align: right; }
+        .activity-log-title { color: var(--dark-yellow); font-size: 13.5px; font-weight: 800; margin-bottom: 5px; border-bottom: 1px solid #f1f5f9; padding-bottom: 4px; flex-shrink: 0; }
+        .activity-list { flex: 1; overflow-y: auto; font-size: 10px; line-height: 1.5; }
+        .activity-item { margin-bottom: 3px; border-bottom: 1px dashed #f8fafc; padding-bottom: 3px; color: #475569; display: flex; align-items: center; text-align: right; }
         
-        .activity-header-part { font-size: 10px; color: var(--chat-yellow); font-weight: 800; } /* تصغير خط الاسم والتاريخ */
-        .activity-time-part { font-size: 10px; font-weight: normal; } /* الساعة بدون تغيير */
-        .activity-text-part { font-size: 10px; color: #475569; font-weight: 700; } /* تصغير خط نص النشاط */
+        .activity-header-part { font-size: 10px; color: var(--chat-yellow); font-weight: 800; }
+        .activity-time-part { font-size: 10px; font-weight: normal; }
+        .activity-text-part { font-size: 10px; color: #475569; font-weight: 700; }
 
         .notes-preview { 
             width: 95%; height: 20px; border: none; background: transparent; font-family: 'Cairo'; 
@@ -299,7 +299,7 @@
         function generateStyledHeader() {
             const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
             const d = new Date();
-            // تعديل الساعة لنظام 24 ساعة
+            // نظام 24 ساعة
             const timeFormatted = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
             return `<span class="activity-header-part">👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${getTodayFormatted()}  <span class="activity-time-part">${timeFormatted}</span>&nbsp;&nbsp;</span>`;
         }
