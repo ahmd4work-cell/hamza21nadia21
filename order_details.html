@@ -33,7 +33,7 @@
         .navbar a { color: var(--white); text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; transition: 0.3s; line-height: 37px; height: 37px; display: inline-block; }
         .navbar a.active { background-color: var(--nav-active); color: #0f172a; border-radius: 6px; height: 26px; line-height: 26px; margin-top: 5.5px; }
 
-        .container { padding: 0 20px 20px 20px; }
+        .container { padding: 0 20px 0 20px; }
 
         .sticky-top-section {
             position: sticky; top: 37px; background-color: var(--bg-color);
@@ -79,7 +79,6 @@
         .dropdown-content button:hover { background-color: #f1f5f9; }
         .dropdown:hover .dropdown-content { display: block; }
 
-        /* تعديل منطقة الجدول للتمرير الذكي */
         .table-wrapper { background: white; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: visible; margin-bottom: 20px; }
         table { width: 100%; border-collapse: collapse; min-width: 1100px; font-family: 'Calibri', sans-serif; table-layout: fixed; }
         
@@ -94,16 +93,14 @@
         
         .row-checkbox { width: 16px; height: 16px; cursor: pointer; }
 
-        /* الكود المصلح لتجميد تذييل الجدول (الصف الأسود) بشكل حتمي وعزله فوق صفوف المنتجات */
         tfoot {
             position: sticky;
-            bottom: 140px; /* يرتفع بمقدار طول سجل النشاط لكي لا يتداخلا */
+            bottom: 140px; 
             z-index: 1350;
         }
 
         .table-footer { background-color: #000; color: #fff; height: 37px; font-family: 'Cairo'; }
         
-        /* تجميد الخلايا الداخلية وتأكيد اللون الأسود والخلفية لمنع الشفافية أثناء التمرير */
         .table-footer td { 
             background-color: #000 !important;
             color: #fff !important; 
@@ -126,7 +123,6 @@
         .status-moallaq { background-color: var(--warning-yellow) !important; color: #854d0e !important; }
         .status-mortaja { background-color: var(--soft-red) !important; color: #991b1b !important; }
 
-        /* سجل النشاط والتواصل مثبت بالكامل في ذيل الشاشة */
         .activity-log-section { 
             margin: 0; padding: 12px 18px; background: #ffffff; border-radius: 10px; 
             border: 1px solid var(--border-color); box-shadow: 0 -3px 10px rgba(0,0,0,0.05);
@@ -148,7 +144,6 @@
             line-height: 20px;
         }
 
-        /* نافذة الملاحظات المنبثقة */
         .modal-notes { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-notes-content { background: white; padding: 18px; border-radius: 12px; width: 440px; height: 480px; display: flex; flex-direction: column; box-sizing: border-box; }
         .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
@@ -239,14 +234,12 @@
             </table>
         </div>
 
-        <!-- سجل النشاط والتواصل -->
         <div class="activity-log-section">
             <div class="activity-log-title">📋 سجل نشاط تفاصيل الطلب</div>
             <div id="activityList" class="activity-list"></div>
         </div>
     </div>
 
-    <!-- النافذة المنبثقة للملاحظات -->
     <div id="noteModal" class="modal-notes">
         <div class="modal-notes-content">
             <div style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right;">سجل ملاحظات ومتابعة المنتج</div>
@@ -259,7 +252,6 @@
         </div>
     </div>
 
-    <!-- النافذة المنبثقة لإضافة منتج جديد -->
     <div id="productModal" class="modal">
         <div class="modal-content">
             <h3>إضافة منتج جديد</h3>
@@ -351,11 +343,11 @@
             const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             let items = (filtered || db[currentOrderId] || []).map((p, i) => ({...p, originalIndex: i}));
             
+            // تم التعديل هنا: الترتيب يعتمد حصرًا على الحالة المتفق عليها لثبات الصفوف تمامًا أثناء تحرير الخلايا
             items.sort((a, b) => {
                 let wA = statusOrderWeight[a.status] || 99;
                 let wB = statusOrderWeight[b.status] || 99;
-                if (wA !== wB) return wA - wB;
-                return (b.updatedAt || 0) - (a.updatedAt || 0);
+                return wA - wB;
             });
             
             updateTableHeaders(items.length > 0 ? items[0].type : "جوال");
