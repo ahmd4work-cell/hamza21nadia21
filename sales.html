@@ -1,1 +1,623 @@
+<!DOCTYPE html>
+<html dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المبيعات | ASGate</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --nav-shiny-navy: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+            --header-shiny-purple: linear-gradient(180deg, #4c1d95 0%, #2e1065 100%);
+            --nav-bg: #0f172a;
+            --nav-active: #a78bfa;
+            --bg-color: #f4f7f9;
+            --white: #ffffff;
+            --accent-blue: #3b82f6;
+            --accent-green-active: #22c55e;
+            --border-soft: #cbd5e1;
+            --text-dark: #1e293b;
+            --dark-yellow: #c29103;
+            --chat-yellow: #b45309;
+            --status-lost-bg: #7f1d1d; /* لون أحمر داكن مميز */
+        }
 
+        html, body { 
+            height: 100%; margin: 0; padding: 0; overflow: hidden; 
+            background-color: var(--bg-color); font-family: 'Cairo', sans-serif; 
+            font-size: 13px; line-height: 1.2; color: var(--text-dark); 
+        }
+
+        .dashboard-container { display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; }
+
+        .navbar { 
+            background: var(--nav-shiny-navy); display: flex; align-items: center; padding: 0 20px; margin: 10px 10px 5px 10px; 
+            border-radius: 12px; height: 37px; flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.1); border: 1px solid #1e293b;
+        }
+        .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; height: 26px; line-height: 26px; display: inline-block; transition: 0.3s; }
+        .navbar a.active { background-color: var(--nav-active); color: #0f172a; border-radius: 6px; }
+
+        .main-content { flex: 1; display: flex; flex-direction: column; padding: 0 15px; min-height: 0; }
+        
+        .action-bar { display: flex; align-items: center; margin: 10px 0; gap: 10px; flex-shrink: 0; }
+        .btn-top { border: none; padding: 0 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; font-size: 12px; height: 35px; }
+        .btn-add { background-color: var(--accent-blue); }
+
+        .search-wrapper { position: relative; width: 15%; display: flex; align-items: center; }
+        .search-input {
+            width: 100%; height: 30px; padding: 0 10px; border-radius: 8px;
+            border: 1px solid var(--border-soft); background: #fff;
+            font-family: 'Cairo'; font-size: 12px; font-weight: 700; outline: none;
+        }
+
+        .stats-bar {
+            margin-right: auto; display: flex; gap: 8px; align-items: center;
+            background: #fff; padding: 0 12px; border-radius: 5px; height: 28px;
+            border: 1px solid var(--border-soft); box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .stat-section { display: flex; align-items: center; gap: 6px; }
+        .stat-label { font-size: 10.5px; font-weight: 800; color: #1e293b; border-left: 2px solid #e2e8f0; padding-left: 8px; margin-left: 4px; }
+        .stat-item { font-size: 10px; font-weight: 800; color: #475569; white-space: nowrap; }
+        .stat-val { color: var(--accent-blue); margin-right: 2px; }
+        .val-success { color: #16a34a; }
+        .val-danger { color: #dc2626; }
+        .stat-divider { color: #cbd5e1; margin: 0 5px; font-weight: normal; }
+
+        .bulk-action-wrapper { position: relative; display: flex; align-items: center; margin-right: 5px; }
+        .btn-bulk-trigger { 
+            height: 25px; padding: 0 12px; border-radius: 5px; border: 1px solid var(--border-soft);
+            background: #fff; color: var(--text-dark); font-family: 'Cairo'; font-size: 11px; font-weight: 800;
+            cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: 0.2s;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .btn-bulk-trigger:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+
+        .dropdown-menu { 
+            display: none; position: absolute; left: 0; 
+            top: 28px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; 
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 1000; min-width: 110px; padding: 4px;
+        }
+        .dropdown-menu button, .dropdown-menu a { 
+            width: 100%; padding: 6px 10px; border: none; background: none; font-family: 'Cairo'; 
+            font-size: 10.5px; text-align: right; cursor: pointer; color: #475569; font-weight: 700; 
+            border-radius: 4px; transition: 0.2s; display: block; text-decoration: none; box-sizing: border-box;
+        }
+        .dropdown-menu button:hover, .dropdown-menu a:hover { background: #f1f5f9; color: var(--accent-blue); }
+        .show { display: block; }
+
+        .table-wrapper { 
+            background: white; border-radius: 10px; overflow-y: auto; border: 1px solid var(--border-soft); 
+            flex: 1; min-height: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.02); position: relative;
+        }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        
+        th { 
+            background: var(--header-shiny-purple); color: white; padding: 0 5px; font-size: 11px; font-weight: 800; 
+            text-align: center; border-bottom: 2px solid #2e1065; position: sticky; top: 0; z-index: 50; height: 40px;
+        }
+        
+        /* تقليص الارتفاع إلى 30 بيكسل للصفوف العادية */
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 30px; max-height: 30px; font-size: 11px; font-weight: 600; white-space: nowrap; position: relative; }
+        
+        tbody tr:nth-child(even) { background-color: #eff6ff; }
+        
+        /* تنسيقات حقل الحالات مع الارتفاع الجديد المتناسق مع الصف */
+        .status-select {
+            font-family: 'Cairo'; font-size: 11px; font-weight: 800; padding: 2px 8px;
+            border-radius: 20px; border: 1.5px solid #e2e8f0; background: #f8fafc;
+            width: 90%; height: 24px; cursor: pointer; outline: none; transition: all 0.3s ease;
+            text-align: center; appearance: none;
+        }
+        .status-select[data-val="مكتمل"] { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+        .status-select[data-val="معلق"] { background: #fef9c3; color: #854d0e; border-color: #fef08a; }
+        .status-select[data-val="مرتجع"] { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+        .status-select[data-val="جاهز"] { background: #e0f2fe; color: #075985; border-color: #bae6fd; }
+        
+        /* تنسيق حالة فقدان (أحمر داكن ونص أبيض) */
+        .status-select[data-val="فقدان"] { background: var(--status-lost-bg); color: #ffffff; border-color: #991b1b; }
+        
+        /* تنسيق إسقاط الصف بالكامل */
+        .row-dropped { opacity: 0.5; background-color: #f1f5f9 !important; transition: opacity 0.3s ease; }
+
+        .notes-preview { 
+            width: 95%; height: 20px; border: none; background: transparent; font-family: 'Cairo'; 
+            font-size: 11px; text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700; 
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; margin: 0 auto; 
+        }
+
+        .activity-log-section { 
+            margin: 15px 0 10px 0; padding: 12px 18px; background: #ffffff; border-radius: 10px; 
+            border: 1px solid var(--border-soft); box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
+            flex-shrink: 0; height: 140px; display: flex; flex-direction: column; box-sizing: border-box;
+        }
+        .activity-log-title { color: var(--dark-yellow); font-size: 13.5px; font-weight: 800; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; flex-shrink: 0; }
+        .activity-list { flex: 1; overflow-y: auto; font-size: 11.5px; line-height: 1.6; }
+        
+        .activity-item { margin-bottom: 4px; border-bottom: 1px dashed #f8fafc; padding-bottom: 4px; color: #475569; display: flex; align-items: center; gap: 4px; justify-content: flex-start; flex-wrap: wrap; text-align: right; }
+        .activity-header-part { font-size: 11.5px; color: var(--chat-yellow); font-weight: 800; display: inline-block; white-space: nowrap; }
+        .activity-time-part { font-size: 10.5px; font-weight: 700; }
+        .activity-text-part { font-size: 11.5px; color: #475569; display: inline-block; }
+
+        .modal-activity-item { margin-bottom: 8px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 6px; color: #475569; text-align: right; }
+        .modal-activity-item .activity-text-part { display: block; width: 100%; text-align: right; margin-top: 2px; }
+
+        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .modal-content { background: white; padding: 15px; border-radius: 12px; width: 440px; height: 460px; display: flex; flex-direction: column; gap: 8px; }
+        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 10px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
+        .note-area { height: 60px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 8px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
+        
+        .file-upload-wrapper { display: flex; align-items: center; gap: 8px; text-align: right; }
+        .file-label { font-size: 11px; font-weight: 700; color: #475569; background: #f1f5f9; border: 1px dashed #cbd5e1; padding: 4px 10px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+        .file-label:hover { background: #e2e8f0; border-color: var(--accent-blue); }
+        .file-input { display: none; }
+        .file-name-preview { font-size: 11px; color: var(--accent-blue); font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 250px; }
+        .file-link { display: inline-block; color: #3b82f6; text-decoration: underline; font-weight: bold; margin-top: 4px; }
+
+        .order-modal-card { background: white; width: 350px; border-radius: 12px; padding: 20px; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); }
+        .form-group { margin-bottom: 12px; text-align: right; position: relative; }
+        .form-group label { display: block; font-weight: 700; font-size: 11px; color: #64748b; margin-bottom: 4px; }
+        .form-group input { width: 100%; padding: 8px 10px; border: 1px solid var(--border-soft); border-radius: 6px; font-family: 'Cairo'; font-size: 12px; box-sizing: border-box; }
+        
+        .modal-results { 
+            position: absolute; top: 100%; left: 0; right: 0; background: white; 
+            border: 1px solid #cbd5e1; z-index: 10005; border-radius: 6px; 
+            max-height: 150px; overflow-y: auto; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .modal-results div { 
+            padding: 8px 10px; cursor: pointer; border-bottom: 1px solid #f1f5f9; 
+            font-size: 11.5px; transition: 0.2s; text-align: right;
+        }
+        .modal-results div:hover { background: #eff6ff; color: var(--accent-blue); }
+        
+        .select-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent-blue); }
+        .order-link { color: inherit; text-decoration: none; font-weight: 800; color: var(--accent-blue); }
+    </style>
+</head>
+<body onload="loadSalesFromStorage(); renderGeneralLogs();">
+
+<div class="dashboard-container">
+    <nav class="navbar">
+        <a href="index.html">الرئيسية</a>
+        <a href="visits.html">الزيارات</a>
+        <a href="opportunities.html">الفرص البيعية</a>
+        <a href="customers.html">العملاء</a>
+        <a href="sales.html" class="active">المبيعات</a>
+    </nav>
+
+    <div class="main-content">
+        <div class="action-bar">
+            <button class="btn-top btn-add" onclick="openOrderModal()">+ إنشاء طلب مبيعات جديد</button>
+            <div class="search-wrapper">
+                <input type="text" id="globalSearch" class="search-input" placeholder="بحث 🔍" onkeyup="filterSalesTable()">
+            </div>
+            
+            <div class="stats-bar">
+                <div class="stat-section">
+                    <span class="stat-label">الإجمالي</span>
+                    <div class="stat-item">الطلبات: <span id="count-total" class="stat-val">0</span></div>
+                    <div class="stat-item">مكتمل: <span id="sum-completed" class="stat-val val-success">0.00</span></div>
+                    <div class="stat-item">معلق: <span id="sum-pending" class="stat-val val-danger">0.00</span></div>
+                </div>
+                <span class="stat-divider">|</span>
+                <div class="stat-section">
+                    <span class="stat-label" style="border:none;">الشهر الحالي</span>
+                    <div class="stat-item">الطلبات: <span id="month-count" class="stat-val">0</span></div>
+                    <div class="stat-item">مكتمل: <span id="month-completed" class="stat-val val-success">0.00</span></div>
+                    <div class="stat-item">معلق: <span id="month-pending" class="stat-val val-danger">0.00</span></div>
+                </div>
+            </div>
+
+            <div class="bulk-action-wrapper">
+                <button class="btn-bulk-trigger" onclick="toggleDropdown(event, this)">إجراء ▾</button>
+                <div class="dropdown-menu">
+                    <button onclick="alert('تغيير المالك')">تغيير المالك</button>
+                    <button onclick="alert('تعديل')">تعديل</button>
+                    <button onclick="alert('تصدير')">تصدير</button>
+                    <button onclick="window.print()">طباعة</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-wrapper">
+            <table id="salesTable">
+                <thead>
+                    <tr>
+                        <th style="width: 30px;"><input type="checkbox" class="select-check" onclick="toggleAllCheckboxes(this)"></th>
+                        <th style="width: 7%;">رقم الطلب</th>
+                        <th style="width: 11%;">اسم الطلب</th>
+                        <th style="width: 10%;">تاريخ الإنشاء</th>
+                        <th style="width: 12%;">الشركة</th>
+                        <th style="width: 9%;">السجل الرئيسي</th>
+                        <th style="width: 9%;">السجل الفرعي</th>
+                        <th style="width: 9%;">الحالة</th>
+                        <th style="width: 6%;">مكتمل</th>
+                        <th style="width: 6%;">معلق</th>
+                        <th style="width: 10%;">ملاحظات</th>
+                        <th style="width: 6%;">الفرصة</th>
+                        <th style="width: 5%;">المالك</th>
+                    </tr>
+                </thead>
+                <tbody id="salesBody"></tbody>
+            </table>
+        </div>
+
+        <div class="activity-log-section">
+            <div class="activity-log-title">📋 سجل نشاط المبيعات</div>
+            <div id="activityLogs" class="activity-list"></div>
+        </div>
+    </div>
+</div>
+
+<div id="noteModal" class="modal">
+    <div class="modal-content">
+        <div style="font-weight: 800; color: #2e1065; text-align: right; margin-bottom: 2px;">سجل ملاحظات الطلب والنتائج</div>
+        <div id="historyLog" class="history-log"></div>
+        
+        <div class="file-upload-wrapper">
+            <label for="modalFileInput" class="file-label">📎 إرفاق ملف</label>
+            <input type="file" id="modalFileInput" class="file-input" onchange="handleFileSelection(this)">
+            <span id="fileNamePreview" class="file-name-preview"></span>
+        </div>
+
+        <textarea id="modalTextArea" class="note-area" placeholder="أدخل تفاصيل الملاحظة هنا..."></textarea>
+        <div style="display:flex; justify-content: flex-end; gap:8px;">
+            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:6px 14px; border-radius:6px; cursor:pointer; font-family:Cairo; font-size:12px;">تراجع</button>
+            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:6px 14px; border-radius:6px; cursor:pointer; font-family:Cairo; font-size:12px; font-weight:bold;">حفظ الملاحظة</button>
+        </div>
+    </div>
+</div>
+
+<div id="orderModal" class="modal">
+    <div class="order-modal-card">
+        <div style="font-weight: 800; margin-bottom: 15px; text-align: center;">إنشاء طلب مبيعات جديد</div>
+        <div class="form-group">
+            <label>البحث بالاسم أو السجل</label>
+            <input type="text" id="mSearchField" onkeyup="searchCustomerInModal(this)" placeholder="ابحث هنا..." autocomplete="off">
+            <div id="mResults" class="modal-results"></div>
+        </div>
+        <div class="form-group"><label>الشركة</label><input type="text" id="mComp" readonly style="background:#f1f5f9"></div>
+        <div class="form-group"><label>السجل الرئيسي</label><input type="text" id="mCr" readonly style="background:#f1f5f9"></div>
+        <div class="form-group"><label>السجل الفرعي</label><input type="text" id="mCrSub" readonly style="background:#f1f5f9"></div>
+        <div class="form-group"><label>اسم الطلب</label><input type="text" id="mType" placeholder="مثال: توريد أجهزة"></div>
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button onclick="closeOrderModal()" style="flex:1; padding:10px; border:none; border-radius:6px; cursor:pointer; font-family:Cairo;">إلغاء</button>
+            <button onclick="addOrderRow()" style="flex:1; padding:10px; background:#0f172a; color:white; border:none; border-radius:6px; cursor:pointer; font-family:Cairo; font-weight:bold;">إضافة</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentActivePreview = null;
+    let attachedFileData = null;
+    let attachedFileName = "";
+    const LOGS_KEY = 'asgate_general_sales_logs';
+    const CUSTOMERS_STORAGE_KEY = 'asgate_customers_v2_final'; 
+
+    function getTodayFormatted() {
+        const d = new Date();
+        return d.toISOString().split('T')[0];
+    }
+
+    function generateStyledHeader() {
+        const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+        const d = new Date();
+        const timeFormatted = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+        return `<span class="activity-header-part">👤 (أحمد) 🗓️ ${days[d.getDay()]} ${getTodayFormatted()} <span class="activity-time-part">${timeFormatted}</span> </span>`;
+    }
+
+    function toggleDropdown(e, btn) {
+        e.stopPropagation();
+        const menu = btn.nextElementSibling;
+        const isOpen = menu.classList.contains('show');
+        document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+        if(!isOpen) menu.classList.add('show');
+    }
+
+    function toggleAllCheckboxes(master) {
+        document.querySelectorAll('#salesBody .select-check').forEach(c => c.checked = master.checked);
+    }
+
+    function updateHeaderStats() {
+        const saved = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
+        const now = new Date();
+        const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+        let totalComp = 0, totalPend = 0;
+        let monthCount = 0, monthComp = 0, monthPend = 0;
+
+        saved.forEach(item => {
+            const sums = calculateOrderSums(item.id);
+            totalComp += sums.completed;
+            totalPend += sums.pending;
+
+            if (item.date && item.date.startsWith(currentMonthStr)) {
+                monthCount++;
+                monthComp += sums.completed;
+                monthPend += sums.pending;
+            }
+        });
+
+        document.getElementById('count-total').innerText = saved.length;
+        document.getElementById('sum-completed').innerText = totalComp.toLocaleString('en-US', {minimumFractionDigits: 2});
+        document.getElementById('sum-pending').innerText = totalPend.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+        document.getElementById('month-count').innerText = monthCount;
+        document.getElementById('month-completed').innerText = monthComp.toLocaleString('en-US', {minimumFractionDigits: 2});
+        document.getElementById('month-pending').innerText = monthPend.toLocaleString('en-US', {minimumFractionDigits: 2});
+    }
+
+    function calculateOrderSums(orderId) {
+        const productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+        const products = productsDb[orderId] || [];
+        let completed = 0, pending = 0;
+        products.forEach(p => {
+            const lineTotal = (parseFloat(p.qty) || 0) * (parseFloat(String(p.sub).replace(/[^\d.]/g, '')) || 0);
+            if (p.status === "مكتمل") completed += lineTotal;
+            if (p.status === "معلق") pending += lineTotal;
+        });
+        return { completed, pending };
+    }
+
+    function renderTableRow(obj, atTop = false) {
+        const tbody = document.getElementById('salesBody');
+        const sums = calculateOrderSums(obj.id);
+        const row = atTop ? tbody.insertRow(0) : tbody.insertRow(-1);
+        const statusOptions = ["مكتمل", "معلق", "مرتجع", "جاهز", "جديد", "فقدان"];
+        const lastNoteText = getLastNoteOnly(obj.notes || "");
+        
+        // التحقق مما إذا كانت الحالة "فقدان" عند التحميل لإسقاط الصف تلقائياً
+        if (obj.status === "فقدان") {
+            row.classList.add('row-dropped');
+        }
+        
+        row.innerHTML = `
+            <td><input type="checkbox" class="select-check"></td>
+            <td><a href="order_details.html?id=${obj.id}" class="order-link">#${obj.id}</a></td>
+            <td contenteditable="true" onblur="updateField(this, 'اسم الطلب', 2, '${obj.comp}', ${obj.id})">${obj.type}</td>
+            <td style="color:#64748b;">${obj.date}</td>
+            <td>${obj.comp}</td>
+            <td>${obj.cr}</td>
+            <td>${obj.crSub}</td>
+            <td>
+                <select class="status-select" data-val="${obj.status}"
+                        onfocus="this.setAttribute('data-old', this.value)" 
+                        onchange="this.setAttribute('data-val', this.value); if(this.value==='فقدان'){this.closest('tr').classList.add('row-dropped');}else{this.closest('tr').classList.remove('row-dropped');} addGeneralLog('الحالة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[4].innerText, 'تغيير حالة الطلب #' + ${obj.id}); autoSave();">
+                    ${statusOptions.map(opt => `<option value="${opt}" ${obj.status === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                </select>
+            </td>
+            <td style="color:#16a34a; font-weight:800;">${sums.completed.toFixed(2)}</td>
+            <td style="color:#dc2626; font-weight:800;">${sums.pending.toFixed(2)}</td>
+            <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${(obj.notes || '').replace(/'/g, "&apos;")}'>${lastNoteText}</div></td>
+            <td contenteditable="true" onblur="updateField(this, 'الفرصة', 11, '${obj.comp}', ${obj.id})">${obj.oppNum || ''}</td>
+            <td style="color:#64748b; font-weight:bold;">${obj.owner || 'أحمد'}</td>
+        `;
+    }
+
+    function autoSave() {
+        const rows = document.querySelectorAll('#salesBody tr');
+        const salesData = Array.from(rows).map(r => ({
+            id: r.cells[1].innerText.replace('#', ''),
+            type: r.cells[2].innerText,
+            date: r.cells[3].innerText,
+            comp: r.cells[4].innerText,
+            cr: r.cells[5].innerText,
+            crSub: r.cells[6].innerText,
+            status: r.cells[7].querySelector('select').value,
+            notes: r.cells[10].querySelector('.notes-preview').getAttribute('data-full-notes'),
+            oppNum: r.cells[11].innerText,
+            owner: r.cells[12].innerText
+        }));
+        localStorage.setItem('asgate_sales_db', JSON.stringify(salesData));
+        updateHeaderStats();
+    }
+
+    function openOrderModal() { document.getElementById('orderModal').style.display = 'flex'; }
+    function closeOrderModal() { 
+        document.getElementById('orderModal').style.display = 'none'; 
+        document.getElementById('mSearchField').value = "";
+        document.getElementById('mResults').style.display = 'none';
+        document.getElementById('mComp').value = "";
+        document.getElementById('mCr').value = "";
+        document.getElementById('mCrSub').value = "";
+        document.getElementById('mType').value = "";
+    }
+
+    function searchCustomerInModal(el) {
+        const query = el.value.toLowerCase().trim();
+        const resDiv = document.getElementById('mResults');
+        const customers = JSON.parse(localStorage.getItem(CUSTOMERS_STORAGE_KEY) || '[]');
+        
+        if (query.length < 1) { resDiv.style.display='none'; return; }
+
+        const filtered = customers.filter(c => {
+            const comp = (c.comp || "").toLowerCase();
+            const mainCr = (c.mainRecord || "").toLowerCase();
+            const subCr = (c.subRecord || "").toLowerCase();
+            return comp.includes(query) || mainCr.includes(query) || subCr.includes(query);
+        });
+
+        if (filtered.length > 0) {
+            resDiv.innerHTML = filtered.map(c => `
+                <div onclick="selectCustomer('${(c.comp || "").replace(/'/g, "\\'")}', '${c.mainRecord || ""}', '${c.subRecord || "-"}')">
+                    <strong>${c.comp}</strong> <br>
+                    <small>سجل رئيسي: ${c.mainRecord || "-"} | سجل فرعي: ${c.subRecord || "-"}</small>
+                </div>
+            `).join('');
+            resDiv.style.display = 'block';
+        } else { 
+            resDiv.innerHTML = '<div style="color:red; cursor:default;">لا يوجد عميل بهذا الاسم أو السجل</div>';
+            resDiv.style.display = 'block';
+        }
+    }
+
+    function selectCustomer(comp, cr, crSub) {
+        document.getElementById('mComp').value = comp;
+        document.getElementById('mCr').value = cr;
+        document.getElementById('mCrSub').value = crSub;
+        document.getElementById('mSearchField').value = comp;
+        document.getElementById('mResults').style.display = 'none';
+    }
+
+    function addOrderRow() {
+        const comp = document.getElementById('mComp').value;
+        if (!comp) return alert("اختر شركة أولاً");
+        const data = {
+            id: Math.floor(1000 + Math.random() * 8999),
+            type: document.getElementById('mType').value || '-',
+            date: getTodayFormatted(),
+            comp: comp,
+            cr: document.getElementById('mCr').value,
+            crSub: document.getElementById('mCrSub').value,
+            status: "جديد",
+            notes: "",
+            oppNum: "",
+            owner: "أحمد"
+        };
+        renderTableRow(data, true);
+        autoSave();
+        addGeneralLog("إنشاء طلب", "", data.type, comp, `إنشاء طلب مبيعات جديد برقم #${data.id}`);
+        closeOrderModal();
+    }
+
+    function updateField(el, fieldLabel, cellIdx, comp, orderId) {
+        const newVal = el.innerText.trim();
+        addGeneralLog(fieldLabel, "تعديل", newVal, comp, `تعديل ${fieldLabel} للطلب #${orderId}`);
+        autoSave();
+    }
+
+    function getLastNoteOnly(fullText) {
+        if (!fullText || fullText.trim() === "") return 'إضافة ملاحظة...';
+        const arr = fullText.split('\n--------------------\n');
+        const lastEntry = arr[arr.length - 1];
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = lastEntry;
+        
+        // إذا كانت الملاحظة تحتوي على ملف فقط، نعرض إشعاراً بذلك
+        const textPart = tempDiv.querySelector('.activity-text-part');
+        if (textPart) {
+            let pureText = textPart.innerText.replace(/📎 ملف مرفق: .*/g, '').trim();
+            if (pureText === "" && textPart.querySelector('.file-link')) {
+                return '📎 ملف مرفق';
+            }
+            return pureText || 'عرض السجل...';
+        }
+        return 'عرض السجل...';
+    }
+
+    function openNote(el) {
+        currentActivePreview = el;
+        const rawNotes = el.getAttribute('data-full-notes') || "";
+        document.getElementById('historyLog').innerHTML = rawNotes.split('\n--------------------\n').map(entry => `<div class="modal-activity-item">${entry}</div>`).join('');
+        document.getElementById('noteModal').style.display = "flex";
+        document.getElementById('modalTextArea').focus();
+        
+        // إعادة تهيئة حقل الملفات عند فتح النافذة
+        attachedFileData = null;
+        attachedFileName = "";
+        document.getElementById('modalFileInput').value = "";
+        document.getElementById('fileNamePreview').innerText = "";
+    }
+
+    function handleFileSelection(input) {
+        const file = input.files[0];
+        if (!file) return;
+        
+        // منع الملفات الكبيرة جداً للحفاظ على مساحة المقارنة في localStorage
+        if (file.size > 2 * 1024 * 1024) {
+            alert("حجم الملف كبير جداً! الحد الأقصى المسموح به هو 2 ميجابايت.");
+            input.value = "";
+            return;
+        }
+
+        attachedFileName = file.name;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            attachedFileData = e.target.result;
+            document.getElementById('fileNamePreview').innerText = `✔ ${file.name}`;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function saveNote() {
+        const newText = document.getElementById('modalTextArea').value.trim();
+        
+        if ((newText || attachedFileData) && currentActivePreview) {
+            let oldNotes = currentActivePreview.getAttribute('data-full-notes'] || "";
+            let fileHTML = "";
+            
+            if (attachedFileData) {
+                fileHTML = `<br><a href="${attachedFileData}" download="${attachedFileName}" class="file-link">📎 تحميل الملف المرفق (${attachedFileName})</a>`;
+            }
+
+            let newEntry = `${generateStyledHeader()}<span class="activity-text-part">${newText}${fileHTML}</span>`;
+            let updatedFullNotes = oldNotes === "" ? newEntry : oldNotes + "\n--------------------\n" + newEntry;
+            
+            currentActivePreview.setAttribute('data-full-notes', updatedFullNotes);
+            
+            // تحديث العرض المصغر في الجدول
+            if (newText) {
+                currentActivePreview.innerText = newText;
+            } else if (attachedFileData) {
+                currentActivePreview.innerText = "📎 ملف مرفق";
+            }
+
+            autoSave();
+            
+            let logText = newText ? newText : `إرفاق ملف: ${attachedFileName}`;
+            addGeneralLog("الملاحظات", "إضافة", logText, currentActivePreview.closest('tr').cells[4].innerText, "إضافة ملاحظة جديدة");
+        }
+        closeNote();
+    }
+
+    function closeNote() { 
+        document.getElementById('noteModal').style.display = "none"; 
+        document.getElementById('modalTextArea').value = ""; 
+        attachedFileData = null;
+        attachedFileName = "";
+        document.getElementById('modalFileInput').value = "";
+        document.getElementById('fileNamePreview').innerText = "";
+    }
+
+    function filterSalesTable() {
+        const q = document.getElementById('globalSearch').value.toLowerCase();
+        document.querySelectorAll('#salesBody tr').forEach(r => {
+            r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none";
+        });
+    }
+
+    function addGeneralLog(fieldName, oldVal, newVal, companyName, actionTextBase) {
+        const logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
+        const headerHTML = generateStyledHeader();
+        
+        // إزالة وسوم الروابط الطويلة في حال وجود ملف عند التخزين في سجل النشاط العام للاختصار
+        let cleanedVal = String(newVal).replace(/<br><a href=.*/g, ' [ملف مرفق]');
+        
+        const logHTML = `${headerHTML}<span class="activity-text-part">${actionTextBase} - [${cleanedVal}] (${companyName})</span>`;
+        logs.unshift(logHTML);
+        localStorage.setItem(LOGS_KEY, JSON.stringify(logs.slice(0, 100)));
+        renderGeneralLogs();
+    }
+
+    function renderGeneralLogs() {
+        const logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
+        document.getElementById('activityLogs').innerHTML = logs.map(l => `<div class="activity-item">${l}</div>`).join('');
+    }
+
+    function loadSalesFromStorage() {
+        let saved = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
+        const tbody = document.getElementById('salesBody');
+        tbody.innerHTML = "";
+        saved.sort((a, b) => b.date.localeCompare(a.date));
+        saved.forEach(item => renderTableRow(item));
+        updateHeaderStats();
+    }
+
+    window.onclick = (e) => {
+        if (!e.target.matches('.btn-bulk-trigger')) {
+            document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+        }
+    };
+</script>
+</body>
+</html>
