@@ -23,7 +23,7 @@
             --chat-yellow: #b45309;
         }
 
-        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; padding: 0; line-height: 1.2; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; padding: 0; line-height: 1.2; }
 
         .navbar { 
             background-color: var(--nav-bg); display: flex; align-items: center; padding: 0 20px; 
@@ -31,7 +31,7 @@
         }
         .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 13px; }
 
-        .main-container { flex: 1; display: flex; flex-direction: column; padding: 15px; overflow: hidden; }
+        .main-container { padding: 15px; height: calc(100vh - 45px); display: flex; flex-direction: column; box-sizing: border-box; }
 
         .header-section {
             background: var(--white); padding: 10px 20px; border-radius: 10px;
@@ -72,7 +72,7 @@
             text-align: center; font-size: 12px; font-weight: 700;
         }
 
-        /* سجل نشاط المبيعات - نسخة طبق الأصل */
+        /* تنسيق سجل النشاط (طبق الأصل من المبيعات) */
         .activity-log-section { 
             margin: 15px 0 0 0; padding: 12px 18px; background: #ffffff; border-radius: 10px; 
             border: 1px solid var(--border-color); box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
@@ -98,7 +98,7 @@
             background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; 
         }
         .modal-content { 
-            background: white; padding: 25px; border-radius: 12px; width: 350px; 
+            background: white; padding: 25px; border-radius: 12px; width: 380px; 
             display: flex; flex-direction: column; gap: 12px; 
         }
         .modal-content input, .modal-content select { 
@@ -140,7 +140,7 @@
         <div class="controls">
             <button class="btn btn-add" onclick="openModal()">+ إضافة منتج/خدمة</button>
             <button class="btn btn-export" onclick="exportToExcel()">تصدير Excel</button>
-            <input type="text" id="tableSearch" class="search-box" placeholder="بحث في المنتجات..." onkeyup="filterTable()">
+            <input type="text" id="tableSearch" class="search-box" placeholder="بحث في السيريال/المستخدم..." onkeyup="filterTable()">
             
             <select id="columnStatusFilter" class="search-box" style="width: 120px;" onchange="filterTable()">
                 <option value="all">كل الحالات</option>
@@ -157,7 +157,7 @@
                         <th style="width: 40px;"><input type="checkbox" onclick="toggleAll(this)"></th>
                         <th style="width: 15%;">النوع</th>
                         <th>اسم المنتج / الخدمة</th>
-                        <th style="width: 15%;">الرقم التسلسلي/المستخدم</th>
+                        <th style="width: 20%;">الرقم التسلسلي/المستخدم</th>
                         <th style="width: 8%;">الكمية</th>
                         <th style="width: 12%;">سعر الوحدة</th>
                         <th style="width: 12%;">الإجمالي</th>
@@ -170,7 +170,7 @@
         </div>
 
         <div class="activity-log-section">
-            <div class="activity-log-title">📋 سجل نشاط الطلب</div>
+            <div class="activity-log-title">📋 سجل نشاط المبيعات</div>
             <div id="activityLogs" class="activity-list"></div>
         </div>
     </div>
@@ -185,7 +185,10 @@
                 <option value="خدمة">خدمة</option>
             </select>
             <input type="text" id="p_name" placeholder="اسم المنتج/الخدمة">
-            <input type="text" id="p_serial" placeholder="الرقم التسلسلي / رقم الشريحة">
+            <div style="display:flex; gap:5px;">
+                <input type="text" id="p_serial" placeholder="الرقم التسلسلي" style="flex:1;">
+                <button id="auto_serial" onclick="document.getElementById('p_serial').value=Math.floor(Math.random()*1000000000)" style="padding:0 5px; font-size:10px; cursor:pointer;">Auto</button>
+            </div>
             <input type="text" id="p_user" placeholder="اسم المستخدم">
             <input type="number" id="p_qty" placeholder="الكمية" value="1">
             <input type="number" id="p_price" placeholder="سعر الوحدة">
@@ -208,7 +211,7 @@
 
         function initPage() {
             if (!currentOrderId) {
-                alert("خطأ: لم يتم تحديد رقم الطلب");
+                alert("خطأ في تحديد الطلب");
                 window.location.href = 'sales.html';
                 return;
             }
@@ -231,26 +234,26 @@
             return db[currentOrderId] || [];
         }
 
-        function saveProducts(arr) {
-            const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
-            db[currentOrderId] = arr;
-            localStorage.setItem('asgate_products_db', JSON.stringify(db));
-            renderProducts();
+        function calculateTotals() {
+            const data = getProducts();
+            let total = 0, completed = 0, pending = 0;
+            data.forEach(p => {
+                const line = p.qty * p.price;
+                total += line;
+                if(p.status === "مكتمل") completed += line;
+                if(p.status === "معلق") pending += line;
+            });
+            document.getElementById('total-amount').innerText = total.toFixed(2);
+            document.getElementById('total-completed').innerText = completed.toFixed(2);
+            document.getElementById('total-pending').innerText = pending.toFixed(2);
         }
 
         function renderProducts(filteredData = null) {
             const data = filteredData || getProducts();
             const tbody = document.getElementById('productBody');
             tbody.innerHTML = "";
-
-            let total = 0, completed = 0, pending = 0;
-
             data.forEach((p, index) => {
                 const lineTotal = p.qty * p.price;
-                total += lineTotal;
-                if (p.status === "مكتمل") completed += lineTotal;
-                if (p.status === "معلق") pending += lineTotal;
-
                 const row = tbody.insertRow();
                 row.innerHTML = `
                     <td><input type="checkbox" class="row-checkbox"></td>
@@ -270,16 +273,13 @@
                     <td><span class="delete-btn" onclick="deleteProduct(${index})">🗑</span></td>
                 `;
             });
-
-            document.getElementById('total-amount').innerText = total.toFixed(2);
-            document.getElementById('total-completed').innerText = completed.toFixed(2);
-            document.getElementById('total-pending').innerText = pending.toFixed(2);
+            calculateTotals();
         }
 
         function addProduct() {
             const name = document.getElementById('p_name').value;
             const price = document.getElementById('p_price').value;
-            if (!name || !price) return alert("يرجى ملء الاسم والسعر");
+            if (!name || !price) return alert("الاسم والسعر مطلوبان");
 
             const newProd = {
                 type: document.getElementById('p_type').value,
@@ -291,41 +291,44 @@
                 status: document.getElementById('p_status').value
             };
 
-            const current = getProducts();
-            current.push(newProd);
-            saveProducts(current);
+            const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+            if(!db[currentOrderId]) db[currentOrderId] = [];
+            db[currentOrderId].push(newProd);
+            localStorage.setItem('asgate_products_db', JSON.stringify(db));
             
             // إضافة سجل نشاط
-            addGeneralLog("بند جديد", "", newProd.name, "طلب #" + currentOrderId, `إضافة ${newProd.type}: ${newProd.name}`);
-            
+            const orderData = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]').find(o => o.id == currentOrderId);
+            addGeneralLog("بند جديد", "", newProd.name, orderData ? orderData.comp : "طلب #"+currentOrderId, `إضافة ${newProd.type}: ${newProd.name}`);
+
+            renderProducts();
             closeModal();
-            // تصفير الحقول
-            document.getElementById('p_name').value = "";
-            document.getElementById('p_serial').value = "";
-            document.getElementById('p_user').value = "";
-            document.getElementById('p_price').value = "";
         }
 
         function updateLineStatus(index, newStatus) {
-            const current = getProducts();
-            const oldStatus = current[index].status;
-            current[index].status = newStatus;
-            saveProducts(current);
+            const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+            const oldStatus = db[currentOrderId][index].status;
+            db[currentOrderId][index].status = newStatus;
+            localStorage.setItem('asgate_products_db', JSON.stringify(db));
             
-            addGeneralLog("الحالة", oldStatus, newStatus, "طلب #" + currentOrderId, `تحديث حالة البند: ${current[index].name}`);
+            const orderData = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]').find(o => o.id == currentOrderId);
+            addGeneralLog("الحالة", oldStatus, newStatus, orderData ? orderData.comp : "طلب #"+currentOrderId, `تحديث حالة البند: ${db[currentOrderId][index].name}`);
+            
+            renderProducts();
         }
 
         function deleteProduct(index) {
-            if (!confirm("هل أنت متأكد من الحذف؟")) return;
-            const current = getProducts();
-            const deletedName = current[index].name;
-            current.splice(index, 1);
-            saveProducts(current);
+            if(!confirm("هل أنت متأكد؟")) return;
+            const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+            const delName = db[currentOrderId][index].name;
+            db[currentOrderId].splice(index, 1);
+            localStorage.setItem('asgate_products_db', JSON.stringify(db));
             
-            addGeneralLog("حذف بند", deletedName, "محذوف", "طلب #" + currentOrderId, `حذف البند: ${deletedName}`);
+            const orderData = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]').find(o => o.id == currentOrderId);
+            addGeneralLog("حذف بند", delName, "محذوف", orderData ? orderData.comp : "طلب #"+currentOrderId, `حذف البند: ${delName}`);
+            
+            renderProducts();
         }
 
-        // دالة إنشاء الهيدر للسجل (نفس المبيعات)
         function generateStyledHeader() {
             const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
             const d = new Date();
@@ -352,20 +355,18 @@
             const q = document.getElementById('tableSearch').value.toLowerCase();
             const currentStatusFilterValue = document.getElementById('columnStatusFilter').value;
             const db = getProducts();
-            
             const searchFiltered = db.filter(p => {
-                const matchesSearch = (p.name||'').toLowerCase().includes(q) || (p.serial||'').toLowerCase().includes(q) || (p.user||'').toLowerCase().includes(q);
+                const matchesSearch = (p.serial||'').toLowerCase().includes(q) || (p.user||'').toLowerCase().includes(q) || (p.name||'').toLowerCase().includes(q);
                 const matchesColumnStatus = (currentStatusFilterValue === "all" || p.status === currentStatusFilterValue);
                 return matchesSearch && matchesColumnStatus;
             });
-            
             renderProducts(searchFiltered);
         }
 
         function toggleAll(s) { 
             document.querySelectorAll('.row-checkbox').forEach(c => c.checked = s.checked); 
         }
-        
+
         function openModal() { document.getElementById('productModal').style.display = 'flex'; handleTypeChange(); }
         function closeModal() { document.getElementById('productModal').style.display = 'none'; }
         
@@ -373,15 +374,15 @@
             const type = document.getElementById('p_type').value;
             const isMobile = (type === "جوال" || type === "بيانات");
             document.getElementById('p_serial').disabled = !isMobile;
+            document.getElementById('auto_serial').disabled = !isMobile;
         }
 
         function exportToExcel() {
             const db = getProducts();
-            if(db.length === 0) return alert("لا توجد بيانات للتصدير");
             const ws = XLSX.utils.json_to_sheet(db);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Details");
-            XLSX.writeFile(wb, `Order_${currentOrderId}_Details.xlsx`);
+            XLSX.writeFile(wb, `Order_${currentOrderId}.xlsx`);
         }
     </script>
 </body>
