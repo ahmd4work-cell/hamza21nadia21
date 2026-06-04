@@ -116,7 +116,6 @@
         .status-moallaq { background-color: var(--warning-yellow) !important; color: #854d0e !important; }
         .status-mortaja { background-color: var(--soft-red) !important; color: #991b1b !important; }
 
-        /* تعديل ارتفاع سجل النشاط إلى 140px بناءً على الطلب */
         .activity-log-section { 
             margin: 0; padding: 8px 18px; background: #ffffff; border-radius: 10px; 
             border: 1px solid var(--border-color); box-shadow: 0 -3px 10px rgba(0,0,0,0.05);
@@ -127,9 +126,11 @@
         .activity-list { flex: 1; overflow-y: auto; font-size: 10px; line-height: 1.5; }
         .activity-item { margin-bottom: 3px; border-bottom: 1px dashed #f8fafc; padding-bottom: 3px; color: #475569; display: flex; flex-direction: column; text-align: right; white-space: pre-wrap; }
         
-        .activity-header-part { font-size: 10px; color: var(--chat-yellow); font-weight: 800; display: block; margin-bottom: 2px; }
+        /* التنسيق الخاص بسجل النشاط ليكون سطراً واحداً */
+        .activity-row-inline { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .activity-header-part { font-size: 10px; color: var(--chat-yellow); font-weight: 800; display: inline-block; }
         .activity-time-part { font-size: 10px; font-weight: normal; color: #64748b; }
-        .activity-text-part { font-size: 11px; color: #1e293b; font-weight: 700; display: block; padding-right: 5px; }
+        .activity-text-part { font-size: 11px; color: #1e293b; font-weight: 700; display: inline-block; }
 
         .notes-preview { 
             width: 95%; height: 20px; border: none; background: transparent; font-family: 'Cairo'; 
@@ -294,23 +295,34 @@
             return `${year}-${month}-${day}`;
         }
 
-        function generateStyledHeader() {
+        // تم تعديل هذه الدالة للملاحظات المنبثقة لتبقى كما هي منفصلة الأسطر عند عرضها بداخل المودال
+        function generateStyledHeaderForNotes() {
             const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
             const d = new Date();
             const timeFormatted = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
             return `<span class="activity-header-part">👤 أحمد  🗓️ ${days[d.getDay()]}  ${getTodayFormatted()}  <span class="activity-time-part">${timeFormatted}</span></span>`;
         }
 
-        // تم التعديل لاستخدام رقم الخدمة كمعرف للمنتج في السجل
+        // دالة إنشاء الهيدر الخطي المخصص لسجل النشاط الرئيسي ليكون بجوار النص
+        function generateInlineHeaderHTML() {
+            const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+            const d = new Date();
+            const timeFormatted = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+            return `<span class="activity-header-part">👤 أحمد &nbsp;🗓️ ${days[d.getDay()]} &nbsp;${getTodayFormatted()} &nbsp;<span class="activity-time-part">${timeFormatted}</span></span>`;
+        }
+
+        // بناء سطر سجل النشاط ليكون خطياً متصلاً بالكامل (بجوار العنوان وليس تحته)
         function addToActivityLog(fieldName, oldVal, newVal, productIdentifier) {
             if (oldVal === newVal) return;
-            const headerHTML = generateStyledHeader();
+            const headerHTML = generateInlineHeaderHTML();
             const cleanId = (productIdentifier && String(productIdentifier).trim() !== "") ? productIdentifier : "بدون رقم";
             const val1 = (oldVal && String(oldVal).trim() !== "") ? oldVal : "فارغ";
             const val2 = (newVal && String(newVal).trim() !== "") ? newVal : "فارغ";
             
             let actionText = fieldName === "إجراء" ? `حذف منتج (${cleanId})` : `تغيير ${fieldName} من [${val1}] إلى [${val2}] للمنتج (${cleanId})`;
-            const fullLogHTML = `${headerHTML}<span class="activity-text-part">${actionText}</span>`;
+            
+            // دمج الهيدر مع النص في حاوية واحدة مرنة لمنع النزول لسطر جديد
+            const fullLogHTML = `<div class="activity-row-inline">${headerHTML} &nbsp; <span class="activity-text-part">${actionText}</span></div>`;
             
             let logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
             logs.unshift(fullLogHTML);
@@ -370,7 +382,6 @@
 
                 const notes = p.note || '';
                 const lastNoteText = getLastNoteOnly(notes);
-                // تحديد المعرف (رقم الخدمة أو السريال) ليتم استخدامه في سجل النشاط
                 const pIden = p.mobile || p.serial || p.name;
 
                 let dynamic = (p.type === "جوال" || p.type === "بيانات") ? `
@@ -482,11 +493,12 @@
             document.getElementById('modalTextArea').focus();
         }
 
+        // الحفاظ على طريقة معالجة وتخزين سجل الملاحظات والمتابعة المنفصل دون مساس
         function saveNote() {
             const newText = document.getElementById('modalTextArea').value.trim();
             if (newText && currentActivePreview && currentActiveOriginalIndex !== null) {
                 let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
-                let newEntry = `${generateStyledHeader()}<span class="activity-text-part">${newText}</span>`;
+                let newEntry = `${generateStyledHeaderForNotes()}<span class="activity-text-part">${newText}</span>`;
                 let updatedFullNotes = oldNotes === "" ? newEntry : oldNotes + "\n--------------------\n" + newEntry;
                 currentActivePreview.setAttribute('data-full-notes', updatedFullNotes);
                 currentActivePreview.innerText = newText;
