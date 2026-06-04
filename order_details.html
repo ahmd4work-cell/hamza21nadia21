@@ -480,25 +480,14 @@
             syncSumsToSales(); renderProducts();
         }
 
-        function handleSmartPaste(e, fieldName, startIdx) {
-            e.preventDefault();
-            const pastedText = (e.clipboardData || window.clipboardData).getData('text');
-            const rows = pastedText.split(/\r\n|\n|\r/).filter(line => line.trim() !== "");
-            if (rows.length > 0) {
-                let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
-                let items = db[currentOrderId] || [];
-                rows.forEach((value, i) => {
-                    let targetIdx = startIdx + i;
-                    if (items[targetIdx] && !["مكتمل", "تم التوثيق", "معلق"].includes(items[targetIdx].status) && items[targetIdx].status !== "فقدان") {
-                        if (items[targetIdx][fieldName] !== value.trim()) {
-                            addToActivityLog(fieldName === 'serial' ? 'رقم السريال' : (fieldName === 'mobile' ? 'رقم الخدمة' : 'المستخدم'), items[targetIdx][fieldName], value.trim(), items[targetIdx].name);
-                            items[targetIdx][fieldName] = value.trim();
-                            items[targetIdx].updatedAt = Date.now();
-                        }
-                    }
+        function handleSmartPaste(event, field, startIdx) {
+            event.preventDefault();
+            const text = event.clipboardData.getData('text');
+            const lines = text.split(/\r?\n/).filter(l => l.trim() !== "");
+            if (lines.length > 0) {
+                lines.forEach((line, i) => {
+                    updateField(startIdx + i, field, line);
                 });
-                localStorage.setItem('asgate_products_db', JSON.stringify(db));
-                renderProducts();
             }
         }
 
@@ -516,8 +505,8 @@
             if (newText && currentActivePreview && currentActiveOriginalIndex !== null) {
                 let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
                 
-                // التعديل: إضافة ستايل لجعل النص يبدأ من أول السطر
-                let newEntry = `${generateStyledHeader()}<span class="activity-text-part" style="display: block; text-align: right; width: 100%;">${newText}</span>`;
+                // إضافة <br> لضمان النزول لسطر جديد لنص الملاحظة
+                let newEntry = `${generateStyledHeader()}<br><span class="activity-text-part">${newText}</span>`;
                 
                 let updatedFullNotes = oldNotes === "" ? newEntry : oldNotes + "\n--------------------\n" + newEntry;
                 
