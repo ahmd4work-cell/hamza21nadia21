@@ -89,18 +89,14 @@
             border: none; 
         }
 
-        /* تعديل رأس الفلتر المصغر لعمود الحالة */
         .status-header-filter {
             display: block; width: 95%; margin: 2px auto 0 auto; font-family: 'Cairo'; font-size: 9px; padding: 1px; border-radius: 4px; border: 1px solid var(--border-color); outline: none; color: var(--text-dark);
         }
         
-        /* تعديل ارتفاع الصفوف الافتراضي إلى 30 بيكسل */
         td { border: 0.5px solid var(--light-border); text-align: center; height: 30px; line-height: 30px; font-size: 13px; font-weight: 500; color: var(--text-dark); padding: 0 5px; overflow: visible; white-space: nowrap; position: relative; }
         
-        /* ضبط السلكت ليتناسب مع الارتفاع الجديد للصف */
         .status-select { font-family: 'Cairo'; font-size: 10px; font-weight: 700; padding: 2px; border-radius: 6px; width: 95%; cursor: pointer; border: 1px solid var(--border-color); height: 24px; }
 
-        /* ستايل مخصص لخلية الفقدان عند اختيارها: أحمر غامق بارتفاع صف 20 بيكسل */
         .row-is-lost td { height: 20px; line-height: 20px; }
         .row-is-lost .status-select-lost { background-color: #8b0000 !important; color: white !important; }
         .row-is-lost .status-select { height: 18px; padding: 0px; }
@@ -298,13 +294,11 @@
     <script>
         let currentOrderId = new URLSearchParams(window.location.search).get('id');
         const statusOptions = ["جديد", "مكتمل", "تم التوثيق", "معلق", "جاهز", "مرتجع", "فقدان"];
-        const statusOrderWeight = { "مكتمل": 1, "تم التوثيق": 2, "معلق": 3, "جاهز": 4, "جديد": 5, "مرتجع": 6, "فقدان": 7 };
         
         let currentActivePreview = null;
         let currentActiveOriginalIndex = null;
         const LOGS_KEY = 'asgate_order_logs_' + currentOrderId;
         
-        // متغير عالمي لحفظ قيمة الفلتر المحددة لعمود الحالة
         let currentStatusFilterValue = "all";
 
         function getTodayFormatted() {
@@ -359,20 +353,20 @@
             const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             let baseItems = db[currentOrderId] || [];
             
-            // تطبيق فلتر الحالة أولاً إذا تم تحديده من العمود
             if (currentStatusFilterValue !== "all") {
                 baseItems = baseItems.filter(p => p.status === currentStatusFilterValue);
             }
             
             let items = (filtered || baseItems).map((p, i) => ({...p, originalIndex: i}));
             
-            // ترتيب مخصص: الحفاظ على الترتيب الأصلي للوزن، وفقدان يسقط دائماً في الأسفل تماماً
+            // تعديل منطق الترتيب: فرز الأحدث فالأحدث بناء على معرف العنصر (id / updatedAt)، مع إسقاط حالة "فقدان" لأسفل الجدول تماماً
             items.sort((a, b) => {
                 if (a.status === "فقدان" && b.status !== "فقدان") return 1;
                 if (a.status !== "فقدان" && b.status === "فقدان") return -1;
-                let wA = statusOrderWeight[a.status] || 99;
-                let wB = statusOrderWeight[b.status] || 99;
-                return wA - wB;
+                // في حال تساوت الحالة (كلاهما ليس فقدان أو كلاهما فقدان)، يظهر الأحدث أولاً (الـ id أو الـ updatedAt الأكبر)
+                let timeA = a.updatedAt || a.id || 0;
+                let timeB = b.updatedAt || b.id || 0;
+                return timeB - timeA;
             });
             
             updateTableHeaders(items.length > 0 ? items[0].type : "جوال");
@@ -384,7 +378,6 @@
                 let sClass = p.status === "مكتمل" ? "status-mektamel" : (p.status === "تم التوثيق" ? "status-tawtheeq" : (p.status === "معلق" ? "status-moallaq" : (p.status === "مرتجع" ? "status-mortaja" : "")));
                 const isLocked = ["مكتمل", "تم التوثيق", "معلق"].includes(p.status);
                 
-                // تفعيل كلاس الفقدان الخاص بالارتفاع واللون
                 const isLost = p.status === "فقدان";
                 if(isLost) sClass = "status-select-lost";
 
@@ -604,11 +597,11 @@
             
             if(isAuto && hasSerial && serial !== "") {
                 for(let i=0; i<qty; i++){ 
-                    db[currentOrderId].push({ type, name, qty:1, sub, serial, status:"جديد", date:new Date().toLocaleDateString('en-GB'), updatedAt:Date.now(), note: "" });
+                    db[currentOrderId].push({ id: Date.now() + i, type, name, qty:1, sub, serial, status:"جديد", date:new Date().toLocaleDateString('en-GB'), updatedAt:Date.now(), note: "" });
                     serial = serial.replace(/(\d+)(?!.*\d)/, n => (BigInt(n)+1n).toString().padStart(n.length, '0')); 
                 }
             } else { 
-                db[currentOrderId].push({ type, name, qty, sub, serial:(hasSerial?serial:""), status:"جديد", date:new Date().toLocaleDateString('en-GB'), updatedAt:Date.now(), note: "" }); 
+                db[currentOrderId].push({ id: Date.now(), type, name, qty, sub, serial:(hasSerial?serial:""), status:"جديد", date:new Date().toLocaleDateString('en-GB'), updatedAt:Date.now(), note: "" }); 
             }
             
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
@@ -620,7 +613,6 @@
             const q = document.getElementById('liveSearch').value.toLowerCase();
             const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
             
-            // فلترة بناء على نص البحث ومراعاة فلتر عمود الحالة المُخزن
             const searchFiltered = db.filter(p => {
                 const matchesSearch = (p.serial||'').toLowerCase().includes(q) || (p.user||'').toLowerCase().includes(q);
                 const matchesColumnStatus = (currentStatusFilterValue === "all" || p.status === currentStatusFilterValue);
