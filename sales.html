@@ -96,11 +96,13 @@
             text-align: center; border-bottom: 2px solid #2e1065; position: sticky; top: 0; z-index: 50; height: 40px;
         }
         
-        /* تعديل ارتفاع الصفوف الافتراضي والحد الأقصى إلى 35 بيكسل */
-        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 35px; max-height: 35px; font-size: 11px; font-weight: 600; white-space: nowrap; position: relative; }
+        /* تعديل ارتفاع الصفوف الافتراضي الصارم إلى 35 بيكسل لجميع الخلايا */
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 35px; max-height: 35px; font-size: 11px; font-weight: 600; white-space: nowrap; position: relative; transition: height 0.2s ease, max-height 0.2s ease; }
         
-        /* فئة مخصصة عندما تكون الحالة فقدان ليتحول الارتفاع إلى 20 بيكسل */
-        tbody tr.row-lost td { height: 20px; max-height: 20px; }
+        /* فئة مخصصة لتصغير ارتفاع الصف كاملاً إلى 20 بيكسل عند اختيار حالة فقدان */
+        .lost-row td { height: 20px !important; max-height: 20px !important; font-size: 10.5px; }
+        .lost-row .status-select { padding: 1px 4px; }
+        .lost-row .notes-preview { height: 16px; font-size: 10px; }
 
         tbody tr:nth-child(even) { background-color: #eff6ff; }
         
@@ -114,7 +116,7 @@
         .status-select[data-val="معلق"] { background: #fef9c3; color: #854d0e; border-color: #fef08a; }
         .status-select[data-val="مرتجع"] { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
         .status-select[data-val="جاهز"] { background: #e0f2fe; color: #075985; border-color: #bae6fd; }
-        .status-select[data-val="فقدان"] { background: #cbd5e1; color: #334155; border-color: #94a3b8; }
+        .status-select[data-val="فقدان"] { background: #e2e8f0; color: #475569; border-color: #cbd5e1; }
 
         .notes-preview { 
             width: 95%; height: 20px; border: none; background: transparent; font-family: 'Cairo'; 
@@ -207,10 +209,10 @@
             <div class="bulk-action-wrapper">
                 <button class="btn-bulk-trigger" onclick="toggleDropdown(event, this)">إجراء ▾</button>
                 <div class="dropdown-menu">
-                    <button onclick="triggerBulkAction('تغيير المالك')">تغيير المالك</button>
-                    <button onclick="triggerBulkAction('تعديل')">تعديل</button>
-                    <button onclick="triggerBulkAction('تصدير')">تصدير</button>
-                    <button onclick="triggerBulkAction('طباعة')">طباعة</button>
+                    <button onclick="executeAction('تغيير المالك')">تغيير المالك</button>
+                    <button onclick="executeAction('تعديل')">تعديل</button>
+                    <button onclick="executeAction('تصدير')">تصدير</button>
+                    <button onclick="executeAction('طباعة')">طباعة</button>
                 </div>
             </div>
         </div>
@@ -266,7 +268,7 @@
 
 <div id="orderModal" class="modal">
     <div class="order-modal-card">
-        <div style="font-weight: 800; margin-bottom: 15px; text-align: center;">إنشاءطلب مبيعات جديد</div>
+        <div style="font-weight: 800; margin-bottom: 15px; text-align: center;">إنشاء طلب مبيعات جديد</div>
         <div class="form-group">
             <label>البحث بالاسم أو السجل</label>
             <input type="text" id="mSearchField" onkeyup="searchCustomerInModal(this)" placeholder="ابحث هنا..." autocomplete="off">
@@ -355,13 +357,12 @@
         return { completed, pending };
     }
 
-    // تفعيل وظيفة النشر لزر إجراء من القائمة المنسدلة للعمليات الجماعية
-    function triggerBulkAction(actionName) {
-        if(actionName === 'طباعة') {
-            addGeneralLog('زر اجراء', 'طلب إجراء', 'طباعة الصفحة', 'النظام العام', 'تنفيذ عملية طباعة مستند المبيعات');
+    // تفعيل وظيفة النشر لزر إجراء من القائمة المنسدلة للعمليات الجماعية مع التوثيق المباشر
+    function executeAction(actionName) {
+        addGeneralLog('زر اجراء', 'طلب إجراء جماعي', actionName, 'النظام العام', `تنفيذ الإجراء: ${actionName}`);
+        if (actionName === 'طباعة') {
             window.print();
         } else {
-            addGeneralLog('زر اجراء', 'طلب إجراء', actionName, 'النظام العام', `تنفيذ عملية جماعية: ${actionName}`);
             alert(actionName);
         }
     }
@@ -373,17 +374,17 @@
         const statusOptions = ["مكتمل", "معلق", "مرتجع", "جاهز", "جديد", "فقدان"];
         const lastNoteText = getLastNoteOnly(obj.notes || "");
         
-        // التحقق الفوري لتبديل الارتفاع إلى 20 بيكسل إذا كانت الحالة المحملة فقدان
+        // التحقق من حالة الفقدان عند بناء الصف لتطبيق الـ 20 بيكسل مباشرة
         if (obj.status === "فقدان") {
-            row.classList.add('row-lost');
+            row.classList.add('lost-row');
         } else {
-            row.classList.remove('row-lost');
+            row.classList.remove('lost-row');
         }
         
         row.innerHTML = `
             <td><input type="checkbox" class="select-check"></td>
             <td><a href="order_details.html?id=${obj.id}" class="order-link">#${obj.id}</a></td>
-            <td contenteditable="true" onfocus="this.setAttribute('data-old', this.innerText)" onblur="if(this.getAttribute('data-old')!=this.innerText){ updateField(this, 'اسم الطلب', obj.comp, obj.id); }">${obj.type}</td>
+            <td contenteditable="true" onfocus="this.setAttribute('data-old', this.innerText)" onblur="if(this.getAttribute('data-old') !== this.innerText) { updateField(this, 'اسم الطلب', '${obj.comp}', ${obj.id}); }">${obj.type}</td>
             <td style="color:#64748b;">${obj.date}</td>
             <td>${obj.comp}</td>
             <td>${obj.cr}</td>
@@ -392,16 +393,16 @@
                 <select class="status-select" data-val="${obj.status}"
                         onfocus="this.setAttribute('data-old', this.value)" 
                         onchange="this.setAttribute('data-val', this.value); 
-                                 if(this.value==='فقدان'){ this.closest('tr').classList.add('row-lost'); } else { this.closest('tr').classList.remove('row-lost'); }
+                                 if(this.value === 'فقدان') { this.closest('tr').classList.add('lost-row'); } else { this.closest('tr').classList.remove('lost-row'); }
                                  addGeneralLog('الحالة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[4].innerText, 'تغيير حالة الطلب #' + ${obj.id}); autoSave();">
                     ${statusOptions.map(opt => `<option value="${opt}" ${obj.status === opt ? 'selected' : ''}>${opt}</option>`).join('')}
                 </select>
             </td>
-            <td style="color:#16a34a; font-weight:800;">${sums.completed.toFixed(2)}</td>
-            <td style="color:#dc2626; font-weight:800;">${sums.pending.toFixed(2)}</td>
+            <td style="color:#16a34a; font-weight:800;" data-field="مكتمل">${sums.completed.toFixed(2)}</td>
+            <td style="color:#dc2626; font-weight:800;" data-field="معلق">${sums.pending.toFixed(2)}</td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${(obj.notes || '').replace(/'/g, "&apos;")}'>${lastNoteText}</div></td>
-            <td contenteditable="true" onfocus="this.setAttribute('data-old', this.innerText)" onblur="if(this.getAttribute('data-old')!=this.innerText){ updateField(this, 'الفرصة', obj.comp, obj.id); }">${obj.oppNum || ''}</td>
-            <td style="color:#64748b; font-weight:bold;">${obj.owner || 'أحمد'}</td>
+            <td contenteditable="true" onfocus="this.setAttribute('data-old', this.innerText)" onblur="if(this.getAttribute('data-old') !== this.innerText) { updateField(this, 'الفرصة', '${obj.comp}', ${obj.id}); }">${obj.oppNum || ''}</td>
+            <td style="color:#64748b; font-weight:bold;" data-field="المالك">${obj.owner || 'أحمد'}</td>
         `;
     }
 
@@ -486,13 +487,14 @@
             owner: "أحمد"
         };
         
-        // عند إضافة سطر جديد، نقوم بإعادة الفرز مباشرة ليظهر الأحدث بالأعلى دائماً
         let saved = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
         saved.push(data);
         localStorage.setItem('asgate_sales_db', JSON.stringify(saved));
         
+        // إعادة تحميل الجدول مباشرة لفرز العنصر الجديد في مكان الترتيب الصحيح بالأعلى
         loadSalesFromStorage();
         
+        // النشر لعمود "اسم الطلب" عند الإنشاء الجديد
         addGeneralLog("اسم الطلب", "", data.type, comp, `إنشاء طلب مبيعات جديد برقم #${data.id}`);
         closeOrderModal();
     }
@@ -501,7 +503,7 @@
         const newVal = el.innerText.trim();
         const oldVal = el.getAttribute('data-old') || "";
         
-        // التحقق من الأعمدة المسموح لها بالنشر في سجل النشاط بناءً على رغبتك
+        // تصفية صارمة للأعمدة المطلوبة للنشر فقط دون غيرها
         const allowedFields = ["اسم الطلب", "الحالة", "مكتمل", "معلق", "الفرصة", "المالك", "زر اجراء"];
         if (allowedFields.includes(fieldLabel)) {
             addGeneralLog(fieldLabel, oldVal, newVal, comp, `تعديل ${fieldLabel} للطلب #${orderId}`);
@@ -583,11 +585,13 @@
 
             autoSave();
             
-            let logText = newText ? newText : `إرفاق ملف: ${attachedFileName}`;
-            // حصر الملاحظات وتحديث المجاميع المرتبطة بـ (مكتمل / معلق) للنشر ضمن الشروط المحددة
-            const sums = calculateOrderSums(currentActivePreview.closest('tr').cells[1].innerText.replace('#', ''));
-            addGeneralLog("مكتمل", "تحديث", sums.completed.toFixed(2), currentActivePreview.closest('tr').cells[4].innerText, "تحديث قيم الملاحظات والمجاميع المكتملة للطلب");
-            addGeneralLog("معلق", "تحديث", sums.pending.toFixed(2), currentActivePreview.closest('tr').cells[4].innerText, "تحديث قيم الملاحظات والمجاميع المعلقة للطلب");
+            // عند تعديل الملاحظات تتأثر مجاميع الأعمدة (مكتمل / معلق)، هنا نضمن نشرها في السجل الموحد
+            const compName = currentActivePreview.closest('tr').cells[4].innerText;
+            const currentOrderId = currentActivePreview.closest('tr').cells[1].innerText.replace('#', '');
+            const updatedSums = calculateOrderSums(currentOrderId);
+            
+            addGeneralLog("مكتمل", "", updatedSums.completed.toFixed(2), compName, `تحديث القيمة المستحقة المكتملة للطلب #${currentOrderId}`);
+            addGeneralLog("معلق", "", updatedSums.pending.toFixed(2), compName, `تحديث القيمة المستحقة المعلقة للطلب #${currentOrderId}`);
         }
         closeNote();
     }
@@ -609,7 +613,7 @@
     }
 
     function addGeneralLog(fieldName, oldVal, newVal, companyName, actionTextBase) {
-        // التحقق من الأعمدة المسموح بالنشر لها فقط بناءً على طلبك
+        // حظر النشر لأي حقل خارج الفلاتر السبعة المعتمدة
         const allowedFields = ["اسم الطلب", "الحالة", "مكتمل", "معلق", "الفرصة", "المالك", "زر اجراء"];
         if (!allowedFields.includes(fieldName)) return;
 
@@ -634,7 +638,7 @@
         const tbody = document.getElementById('salesBody');
         tbody.innerHTML = "";
         
-        // الترتيب ليظهر في الأعلى الأحدث حسب / تاريخ الإنشاء بشكل تنازلي دائم
+        // فرز وترتيب العناصر بشكل صارم حسب الأحدث من حيث تاريخ الإنشاء للظهور بالأعلى دائماً
         saved.sort((a, b) => b.date.localeCompare(a.date));
         
         saved.forEach(item => renderTableRow(item));
