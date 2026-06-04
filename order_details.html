@@ -82,8 +82,9 @@
         .table-wrapper { background: white; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: visible; margin-bottom: 20px; }
         table { width: 100%; border-collapse: collapse; min-width: 1100px; font-family: 'Calibri', sans-serif; table-layout: fixed; }
         
+        /* تعديل ارتفاع شريط العناوين الأخضر إلى 45 بيكسل */
         thead th { 
-            background-color: var(--header-green); height: 37px; line-height: 37px;
+            background-color: var(--header-green); height: 45px; line-height: 45px;
             padding: 0 5px; color: white; font-size: 11px; font-weight: 800; text-align: center; 
             position: sticky; top: 174px; z-index: 1300; font-family: 'Cairo'; 
             border: none; 
@@ -93,10 +94,12 @@
             display: block; width: 95%; margin: 2px auto 0 auto; font-family: 'Cairo'; font-size: 9px; padding: 1px; border-radius: 4px; border: 1px solid var(--border-color); outline: none; color: var(--text-dark);
         }
         
-        td { border: 0.5px solid var(--light-border); text-align: center; height: 30px; line-height: 30px; font-size: 13px; font-weight: 500; color: var(--text-dark); padding: 0 5px; overflow: visible; white-space: nowrap; position: relative; }
+        /* تعديل الارتفاع الافتراضي لصفوف الجدول إلى 35 بيكسل */
+        td { border: 0.5px solid var(--light-border); text-align: center; height: 35px; line-height: 35px; font-size: 13px; font-weight: 500; color: var(--text-dark); padding: 0 5px; overflow: visible; white-space: nowrap; position: relative; }
         
         .status-select { font-family: 'Cairo'; font-size: 10px; font-weight: 700; padding: 2px; border-radius: 6px; width: 95%; cursor: pointer; border: 1px solid var(--border-color); height: 24px; }
 
+        /* تعديل الارتفاع لصفوف الفقدان لتكون 20 بيكسل */
         .row-is-lost td { height: 20px; line-height: 20px; }
         .row-is-lost .status-select-lost { background-color: #8b0000 !important; color: white !important; }
         .row-is-lost .status-select { height: 18px; padding: 0px; }
@@ -126,7 +129,6 @@
         .activity-list { flex: 1; overflow-y: auto; font-size: 10px; line-height: 1.5; }
         .activity-item { margin-bottom: 3px; border-bottom: 1px dashed #f8fafc; padding-bottom: 3px; color: #475569; display: flex; flex-direction: column; text-align: right; white-space: pre-wrap; }
         
-        /* التنسيق الخاص بسجل النشاط ليكون سطراً واحداً */
         .activity-row-inline { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
         .activity-header-part { font-size: 10px; color: var(--chat-yellow); font-weight: 800; display: inline-block; }
         .activity-time-part { font-size: 10px; font-weight: normal; color: #64748b; }
@@ -295,7 +297,6 @@
             return `${year}-${month}-${day}`;
         }
 
-        // تم تعديل هذه الدالة للملاحظات المنبثقة لتبقى كما هي منفصلة الأسطر عند عرضها بداخل المودال
         function generateStyledHeaderForNotes() {
             const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
             const d = new Date();
@@ -303,7 +304,6 @@
             return `<span class="activity-header-part">👤 أحمد  🗓️ ${days[d.getDay()]}  ${getTodayFormatted()}  <span class="activity-time-part">${timeFormatted}</span></span>`;
         }
 
-        // دالة إنشاء الهيدر الخطي المخصص لسجل النشاط الرئيسي ليكون بجوار النص
         function generateInlineHeaderHTML() {
             const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
             const d = new Date();
@@ -311,7 +311,6 @@
             return `<span class="activity-header-part">👤 أحمد &nbsp;🗓️ ${days[d.getDay()]} &nbsp;${getTodayFormatted()} &nbsp;<span class="activity-time-part">${timeFormatted}</span></span>`;
         }
 
-        // بناء سطر سجل النشاط ليكون خطياً متصلاً بالكامل (بجوار العنوان وليس تحته)
         function addToActivityLog(fieldName, oldVal, newVal, productIdentifier) {
             if (oldVal === newVal) return;
             const headerHTML = generateInlineHeaderHTML();
@@ -321,7 +320,6 @@
             
             let actionText = fieldName === "إجراء" ? `حذف منتج (${cleanId})` : `تغيير ${fieldName} من [${val1}] إلى [${val2}] للمنتج (${cleanId})`;
             
-            // دمج الهيدر مع النص في حاوية واحدة مرنة لمنع النزول لسطر جديد
             const fullLogHTML = `<div class="activity-row-inline">${headerHTML} &nbsp; <span class="activity-text-part">${actionText}</span></div>`;
             
             let logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
@@ -455,7 +453,7 @@
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             let item = db[currentOrderId][idx];
             const oldS = item.status;
-            if (["مكتمل", "تم التوثيق", "معلق"].includes(s) && !confirm("تنبيه: سيتم قفل هذا الصف. هل أنت متأكد؟")) { renderProducts(); return; }
+            if (["مكتمل", "تم التوثيق", "معلق"].includes(s) && !confirm("تنبيه: سيتم قفل هذا صف. هل أنت متأكد؟")) { renderProducts(); return; }
             
             const pIden = item.mobile || item.serial || item.name;
             addToActivityLog('الحالة', oldS, s, pIden);
@@ -493,7 +491,6 @@
             document.getElementById('modalTextArea').focus();
         }
 
-        // الحفاظ على طريقة معالجة وتخزين سجل الملاحظات والمتابعة المنفصل دون مساس
         function saveNote() {
             const newText = document.getElementById('modalTextArea').value.trim();
             if (newText && currentActivePreview && currentActiveOriginalIndex !== null) {
