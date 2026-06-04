@@ -84,7 +84,7 @@
         
         thead th { 
             background-color: var(--header-green); 
-            height: 30px; /* تم تقليل الارتفاع هنا */
+            height: 30px; 
             line-height: 30px;
             padding: 0 5px; color: white; font-size: 11px; font-weight: 800; text-align: center; 
             position: sticky; top: 174px; z-index: 1300; font-family: 'Cairo'; 
@@ -98,10 +98,6 @@
         td { border: 0.5px solid var(--light-border); text-align: center; height: 35px; line-height: 35px; font-size: 13px; font-weight: 500; color: var(--text-dark); padding: 0 5px; overflow: visible; white-space: nowrap; position: relative; }
         
         .status-select { font-family: 'Cairo'; font-size: 10px; font-weight: 700; padding: 2px; border-radius: 6px; width: 95%; cursor: pointer; border: 1px solid var(--border-color); height: 24px; }
-
-        .row-is-lost td { height: 20px; line-height: 20px; }
-        .row-is-lost .status-select-lost { background-color: #8b0000 !important; color: white !important; }
-        .row-is-lost .status-select { height: 18px; padding: 0px; }
 
         .row-checkbox { width: 16px; height: 16px; cursor: pointer; }
 
@@ -124,7 +120,7 @@
             position: sticky; bottom: 0; z-index: 1450;
         }
         .activity-log-title { color: var(--dark-yellow); font-size: 13.5px; font-weight: 800; margin-bottom: 5px; border-bottom: 1px solid #f1f5f9; padding-bottom: 4px; flex-shrink: 0; }
-        .activity-list { flex: 1; overflow-y: auto; font-size: 10px; line-height: 1.8; /* تمت زيادة المسافة بين السطور هنا */ }
+        .activity-list { flex: 1; overflow-y: auto; font-size: 10px; line-height: 1.8; }
         .activity-item { margin-bottom: 3px; border-bottom: 1px dashed #f8fafc; padding-bottom: 3px; color: #475569; display: flex; flex-direction: column; text-align: right; white-space: pre-wrap; }
         
         .activity-row-inline { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -141,7 +137,7 @@
 
         .modal-notes { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-notes-content { background: white; padding: 18px; border-radius: 12px; width: 440px; height: 480px; display: flex; flex-direction: column; box-sizing: border-box; }
-        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.6; /* تمت زيادة المسافة هنا أيضاً */ }
+        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.6; }
         .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
 
         .btn { border: none; padding: 0 15px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; font-size: 11px; color: white; display: flex; align-items: center; gap: 5px; box-sizing: border-box; }
@@ -310,13 +306,22 @@
         }
 
         function addToActivityLog(fieldName, oldVal, newVal, productIdentifier) {
-            if (oldVal === newVal) return;
+            // التحقق من الأعمدة المسموح بالنشر لها فقط بناءً على طلبك
+            const allowedFields = ["تفاصيل المنتج", "العدد", "الاشتراك", "رقم السريال", "رقم الخدمة", "المستخدم", "الحالة", "إضافة منتج جديد"];
+            if (!allowedFields.includes(fieldName)) return; 
+
+            if (oldVal === newVal && fieldName !== "إضافة منتج جديد") return;
             const headerHTML = generateInlineHeaderHTML();
             const cleanId = (productIdentifier && String(productIdentifier).trim() !== "") ? productIdentifier : "بدون رقم";
             const val1 = (oldVal && String(oldVal).trim() !== "") ? oldVal : "فارغ";
             const val2 = (newVal && String(newVal).trim() !== "") ? newVal : "فارغ";
             
-            let actionText = fieldName === "إجراء" ? `حذف منتج (${cleanId})` : `تغيير ${fieldName} من [${val1}] إلى [${val2}] للمنتج (${cleanId})`;
+            let actionText = "";
+            if (fieldName === "إضافة منتج جديد") {
+                actionText = `إضافة منتج جديد: ${newVal} للمنتج (${cleanId})`;
+            } else {
+                actionText = `تغيير ${fieldName} من [${val1}] إلى [${val2}] للمنتج (${cleanId})`;
+            }
             
             const fullLogHTML = `<div class=\"activity-row-inline\">${headerHTML} &nbsp; <span class=\"activity-text-part\">${actionText}</span></div>`;
             
@@ -384,9 +389,9 @@
                     <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${p.serial||''}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ addToActivityLog('رقم السريال', this.getAttribute('data-old'), this.innerText, '${pIden}'); updateField(${p.originalIndex},'serial',this.innerText); }\">${p.serial||''}</td>
                     <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${p.mobile||''}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ addToActivityLog('رقم الخدمة', this.getAttribute('data-old'), this.innerText, '${pIden}'); updateField(${p.originalIndex},'mobile',this.innerText); }\">${p.mobile||''}</td>
                     <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${p.user||''}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ addToActivityLog('المستخدم', this.getAttribute('data-old'), this.innerText, '${pIden}'); updateField(${p.originalIndex},'user',this.innerText); }\">${p.user||''}</td>` : `
-                    <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${p.sai||''}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ addToActivityLog('رقم الكبينة', this.getAttribute('data-old'), this.innerText, '${pIden}'); updateField(${p.originalIndex},'sai',this.innerText); }\">${p.sai||''}</td>
-                    <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${p.coords||''}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ addToActivityLog('الإحداثيات', this.getAttribute('data-old'), this.innerText, '${pIden}'); updateField(${p.originalIndex},'coords',this.innerText); }\">${p.coords||''}</td>
-                    <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${p.city||''}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ addToActivityLog('المدينة', this.getAttribute('data-old'), this.innerText, '${pIden}'); updateField(${p.originalIndex},'city',this.innerText); }\">${p.city||''}</td>`;
+                    <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${p.sai||''}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ updateField(${p.originalIndex},'sai',this.innerText); }\">${p.sai||''}</td>
+                    <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${p.coords||''}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ updateField(${p.originalIndex},'coords',this.innerText); }\">${p.coords||''}</td>
+                    <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${p.city||''}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ updateField(${p.originalIndex},'city',this.innerText); }\">${p.city||''}</td>`;
 
                 tbody.innerHTML += `<tr class=\"${isLocked ? 'row-locked' : ''} ${isLost ? 'row-is-lost' : ''}\">
                     <td class=\"not-locked\"><input type=\"checkbox\" class=\"row-checkbox\" data-index=\"${p.originalIndex}\" data-locked=\"${isLocked || isLost}\" onchange=\"calculateTotals()\"></td>
@@ -470,11 +475,6 @@
             if (validIdxs.length === 0) { alert("لا يمكن حذف الصفوف المغلقة"); return; }
             if(!confirm(`حذف (${validIdxs.length}) منتجات؟`)) return;
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
-            validIdxs.forEach(idx => {
-                const item = db[currentOrderId][idx];
-                const pIden = item.mobile || item.serial || item.name;
-                addToActivityLog('إجراء', 'موجود', 'محذوف', pIden);
-            });
             db[currentOrderId] = db[currentOrderId].filter((_, i) => !validIdxs.includes(i));
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
             syncSumsToSales(); renderProducts();
@@ -502,9 +502,6 @@
                 item.note = updatedFullNotes;
                 item.updatedAt = Date.now();
                 localStorage.setItem('asgate_products_db', JSON.stringify(db));
-                
-                const pIden = item.mobile || item.serial || item.name;
-                addToActivityLog('سجل المتابعة', 'إضافة ملاحظة', newText, pIden);
                 renderProducts();
             }
             closeNote();
@@ -549,11 +546,13 @@
             if(isAuto && ["جوال", "بيانات"].includes(type) && serial !== "") {
                 for(let i=0; i<qty; i++){ 
                     db[currentOrderId].push({ id: Date.now() + i, type, name, qty:1, sub, serial, status:"جديد", date:new Date().toLocaleDateString('en-GB'), updatedAt:Date.now(), note: "" });
+                    addToActivityLog('إضافة منتج جديد', '', `${name} (باقة: ${type})`, serial);
                     serial = serial.replace(/(\d+)(?!.*\d)/, n => (BigInt(n)+1n).toString().padStart(n.length, '0')); 
                 }
             } else { 
                 const newItem = { id: Date.now(), type, name, qty, sub, serial:(["جوال", "بيانات"].includes(type)?serial:""), status:"جديد", date:new Date().toLocaleDateString('en-GB'), updatedAt:Date.now(), note: "" };
                 db[currentOrderId].push(newItem); 
+                addToActivityLog('إضافة منتج جديد', '', `${name} (باقة: ${type})`, newItem.serial || newItem.name);
             }
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
             syncSumsToSales(); renderProducts(); closeModal();
