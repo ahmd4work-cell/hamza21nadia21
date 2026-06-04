@@ -82,9 +82,9 @@
         .table-wrapper { background: white; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: visible; margin-bottom: 20px; }
         table { width: 100%; border-collapse: collapse; min-width: 1100px; font-family: 'Calibri', sans-serif; table-layout: fixed; }
         
-        /* تعديل ارتفاع شريط العناوين الأخضر إلى 45 بيكسل */
+        /* تعديل ارتفاع شريط العناوين الأخضر إلى 40 بيكسل */
         thead th { 
-            background-color: var(--header-green); height: 45px; line-height: 45px;
+            background-color: var(--header-green); height: 40px; line-height: 40px;
             padding: 0 5px; color: white; font-size: 11px; font-weight: 800; text-align: center; 
             position: sticky; top: 174px; z-index: 1300; font-family: 'Cairo'; 
             border: none; 
@@ -94,12 +94,12 @@
             display: block; width: 95%; margin: 2px auto 0 auto; font-family: 'Cairo'; font-size: 9px; padding: 1px; border-radius: 4px; border: 1px solid var(--border-color); outline: none; color: var(--text-dark);
         }
         
-        /* تعديل الارتفاع الافتراضي لصفوف الجدول إلى 35 بيكسل */
+        /* الارتفاع الافتراضي لصفوف الجدول 35 بيكسل */
         td { border: 0.5px solid var(--light-border); text-align: center; height: 35px; line-height: 35px; font-size: 13px; font-weight: 500; color: var(--text-dark); padding: 0 5px; overflow: visible; white-space: nowrap; position: relative; }
         
         .status-select { font-family: 'Cairo'; font-size: 10px; font-weight: 700; padding: 2px; border-radius: 6px; width: 95%; cursor: pointer; border: 1px solid var(--border-color); height: 24px; }
 
-        /* تعديل الارتفاع لصفوف الفقدان لتكون 20 بيكسل */
+        /* ارتفاع صفوف الفقدان 20 بيكسل */
         .row-is-lost td { height: 20px; line-height: 20px; }
         .row-is-lost .status-select-lost { background-color: #8b0000 !important; color: white !important; }
         .row-is-lost .status-select { height: 18px; padding: 0px; }
@@ -107,8 +107,7 @@
         .row-checkbox { width: 16px; height: 16px; cursor: pointer; }
 
         tfoot { position: sticky; bottom: 140px; z-index: 1350; }
-        .table-footer { background-color: #000; color: #fff; height: 27px; font-family: 'Cairo'; } 
-        .table-footer td { background-color: #000 !important; color: #fff !important; border: none; font-weight: 800; font-size: 12px; height: 27px; line-height: 27px; position: sticky; bottom: 140px; }
+        .table-footer td { background-color: #000 !important; color: #fff !important; border: none; font-weight: 800; font-size: 12px; height: 27px; line-height: 27px; position: sticky; bottom: 140px; text-align: center; }
 
         .row-locked { background-color: #f1f5f9 !important; color: #94a3b8 !important; }
         .row-locked td:not(.not-locked) { pointer-events: none; }
@@ -553,11 +552,9 @@
                     db[currentOrderId].push({ id: Date.now() + i, type, name, qty:1, sub, serial, status:"جديد", date:new Date().toLocaleDateString('en-GB'), updatedAt:Date.now(), note: "" });
                     serial = serial.replace(/(\d+)(?!.*\d)/, n => (BigInt(n)+1n).toString().padStart(n.length, '0')); 
                 }
-                addToActivityLog('إجراء', 'غير موجود', `إضافة عدد (${qty}) منتجات بتسلسل تلقائي`, serial);
             } else { 
                 const newItem = { id: Date.now(), type, name, qty, sub, serial:(["جوال", "بيانات"].includes(type)?serial:""), status:"جديد", date:new Date().toLocaleDateString('en-GB'), updatedAt:Date.now(), note: "" };
                 db[currentOrderId].push(newItem); 
-                addToActivityLog('إجراء', 'غير موجود', `إضافة منتج جديد (${name})`, newItem.serial || name);
             }
             localStorage.setItem('asgate_products_db', JSON.stringify(db));
             syncSumsToSales(); renderProducts(); closeModal();
