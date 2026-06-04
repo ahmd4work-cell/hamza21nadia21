@@ -287,13 +287,17 @@
 
         function getTodayFormatted() {
             const d = new Date();
-            return d.toISOString().split('T')[0];
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
         }
 
         function generateStyledHeader() {
             const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
             const d = new Date();
             const timeFormatted = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+            // الرمز والاسم ثم التاريخ والوقت
             return `<span class="activity-header-part">👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${getTodayFormatted()}  <span class="activity-time-part">${timeFormatted}</span></span>`;
         }
 
@@ -505,7 +509,7 @@
             if (newText && currentActivePreview && currentActiveOriginalIndex !== null) {
                 let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
                 
-                // إضافة <br> لضمان النزول لسطر جديد لنص الملاحظة
+                // الهيدر في سطر والنص في سطر جديد كما في الصورة
                 let newEntry = `${generateStyledHeader()}<br><span class="activity-text-part">${newText}</span>`;
                 
                 let updatedFullNotes = oldNotes === "" ? newEntry : oldNotes + "\n--------------------\n" + newEntry;
