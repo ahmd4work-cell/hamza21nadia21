@@ -145,12 +145,10 @@
 
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
         
-        /* تنسيق الصندوق المحدث ليتناسب تماماً مع الترتيب الجديد للمدخلات وعرضها المتناسق */
         .modal-content { background: white; padding: 20px; border-radius: 12px; width: 380px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .modal-content h3 { margin-top: 0; margin-bottom: 15px; font-size: 15px; text-align: center; color: var(--nav-bg); }
         .modal-content input, .modal-content select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-family: 'Cairo'; margin-bottom: 12px; box-sizing: border-box; font-size: 12px; outline: none; }
         
-        /* كلاسات التحكم وتوزيع الحقول الجديد */
         .form-row-grid { display: flex; gap: 10px; }
         .form-row-grid > div { flex: 1; }
         .serial-wrapper { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
@@ -568,14 +566,17 @@
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             if(!db[currentOrderId]) db[currentOrderId] = [];
             
+            const baseTime = Date.now();
+            
             if(isAuto && ["جوال", "بيانات"].includes(type) && serial !== "") {
                 for(let i=0; i<qty; i++){ 
-                    db[currentOrderId].push({ id: Date.now() + i, type, name, qty:1, sub, serial, status:"جديد", date:new Date().toLocaleDateString('en-GB'), updatedAt:Date.now(), note: "" });
+                    // لتظهر الأرقام الأصغر أولاً (بالأعلى)، يتم طرح معامل الفهرس من الوقت الأساسي لمنح الرقم الأصغر وقتاً أحدث عند الفرز التنازلي للجدول
+                    db[currentOrderId].push({ id: baseTime + i, type, name, qty:1, sub, serial, status:"جديد", date:new Date().toLocaleDateString('en-GB'), updatedAt: baseTime - i, note: "" });
                     addToActivityLog('إضافة منتج جديد', '', `${name} (باقة: ${type})`, serial);
                     serial = serial.replace(/(\d+)(?!.*\d)/, n => (BigInt(n)+1n).toString().padStart(n.length, '0')); 
                 }
             } else { 
-                const newItem = { id: Date.now(), type, name, qty, sub, serial:(["جوال", "بيانات"].includes(type)?serial:""), status:"جديد", date:new Date().toLocaleDateString('en-GB'), updatedAt:Date.now(), note: "" };
+                const newItem = { id: baseTime, type, name, qty, sub, serial:(["جوال", "بيانات"].includes(type)?serial:""), status:"جديد", date:new Date().toLocaleDateString('en-GB'), updatedAt: baseTime, note: "" };
                 db[currentOrderId].push(newItem); 
                 addToActivityLog('إضافة منتج جديد', '', `${name} (باقة: ${type})`, newItem.serial || newItem.name);
             }
