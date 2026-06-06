@@ -29,7 +29,7 @@
         .navbar { 
             background-color: var(--nav-bg); display: flex; align-items: center; padding: 0 20px; 
             margin: 0; border-radius: 0; height: 37px; position: sticky; top: 0; z-index: 1500;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1); box-shadow: 0 2px 4px rgba(0,0,0,0.1); box-sizing: border-box;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); box-sizing: border-box;
         }
         .navbar a { color: var(--white); text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; transition: 0.3s; line-height: 37px; height: 37px; display: inline-block; }
         .navbar a.active { background-color: var(--nav-active); color: #0f172a; border-radius: 6px; height: 26px; line-height: 26px; margin-top: 5.5px; }
@@ -198,7 +198,7 @@
             <div class="action-bar">
                 <button class="btn btn-add" onclick="openModal()">+ إضافة منتج جديد</button>
                 <div class="search-wrapper">
-                    <input type="text" id="liveSearch" class="search-input" placeholder="بحث بالسريال أو الخدمة أو المستخدم..." onkeyup="applyFilters()">
+                    <input type="text" id="liveSearch" class="search-input" placeholder="بحث بالسريال أو الخدمة أو هوية المستخدم..." onkeyup="applyFilters()">
                 </div>
                 
                 <div class="stats-container">
@@ -364,7 +364,7 @@
         }
 
         function addToActivityLog(fieldName, oldVal, newVal, productIdentifier) {
-            const allowedFields = ["تفاصيل المنتج", "العدد", "الاشتراك", "رقم السريال", "رقم الخدمة", "المستخدم", "الحالة", "إضافة منتج جديد", "زر إجراء"];
+            const allowedFields = ["تفاصيل المنتج", "العدد", "الاشتراك", "رقم السريال", "رقم الخدمة", "هوية المستخدم", "الحالة", "إضافة منتج جديد", "زر إجراء"];
             if (!allowedFields.includes(fieldName)) return; 
 
             if (oldVal === newVal && fieldName !== "إضافة منتج جديد" && fieldName !== "زر إجراء") return;
@@ -481,7 +481,7 @@
                 let dynamic = (p.type === "جوال" || p.type === "بيانات") ? `
                     <td contenteditable="${!isLocked && !isLost}" data-old="${p.serial||''}" onfocus="this.setAttribute('data-old', this.innerText)" oninput="validateNumberInput(this, false)" onblur="if(this.getAttribute('data-old')!=this.innerText){ addToActivityLog('رقم السريال', this.getAttribute('data-old'), this.innerText, '${pIden}'); updateField(${p.originalIndex},'serial',this.innerText); }">${p.serial||''}</td>
                     <td contenteditable="${!isLocked && !isLost}" data-old="${p.mobile||''}" onfocus="this.setAttribute('data-old', this.innerText)" oninput="validateNumberInput(this, false)" onblur="if(this.getAttribute('data-old')!=this.innerText){ addToActivityLog('رقم الخدمة', this.getAttribute('data-old'), this.innerText, '${pIden}'); updateField(${p.originalIndex},'mobile',this.innerText); }">${p.mobile||''}</td>
-                    <td contenteditable="${!isLocked && !isLost}" data-old="${p.user||''}" onfocus="this.setAttribute('data-old', this.innerText)" onblur="if(this.getAttribute('data-old')!=this.innerText){ addToActivityLog('المستخدم', this.getAttribute('data-old'), this.innerText, '${pIden}'); updateField(${p.originalIndex},'user',this.innerText); }">${p.user||''}</td>` : `
+                    <td contenteditable="${!isLocked && !isLost}" data-old="${p.user||''}" onfocus="this.setAttribute('data-old', this.innerText)" oninput="validateNumberInput(this, false)" onblur="if(this.getAttribute('data-old')!=this.innerText){ addToActivityLog('هوية المستخدم', this.getAttribute('data-old'), this.innerText, '${pIden}'); updateField(${p.originalIndex},'user',this.innerText); }">${p.user||''}</td>` : `
                     <td contenteditable="${!isLocked && !isLost}" data-old="${p.sai||''}" onfocus="this.setAttribute('data-old', this.innerText)" onblur="if(this.getAttribute('data-old')!=this.innerText){ updateField(${p.originalIndex},'sai',this.innerText); }">${p.sai||''}</td>
                     <td contenteditable="${!isLocked && !isLost}" data-old="${p.coords||''}" onfocus="this.setAttribute('data-old', this.innerText)" onblur="if(this.getAttribute('data-old')!=this.innerText){ updateField(${p.originalIndex},'coords',this.innerText); }">${p.coords||''}</td>
                     <td contenteditable="${!isLocked && !isLost}" data-old="${p.city||''}" onfocus="this.setAttribute('data-old', this.innerText)" onblur="if(this.getAttribute('data-old')!=this.innerText){ updateField(${p.originalIndex},'city',this.innerText); }">${p.city||''}</td>`;
@@ -505,7 +505,7 @@
 
         function updateTableHeaders(type) {
             const header = document.getElementById('dynamicHeader');
-            let dynamic = (type === "جوال" || type === "بيانات") ? `<th>رقم السريال</th><th>رقم الخدمة</th><th>المستخدم</th>` : `<th>رقم الكبينة</th><th>الإحداثيات</th><th>المدينة</th>`;
+            let dynamic = (type === "جوال" || type === "بيانات") ? `<th>رقم السريال</th><th>رقم الخدمة</th><th>هوية المستخدم</th>` : `<th>رقم الكبينة</th><th>الإحداثيات</th><th>المدينة</th>`;
             header.innerHTML = `<th style="width: 30px;"><input type="checkbox" id="checkAllBox" onclick="toggleAll(this)"></th><th style="width:100px;">نوع المنتج</th><th>تفاصيل المنتج</th><th style="width:50px;">العدد</th><th style="width:80px;">الاشتراك</th><th style="width:80px;">الإجمالي</th>${dynamic}<th style="width:110px;">الحالة <select id="colStatusFilter" class="status-header-filter" onchange="triggerStatusColumnFilter(this.value)"><option value="all" ${currentStatusFilterValue==='all'?'selected':''}>الكل</option>${statusOptions.map(opt=>`<option value="${opt}" ${currentStatusFilterValue===opt?'selected':''}>${opt}</option>`).join('')}</select></th><th style="width:80px;">تاريخ الحالة</th><th>سجل المتابعة</th>`;
         }
 
@@ -569,7 +569,6 @@
             if(!confirm(`حذف (${validIdxs.length}) منتجات؟`)) return;
             let db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             
-            // تسجيل نشاط لعملية الحذف قبل الفلترة
             validIdxs.forEach(originalIdx => {
                 const item = db[currentOrderId][originalIdx];
                 const pIden = item.mobile || item.serial || item.name;
