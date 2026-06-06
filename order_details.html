@@ -198,7 +198,7 @@
             <div class="action-bar">
                 <button class="btn btn-add" onclick="openModal()">+ إضافة منتج جديد</button>
                 <div class="search-wrapper">
-                    <input type="text" id="liveSearch" class="search-input" placeholder="بحث بالسريال أو المستخدم..." onkeyup="applyFilters()">
+                    <input type="text" id="liveSearch" class="search-input" placeholder="بحث بالسريال أو الخدمة أو المستخدم..." onkeyup="applyFilters()">
                 </div>
                 
                 <div class="stats-container">
@@ -636,11 +636,18 @@
             syncSumsToSales(); renderProducts(); closeModal();
         }
 
+        // دالة الفرز والتصفية المحدثة للبحث الشامل في (رقم السريال / رقم الخدمة / المستخدم)
         function applyFilters() {
-            const q = document.getElementById('liveSearch').value.toLowerCase();
+            const q = document.getElementById('liveSearch').value.toLowerCase().trim();
             const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
+            
             const searchFiltered = db.filter(p => {
-                const matchesSearch = (p.serial||'').toLowerCase().includes(q) || (p.user||'').toLowerCase().includes(q);
+                // فحص المطابقة عبر الأعمدة الثلاثة معاً بمرونة تامة لضمان عدم حدوث أخطاء برمجية في حال كانت القيم فارغة
+                const matchesSearch = 
+                    (p.serial || '').toLowerCase().includes(q) || 
+                    (p.mobile || '').toLowerCase().includes(q) || 
+                    (p.user || '').toLowerCase().includes(q);
+                    
                 const matchesColumnStatus = (currentStatusFilterValue === "all" || p.status === currentStatusFilterValue);
                 return matchesSearch && matchesColumnStatus;
             });
