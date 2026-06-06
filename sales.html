@@ -23,7 +23,7 @@
         html, body { 
             height: 100%; margin: 0; padding: 0; overflow: hidden; 
             background-color: var(--bg-color); font-family: 'Cairo', sans-serif; 
-            font-size: 13px; line-height: 1.2; color: var(--text-dark); 
+            font-size: 12px; line-height: 1.15; color: var(--text-dark); 
         }
 
         .dashboard-container { display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; }
@@ -33,30 +33,30 @@
             border-radius: 12px; height: 37px; flex-shrink: 0;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.1); border: 1px solid #1e293b;
         }
-        .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; height: 26px; line-height: 26px; display: inline-block; transition: 0.3s; }
+        .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 11px; height: 26px; line-height: 26px; display: inline-block; transition: 0.3s; }
         .navbar a.active { background-color: var(--nav-active); color: #0f172a; border-radius: 6px; }
 
         .main-content { flex: 1; display: flex; flex-direction: column; padding: 0 15px; min-height: 0; }
         
         .action-bar { display: flex; align-items: center; margin: 10px 0; gap: 10px; flex-shrink: 0; }
-        .btn-top { border: none; padding: 0 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; font-size: 12px; height: 35px; }
+        .btn-top { border: none; padding: 0 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; font-size: 11px; height: 35px; }
         .btn-add { background-color: var(--accent-blue); }
 
         .search-wrapper { position: relative; width: 15%; display: flex; align-items: center; }
         .search-input {
             width: 100%; height: 30px; padding: 0 10px; border-radius: 8px;
             border: 1px solid var(--border-soft); background: #fff;
-            font-family: 'Cairo'; font-size: 12px; font-weight: 700; outline: none;
+            font-family: 'Cairo'; font-size: 11px; font-weight: 700; outline: none;
         }
 
         .stats-container { margin-right: auto; display: flex; gap: 10px; align-items: center; }
         .stat-card {
             background: #fff; padding: 5px 12px; border-radius: 8px; border: 1px solid var(--border-soft);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 2px; min-width: 180px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 1px; min-width: 180px;
         }
-        .stat-card-title { font-size: 10px; font-weight: 800; color: #64748b; border-bottom: 1px solid #f1f5f9; padding-bottom: 2px; margin-bottom: 2px; text-align: center; }
+        .stat-card-title { font-size: 9px; font-weight: 800; color: #64748b; border-bottom: 1px solid #f1f5f9; padding-bottom: 2px; margin-bottom: 2px; text-align: center; }
         .stat-content { display: flex; gap: 8px; justify-content: center; align-items: center; }
-        .stat-item { font-size: 10px; font-weight: 800; color: #475569; white-space: nowrap; }
+        .stat-item { font-size: 9px; font-weight: 800; color: #475569; white-space: nowrap; }
         .stat-val { color: var(--accent-blue); margin-right: 2px; }
         .val-success { color: #16a34a; }
         .val-danger { color: #dc2626; }
@@ -64,7 +64,7 @@
         .bulk-action-wrapper { position: relative; display: flex; align-items: center; margin-right: 5px; }
         .btn-bulk-trigger { 
             height: 25px; padding: 0 12px; border-radius: 5px; border: 1px solid var(--border-soft);
-            background: #fff; color: var(--text-dark); font-family: 'Cairo'; font-size: 11px; font-weight: 800;
+            background: #fff; color: var(--text-dark); font-family: 'Cairo'; font-size: 10px; font-weight: 800;
             cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: 0.2s;
             display: flex; align-items: center; gap: 5px;
         }
@@ -77,7 +77,7 @@
         }
         .dropdown-menu button { 
             width: 100%; padding: 6px 10px; border: none; background: none; font-family: 'Cairo'; 
-            font-size: 10.5px; text-align: right; cursor: pointer; color: #475569; font-weight: 700; 
+            font-size: 9.5px; text-align: right; cursor: pointer; color: #475569; font-weight: 700; 
             border-radius: 4px; transition: 0.2s; display: block;
         }
         .dropdown-menu button:hover { background: #f1f5f9; color: var(--accent-blue); }
@@ -90,34 +90,31 @@
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         
         th { 
-            background: var(--header-shiny-purple); color: white; padding: 0 5px; font-size: 11px; font-weight: 800; 
+            background: var(--header-shiny-purple); color: white; padding: 0 5px; font-size: 10px; font-weight: 800; 
             text-align: center; border-bottom: 2px solid #2e1065; position: sticky; top: 0; z-index: 50; height: 40px;
         }
         
-        /* التحكم في ارتفاع الصف */
         td { 
             border-bottom: 1px solid #f1f5f9; text-align: center; 
-            height: 35px; font-size: 11px; font-weight: 600; 
+            height: 35px; font-size: 10px; font-weight: 600; 
             white-space: nowrap; position: relative; transition: height 0.2s ease;
         }
 
-        /* تنسيق الصف عند حالة الفقدان */
         tr.row-lost td { 
             height: 20px !important; 
-            font-size: 10px; /* تصغير الخط قليلاً ليتناسب مع الارتفاع الصغير */
+            font-size: 9px; 
         }
         
         tbody tr:nth-child(even) { background-color: #eff6ff; }
         
         .status-select {
-            font-family: 'Cairo'; font-size: 11px; font-weight: 800; padding: 2px 8px;
+            font-family: 'Cairo'; font-size: 10px; font-weight: 800; padding: 2px 8px;
             border-radius: 20px; border: 1.5px solid #e2e8f0; background: #f8fafc;
             width: 90%; cursor: pointer; outline: none; transition: all 0.3s ease;
             text-align: center; appearance: none;
         }
 
-        /* ارتفاع السيلكت داخل حالة الفقدان */
-        tr.row-lost .status-select { padding: 0px 5px; height: 16px; font-size: 9px; }
+        tr.row-lost .status-select { padding: 0px 5px; height: 16px; font-size: 8px; }
 
         .status-select[data-val="مكتمل"] { background: #dcfce7; color: #166534; border-color: #16a34a; }
         .status-select[data-val="معلق"] { background: #fef9c3; color: #854d0e; border-color: #eab308; }
@@ -128,34 +125,42 @@
 
         .notes-preview { 
             width: 95%; height: 20px; border: none; background: transparent; font-family: 'Cairo'; 
-            font-size: 11px; text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700; 
+            font-size: 10px; text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700; 
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; margin: 0 auto; 
         }
-        tr.row-lost .notes-preview { height: 15px; font-size: 9px; }
+        tr.row-lost .notes-preview { height: 15px; font-size: 8px; }
 
         .activity-log-section { 
             margin: 15px 0 10px 0; padding: 12px 18px; background: #ffffff; border-radius: 10px; 
             border: 1px solid var(--border-soft); box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
             flex-shrink: 0; height: 140px; display: flex; flex-direction: column; box-sizing: border-box;
         }
-        .activity-log-title { color: var(--dark-yellow); font-size: 13.5px; font-weight: 800; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; flex-shrink: 0; }
-        .activity-list { flex: 1; overflow-y: auto; font-size: 11.5px; line-height: 1.6; }
-        .activity-item { margin-bottom: 4px; border-bottom: 1px dashed #f8fafc; padding-bottom: 4px; color: #475569; display: flex; align-items: center; gap: 4px; justify-content: flex-start; flex-wrap: wrap; text-align: right; }
-        .activity-header-part { font-size: 11.5px; color: var(--chat-yellow); font-weight: 800; }
-        .activity-text-part { font-size: 11.5px; color: #475569; }
+        .activity-log-title { color: var(--dark-yellow); font-size: 12.5px; font-weight: 800; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; flex-shrink: 0; }
+        .activity-list { flex: 1; overflow-y: auto; font-size: 10.5px; line-height: 1.3; }
+        .activity-item { margin-bottom: 2px; border-bottom: 1px dashed #f8fafc; padding-bottom: 2px; color: #475569; display: flex; align-items: center; gap: 4px; justify-content: flex-start; flex-wrap: wrap; text-align: right; }
+        .activity-header-part { font-size: 10.5px; color: var(--chat-yellow); font-weight: 800; }
+        .activity-text-part { font-size: 10.5px; color: #475569; }
 
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-        .modal-content { background: white; padding: 15px; border-radius: 12px; width: 440px; height: 460px; display: flex; flex-direction: column; gap: 8px; }
-        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 10px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
-        .note-area { height: 60px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 8px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
+        .modal-content { background: white; padding: 15px; border-radius: 12px; width: 440px; height: 460px; display: flex; flex-direction: column; gap: 6px; transition: height 0.3s ease, width 0.3s ease; }
+        
+        /* كلاس توسيع المودال الخاص بالملاحظات */
+        .modal-content.expanded { height: 600px; width: 550px; }
+        
+        .modal-header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; border-bottom: 1px solid #f1f5f9; padding-bottom: 4px; flex-shrink: 0; }
+        .btn-toggle-expand { background: none; border: none; color: #64748b; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 4px; transition: 0.2s; padding: 0; }
+        .btn-toggle-expand:hover { background: #f1f5f9; color: var(--accent-blue); }
+
+        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 10px; font-size: 11px; text-align: right; white-space: pre-wrap; line-height: 1.4; }
+        .note-area { height: 60px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 8px; font-family: 'Cairo'; resize: none; outline: none; font-size: 12px; text-align: right; box-sizing: border-box; }
         
         .order-modal-card { background: white; width: 350px; border-radius: 12px; padding: 20px; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); }
         .form-group { margin-bottom: 12px; text-align: right; position: relative; }
-        .form-group label { display: block; font-weight: 700; font-size: 11px; color: #64748b; margin-bottom: 4px; }
-        .form-group input { width: 100%; padding: 8px 10px; border: 1px solid var(--border-soft); border-radius: 6px; font-family: 'Cairo'; font-size: 12px; box-sizing: border-box; }
+        .form-group label { display: block; font-weight: 700; font-size: 10px; color: #64748b; margin-bottom: 4px; }
+        .form-group input { width: 100%; padding: 8px 10px; border: 1px solid var(--border-soft); border-radius: 6px; font-family: 'Cairo'; font-size: 11px; box-sizing: border-box; }
         
         .modal-results { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #cbd5e1; z-index: 10005; border-radius: 6px; max-height: 150px; overflow-y: auto; display: none; }
-        .modal-results div { padding: 8px 10px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 11.5px; text-align: right; }
+        .modal-results div { padding: 8px 10px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 10.5px; text-align: right; }
         .modal-results div:hover { background: #eff6ff; }
         
         .select-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent-blue); }
@@ -242,8 +247,11 @@
 </div>
 
 <div id="noteModal" class="modal">
-    <div class="modal-content">
-        <div style="font-weight: 800; color: #2e1065; text-align: right;">سجل ملاحظات الطلب والنتائج</div>
+    <div class="modal-content" id="modalNoteContent">
+        <div class="modal-header-container">
+            <div style="font-weight: 800; color: #2e1065; text-align: right;">سجل ملاحظات الطلب والنتائج</div>
+            <button class="btn-toggle-expand" onclick="toggleModalSize()" title="توسيع / تقليص" id="toggleModalBtn">⤢</button>
+        </div>
         <div id="historyLog" class="history-log"></div>
         <input type="file" id="modalFileInput" style="display:none" onchange="handleFileSelection(this)">
         <button onclick="document.getElementById('modalFileInput').click()" style="text-align:right; background:none; border:none; color:blue; cursor:pointer; font-family:Cairo; font-size:11px;">📎 إرفاق ملف</button>
@@ -286,8 +294,20 @@
 
     function generateStyledHeader() {
         const d = new Date();
-        const timeFormatted = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+        const timeFormatted = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
         return `<span class="activity-header-part">👤 (أحمد) 🗓️ ${getTodayFormatted()} <span style="font-size:10px;">${timeFormatted}</span> </span>`;
+    }
+
+    function toggleModalSize() {
+        const modalContent = document.getElementById('modalNoteContent');
+        const btn = document.getElementById('toggleModalBtn');
+        if (modalContent.classList.contains('expanded')) {
+            modalContent.classList.remove('expanded');
+            btn.innerText = '⤢';
+        } else {
+            modalContent.classList.add('expanded');
+            btn.innerText = '⤡';
+        }
     }
 
     function toggleDropdown(e, btn) {
@@ -337,7 +357,6 @@
         el.setAttribute('data-val', val);
         const row = el.closest('tr');
         
-        // التبديل الديناميكي للكلاس للتحكم في الارتفاع
         if (val === "فقدان") {
             row.classList.add('row-lost');
         } else {
@@ -353,7 +372,6 @@
         const sums = calculateOrderSums(obj.id);
         const row = tbody.insertRow(-1);
         
-        // تطبيق الكلاس عند التحميل إذا كانت الحالة فقدان
         if (obj.status === "فقدان") row.classList.add('row-lost');
         
         const statusOptions = ["مكتمل", "معلق", "مرتجع", "جاهز", "جديد", "فقدان"];
@@ -446,7 +464,9 @@
 
     function openNote(el) {
         currentActivePreview = el;
-        document.getElementById('historyLog').innerHTML = (el.getAttribute('data-full-notes') || "").split('\n--------------------\n').map(e => `<div style="margin-bottom:8px; border-bottom:1px dashed #eee;">${e}</div>`).join('');
+        document.getElementById('modalNoteContent').classList.remove('expanded');
+        document.getElementById('toggleModalBtn').innerText = '⤢';
+        document.getElementById('historyLog').innerHTML = (el.getAttribute('data-full-notes') || "").split('\n--------------------\n').map(e => `<div style="margin-bottom:8px; border-bottom:1px dashed #eee; line-height:1.4;">${e}</div>`).join('');
         document.getElementById('noteModal').style.display = "flex";
     }
 
