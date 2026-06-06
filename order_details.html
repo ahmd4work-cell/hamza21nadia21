@@ -101,7 +101,7 @@
 
         .row-checkbox { width: 16px; height: 16px; cursor: pointer; }
 
-        tfoot { position: sticky; bottom: 100px; z-index: 1350; } /* تعديل الـ bottom ليتناسب مع تقليل ارتفاع السجل السفلي */
+        tfoot { position: sticky; bottom: 100px; z-index: 1350; }
         .table-footer td { background-color: #000 !important; color: #fff !important; border: none; font-weight: 800; font-size: 12px; height: 27px; line-height: 27px; position: sticky; bottom: 100px; text-align: center; }
 
         .row-locked { background-color: #f1f5f9 !important; color: #94a3b8 !important; }
@@ -113,7 +113,6 @@
         .status-moallaq { background-color: var(--warning-yellow) !important; color: #854d0e !important; }
         .status-mortaja { background-color: var(--soft-red) !important; color: #991b1b !important; }
 
-        /* =================== التعديلات المطلوبة على سجل النشاط تفاصيل الطلب =================== */
         .activity-log-section { 
             margin: 0; padding: 6px 18px; background: #ffffff; border-radius: 10px; 
             border: 1px solid var(--border-color); box-shadow: 0 -3px 10px rgba(0,0,0,0.05);
@@ -128,7 +127,6 @@
         .activity-header-part { font-size: 9px; color: var(--chat-yellow); font-weight: 800; display: inline-block; }
         .activity-time-part { font-size: 9px; font-weight: normal; color: #64748b; }
         .activity-text-part { font-size: 10px; color: #1e293b; font-weight: 700; display: inline-block; }
-        /* ==================================================================================== */
 
         .notes-preview { 
             width: 95%; height: 20px; border: none; background: transparent; font-family: 'Cairo'; 
@@ -146,9 +144,20 @@
         .btn-add { background: var(--accent-blue); height: 35px; }
 
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
-        .modal-content { background: white; padding: 20px; border-radius: 12px; width: 360px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        
+        /* تنسيق الصندوق المحدث ليتناسب تماماً مع الترتيب الجديد للمدخلات وعرضها المتناسق */
+        .modal-content { background: white; padding: 20px; border-radius: 12px; width: 380px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .modal-content h3 { margin-top: 0; margin-bottom: 15px; font-size: 15px; text-align: center; color: var(--nav-bg); }
         .modal-content input, .modal-content select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-family: 'Cairo'; margin-bottom: 12px; box-sizing: border-box; font-size: 12px; outline: none; }
+        
+        /* كلاسات التحكم وتوزيع الحقول الجديد */
+        .form-row-grid { display: flex; gap: 10px; }
+        .form-row-grid > div { flex: 1; }
+        .serial-wrapper { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+        .serial-wrapper input[type="text"] { margin-bottom: 0; flex: 1; }
+        .auto-serial-container { display: flex; align-items: center; justify-content: center; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; width: 105px; height: 39px; box-sizing: border-box; padding: 0 5px; gap: 4px; }
+        .auto-serial-container input[type="checkbox"] { width: 14px; height: 14px; margin: 0; cursor: pointer; }
+        .auto-serial-container label { font-size: 10.5px; font-weight: bold; color: #475569; white-space: nowrap; cursor: pointer; }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
 </head>
@@ -248,6 +257,7 @@
     <div id="productModal" class="modal">
         <div class="modal-content">
             <h3>إضافة منتج جديد</h3>
+            
             <label style="font-size: 11px; font-weight: bold; color: #64748b;">نوع المنتج</label>
             <select id="p_type" onchange="handleTypeChange()">
                 <option value="جوال">جوال</option>
@@ -258,17 +268,31 @@
                 <option value="SIP Trunk">SIP Trunk</option>
                 <option value="Ipvpn">Ipvpn</option>
             </select>
+            
+            <label style="font-size: 11px; font-weight: bold; color: #64748b;">تفاصيل المنتج</label>
             <input type="text" id="p_name" placeholder="تفاصيل المنتج (مثال: باقة 200 جيجا)">
-            <div style="display:flex; gap:10px;">
-                <input type="number" id="p_qty" value="1" min="1" placeholder="العدد">
+            
+            <div class="form-row-grid">
+                <div>
+                    <label style="font-size: 11px; font-weight: bold; color: #64748b;">قيمة الاشتراك</label>
+                    <input type="number" id="p_sub" placeholder="قيمة الاشتراك">
+                </div>
+                <div>
+                    <label style="font-size: 11px; font-weight: bold; color: #64748b;">العدد</label>
+                    <input type="number" id="p_qty" value="1" min="1" placeholder="العدد">
+                </div>
+            </div>
+            
+            <label style="font-size: 11px; font-weight: bold; color: #64748b;">السريال</label>
+            <div class="serial-wrapper">
                 <input type="text" id="p_serial" placeholder="السريال">
+                <div class="auto-serial-container">
+                    <input type="checkbox" id="auto_serial">
+                    <label for="auto_serial">تسلسل تلقائي</label>
+                </div>
             </div>
-            <div style="display:flex; align-items:center; gap:5px; margin-bottom:10px;">
-                <input type="checkbox" id="auto_serial" style="width:auto; margin:0;">
-                <label for="auto_serial" style="font-size:11px;">تسلسل تلقائي</label>
-            </div>
-            <input type="number" id="p_sub" placeholder="قيمة الاشتراك">
-            <div style="display:flex; gap:10px;">
+            
+            <div style="display:flex; gap:10px; margin-top: 5px;">
                 <button class="btn" style="flex:1; background:var(--header-green); justify-content:center;" onclick="saveProduct()">حفظ</button>
                 <button class="btn" style="flex:1; background:var(--danger-red); justify-content:center;" onclick="closeModal()">إلغاء</button>
             </div>
