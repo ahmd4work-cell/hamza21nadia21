@@ -117,9 +117,20 @@
             margin: 0; padding: 6px 18px; background: #ffffff; border-radius: 10px; 
             border: 1px solid var(--border-color); box-shadow: 0 -3px 10px rgba(0,0,0,0.05);
             flex-shrink: 0; height: 100px; display: flex; flex-direction: column; box-sizing: border-box; 
-            position: sticky; bottom: 0; z-index: 1450;
+            position: sticky; bottom: 0; z-index: 1450; transition: height 0.3s ease;
         }
-        .activity-log-title { color: var(--dark-yellow); font-size: 12.5px; font-weight: 800; margin-bottom: 3px; border-bottom: 1px solid #f1f5f9; padding-bottom: 2px; flex-shrink: 0; }
+        .activity-log-section.expanded { height: 150px; }
+        
+        .activity-log-header-container {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; border-bottom: 1px solid #f1f5f9; padding-bottom: 2px; flex-shrink: 0;
+        }
+        .activity-log-title { color: var(--dark-yellow); font-size: 12.5px; font-weight: 800; margin: 0; }
+        
+        .btn-toggle-expand {
+            background: none; border: none; color: #64748b; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 4px; transition: 0.2s; padding: 0;
+        }
+        .btn-toggle-expand:hover { background: #f1f5f9; color: var(--accent-blue); }
+
         .activity-list { flex: 1; overflow-y: auto; font-size: 9px; line-height: 1.4; }
         .activity-item { margin-bottom: 1px; border-bottom: 1px dashed #f8fafc; padding-bottom: 1px; color: #475569; display: flex; flex-direction: column; text-align: right; white-space: pre-wrap; }
         
@@ -234,8 +245,11 @@
             </table>
         </div>
 
-        <div class="activity-log-section">
-            <div class="activity-log-title">📋 سجل نشاط تفاصيل الطلب</div>
+        <div class="activity-log-section" id="activityLogSection">
+            <div class="activity-log-header-container">
+                <div class="activity-log-title">📋 سجل نشاط تفاصيل الطلب</div>
+                <button class="btn-toggle-expand" onclick="toggleLogHeight()" title="توسيع / تقليص" id="toggleExpandBtn">⤢</button>
+            </div>
             <div id="activityList" class="activity-list"></div>
         </div>
     </div>
@@ -306,6 +320,18 @@
         const LOGS_KEY = 'asgate_order_logs_' + currentOrderId;
         
         let currentStatusFilterValue = "all";
+
+        function toggleLogHeight() {
+            const section = document.getElementById('activityLogSection');
+            const btn = document.getElementById('toggleExpandBtn');
+            if (section.classList.contains('expanded')) {
+                section.classList.remove('expanded');
+                btn.innerText = '⤢';
+            } else {
+                section.classList.add('expanded');
+                btn.innerText = '⤡';
+            }
+        }
 
         function getTodayFormatted() {
             const d = new Date();
@@ -570,7 +596,6 @@
             
             if(isAuto && ["جوال", "بيانات"].includes(type) && serial !== "") {
                 for(let i=0; i<qty; i++){ 
-                    // لتظهر الأرقام الأصغر أولاً (بالأعلى)، يتم طرح معامل الفهرس من الوقت الأساسي لمنح الرقم الأصغر وقتاً أحدث عند الفرز التنازلي للجدول
                     db[currentOrderId].push({ id: baseTime + i, type, name, qty:1, sub, serial, status:"جديد", date:new Date().toLocaleDateString('en-GB'), updatedAt: baseTime - i, note: "" });
                     addToActivityLog('إضافة منتج جديد', '', `${name} (باقة: ${type})`, serial);
                     serial = serial.replace(/(\d+)(?!.*\d)/, n => (BigInt(n)+1n).toString().padStart(n.length, '0')); 
