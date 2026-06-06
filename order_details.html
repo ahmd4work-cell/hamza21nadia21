@@ -191,7 +191,7 @@
                     <div class="info-item"><span class="info-label">الشركة</span><span class="info-value" id="orderComp">-</span></div>
                     <div class="info-item"><span class="info-label">السجل</span><span class="info-value" id="orderCr">-</span></div>
                     <div class="info-item"><span class="info-label">حالة الطلب</span><span class="info-value" id="orderStatus">-</span></div>
-                    <div class="info-item"><span class="info-label">قيمة الطلب</span><span class="info-value" id="orderTotalSum">0.00 ر.س</span></div>
+                    <div class="info-item"><span class="info-label">قيمة الطلب</span><span class="info-value" id="orderTotalSum">0.0 ر.س</span></div>
                 </div>
             </div>
 
@@ -204,13 +204,13 @@
                 <div class="stats-container">
                     <div class="stats-box right-box">
                         <span class="stat-label">الاجمالي</span>
-                        <span>مكتمل: <span id="stat_total_ok" class="stat-val-green">0.00</span></span>
-                        <span>معلق: <span id="stat_total_wait" class="stat-val-orange">0.00</span></span>
+                        <span>مكتمل: <span id="stat_total_ok" class="stat-val-green">0.0</span></span>
+                        <span>معلق: <span id="stat_total_wait" class="stat-val-orange">0.0</span></span>
                     </div>
                     <div class="stats-box left-box">
                         <span class="stat-label">الشهر</span>
-                        <span>مكتمل: <span id="stat_month_ok" class="stat-val-green">0.00</span></span>
-                        <span>معلق: <span id="stat_month_wait" class="stat-val-orange">0.00</span></span>
+                        <span>مكتمل: <span id="stat_month_ok" class="stat-val-green">0.0</span></span>
+                        <span>معلق: <span id="stat_month_wait" class="stat-val-orange">0.0</span></span>
                     </div>
                 </div>
 
@@ -238,8 +238,8 @@
                         <td id="f_count">0</td>
                         <td></td>
                         <td id="f_qty">0</td>
-                        <td id="f_sub">0</td>
-                        <td id="f_total">0</td>
+                        <td id="f_sub">0.0</td>
+                        <td id="f_total">0.0</td>
                         <td colspan="6"></td>
                     </tr>
                 </tfoot>
@@ -321,6 +321,14 @@
         const LOGS_KEY = 'asgate_order_logs_' + currentOrderId;
         
         let currentStatusFilterValue = "all";
+
+        // دالة مساعدة لتنسيق الأرقام بالفاصلة الآلاف وخانة عشرية واحدة فقط
+        function formatNumberWithOneDecimal(num) {
+            return Number(num).toLocaleString('en-US', {
+                minimumFractionDigits: 1,
+                maximumFractionDigits: 1
+            });
+        }
 
         function toggleLogHeight() {
             const section = document.getElementById('activityLogSection');
@@ -466,8 +474,8 @@
                     <td>${p.type}</td>
                     <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${p.name}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ addToActivityLog('تفاصيل المنتج', this.getAttribute('data-old'), this.innerText, '${pIden}'); updateField(${p.originalIndex},'name',this.innerText); }\">${p.name}</td>
                     <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${p.qty}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" oninput=\"validateNumberInput(this, false)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ addToActivityLog('العدد', this.getAttribute('data-old'), this.innerText, '${pIden}'); updateField(${p.originalIndex},'qty',this.innerText); }\">${p.qty}</td>
-                    <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${subVal.toFixed(2)}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" oninput=\"validateNumberInput(this, true)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ addToActivityLog('الاشتراك', this.getAttribute('data-old'), this.innerText, '${pIden}'); updateField(${p.originalIndex},'sub',this.innerText); }\">${subVal.toFixed(2)}</td>
-                    <td style=\"color:var(--header-green);font-weight:800;\">${(p.qty * subVal).toFixed(2)}</td>
+                    <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${subVal.toFixed(1)}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" oninput=\"validateNumberInput(this, true)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ addToActivityLog('الاشتراك', this.getAttribute('data-old'), this.innerText, '${pIden}'); updateField(${p.originalIndex},'sub',this.innerText); }\">${formatNumberWithOneDecimal(subVal)}</td>
+                    <td style=\"color:var(--header-green);font-weight:800;\">${formatNumberWithOneDecimal(p.qty * subVal)}</td>
                     ${dynamic}
                     <td><select class=\"status-select ${sClass}\" data-old=\"${p.status}\" onfocus=\"this.setAttribute('data-old', this.value)\" onchange=\"changeStatus(${p.originalIndex},this.value)\">
                         ${statusOptions.map(s=>`<option value=\"${s}\" ${p.status===s?'selected':''}>${s}</option>`).join('')}</select></td>
@@ -503,10 +511,10 @@
                     if (p.status === "معلق") monthWaitAmount += productTotal;
                 }
             });
-            document.getElementById('stat_total_ok').innerText = totalOkAmount.toFixed(2);
-            document.getElementById('stat_total_wait').innerText = totalWaitAmount.toFixed(2);
-            document.getElementById('stat_month_ok').innerText = monthOkAmount.toFixed(2);
-            document.getElementById('stat_month_wait').innerText = monthWaitAmount.toFixed(2);
+            document.getElementById('stat_total_ok').innerText = formatNumberWithOneDecimal(totalOkAmount);
+            document.getElementById('stat_total_wait').innerText = formatNumberWithOneDecimal(totalWaitAmount);
+            document.getElementById('stat_month_ok').innerText = formatNumberWithOneDecimal(monthOkAmount);
+            document.getElementById('stat_month_wait').innerText = formatNumberWithOneDecimal(monthWaitAmount);
         }
 
         function updateField(idx, f, v) {
@@ -592,7 +600,7 @@
         function syncSumsToSales() {
             const items = JSON.parse(localStorage.getItem('asgate_products_db') || '{}')[currentOrderId] || [];
             let tot = items.reduce((acc, p) => acc + (p.qty * p.sub), 0);
-            document.getElementById('orderTotalSum').innerText = tot.toFixed(2) + " ر.س";
+            document.getElementById('orderTotalSum').innerText = formatNumberWithOneDecimal(tot) + " ر.س";
         }
 
         function calculateTotals() {
@@ -601,8 +609,8 @@
             document.getElementById('f_selection').innerText = document.querySelectorAll('.row-checkbox:checked').length;
             document.getElementById('f_count').innerText = db.length; 
             document.getElementById('f_qty').innerText = q; 
-            document.getElementById('f_sub').innerText = s.toFixed(2); 
-            document.getElementById('f_total').innerText = t.toFixed(2);
+            document.getElementById('f_sub').innerText = formatNumberWithOneDecimal(s); 
+            document.getElementById('f_total').innerText = formatNumberWithOneDecimal(t);
         }
 
         function saveProduct() {
