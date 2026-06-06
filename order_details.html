@@ -155,7 +155,6 @@
         .btn-add { background: var(--accent-blue); height: 35px; }
 
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
-        
         .modal-content { background: white; padding: 20px; border-radius: 12px; width: 380px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .modal-content h3 { margin-top: 0; margin-bottom: 15px; font-size: 15px; text-align: center; color: var(--nav-bg); }
         .modal-content input, .modal-content select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-family: 'Cairo'; margin-bottom: 12px; box-sizing: border-box; font-size: 12px; outline: none; }
@@ -287,17 +286,17 @@
             <div class="form-row-grid">
                 <div>
                     <label style="font-size: 11px; font-weight: bold; color: #64748b;">قيمة الاشتراك</label>
-                    <input type="number" id="p_sub" placeholder="قيمة الاشتراك">
+                    <input type="text" id="p_sub" placeholder="قيمة الاشتراك" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');">
                 </div>
                 <div>
                     <label style="font-size: 11px; font-weight: bold; color: #64748b;">العدد</label>
-                    <input type="number" id="p_qty" value="1" min="1" placeholder="العدد">
+                    <input type="text" id="p_qty" value="1" placeholder="العدد" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                 </div>
             </div>
             
             <label style="font-size: 11px; font-weight: bold; color: #64748b;">السريال</label>
             <div class="serial-wrapper">
-                <input type="text" id="p_serial" placeholder="السريال">
+                <input type="text" id="p_serial" placeholder="السريال" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                 <div class="auto-serial-container">
                     <input type="checkbox" id="auto_serial">
                     <label for="auto_serial">تسلسل تلقائي</label>
@@ -401,6 +400,27 @@
             }
         }
 
+        // دالة مخصصة لفلترة المدخلات غير الرقمية في الخلايا القابلة للتعديل
+        function validateNumberInput(el, isFloat = false) {
+            let originalText = el.innerText;
+            let cleanedText = originalText;
+            if (isFloat) {
+                cleanedText = originalText.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');
+            } else {
+                cleanedText = originalText.replace(/[^0-9]/g, '');
+            }
+            if (originalText !== cleanedText) {
+                el.innerText = cleanedText;
+                // تعيين المؤشر لنهاية النص بعد التعديل التلقائي
+                let range = document.createRange();
+                let sel = window.getSelection();
+                range.selectNodeContents(el);
+                range.collapse(false);
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+        }
+
         function renderProducts(filtered = null) {
             const db = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
             let baseItems = db[currentOrderId] || [];
@@ -435,9 +455,9 @@
                 const pIden = p.mobile || p.serial || p.name;
 
                 let dynamic = (p.type === "جوال" || p.type === "بيانات") ? `
-                    <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${p.serial||''}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ addToActivityLog('رقم السريال', this.getAttribute('data-old'), this.innerText, '${pIden}'); updateField(${p.originalIndex},'serial',this.innerText); }\">${p.serial||''}</td>
-                    <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${p.mobile||''}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ addToActivityLog('رقم الخدمة', this.getAttribute('data-old'), this.innerText, '${pIden}'); updateField(${p.originalIndex},'mobile',this.innerText); }\">${p.mobile||''}</td>
-                    <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${p.user||''}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ addToActivityLog('المستخدم', this.getAttribute('data-old'), this.innerText, '${pIden}'); updateField(${p.originalIndex},'user',this.innerText); }\">${p.user||''}</td>` : `
+                    <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${p.serial||''}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" oninput=\"validateNumberInput(this, false)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ addToActivityLog('رقم السريال', this.getAttribute('data-old'), this.innerText, '${pIden}'); updateField(${p.originalIndex},'serial',this.innerText); }\">${p.serial||''}</td>
+                    <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${p.mobile||''}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" oninput=\"validateNumberInput(this, false)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ addToActivityLog('رقم الخدمة', this.getAttribute('data-old'), this.innerText, '${pIden}'); updateField(${p.originalIndex},'mobile',this.innerText); }\">${p.mobile||''}</td>
+                    <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${p.user||''}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" oninput=\"validateNumberInput(this, false)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ addToActivityLog('المستخدم', this.getAttribute('data-old'), this.innerText, '${pIden}'); updateField(${p.originalIndex},'user',this.innerText); }\">${p.user||''}</td>` : `
                     <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${p.sai||''}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ updateField(${p.originalIndex},'sai',this.innerText); }\">${p.sai||''}</td>
                     <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${p.coords||''}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ updateField(${p.originalIndex},'coords',this.innerText); }\">${p.coords||''}</td>
                     <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${p.city||''}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ updateField(${p.originalIndex},'city',this.innerText); }\">${p.city||''}</td>`;
@@ -446,8 +466,8 @@
                     <td class=\"not-locked\"><input type=\"checkbox\" class=\"row-checkbox\" data-index=\"${p.originalIndex}\" data-locked=\"${isLocked || isLost}\" onchange=\"calculateTotals()\"></td>
                     <td>${p.type}</td>
                     <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${p.name}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ addToActivityLog('تفاصيل المنتج', this.getAttribute('data-old'), this.innerText, '${pIden}'); updateField(${p.originalIndex},'name',this.innerText); }\">${p.name}</td>
-                    <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${p.qty}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ addToActivityLog('العدد', this.getAttribute('data-old'), this.innerText, '${pIden}'); updateField(${p.originalIndex},'qty',this.innerText); }\">${p.qty}</td>
-                    <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${subVal.toFixed(2)}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ addToActivityLog('الاشتراك', this.getAttribute('data-old'), this.innerText, '${pIden}'); updateField(${p.originalIndex},'sub',this.innerText); }\">${subVal.toFixed(2)}</td>
+                    <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${p.qty}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" oninput=\"validateNumberInput(this, false)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ addToActivityLog('العدد', this.getAttribute('data-old'), this.innerText, '${pIden}'); updateField(${p.originalIndex},'qty',this.innerText); }\">${p.qty}</td>
+                    <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${subVal.toFixed(2)}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" oninput=\"validateNumberInput(this, true)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ addToActivityLog('الاشتراك', this.getAttribute('data-old'), this.innerText, '${pIden}'); updateField(${p.originalIndex},'sub',this.innerText); }\">${subVal.toFixed(2)}</td>
                     <td style=\"color:var(--header-green);font-weight:800;\">${(p.qty * subVal).toFixed(2)}</td>
                     ${dynamic}
                     <td class=\"${isLost ? 'row-is-lost' : ''}\"><select class=\"status-select ${sClass}\" data-old=\"${p.status}\" onfocus=\"this.setAttribute('data-old', this.value)\" onchange=\"changeStatus(${p.originalIndex},this.value)\">
@@ -621,7 +641,13 @@
         }
 
         function toggleAll(s) { document.querySelectorAll('.row-checkbox').forEach(c => c.checked = s.checked); calculateTotals(); }
-        function openModal() { document.getElementById('productModal').style.display = 'flex'; handleTypeChange(); }
+        function openModal() { 
+            document.getElementById('productModal').style.display = 'flex'; 
+            document.getElementById('p_qty').value = "1";
+            document.getElementById('p_sub').value = "";
+            document.getElementById('p_serial').value = "";
+            handleTypeChange(); 
+        }
         function closeModal() { document.getElementById('productModal').style.display = 'none'; }
         function handleTypeChange() {
             const type = document.getElementById('p_type').value;
