@@ -21,6 +21,7 @@
             --soft-red: #fee2e2;
             --dark-yellow: #c29103;
             --chat-yellow: #b45309;
+            --dark-red: #991b1b;
         }
 
         body { background-color: var(--bg-color); font-family: 'Cairo', sans-serif; margin: 0; padding: 0; line-height: 1.2; }
@@ -112,6 +113,7 @@
         .status-tawtheeq { background-color: var(--soft-green) !important; color: #166534 !important; }
         .status-moallaq { background-color: var(--warning-yellow) !important; color: #854d0e !important; }
         .status-mortaja { background-color: var(--soft-red) !important; color: #991b1b !important; }
+        .status-faqd { background-color: var(--dark-red) !important; color: white !important; }
 
         .activity-log-section { 
             margin: 0; padding: 6px 18px; background: #ffffff; border-radius: 10px; 
@@ -400,7 +402,6 @@
             }
         }
 
-        // دالة مخصصة لفلترة المدخلات غير الرقمية في الخلايا القابلة للتعديل
         function validateNumberInput(el, isFloat = false) {
             let originalText = el.innerText;
             let cleanedText = originalText;
@@ -411,7 +412,6 @@
             }
             if (originalText !== cleanedText) {
                 el.innerText = cleanedText;
-                // تعيين المؤشر لنهاية النص بعد التعديل التلقائي
                 let range = document.createRange();
                 let sel = window.getSelection();
                 range.selectNodeContents(el);
@@ -445,10 +445,9 @@
             
             items.forEach((p) => {
                 const subVal = parseFloat(p.sub) || 0;
-                let sClass = p.status === "مكتمل" ? "status-mektamel" : (p.status === "تم التوثيق" ? "status-tawtheeq" : (p.status === "معلق" ? "status-moallaq" : (p.status === "مرتجع" ? "status-mortaja" : "")));
+                let sClass = p.status === "مكتمل" ? "status-mektamel" : (p.status === "تم التوثيق" ? "status-tawtheeq" : (p.status === "معلق" ? "status-moallaq" : (p.status === "مرتجع" ? "status-mortaja" : (p.status === "فقدان" ? "status-faqd" : ""))));
                 const isLocked = ["مكتمل", "تم التوثيق", "معلق"].includes(p.status);
                 const isLost = p.status === "فقدان";
-                if(isLost) sClass = "status-select-lost";
 
                 const notes = p.note || '';
                 const lastNoteText = getLastNoteOnly(notes);
@@ -470,7 +469,7 @@
                     <td contenteditable=\"${!isLocked && !isLost}\" data-old=\"${subVal.toFixed(2)}\" onfocus=\"this.setAttribute('data-old', this.innerText)\" oninput=\"validateNumberInput(this, true)\" onblur=\"if(this.getAttribute('data-old')!=this.innerText){ addToActivityLog('الاشتراك', this.getAttribute('data-old'), this.innerText, '${pIden}'); updateField(${p.originalIndex},'sub',this.innerText); }\">${subVal.toFixed(2)}</td>
                     <td style=\"color:var(--header-green);font-weight:800;\">${(p.qty * subVal).toFixed(2)}</td>
                     ${dynamic}
-                    <td class=\"${isLost ? 'row-is-lost' : ''}\"><select class=\"status-select ${sClass}\" data-old=\"${p.status}\" onfocus=\"this.setAttribute('data-old', this.value)\" onchange=\"changeStatus(${p.originalIndex},this.value)\">
+                    <td><select class=\"status-select ${sClass}\" data-old=\"${p.status}\" onfocus=\"this.setAttribute('data-old', this.value)\" onchange=\"changeStatus(${p.originalIndex},this.value)\">
                         ${statusOptions.map(s=>`<option value=\"${s}\" ${p.status===s?'selected':''}>${s}</option>`).join('')}</select></td>
                     <td style=\"font-size:10px\">${p.date}</td>
                     <td class=\"not-locked\"><div class=\"notes-preview\" onclick=\"openNote(this, ${p.originalIndex})\" data-full-notes='${notes.replace(/'/g, "&apos;")}' id=\"preview-${Date.now()}-${p.originalIndex}\">${lastNoteText}</div></td></tr>`;
