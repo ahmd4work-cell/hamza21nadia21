@@ -593,8 +593,45 @@
     }
 
     function executeAction(actionType) {
-        // الاحتفاظ بالوظيفة الديناميكية للإجراءات وإمكانية إضافة منطق الحذف هنا عند الحاجة
-        console.log("تم استدعاء إجراء: " + actionType);
+        if (actionType === 'حذف') {
+            const checkedBoxes = document.querySelectorAll('#salesBody .select-check:checked');
+            if (checkedBoxes.length === 0) {
+                alert('الرجاء تحديد طلب واحد على الأقل لحذفه.');
+                return;
+            }
+            if (confirm(`هل أنت متأكد من رغبتك في حذف ${checkedBoxes.length} من الطلبات المحددة؟`)) {
+                let saved = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
+                
+                checkedBoxes.forEach(cb => {
+                    const row = cb.closest('tr');
+                    const orderId = row.cells[1].innerText.replace('#', '').trim();
+                    const company = row.cells[4].innerText;
+                    
+                    // إزالة الطلب من المصفوفة المحفوظة
+                    saved = saved.filter(item => String(item.id) !== String(orderId));
+                    
+                    // خياري: حذف المنتجات المرتبطة بهذا الطلب أيضاً
+                    let productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+                    if (productsDb[orderId]) {
+                        delete productsDb[orderId];
+                        localStorage.setItem('asgate_products_db', JSON.stringify(productsDb));
+                    }
+
+                    // إضافة لوج عام بالحذف
+                    addGeneralLog('إجراء', '', 'حذف', company, `تم حذف طلب المبيعات #${orderId}`);
+                });
+                
+                localStorage.setItem('asgate_sales_db', JSON.stringify(saved));
+                
+                // إعادة تعيين مربع الاختيار الرئيسي (الرأس) إلى غير محدد
+                const masterCheck = document.querySelector('thead .select-check');
+                if (masterCheck) masterCheck.checked = false;
+
+                loadSalesFromStorage();
+            }
+        } else {
+            console.log("تم استدعاء إجراء: " + actionType);
+        }
     }
 
     function addGeneralLog(field, old, newVal, comp, action) {
