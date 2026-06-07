@@ -305,6 +305,29 @@
         return `<span class="activity-header-part">👤 (أحمد) 🗓️ ${getTodayFormatted()} <span style="font-size:10px;">${timeFormatted}</span> </span>`;
     }
 
+    function generateCustomOrderId() {
+        const now = new Date();
+        const year = String(now.getFullYear()).slice(-2); 
+        const month = String(now.getMonth() + 1).padStart(2, '0'); 
+        const prefix = year + month; 
+
+        const saved = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
+        
+        let maxSequence = 0;
+        saved.forEach(item => {
+            const idStr = String(item.id);
+            if (idStr.startsWith(prefix) && idStr.length === 8) {
+                const seq = parseInt(idStr.slice(4), 10);
+                if (seq > maxSequence) {
+                    maxSequence = seq;
+                }
+            }
+        });
+
+        const nextSequence = maxSequence + 1;
+        return prefix + String(nextSequence).padStart(4, '0');
+    }
+
     function toggleGeneralLogHeight() {
         const section = document.getElementById('generalActivityLogSection');
         const btn = document.getElementById('toggleGeneralLogBtn');
@@ -459,7 +482,7 @@
         const comp = document.getElementById('mComp').value;
         if (!comp) return alert("اختر شركة أولاً");
         const data = {
-            id: Math.floor(1000 + Math.random() * 8999),
+            id: generateCustomOrderId(),
             type: document.getElementById('mType').value || '-',
             date: getTodayFormatted(),
             comp: comp, cr: document.getElementById('mCr').value, crSub: document.getElementById('mCrSub').value,
