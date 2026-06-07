@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>المبيعات | ASGate</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --nav-shiny-navy: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
@@ -102,7 +102,8 @@
 
         tr.row-lost td { 
             height: 20px !important; 
-            font-size: 9px; 
+            font-size: 9px;
+            font-weight: 500 !important;
         }
         
         tbody tr:nth-child(even) { background-color: #eff6ff; }
@@ -114,7 +115,7 @@
             text-align: center; appearance: none;
         }
 
-        tr.row-lost .status-select { padding: 0px 5px; height: 16px; font-size: 8px; }
+        tr.row-lost .status-select { padding: 0px 5px; height: 16px; font-size: 8px; font-weight: 500 !important; }
 
         .status-select[data-val="مكتمل"] { background: #dcfce7; color: #166534; border-color: #16a34a; }
         .status-select[data-val="معلق"] { background: #fef9c3; color: #854d0e; border-color: #eab308; }
@@ -159,7 +160,7 @@
         }
         tr.row-lost .notes-preview { min-height: 16px; }
         tr.row-lost .note-row-header { font-size: 7.5px; display: none; }
-        tr.row-lost .note-row-text { font-size: 8.5px; text-align: center; }
+        tr.row-lost .note-row-text { font-size: 8.5px; font-weight: 500 !important; text-align: center; }
 
         .activity-log-section { 
             margin: 1px 0 0px 0; padding: 10px 18px; background: #ffffff; border-radius: 10px; 
@@ -607,23 +608,19 @@
                     const orderId = row.cells[1].innerText.replace('#', '').trim();
                     const company = row.cells[4].innerText;
                     
-                    // إزالة الطلب من المصفوفة المحفوظة
                     saved = saved.filter(item => String(item.id) !== String(orderId));
                     
-                    // خياري: حذف المنتجات المرتبطة بهذا الطلب أيضاً
                     let productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
                     if (productsDb[orderId]) {
                         delete productsDb[orderId];
                         localStorage.setItem('asgate_products_db', JSON.stringify(productsDb));
                     }
 
-                    // إضافة لوج عام بالحذف
                     addGeneralLog('إجراء', '', 'حذف', company, `تم حذف طلب المبيعات #${orderId}`);
                 });
                 
                 localStorage.setItem('asgate_sales_db', JSON.stringify(saved));
                 
-                // إعادة تعيين مربع الاختيار الرئيسي (الرأس) إلى غير محدد
                 const masterCheck = document.querySelector('thead .select-check');
                 if (masterCheck) masterCheck.checked = false;
 
