@@ -19,6 +19,7 @@
             --text-dark: #1e293b;
             --dark-yellow: #c29103;
             --chat-yellow: #b45309;
+            --whatsapp-green: #25d366;
         }
 
         html, body { 
@@ -105,6 +106,25 @@
             font-size: 10px; font-weight: 600; text-align: center; outline: none; height: 100%; padding: 0;
         }
         td input:focus { background: #fff; box-shadow: inset 0 0 0 1px var(--accent-blue); border-radius: 4px; }
+
+        .phone-cell-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            width: 90%;
+            margin: 0 auto;
+            height: 100%;
+        }
+        .phone-cell-wrapper input { width: 100%; }
+        .whatsapp-icon {
+            color: var(--whatsapp-green);
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            user-select: none;
+        }
 
         .notes-preview { 
             width: 95%; max-height: 32px; border: none; background: transparent; font-family: 'Cairo'; 
@@ -197,8 +217,10 @@
             <div class="bulk-action-wrapper">
                 <button class="btn-bulk-trigger" onclick="toggleDropdown(event, this)">إجراء ▾</button>
                 <div class="dropdown-menu">
-                    <button onclick="executeAction('حذف')">حذف المحدّد</button>
-                    <button onclick="executeAction('تصدير')">تصدير بيانات</button>
+                    <button onclick="executeAction('تعديل')">تعديل</button>
+                    <button onclick="executeAction('تصدير')">تصدير</button>
+                    <button onclick="executeAction('طباعة')">طباعة</button>
+                    <button onclick="executeAction('حذف')">حذف</button>
                 </div>
             </div>
         </div>
@@ -212,7 +234,7 @@
                         <th style="width: 20%;">الشركة</th>
                         <th style="width: 12%;">السجل الرئيسي</th>
                         <th style="width: 12%;">السجل الفرعي</th>
-                        <th style="width: 13%;">رقم المالك</th>
+                        <th style="width: 13%;">اسم المسؤول</th>
                         <th style="width: 13%;">رقم التواصل</th>
                         <th style="width: 15%;">الملاحظات والنتائج العامة</th>
                         <th style="width: 10%;">المنشئ</th>
@@ -340,8 +362,13 @@
             <td><input type="text" value="${data.comp || ''}" placeholder="اسم الشركة" onblur="handleCellBlur(this, 'اسم الشركة')"></td>
             <td><input type="text" value="${data.mainRecord || ''}" placeholder="700xxxxxx" onblur="handleCellBlur(this, 'السجل الرئيسي')"></td>
             <td><input type="text" value="${data.subRecord || ''}" placeholder="05xxxx" onblur="handleCellBlur(this, 'السجل الفرعي')"></td>
-            <td><input type="text" value="${data.ownerPhone || ''}" placeholder="05xxxx" onblur="handleCellBlur(this, 'رقم المالك')"></td>
-            <td><input type="text" value="${data.contactPhone || ''}" placeholder="05xxxx" onblur="handleCellBlur(this, 'رقم التواصل')"></td>
+            <td><input type="text" value="${data.ownerPhone || ''}" placeholder="اسم المسؤول" onblur="handleCellBlur(this, 'اسم المسؤول')"></td>
+            <td>
+                <div class="phone-cell-wrapper">
+                    <input type="text" value="${data.contactPhone || ''}" placeholder="05xxxx" onblur="handleCellBlur(this, 'رقم التواصل')">
+                    <span class="whatsapp-icon" title="واتساب">💬</span>
+                </div>
+            </td>
             <td>
                 <div class="notes-preview" onclick="openNote(this)" data-full-notes="${(data.notes || '').replace(/"/g, '&quot;')}">
                     ${getFormattedNoteLayout(data.notes || "")}
@@ -373,7 +400,7 @@
                 mainRecord: r.cells[3].querySelector('input').value.trim(),
                 subRecord: r.cells[4].querySelector('input').value.trim(),
                 ownerPhone: r.cells[5].querySelector('input').value.trim(),
-                contactPhone: r.cells[6].querySelector('input').value.trim(),
+                contactPhone: r.cells[6].querySelector('input').type === 'text' ? r.cells[6].querySelector('input').value.trim() : r.cells[6].querySelector('.phone-cell-wrapper input').value.trim(),
                 notes: r.cells[7].querySelector('.notes-preview').getAttribute('data-full-notes') || "",
                 creator: r.cells[8].innerText.trim()
             });
@@ -441,6 +468,10 @@
         } else if (type === 'تصدير') {
             const rawData = localStorage.getItem(STORAGE_KEY) || '[]';
             alert("بيانات التصدير (JSON):\n\n" + rawData);
+        } else if (type === 'تعديل') {
+            alert("نمط التعديل السريع نشط تلقائياً عبر الخلايا.");
+        } else if (type === 'طباعة') {
+            window.print();
         }
     }
 
