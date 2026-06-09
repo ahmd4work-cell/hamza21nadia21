@@ -429,7 +429,7 @@
         if (txt && currentActivePreview) {
             let old = currentActivePreview.getAttribute('data-full-notes') || "";
             let entry = `${generateStyledHeader()}<span class="activity-text-part">${txt}</span>`;
-            let updated = old === \"\" ? entry : old + "\n--------------------\n" + entry;
+            let updated = old === "" ? entry : old + "\n--------------------\n" + entry;
             currentActivePreview.setAttribute('data-full-notes', updated);
             currentActivePreview.innerText = txt;
             
