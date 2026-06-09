@@ -107,6 +107,21 @@
         }
         td input:focus { background: #fff; box-shadow: inset 0 0 0 1px var(--accent-blue); border-radius: 4px; }
 
+        .id-link {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 800;
+            display: inline-block;
+            width: 100%;
+            height: 100%;
+            line-height: 35px;
+            transition: color 0.2s;
+        }
+        .id-link:hover {
+            color: #1d4ed8;
+            text-decoration: underline;
+        }
+
         .phone-cell-wrapper {
             display: flex;
             align-items: center;
@@ -241,7 +256,7 @@
                 <thead>
                     <tr>
                         <th style="width: 30px;"><input type="checkbox" class="select-check" onclick="toggleAll(this)"></th>
-                        <th style="width: 4%;">م</th>
+                        <th style="width: 4%;">ID</th>
                         <th style="width: 18%;">الشركة</th>
                         <th style="width: 11%;">السجل الرئيسي</th>
                         <th style="width: 11%;">السجل الفرعي</th>
@@ -393,7 +408,7 @@
         
         row.innerHTML = `
             <td><input type="checkbox" class="select-check"></td>
-            <td style="color:#64748b; font-weight:bold;">${index}</td>
+            <td><a href="customer-profile.html?id=${index}" class="id-link">${index}</a></td>
             <td><input type="text" value="${data.comp || ''}" placeholder="اسم الشركة" onblur="handleCellBlur(this, 'اسم الشركة')"></td>
             <td><input type="text" value="${data.mainRecord || ''}" placeholder="700xxxxxx" onblur="handleCellBlur(this, 'السجل الرئيسي')"></td>
             <td><input type="text" value="${data.subRecord || ''}" placeholder="05xxxx" onblur="handleCellBlur(this, 'السجل الفرعي')"></td>
@@ -520,7 +535,9 @@
     function reIndexTable() {
         const rows = document.querySelectorAll('#customersBody tr');
         rows.forEach((r, idx) => {
-            r.cells[1].innerText = idx + 1;
+            const currentId = idx + 1;
+            const idCell = r.cells[1];
+            idCell.innerHTML = `<a href="customer-profile.html?id=${currentId}" class="id-link">${currentId}</a>`;
         });
     }
 
