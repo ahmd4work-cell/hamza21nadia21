@@ -484,8 +484,6 @@
             currentActivePreview.setAttribute('data-full-notes', updated);
             currentActivePreview.innerHTML = getFormattedNoteLayout(updated);
             
-            const companyName = currentActivePreview.closest('tr').cells[2].querySelector('input').value;
-            addToActivityLog('الملاحظات', '...', txt, companyName);
             saveAllDataSilently();
         }
         closeNote();
