@@ -19,13 +19,12 @@
             --text-dark: #1e293b;
             --dark-yellow: #c29103;
             --chat-yellow: #b45309;
-            --whatsapp-green: #25d366;
         }
 
         html, body { 
             height: 100%; margin: 0; padding: 0; overflow: hidden; 
             background-color: var(--bg-color); font-family: 'Cairo', sans-serif; 
-            font-size: 12px; line-height: 1.15; color: var(--text-dark); 
+            font-size: 13px; line-height: 1.2; color: var(--text-dark); 
         }
 
         .dashboard-container { display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; }
@@ -35,158 +34,81 @@
             border-radius: 12px; height: 37px; flex-shrink: 0;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.1); border: 1px solid #1e293b;
         }
-        .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 11px; height: 26px; line-height: 26px; display: inline-block; transition: 0.3s; }
+        .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; height: 26px; line-height: 26px; display: inline-block; transition: 0.3s; }
         .navbar a.active { background-color: var(--nav-active); color: #0f172a; border-radius: 6px; }
 
         .main-content { flex: 1; display: flex; flex-direction: column; padding: 0 15px; min-height: 0; }
-        
+         
         .action-bar { display: flex; align-items: center; margin: 10px 0; gap: 10px; flex-shrink: 0; }
-        .btn-top { border: none; padding: 0 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; font-size: 11px; height: 35px; }
-        .btn-add { background-color: var(--accent-blue); }
-
-        .search-wrapper { position: relative; width: 15%; display: flex; align-items: center; }
+        
+        .search-wrapper { position: relative; width: 18%; display: flex; align-items: center; }
         .search-input {
-            width: 100%; height: 30px; padding: 0 10px; border-radius: 8px;
+            width: 100%; height: 35px; padding: 0 10px; border-radius: 8px;
             border: 1px solid var(--border-soft); background: #fff;
-            font-family: 'Cairo'; font-size: 11px; font-weight: 700; outline: none;
+            font-family: 'Cairo'; font-size: 12px; font-weight: 700; outline: none;
         }
 
-        .stats-container { margin-right: auto; display: flex; gap: 10px; align-items: center; }
-        .stat-card {
-            background: #fff; padding: 5px 12px; border-radius: 8px; border: 1px solid var(--border-soft);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 1px; min-width: 180px;
-        }
-        .stat-card-title { font-size: 9px; font-weight: 800; color: #64748b; border-bottom: 1px solid #f1f5f9; padding-bottom: 2px; margin-bottom: 2px; text-align: center; }
-        .stat-content { display: flex; gap: 8px; justify-content: center; align-items: center; }
-        .stat-item { font-size: 9px; font-weight: 800; color: #475569; white-space: nowrap; }
-        .stat-val { color: var(--accent-blue); margin-right: 2px; }
+        .stats-bar-visit { margin-right: auto; display: flex; gap: 12px; align-items: center; background: #fff; padding: 0 15px; border-radius: 5px; height: 35px; border: 1px solid var(--border-soft); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .stat-item { font-size: 11px; font-weight: 800; color: #475569; white-space: nowrap; }
+        .stat-val { color: var(--accent-blue); margin-right: 3px; }
+        .stat-divider { color: #cbd5e1; font-weight: normal; margin: 0 2px; }
 
         .bulk-action-wrapper { position: relative; display: flex; align-items: center; margin-right: 5px; }
         .btn-bulk-trigger { 
-            height: 25px; padding: 0 12px; border-radius: 5px; border: 1px solid var(--border-soft);
-            background: #fff; color: var(--text-dark); font-family: 'Cairo'; font-size: 10px; font-weight: 800;
+            height: 35px; padding: 0 15px; border-radius: 5px; border: 1px solid var(--border-soft);
+            background: #fff; color: var(--text-dark); font-family: 'Cairo'; font-size: 12px; font-weight: 800;
             cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: 0.2s;
             display: flex; align-items: center; gap: 5px;
         }
         .btn-bulk-trigger:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
-
-        .dropdown-menu { 
-            display: none; position: absolute; left: 0; 
-            top: 28px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; 
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 1000; min-width: 110px; padding: 4px;
-        }
-        .dropdown-menu button { 
-            width: 100%; padding: 6px 10px; border: none; background: none; font-family: 'Cairo'; 
-            font-size: 9.5px; text-align: right; cursor: pointer; color: #475569; font-weight: 700; 
-            border-radius: 4px; transition: 0.2s; display: block;
-        }
-        .dropdown-menu button:hover { background: #f1f5f9; color: var(--accent-blue); }
-        .show { display: block; }
 
         .table-wrapper { 
             background: white; border-radius: 10px; overflow-y: auto; border: 1px solid var(--border-soft); 
             flex: 1; min-height: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.02); position: relative;
         }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        
+         
         th { 
-            background: var(--header-shiny-purple); color: white; padding: 0 5px; font-size: 10px; font-weight: 800; 
+            background: var(--header-shiny-purple); color: white; padding: 0 5px; font-size: 11px; font-weight: 800; 
             text-align: center; border-bottom: 2px solid #2e1065; position: sticky; top: 0; z-index: 50; height: 40px;
         }
-        
-        td { 
-            border-bottom: 1px solid #f1f5f9; text-align: center; 
-            height: 35px; font-size: 10px; font-weight: 600; 
-            white-space: nowrap; position: relative; max-height: 35px; overflow: hidden;
-        }
+         
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; max-height: 45px; font-size: 11px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; }
+
         tbody tr:nth-child(even) { background-color: #eff6ff; }
-        
-        td input { 
-            width: 90%; border: none; background: transparent; font-family: 'Cairo'; 
-            font-size: 10px; font-weight: 600; text-align: center; outline: none; height: 100%; padding: 0;
-        }
-        td input:focus { background: #fff; box-shadow: inset 0 0 0 1px var(--accent-blue); border-radius: 4px; }
 
-        .id-link {
-            color: var(--accent-blue);
-            text-decoration: none;
-            font-weight: 800;
-            display: inline-block;
-            width: 100%;
-            height: 100%;
-            line-height: 35px;
-            transition: color 0.2s;
+        .excel-input { 
+            width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; 
+            background: transparent; font-size: 11.5px; color: inherit; font-weight: inherit; 
+            height: 100%; overflow: hidden; text-overflow: ellipsis; 
         }
-        .id-link:hover {
-            color: #1d4ed8;
-            text-decoration: underline;
+        .readonly-cust-val { color: #1e3a8a !important; font-weight: 800 !important; cursor: not-allowed; }
+
+        .select-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent-blue); vertical-align: middle; }
+
+        .dropdown-menu { 
+            display: none; position: absolute; left: 0; 
+            top: 38px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; 
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 1000; min-width: 110px; padding: 4px;
         }
 
-        .phone-cell-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            width: 92%;
-            margin: 0 auto;
-            height: 100%;
+        .dropdown-menu button { 
+            width: 100%; padding: 6px 10px; border: none; background: none; font-family: 'Cairo'; 
+            font-size: 10.5px; text-align: right; cursor: pointer; color: #475569; font-weight: 700; 
+            border-radius: 4px; transition: 0.2s; display: block;
         }
-        .phone-cell-wrapper input { width: 100%; }
-        
-        .whatsapp-link-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.2s;
-            user-select: none;
-            width: 16px;
-            height: 16px;
-        }
-        .whatsapp-link-btn:hover {
-            transform: scale(1.15);
-        }
-        .whatsapp-link-btn svg {
-            width: 16px;
-            height: 16px;
-            display: block;
-        }
+        .dropdown-menu button:hover { background: #f1f5f9; color: var(--accent-blue); }
+        .dropdown-menu .del-btn:hover { background: #fee2e2; color: #ef4444; }
+        .show { display: block; }
 
         .notes-preview { 
-            width: 95%; max-height: 32px; border: none; background: transparent; font-family: 'Cairo'; 
-            cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; margin: 0 auto; 
-            box-sizing: border-box; overflow: hidden; text-align: right; padding: 0 4px;
-        }
-        .note-row-header {
-            font-size: 8.5px;
-            font-weight: 800;
-            color: var(--chat-yellow);
-            white-space: nowrap;
-            margin-bottom: 1px;
-            width: 100%;
-            text-align: right;
-            display: block;
-        }
-        .note-row-text {
-            font-size: 10px;
-            font-weight: 700;
-            color: var(--accent-blue);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            width: 100%;
-            text-align: right;
-            display: block;
-        }
-        .note-row-empty {
-            font-size: 10px;
-            font-weight: 700;
-            color: #94a3b8;
-            width: 100%;
-            text-align: center;
-            display: block;
+            width: 95%; height: 20px; border: none; background: transparent; font-family: 'Cairo'; 
+            font-size: 11px; text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700; 
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; margin: 0 auto; 
+            line-height: 20px;
         }
 
+        /* تنسيق سجل النشاط وإدارة العملاء ليتطابق تماماً مع الصورة وبخط أصغر */
         .activity-log-section { 
             margin: 1px 0 0px 0; padding: 10px 18px; background: #ffffff; border-radius: 10px; 
             border: 1px solid var(--border-soft); box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
@@ -196,24 +118,46 @@
         .activity-log-section.expanded { height: 200px; }
         
         .activity-log-header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; border-bottom: 1px solid #f1f5f9; padding-bottom: 4px; flex-shrink: 0; }
-        .activity-log-title { color: var(--dark-yellow); font-size: 11.5px; font-weight: 800; margin: 0; }
+        .activity-log-title { color: var(--dark-yellow); font-size: 11.5px; font-weight: 800; margin: 0; text-align: right; }
+        
         .btn-toggle-expand { background: none; border: none; color: #64748b; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 4px; transition: 0.2s; padding: 0; }
         .btn-toggle-expand:hover { background: #f1f5f9; color: var(--accent-blue); }
-        
-        .activity-list { flex: 1; overflow-y: auto; font-size: 9.5px; line-height: 1.3; }
-        .activity-item { margin-bottom: 2px; border-bottom: 1px dashed #f8fafc; padding-bottom: 2px; color: #475569; display: flex; align-items: center; gap: 4px; justify-content: flex-start; white-space: nowrap; text-align: right; }
-        .activity-header-part { font-size: 9.5px; color: var(--chat-yellow); font-weight: 800; display: inline; }
-        .activity-text-part { font-size: 9.5px; color: #475569; display: inline; margin-right: 5px; }
 
-        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-        .modal-content { background: white; padding: 15px; border-radius: 12px; width: 420px; height: 420px; display: flex; flex-direction: column; gap: 8px; }
-        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 10px; font-size: 11px; text-align: right; }
-        .note-area { height: 60px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 8px; font-family: 'Cairo'; resize: none; outline: none; font-size: 12px; text-align: right; box-sizing: border-box; }
-        
-        .select-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent-blue); }
+        .activity-list { flex: 1; overflow-y: auto; font-size: 9.5px; line-height: 1.4; text-align: right; }
+        .activity-item { margin-bottom: 4px; border-bottom: 1px dashed #f1f5f9; padding-bottom: 4px; color: #1e293b; display: block; white-space: normal; text-align: right; font-weight: 700; direction: rtl; }
+         
+        .activity-header-part { font-size: 9.5px; color: var(--chat-yellow); font-weight: 800; display: inline-block; direction: rtl; }
+        .activity-time-part { font-size: 8.5px; font-weight: normal; color: #64748b; }
+        .activity-text-part { font-size: 9.5px; color: #2563eb; font-weight: 700; display: inline; margin-right: 6px; }
+
+        /* نافذة الملاحظات المنبثقة للكبسولة الذكية الموحدة */
+        .modal-notes { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .modal-notes-content { background: white; padding: 18px; border-radius: 12px; width: 440px; height: 480px; display: flex; flex-direction: column; box-sizing: border-box; }
+        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; direction: rtl; }
+        .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; direction: rtl; }
+
+        .location-btn {
+            background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;
+            padding: 3px 8px; border-radius: 4px; font-family: 'Cairo';
+            font-size: 10.5px; font-weight: 700; cursor: pointer; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 4px; transition: 0.2s;
+        }
+        .location-btn:hover { background: #dbeafe; color: #1d4ed8; }
+        .no-location { color: #94a3b8; font-size: 10.5px; font-style: italic; }
+
+        .col-select { width: 3%; }
+        .col-id { width: 11%; } 
+        .col-company { width: 15%; } 
+        .col-location { width: 7%; } 
+        .col-manager { width: 9%; } 
+        .col-mobile { width: 9%; } 
+        .col-email { width: 9%; } 
+        .col-record { width: 8%; } 
+        .col-notes { width: 15%; } 
+        .col-owner { width: 7%; }
     </style>
 </head>
-<body onload="loadAllData();">
+<body onload="loadSavedData()">
 
 <div class="dashboard-container">
     <nav class="navbar">
@@ -226,133 +170,87 @@
 
     <div class="main-content">
         <div class="action-bar">
-            <button class="btn-top btn-add" onclick="addNewCustomerRow()">+ إضافة عميل جديد</button>
             <div class="search-wrapper">
-                <input type="text" id="globalSearch" class="search-input" placeholder="بحث 🔍" onkeyup="filterTable()">
+                <input type="text" id="searchInput" class="search-input" placeholder="بحث باسم الشركة أو العميل... 🔍" onkeyup="filterTable()">
             </div>
-            
-            <div class="stats-container">
-                <div class="stat-card">
-                    <div class="stat-card-title">إحصائيات العملاء العامة</div>
-                    <div class="stat-content">
-                        <div class="stat-item">إجمالي العملاء: <span id="total-customers-count" class="stat-val">0</span></div>
-                    </div>
-                </div>
+             
+            <div class="stats-bar-visit">
+                <div class="stat-item">إجمالي العملاء: <span id="stat-total" class="stat-val">0</span></div>
             </div>
 
             <div class="bulk-action-wrapper">
                 <button class="btn-bulk-trigger" onclick="toggleDropdown(event, this)">إجراء ▾</button>
                 <div class="dropdown-menu">
-                    <button onclick="executeAction('تعديل')">تعديل</button>
-                    <button onclick="executeAction('تصدير')">تصدير</button>
-                    <button onclick="executeAction('طباعة')">طباعة</button>
-                    <button onclick="executeAction('حذف')">حذف</button>
+                    <button onclick="handleBulkAction('تغيير المالك')">تغيير المالك</button>
+                    <button onclick="handleBulkAction('تصدير')">تصدير</button>
+                    <button onclick="handleBulkAction('طباعة')">طباعة</button>
+                    <button class="del-btn" onclick="handleBulkAction('حذف')">حذف</button>
                 </div>
             </div>
         </div>
-        
+         
         <div class="table-wrapper">
-            <table id="customersTable">
+            <table id="mainTable">
                 <thead>
                     <tr>
-                        <th style="width: 30px;"><input type="checkbox" class="select-check" onclick="toggleAll(this)"></th>
-                        <th style="width: 4%;">ID</th>
-                        <th style="width: 18%;">الشركة</th>
-                        <th style="width: 11%;">السجل الرئيسي</th>
-                        <th style="width: 11%;">السجل الفرعي</th>
-                        <th style="width: 12%;">اسم المسؤول</th>
-                        <th style="width: 13%;">رقم التواصل</th>
-                        <th style="width: 13%;">/ الايميل</th>
-                        <th style="width: 14%;">الملاحظات والنتائج العامة</th>
-                        <th style="width: 8%;">المنشئ</th>
+                        <th class="col-select"><input type="checkbox" onclick="toggleAllCheckboxes(this)"></th>
+                        <th class="col-id">كود العميل</th>
+                        <th class="col-company">الشركة</th>
+                        <th class="col-location">الموقع</th> 
+                        <th class="col-manager">المسؤول</th>
+                        <th class="col-mobile">الموبايل</th>
+                        <th class="col-email">الإيميل</th>
+                        <th class="col-record">السجل</th>
+                        <th class="col-notes">ملاحظات ومتابعة</th>
+                        <th class="col-owner">المالك</th>
                     </tr>
                 </thead>
-                <tbody id="customersBody"></tbody>
+                <tbody id="tableBody"></tbody>
             </table>
         </div>
 
-        <div class="activity-log-section" id="customerActivityLogSection">
+        <div class="activity-log-section" id="custActivityLogSection">
             <div class="activity-log-header-container">
                 <div class="activity-log-title">📋 سجل نشاط إدارة العملاء</div>
                 <button class="btn-toggle-expand" onclick="toggleActivityLogHeight()" title="توسيع / تقليص" id="toggleLogBtn">⤢</button>
             </div>
-            <div id="activityLogs" class="activity-list"></div>
+            <div id="activityList" class="activity-list"></div>
         </div>
     </div>
 </div>
 
-<div id="noteModal" class="modal">
-    <div class="modal-content">
-        <div style="font-weight: 800; color: #2e1065; text-align: right; margin-bottom: 4px; border-bottom: 1px solid #f1f5f9; padding-bottom: 4px;">سجل ملاحظات العميل والنتائج</div>
+<div id="noteModal" class="modal-notes">
+    <div class="modal-notes-content">
+        <div style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right;">سجل متابعة العميل والنتائج</div>
         <div id="historyLog" class="history-log"></div>
         <textarea id="modalTextArea" class="note-area" placeholder="أدخل تفاصيل الملاحظة هنا..."></textarea>
-        <div style="display:flex; justify-content: flex-end; gap:8px;">
-            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:6px 14px; border-radius:6px; cursor:pointer; font-family:Cairo;">تراجع</button>
-            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:6px 14px; border-radius:6px; cursor:pointer; font-family:Cairo; font-weight:bold;">حفظ</button>
+        <div style="display:flex; justify-content: flex-end; gap:8px; margin-top:10px;">
+            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px;">تراجع</button>
+            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px; font-weight:bold;">حفظ الملاحظة</button>
         </div>
     </div>
 </div>
 
 <script>
     let currentActivePreview = null;
-    const STORAGE_KEY = 'asgate_customers_v2_final';
-    const LOGS_KEY = 'asgate_customers_logs_v2_final';
+    const STORAGE_KEY = 'asgate_customers_final_v33'; 
+    const LOGS_KEY = 'asgate_customers_logs_v33';
+    const INCOMING_KEY = 'asgate_customers_incoming_v33'; 
 
     function getTodayFormatted() {
-        return new Date().toISOString().split('T')[0];
+        const d = new Date();
+        return d.toISOString().split('T')[0];
     }
 
     function generateStyledHeader() {
+        const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
         const d = new Date();
-        const timeFormatted = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
-        return `<span class="activity-header-part">👤 (أحمد) 🗓️ ${getTodayFormatted()} <span style="font-size:8.5px;">${timeFormatted}</span></span>`;
-    }
-
-    function getFormattedNoteLayout(fullText) {
-        if (!fullText) return '<span class="note-row-empty">إضافة ملاحظة...</span>';
-        const arr = fullText.split('\n--------------------\n');
-        const last = arr[arr.length - 1];
-        
-        if (last.includes('activity-text-part')) {
-            let headerPart = "";
-            if (last.includes('activity-header-part">')) {
-                headerPart = last.split('activity-header-part">')[1].split('</span>')[0];
-                headerPart = headerPart.replace(/👤/g, '').trim();
-            }
-            
-            let textPart = last.split('activity-text-part">')[1].split('</span>')[0];
-            return `
-                <div class="note-row-header">👤 ${headerPart}</div>
-                <div class="note-row-text">${textPart}</div>
-            `;
-        }
-        return '<span class="note-row-empty">عرض السجل...</span>';
-    }
-
-    function openWhatsAppLink(el) {
-        const row = el.closest('tr');
-        const inputVal = row.cells[6].querySelector('input').value.trim();
-        if(!inputVal) {
-            alert('الرجاء إدخال رقم التواصل أولاً.');
-            return;
-        }
-        
-        let cleaned = inputVal.replace(/\D/g, '');
-        if(cleaned.startsWith('05') && cleaned.length === 10) {
-            cleaned = '966' + cleaned.substring(1);
-        } else if(cleaned.startsWith('5') && cleaned.length === 9) {
-            cleaned = '966' + cleaned;
-        } else if(cleaned.startsWith('00966')) {
-            cleaned = cleaned.substring(2);
-        } else if(!cleaned.startsWith('966') && cleaned.length === 9) {
-            cleaned = '966' + cleaned;
-        }
-        
-        window.open(`https://api.whatsapp.com/send?phone=${cleaned}`, '_blank');
+        const timeFormatted = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+        return `<span class="activity-header-part">👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${getTodayFormatted()}  <span class="activity-time-part">${timeFormatted}</span>&nbsp;&nbsp;</span>`;
     }
 
     function toggleActivityLogHeight() {
-        const section = document.getElementById('customerActivityLogSection');
+        const section = document.getElementById('custActivityLogSection');
         const btn = document.getElementById('toggleLogBtn');
         if (section.classList.contains('expanded')) {
             section.classList.remove('expanded');
@@ -363,198 +261,182 @@
         }
     }
 
-    function toggleDropdown(e, btn) {
-        e.stopPropagation();
-        document.querySelectorAll('.dropdown-menu').forEach(m => {
-            if(m !== btn.nextElementSibling) m.classList.remove('show');
-        });
-        btn.nextElementSibling.classList.toggle('show');
+    function addToActivityLog(fieldName, oldVal, newVal, companyName) {
+        const headerHTML = generateStyledHeader();
+        const cleanCompany = (companyName && companyName.trim() !== "") ? companyName : "عميل جديد";
+        const v1 = (oldVal && oldVal.toString().trim() !== "") ? oldVal : "فارغ";
+        const v2 = (newVal && newVal.toString().trim() !== "") ? newVal : "فارغ";
+        
+        let actionText = "";
+        if (fieldName === "إجراء") {
+            actionText = `${oldVal} لملف شركة ( ${cleanCompany} )`;
+        } else {
+            actionText = `تعديل ${fieldName} من [${v1}] إلى [${v2}] في ( ${cleanCompany} )`;
+        }
+        
+        const fullLogHTML = `${headerHTML}<span class="activity-text-part">${actionText}</span>`;
+        let logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
+        logs.unshift(fullLogHTML);
+        localStorage.setItem(LOGS_KEY, JSON.stringify(logs.slice(0, 100)));
+        renderActivityLog();
     }
 
-    function toggleAll(master) {
-        document.querySelectorAll('#customersBody .select-check').forEach(c => c.checked = master.checked);
+    function renderActivityLog() {
+        const list = document.getElementById('activityList');
+        const logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
+        list.innerHTML = logs.map(log => `<div class="activity-item">${log}</div>`).join('');
     }
 
     function updateStats() {
-        const rows = document.querySelectorAll('#customersBody tr');
-        document.getElementById('total-customers-count').innerText = rows.length;
+        const rows = document.querySelectorAll('#tableBody tr');
+        document.getElementById('stat-total').innerText = rows.length;
     }
 
-    function addNewCustomerRow() {
-        const tbody = document.getElementById('customersBody');
-        const nextIndex = tbody.rows.length + 1;
+    function generateCustomerID() {
+        const d = new Date();
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const prefix = `${year}${month}`;
         
-        const rowData = {
-            comp: "",
-            mainRecord: "",
-            subRecord: "",
-            ownerPhone: "",
-            contactPhone: "",
-            email: "",
-            notes: "",
-            creator: "أحمد"
-        };
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        let maxSeq = 0;
+        saved.forEach(c => {
+            if (c.custId && c.custId.startsWith(prefix)) {
+                const seq = parseInt(c.custId.substring(6)) || 0;
+                if (seq > maxSeq) maxSeq = seq;
+            }
+        });
         
-        renderRow(rowData, nextIndex);
-        updateStats();
-        saveAllDataSilently();
-        
-        addToActivityLog('عميل جديد', '', 'إضافة سطر عميل فارغ جديد', '');
+        const nextSeq = String(maxSeq + 1).padStart(4, '0');
+        return `${prefix}${nextSeq}`;
     }
 
-    function renderRow(data, index) {
-        const tbody = document.getElementById('customersBody');
-        const row = tbody.insertRow(-1);
+    function renderTableRow(v = {}, prepend = false) {
+        const tbody = document.getElementById('tableBody');
+        const row = prepend ? tbody.insertRow(0) : tbody.insertRow();
         
+        const custId = v.custId || generateCustomerID();
+        const notes = v.notes || '';
+        const lastNoteText = getLastNoteOnly(notes);
+        
+        const locationUrl = v.locationUrl || '';
+        let locationTdHTML = `<span class="no-location">لا يوجد</span>`;
+        if (locationUrl && locationUrl.trim() !== '') {
+            locationTdHTML = `<a href="${locationUrl}" target="_blank" class="location-btn">📍 الموقع</a>`;
+        }
+
         row.innerHTML = `
-            <td><input type="checkbox" class="select-check"></td>
-            <td><a href="customer-profile.html?id=${index}" class="id-link">${index}</a></td>
-            <td><input type="text" value="${data.comp || ''}" placeholder="اسم الشركة" onblur="handleCellBlur(this, 'اسم الشركة')"></td>
-            <td><input type="text" value="${data.mainRecord || ''}" placeholder="700xxxxxx" onblur="handleCellBlur(this, 'السجل الرئيسي')"></td>
-            <td><input type="text" value="${data.subRecord || ''}" placeholder="05xxxx" onblur="handleCellBlur(this, 'السجل الفرعي')"></td>
-            <td><input type="text" value="${data.ownerPhone || ''}" placeholder="اسم المسؤول" onblur="handleCellBlur(this, 'اسم المسؤول')"></td>
+            <td class="col-select"><input type="checkbox" class="select-check"></td>
+            <td><input type="text" class="excel-input readonly-cust-val" value="${custId}" readonly></td>
+            <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الشركة', this.dataset.old, this.value, this.value); saveAllDataSilently();"></td>
             <td>
-                <div class="phone-cell-wrapper">
-                    <input type="text" value="${data.contactPhone || ''}" placeholder="05xxxx" onblur="handleCellBlur(this, 'رقم التواصل')">
-                    <span class="whatsapp-link-btn" onclick="openWhatsAppLink(this)" title="فتح محادثة واتساب">
-                        <svg viewBox="0 0 32 32" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M16 2C8.3 2 2 8.3 2 16c0 3 1 5.8 2.7 8.2L3 30l6-1.7C11.3 29.4 13.6 30 16 30c7.7 0 14-6.3 14-14S23.7 2 16 2z" fill="#25d366"/>
-                            <path d="M24 20.7c-.3-.5-1.1-.8-2.3-1.4-.4-.2-.7-.3-1 .2-.3.4-.7.9-.9 1.1-.2.2-.4.2-.8 0-.5-.3-1.7-1-3.2-2.3-1.1-1-1.9-2.3-2.1-2.7-.2-.4 0-.6.2-.8.2-.2.4-.4.6-.6.2-.2.3-.3.4-.5.1-.2 0-.4-.1-.6-.1-.2-.9-2.1-1.2-2.9-.3-.8-.7-.7-1-.7h-.8c-.3 0-.8.1-1.2.6-.4.5-1.6 1.6-1.6 3.9 0 2.3 1.7 4.5 1.9 4.8.2.3 3.3 5 8 7 .9.4 1.8.7 2.4.9 1.1.3 2.1.3 2.9.2.9-.1 2.3-.9 2.6-1.8.4-.9.4-1.7.3-1.8-.2-.3-.5-.4-.9-.6z" fill="#fff"/>
-                        </svg>
-                    </span>
-                </div>
+                ${locationTdHTML}
+                <input type="hidden" class="location-url-val" value="${locationUrl}">
             </td>
-            <td><input type="text" value="${data.email || ''}" placeholder="example@domain.com" onblur="handleCellBlur(this, '/ الايميل')"></td>
-            <td>
-                <div class="notes-preview" onclick="openNote(this)" data-full-notes="${(data.notes || '').replace(/"/g, '&quot;')}">
-                    ${getFormattedNoteLayout(data.notes || "")}
-                </div>
-            </td>
-            <td style="color:#64748b; font-weight:bold;">${data.creator || 'أحمد'}</td>
+            <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المسؤول', this.dataset.old, this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الموبايل', this.dataset.old, this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الإيميل', this.dataset.old, this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('السجل', this.dataset.old, this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
+            <td><input type="text" class="excel-input" value="${v.owner || 'أحمد'}" data-old="${v.owner || 'أحمد'}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المالك', this.dataset.old, this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
         `;
+
+        updateStats();
     }
 
-    function handleCellBlur(input, fieldName) {
-        const row = input.closest('tr');
-        const companyName = row.cells[2].querySelector('input').value.trim() || "غير مسمى";
-        const val = input.value.trim();
-        
-        saveAllDataSilently();
-        
-        if (val !== "") {
-            addToActivityLog(fieldName, '...', val, companyName);
+    function toggleAllCheckboxes(source) {
+        document.querySelectorAll('.select-check').forEach(chk => chk.checked = source.checked);
+    }
+
+    function toggleDropdown(event, btn) {
+        event.stopPropagation();
+        const menu = btn.nextElementSibling;
+        const isOpen = menu.classList.contains('show');
+        document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+        if(!isOpen) menu.classList.add('show');
+    }
+
+    function handleBulkAction(action) {
+        const selected = document.querySelectorAll('.select-check:checked');
+        if (selected.length === 0) return alert('حدد صفا أولا');
+        if (action === 'حذف' && confirm('تأكيد الحذف؟')) {
+            selected.forEach(chk => {
+                const row = chk.closest('tr');
+                const companyName = row.cells[2].querySelector('input').value;
+                addToActivityLog('إجراء', 'حذف العميل', '', companyName);
+                row.remove();
+            });
+            saveAllDataSilently();
+            updateStats();
+        } else {
+            selected.forEach(chk => {
+                const row = chk.closest('tr');
+                const companyName = row.cells[2].querySelector('input').value;
+                addToActivityLog('إجراء', action, '', companyName);
+            });
+            alert('تم تنفيذ ' + action + ' على ' + selected.length + ' من صفوف العملاء');
         }
     }
 
     function saveAllDataSilently() {
-        const rows = document.querySelectorAll('#customersBody tr');
-        const dataArr = [];
-        
-        rows.forEach(r => {
-            dataArr.push({
-                comp: r.cells[2].querySelector('input').value.trim(),
-                mainRecord: r.cells[3].querySelector('input').value.trim(),
-                subRecord: r.cells[4].querySelector('input').value.trim(),
-                ownerPhone: r.cells[5].querySelector('input').value.trim(),
-                contactPhone: r.cells[6].querySelector('input').type === 'text' ? r.cells[6].querySelector('input').value.trim() : r.cells[6].querySelector('.phone-cell-wrapper input').value.trim(),
-                email: r.cells[7].querySelector('input').value.trim(),
-                notes: r.cells[8].querySelector('.notes-preview').getAttribute('data-full-notes') || "",
-                creator: r.cells[9].innerText.trim()
+        const data = [];
+        document.querySelectorAll('#tableBody tr').forEach(row => {
+            data.push({
+                custId: row.cells[1].querySelector('input').value,
+                comp: row.cells[2].querySelector('input').value,
+                locationUrl: row.querySelector('.location-url-val').value, 
+                mgr: row.cells[4].querySelector('input').value,
+                mob: row.cells[5].querySelector('input').value,
+                email: row.cells[6].querySelector('input').value,
+                record: row.cells[7].querySelector('input').value,
+                notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '',
+                owner: row.cells[9].querySelector('input').value
             });
         });
-        
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(dataArr));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
 
-    function loadAllData() {
-        const rawData = localStorage.getItem(STORAGE_KEY);
-        const tbody = document.getElementById('customersBody');
-        tbody.innerHTML = "";
-        
-        if (rawData) {
-            const arr = JSON.parse(rawData);
-            arr.forEach((item, idx) => {
-                renderRow(item, idx + 1);
+    function checkIncomingCustomers() {
+        const incomingData = localStorage.getItem(INCOMING_KEY);
+        if (incomingData) {
+            const newCusts = JSON.parse(incomingData);
+            newCusts.forEach(cust => {
+                renderTableRow(cust, true);
+                addToActivityLog("إجراء", "تأهيل وتأسيس ملف عميل جديد من الفرص", "", cust.comp);
             });
+            saveAllDataSilently();
+            localStorage.removeItem(INCOMING_KEY);
         }
+    }
+
+    function loadSavedData() {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = "";
+        saved.forEach(v => renderTableRow(v));
         
+        checkIncomingCustomers();
+
+        renderActivityLog();
         updateStats();
-        renderActivityLogs();
     }
 
     function filterTable() {
-        const q = document.getElementById('globalSearch').value.toLowerCase().trim();
-        const rows = document.querySelectorAll('#customersBody tr');
-        
-        rows.forEach(r => {
-            const text = r.innerText.toLowerCase();
-            const compVal = r.cells[2].querySelector('input').value.toLowerCase();
-            const mainVal = r.cells[3].querySelector('input').value.toLowerCase();
-            const subVal = r.cells[4].querySelector('input').value.toLowerCase();
-            
-            if (text.includes(q) || compVal.includes(q) || mainVal.includes(q) || subVal.includes(q)) {
-                r.style.display = "";
-            } else {
-                r.style.display = "none";
-            }
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        document.querySelectorAll('#tableBody tr').forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(q) ? "" : "none";
         });
     }
 
-    function executeAction(type) {
-        if (type === 'حذف') {
-            const checkedBoxes = document.querySelectorAll('#customersBody .select-check:checked');
-            if (checkedBoxes.length === 0) {
-                alert('الرجاء تحديد صف واحد على الأقل لحذفه.');
-                return;
-            }
-            
-            if (confirm(`هل أنت متأكد من حذف ${checkedBoxes.length} من العملاء المحددين؟`)) {
-                checkedBoxes.forEach(cb => {
-                    const row = cb.closest('tr');
-                    const compName = row.cells[2].querySelector('input').value || "غير مسمى";
-                    addToActivityLog('حذف عميل', '', `تم حذف بيانات العميل كاملاً`, compName);
-                    row.remove();
-                });
-                
-                saveAllDataSilently();
-                reIndexTable();
-                updateStats();
-                
-                document.querySelector('thead .select-check').checked = false;
-            }
-        } else if (type === 'تصدير') {
-            const rawData = localStorage.getItem(STORAGE_KEY) || '[]';
-            alert("بيانات التصدير (JSON):\n\n" + rawData);
-        } else if (type === 'تعديل') {
-            alert("نمط التعديل السريع نشط تلقائياً عبر الخلايا.");
-        } else if (type === 'طباعة') {
-            window.print();
-        }
-    }
-
-    function reIndexTable() {
-        const rows = document.querySelectorAll('#customersBody tr');
-        rows.forEach((r, idx) => {
-            const currentId = idx + 1;
-            const idCell = r.cells[1];
-            idCell.innerHTML = `<a href="customer-profile.html?id=${currentId}" class="id-link">${currentId}</a>`;
-        });
-    }
-
-    function addToActivityLog(field, old, newVal, compName) {
-        const logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
-        const displayComp = compName ? `(${compName})` : '';
-        const logEntry = `${generateStyledHeader()}<span class="activity-text-part">${field} - [${newVal}] ${displayComp}</span>`;
-        
-        logs.unshift(logEntry);
-        localStorage.setItem(LOGS_KEY, JSON.stringify(logs.slice(0, 50)));
-        renderActivityLogs();
-    }
-
-    function renderActivityLogs() {
-        const logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
-        const container = document.getElementById('activityLogs');
-        container.innerHTML = logs.map(l => `<div class="activity-item">${l}</div>`).join('');
+    function getLastNoteOnly(fullText) {
+        if (!fullText || fullText.trim() === "") return 'إضافة ملاحظة...';
+        const arr = fullText.split('\n--------------------\n');
+        const lastEntry = arr[arr.length - 1];
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = lastEntry;
+        const textPart = tempDiv.querySelector('.activity-text-part');
+        return textPart ? textPart.innerText : 'عرض السجل...';
     }
 
     function openNote(el) {
@@ -572,8 +454,10 @@
             let entry = `${generateStyledHeader()}<span class="activity-text-part">${txt}</span>`;
             let updated = old === "" ? entry : old + "\n--------------------\n" + entry;
             currentActivePreview.setAttribute('data-full-notes', updated);
-            currentActivePreview.innerHTML = getFormattedNoteLayout(updated);
+            currentActivePreview.innerText = txt;
             
+            const companyName = currentActivePreview.closest('tr').cells[2].querySelector('input').value;
+            addToActivityLog('الملاحظات', '...', txt, companyName);
             saveAllDataSilently();
         }
         closeNote();
