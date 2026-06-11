@@ -133,19 +133,19 @@
             line-height: 20px;
         }
 
-        /* ستايل سجل النشاط والتواصل الموحد */
+        /* ستايل سجل النشاط والتواصل الموحد بعد تصغير الخط درجة واحدة */
         .activity-log-section { 
             margin: 15px 0 10px 0; padding: 12px 18px; background: #ffffff; border-radius: 10px; 
             border: 1px solid var(--border-soft); box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
             flex-shrink: 0; height: 140px; display: flex; flex-direction: column; box-sizing: border-box;
         }
-        .activity-log-title { color: var(--dark-yellow); font-size: 13.5px; font-weight: 800; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; flex-shrink: 0; text-align: right; }
-        .activity-list { flex: 1; overflow-y: auto; font-size: 11.5px; line-height: 1.6; }
+        .activity-log-title { color: var(--dark-yellow); font-size: 12.5px; font-weight: 800; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; flex-shrink: 0; text-align: right; }
+        .activity-list { flex: 1; overflow-y: auto; font-size: 10.5px; line-height: 1.6; }
         .activity-item { margin-bottom: 4px; border-bottom: 1px dashed #f8fafc; padding-bottom: 4px; color: #475569; display: flex; align-items: center; text-align: right; direction: rtl; }
          
-        .activity-header-part { font-size: 11.5px; color: var(--chat-yellow); font-weight: 800; display: inline-block; }
-        .activity-time-part { font-size: 10px; font-weight: normal; }
-        .activity-text-part { font-size: 11.5px; color: #475569; font-weight: 700; display: inline-block; }
+        .activity-header-part { font-size: 10.5px; color: var(--chat-yellow); font-weight: 800; display: inline-block; }
+        .activity-time-part { font-size: 9px; font-weight: normal; }
+        .activity-text-part { font-size: 10.5px; color: #475569; font-weight: 700; display: inline-block; }
 
         /* نافذة الملاحظات المنبثقة للكبسولة الذكية الموحدة */
         .modal-notes { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
@@ -244,7 +244,6 @@
             </table>
         </div>
 
-        <!-- قسم سجل النشاط والتواصل الموحد -->
         <div class="activity-log-section">
             <div class="activity-log-title">📋 سجل نشاط الفرص البيعية</div>
             <div id="activityList" class="activity-list"></div>
@@ -252,7 +251,6 @@
     </div>
 </div>
 
-<!-- النافذة المنبثقة الذكية للملاحظات الموحدة -->
 <div id="noteModal" class="modal-notes">
     <div class="modal-notes-content">
         <div style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right;">سجل متابعة الفرصة والنتائج</div>
