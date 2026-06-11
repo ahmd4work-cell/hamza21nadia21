@@ -38,25 +38,30 @@
         .navbar a.active { background-color: var(--nav-active); color: #0f172a; border-radius: 6px; }
 
         .main-content { flex: 1; display: flex; flex-direction: column; padding: 0 15px; min-height: 0; }
-         
-        .action-bar { display: flex; align-items: center; margin: 10px 0; gap: 10px; flex-shrink: 0; }
         
-        .search-wrapper { position: relative; width: 18%; display: flex; align-items: center; }
+        .action-bar { display: flex; align-items: center; margin: 10px 0; gap: 10px; flex-shrink: 0; }
+        .btn-top { border: none; padding: 0 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; font-size: 12px; height: 35px; }
+        .btn-add { background-color: var(--accent-blue); }
+
+        .search-wrapper { position: relative; width: 15%; display: flex; align-items: center; }
         .search-input {
-            width: 100%; height: 35px; padding: 0 10px; border-radius: 8px;
+            width: 100%; height: 30px; padding: 0 10px; border-radius: 8px;
             border: 1px solid var(--border-soft); background: #fff;
             font-family: 'Cairo'; font-size: 12px; font-weight: 700; outline: none;
         }
 
-        .stats-bar-visit { margin-right: auto; display: flex; gap: 12px; align-items: center; background: #fff; padding: 0 15px; border-radius: 5px; height: 35px; border: 1px solid var(--border-soft); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .stat-item { font-size: 11px; font-weight: 800; color: #475569; white-space: nowrap; }
+        .stats-bar {
+            margin-right: auto; display: flex; gap: 10px; align-items: center;
+            background: #fff; padding: 0 10px; border-radius: 5px; height: 25px;
+            border: 1px solid var(--border-soft); box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .stat-item { font-size: 10px; font-weight: 800; color: #475569; white-space: nowrap; }
         .stat-val { color: var(--accent-blue); margin-right: 3px; }
-        .stat-divider { color: #cbd5e1; font-weight: normal; margin: 0 2px; }
 
         .bulk-action-wrapper { position: relative; display: flex; align-items: center; margin-right: 5px; }
         .btn-bulk-trigger { 
-            height: 35px; padding: 0 15px; border-radius: 5px; border: 1px solid var(--border-soft);
-            background: #fff; color: var(--text-dark); font-family: 'Cairo'; font-size: 12px; font-weight: 800;
+            height: 25px; padding: 0 12px; border-radius: 5px; border: 1px solid var(--border-soft);
+            background: #fff; color: var(--text-dark); font-family: 'Cairo'; font-size: 11px; font-weight: 800;
             cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: 0.2s;
             display: flex; align-items: center; gap: 5px;
         }
@@ -67,31 +72,29 @@
             flex: 1; min-height: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.02); position: relative;
         }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-         
+        
         th { 
             background: var(--header-shiny-purple); color: white; padding: 0 5px; font-size: 11px; font-weight: 800; 
             text-align: center; border-bottom: 2px solid #2e1065; position: sticky; top: 0; z-index: 50; height: 40px;
         }
-         
+        
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; max-height: 45px; font-size: 11px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; }
-
-        tbody tr:nth-child(even) { background-color: #eff6ff; }
+        
+        tbody tr.main-row:nth-child(4n+1) { background-color: #eff6ff; }
 
         .excel-input { 
             width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; 
             background: transparent; font-size: 11.5px; color: inherit; font-weight: inherit; 
             height: 100%; overflow: hidden; text-overflow: ellipsis; 
         }
-        .readonly-cust-val { color: #1e3a8a !important; font-weight: 800 !important; cursor: not-allowed; }
-
+        .readonly-input { color: #1e3a8a !important; font-weight: 800 !important; cursor: not-allowed; }
         .select-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent-blue); vertical-align: middle; }
 
         .dropdown-menu { 
             display: none; position: absolute; left: 0; 
-            top: 38px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; 
+            top: 28px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; 
             box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 1000; min-width: 110px; padding: 4px;
         }
-
         .dropdown-menu button { 
             width: 100%; padding: 6px 10px; border: none; background: none; font-family: 'Cairo'; 
             font-size: 10.5px; text-align: right; cursor: pointer; color: #475569; font-weight: 700; 
@@ -105,10 +108,9 @@
             width: 95%; height: 20px; border: none; background: transparent; font-family: 'Cairo'; 
             font-size: 11px; text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700; 
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; margin: 0 auto; 
-            line-height: 20px;
         }
 
-        /* تحديث سجل النشاط ليتطابق تماماً مع الصورة وبالحجم الصغير والارتفاع المطلوب */
+        /* تعديل هيكل سجل النشاط ليتطابق مع الصورة بارتفاع 100 بيكسل يتوسع إلى 200 بيكسل */
         .activity-log-section { 
             margin: 1px 0 0px 0; padding: 10px 18px; background: #ffffff; border-radius: 10px; 
             border: 1px solid var(--border-soft); box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
@@ -130,30 +132,23 @@
         .activity-time-part { font-size: 8.5px; font-weight: normal; color: #64748b; }
         .activity-text-part { font-size: 9.5px; color: #2563eb; font-weight: 700; display: inline; margin-right: 6px; }
 
-        /* نافذة الملاحظات المنبثقة للكبسولة الذكية الموحدة */
-        .modal-notes { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-        .modal-notes-content { background: white; padding: 18px; border-radius: 12px; width: 440px; height: 480px; display: flex; flex-direction: column; box-sizing: border-box; }
-        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; direction: rtl; }
-        .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; direction: rtl; }
+        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .modal-content { background: white; padding: 18px; border-radius: 12px; width: 440px; height: 480px; display: flex; flex-direction: column; }
+        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
+        .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
 
-        .location-btn {
-            background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;
-            padding: 3px 8px; border-radius: 4px; font-family: 'Cairo';
-            font-size: 10.5px; font-weight: 700; cursor: pointer; text-decoration: none;
-            display: inline-flex; align-items: center; gap: 4px; transition: 0.2s;
-        }
-        .location-btn:hover { background: #dbeafe; color: #1d4ed8; }
-        .no-location { color: #94a3b8; font-size: 10.5px; font-style: italic; }
-
+        /* التحكم في أبعاد وتصغير حجم الأعمدة المحددة */
         .col-select { width: 3%; }
-        .col-id { width: 11%; } 
-        .col-company { width: 15%; } 
-        .col-location { width: 7%; } 
-        .col-manager { width: 9%; } 
-        .col-mobile { width: 9%; } 
-        .col-email { width: 9%; } 
-        .col-record { width: 8%; } 
-        .col-notes { width: 15%; } 
+        .col-id { width: 6%; } /* تصغير عمود كود العميل / ID */
+        .col-company { width: 15%; }
+        .col-records { width: 9%; }
+        .col-contact { width: 9%; }
+        .col-phone { width: 9%; }
+        .col-email { width: 11%; }
+        .col-type { width: 7%; }
+        .col-status { width: 7%; }
+        .col-notes { width: 14%; }
+        .col-created { width: 10%; }
         .col-owner { width: 7%; }
     </style>
 </head>
@@ -170,38 +165,45 @@
 
     <div class="main-content">
         <div class="action-bar">
+            <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة عميل جديد</button>
             <div class="search-wrapper">
-                <input type="text" id="searchInput" class="search-input" placeholder="بحث باسم الشركة أو العميل... 🔍" onkeyup="filterTable()">
+                <input type="text" id="searchInput" class="search-input" placeholder="بحث في العملاء 🔍" onkeyup="filterTable()">
             </div>
-             
-            <div class="stats-bar-visit">
+            
+            <div class="stats-bar">
                 <div class="stat-item">إجمالي العملاء: <span id="stat-total" class="stat-val">0</span></div>
+                <div class="stat-item">عملاء الشهر: <span id="stat-month" class="stat-val">0</span></div>
+                <div class="stat-item">عملاء اليوم: <span id="stat-today" class="stat-val">0</span></div>
             </div>
 
             <div class="bulk-action-wrapper">
                 <button class="btn-bulk-trigger" onclick="toggleDropdown(event, this)">إجراء ▾</button>
                 <div class="dropdown-menu">
                     <button onclick="handleBulkAction('تغيير المالك')">تغيير المالك</button>
+                    <button onclick="handleBulkAction('تعديل')">تعديل</button>
                     <button onclick="handleBulkAction('تصدير')">تصدير</button>
                     <button onclick="handleBulkAction('طباعة')">طباعة</button>
                     <button class="del-btn" onclick="handleBulkAction('حذف')">حذف</button>
                 </div>
             </div>
         </div>
-         
+        
         <div class="table-wrapper">
             <table id="mainTable">
                 <thead>
                     <tr>
                         <th class="col-select"><input type="checkbox" onclick="toggleAllCheckboxes(this)"></th>
-                        <th class="col-id">كود العميل</th>
-                        <th class="col-company">الشركة</th>
-                        <th class="col-location">الموقع</th> 
-                        <th class="col-manager">المسؤول</th>
-                        <th class="col-mobile">الموبايل</th>
-                        <th class="col-email">الإيميل</th>
-                        <th class="col-record">السجل</th>
-                        <th class="col-notes">ملاحظات ومتابعة</th>
+                        <th class="col-id">ID</th>
+                        <th class="col-company">اسم المنشأة / الشركة</th>
+                        <th class="col-records">السجل الرئيسي</th>
+                        <th class="col-records">السجل الفرعي</th>
+                        <th class="col-contact">الشخص المسؤول</th>
+                        <th class="col-phone">رقم التواصل</th>
+                        <th class="col-email">البريد الإلكتروني</th>
+                        <th class="col-type">التصنيف</th>
+                        <th class="col-status">الحالة</th>
+                        <th class="col-notes">سجل المتابعة</th>
+                        <th class="col-created">تاريخ الإنشاء</th>
                         <th class="col-owner">المالك</th>
                     </tr>
                 </thead>
@@ -219,23 +221,22 @@
     </div>
 </div>
 
-<div id="noteModal" class="modal-notes">
-    <div class="modal-notes-content">
-        <div style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right;">سجل متابعة العميل والنتائج</div>
+<div id="noteModal" class="modal">
+    <div class="modal-content">
+        <div style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right;">سجل ملاحظات ومتابعة العميل</div>
         <div id="historyLog" class="history-log"></div>
-        <textarea id="modalTextArea" class="note-area" placeholder="أدخل تفاصيل الملاحظة هنا..."></textarea>
+        <textarea id="modalTextArea" class="note-area" placeholder="أضف ملاحظة جديدة بخصوص هذا العميل..."></textarea>
         <div style="display:flex; justify-content: flex-end; gap:8px; margin-top:10px;">
-            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px;">تراجع</button>
-            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px; font-weight:bold;">حفظ الملاحظة</button>
+            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px;">إلغاء</button>
+            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px; font-weight:bold;">تحديث الملاحظات</button>
         </div>
     </div>
 </div>
 
 <script>
     let currentActivePreview = null;
-    const STORAGE_KEY = 'asgate_customers_final_v33'; 
-    const LOGS_KEY = 'asgate_customers_logs_v33';
-    const INCOMING_KEY = 'asgate_customers_incoming_v33'; 
+    const STORAGE_KEY = 'asgate_customers_v2_final'; 
+    const LOGS_KEY = 'asgate_customers_logs_v2';
 
     function getTodayFormatted() {
         const d = new Date();
@@ -263,17 +264,10 @@
 
     function addToActivityLog(fieldName, oldVal, newVal, companyName) {
         const headerHTML = generateStyledHeader();
-        const cleanCompany = (companyName && companyName.trim() !== "") ? companyName : "عميل جديد";
-        const v1 = (oldVal && oldVal.toString().trim() !== "") ? oldVal : "فارغ";
-        const v2 = (newVal && newVal.toString().trim() !== "") ? newVal : "فارغ";
-        
-        let actionText = "";
-        if (fieldName === "إجراء") {
-            actionText = `${oldVal} لملف شركة ( ${cleanCompany} )`;
-        } else {
-            actionText = `تعديل ${fieldName} من [${v1}] إلى [${v2}] في ( ${cleanCompany} )`;
-        }
-        
+        const cleanCompany = companyName && companyName.trim() !== "" ? companyName : "عميل جديد";
+        const val1 = (oldVal && oldVal.trim() !== "") ? oldVal : "فارغ";
+        const val2 = (newVal && newVal.trim() !== "") ? newVal : "فارغ";
+        let actionText = fieldName === "إجراء" ? `حذف بيانات العميل ( ${cleanCompany} )` : `تغيير ${fieldName} من [${val1}] إلى [${val2}] للعميل ( ${cleanCompany} )`;
         const fullLogHTML = `${headerHTML}<span class="activity-text-part">${actionText}</span>`;
         let logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
         logs.unshift(fullLogHTML);
@@ -288,59 +282,65 @@
     }
 
     function updateStats() {
-        const rows = document.querySelectorAll('#tableBody tr');
-        document.getElementById('stat-total').innerText = rows.length;
-    }
-
-    function generateCustomerID() {
-        const d = new Date();
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const prefix = `${year}${month}`;
+        const rows = document.querySelectorAll('#tableBody .main-row');
+        const today = getTodayFormatted();
+        const currentMonth = today.substring(0, 7); // YYYY-MM
         
-        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-        let maxSeq = 0;
-        saved.forEach(c => {
-            if (c.custId && c.custId.startsWith(prefix)) {
-                const seq = parseInt(c.custId.substring(6)) || 0;
-                if (seq > maxSeq) maxSeq = seq;
-            }
+        let total = rows.length;
+        let countToday = 0;
+        let countMonth = 0;
+
+        rows.forEach(r => {
+            const dateVal = r.querySelector('.created-date-val').value;
+            if(dateVal === today) countToday++;
+            if(dateVal.startsWith(currentMonth)) countMonth++;
         });
-        
-        const nextSeq = String(maxSeq + 1).padStart(4, '0');
-        return `${prefix}${nextSeq}`;
+
+        document.getElementById('stat-total').innerText = total;
+        document.getElementById('stat-month').innerText = countMonth;
+        document.getElementById('stat-today').innerText = countToday;
     }
 
-    function renderTableRow(v = {}, prepend = false) {
+    function renderRow(c = {}, prepend = false) {
         const tbody = document.getElementById('tableBody');
-        const row = prepend ? tbody.insertRow(0) : tbody.insertRow();
+        const rowId = 'cust-' + Date.now() + Math.random().toString(36).substr(2, 5);
+        const mainRow = prepend ? tbody.insertRow(0) : tbody.insertRow();
+        mainRow.className = 'main-row';
+        mainRow.id = rowId;
         
-        const custId = v.custId || generateCustomerID();
-        const notes = v.notes || '';
+        const notes = c.notes || '';
         const lastNoteText = getLastNoteOnly(notes);
         
-        const locationUrl = v.locationUrl || '';
-        let locationTdHTML = `<span class="no-location">لا يوجد</span>`;
-        if (locationUrl && locationUrl.trim() !== '') {
-            locationTdHTML = `<a href="${locationUrl}" target="_blank" class="location-btn">📍 الموقع</a>`;
-        }
+        // إدراج تاريخ اليوم للعميل الجديد تلقائياً مع منعه من التعديل
+        const createdAt = c.createdDate || getTodayFormatted();
 
-        row.innerHTML = `
+        mainRow.innerHTML = `
             <td class="col-select"><input type="checkbox" class="select-check"></td>
-            <td><input type="text" class="excel-input readonly-cust-val" value="${custId}" readonly></td>
-            <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الشركة', this.dataset.old, this.value, this.value); saveAllDataSilently();"></td>
+            <td class="col-id"><input type="text" class="excel-input readonly-input" value="${c.id || Math.floor(1000 + Math.random() * 9000)}" readonly></td>
+            <td><input type="text" class="excel-input" value="${c.comp || ''}" data-old="${c.comp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الشركة', this.getAttribute('data-old'), this.value, this.value); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${c.mainRecord || ''}" data-old="${c.mainRecord || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('السجل الرئيسي', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${c.subRecord || ''}" data-old="${c.subRecord || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('السجل الفرعي', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${c.contact || ''}" data-old="${c.contact || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المسؤول', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${c.phone || ''}" data-old="${c.phone || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الهاتف', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${c.email || ''}" data-old="${c.email || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الإيميل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
             <td>
-                ${locationTdHTML}
-                <input type="hidden" class="location-url-val" value="${locationUrl}">
+                <select class="excel-input" data-old="${c.type || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('التصنيف', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();">
+                    <option value="VIP" ${c.type === 'VIP' ? 'selected' : ''}>VIP</option>
+                    <option value="تجاري" ${c.type === 'تجاري' ? 'selected' : ''}>تجاري</option>
+                    <option value="حكومي" ${c.type === 'حكومي' ? 'selected' : ''}>حكومي</option>
+                    <option value="صغير" ${c.type === 'صغير' ? 'selected' : ''}>صغير</option>
+                </select>
             </td>
-            <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المسؤول', this.dataset.old, this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الموبايل', this.dataset.old, this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الإيميل', this.dataset.old, this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('السجل', this.dataset.old, this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
+            <td>
+                <select class="excel-input" data-old="${c.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الحالة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();">
+                    <option value="نشط" ${c.status === 'نشط' ? 'selected' : ''}>نشط</option>
+                    <option value="غير نشط" ${c.status === 'غير نشط' ? 'selected' : ''}>غير نشط</option>
+                </select>
+            </td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
-            <td><input type="text" class="excel-input" value="${v.owner || 'أحمد'}" data-old="${v.owner || 'أحمد'}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المالك', this.dataset.old, this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input readonly-input" value="${createdAt}" readonly><input type="hidden" class="created-date-val" value="${createdAt}"></td>
+            <td><input type="text" class="excel-input" value="${c.owner || 'أحمد'}" onchange="saveAllDataSilently();"></td>
         `;
-
         updateStats();
     }
 
@@ -348,8 +348,8 @@
         document.querySelectorAll('.select-check').forEach(chk => chk.checked = source.checked);
     }
 
-    function toggleDropdown(event, btn) {
-        event.stopPropagation();
+    function toggleDropdown(e, btn) {
+        e.stopPropagation();
         const menu = btn.nextElementSibling;
         const isOpen = menu.classList.contains('show');
         document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
@@ -358,85 +358,68 @@
 
     function handleBulkAction(action) {
         const selected = document.querySelectorAll('.select-check:checked');
-        if (selected.length === 0) return alert('حدد صفا أولا');
-        if (action === 'حذف' && confirm('تأكيد الحذف؟')) {
+        if (selected.length === 0) return alert('يرجى تحديد العملاء أولاً');
+        if (action === 'حذف' && confirm('هل أنت متأكد من حذف العملاء المحددين؟')) {
             selected.forEach(chk => {
                 const row = chk.closest('tr');
                 const companyName = row.cells[2].querySelector('input').value;
-                addToActivityLog('إجراء', 'حذف العميل', '', companyName);
+                addToActivityLog('إجراء', '', '', companyName);
                 row.remove();
             });
             saveAllDataSilently();
             updateStats();
         } else {
-            selected.forEach(chk => {
-                const row = chk.closest('tr');
-                const companyName = row.cells[2].querySelector('input').value;
-                addToActivityLog('إجراء', action, '', companyName);
-            });
-            alert('تم تنفيذ ' + action + ' على ' + selected.length + ' من صفوف العملاء');
+            alert('تم طلب تنفيذ ' + action + ' على ' + selected.length + ' عميل');
         }
     }
 
     function saveAllDataSilently() {
         const data = [];
-        document.querySelectorAll('#tableBody tr').forEach(row => {
+        document.querySelectorAll('.main-row').forEach(row => {
             data.push({
-                custId: row.cells[1].querySelector('input').value,
+                id: row.cells[1].querySelector('input') ? row.cells[1].querySelector('input').value : row.cells[1].innerText,
                 comp: row.cells[2].querySelector('input').value,
-                locationUrl: row.querySelector('.location-url-val').value, 
-                mgr: row.cells[4].querySelector('input').value,
-                mob: row.cells[5].querySelector('input').value,
-                email: row.cells[6].querySelector('input').value,
-                record: row.cells[7].querySelector('input').value,
+                mainRecord: row.cells[3].querySelector('input').value,
+                subRecord: row.cells[4].querySelector('input').value,
+                contact: row.cells[5].querySelector('input').value,
+                phone: row.cells[6].querySelector('input').value,
+                email: row.cells[7].querySelector('input').value,
+                type: row.cells[8].querySelector('select').value,
+                status: row.cells[9].querySelector('select').value,
                 notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '',
-                owner: row.cells[9].querySelector('input').value
+                createdDate: row.querySelector('.created-date-val').value,
+                owner: row.cells[12].querySelector('input').value
             });
         });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    }
-
-    function checkIncomingCustomers() {
-        const incomingData = localStorage.getItem(INCOMING_KEY);
-        if (incomingData) {
-            const newCusts = JSON.parse(incomingData);
-            newCusts.forEach(cust => {
-                renderTableRow(cust, true);
-                addToActivityLog("إجراء", "تأهيل وتأسيس ملف عميل جديد من الفرص", "", cust.comp);
-            });
-            saveAllDataSilently();
-            localStorage.removeItem(INCOMING_KEY);
-        }
+        updateStats();
     }
 
     function loadSavedData() {
-        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-        const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = "";
-        saved.forEach(v => renderTableRow(v));
-        
-        checkIncomingCustomers();
-
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) JSON.parse(saved).forEach(item => renderRow(item));
         renderActivityLog();
         updateStats();
     }
 
+    function insertNewRow() { renderRow({}, true); saveAllDataSilently(); }
+
     function filterTable() {
         const q = document.getElementById('searchInput').value.toLowerCase();
-        document.querySelectorAll('#tableBody tr').forEach(row => {
-            const text = row.innerText.toLowerCase();
-            row.style.display = text.includes(q) ? "" : "none";
+        document.querySelectorAll('.main-row').forEach(r => {
+            const match = [2,3,4,5,6].some(idx => r.cells[idx].querySelector('input').value.toLowerCase().includes(q));
+            r.style.display = match ? "" : "none";
         });
     }
 
     function getLastNoteOnly(fullText) {
-        if (!fullText || fullText.trim() === "") return 'إضافة ملاحظة...';
+        if (!fullText) return 'أضف ملاحظة...';
         const arr = fullText.split('\n--------------------\n');
-        const lastEntry = arr[arr.length - 1];
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = lastEntry;
-        const textPart = tempDiv.querySelector('.activity-text-part');
-        return textPart ? textPart.innerText : 'عرض السجل...';
+        const last = arr[arr.length - 1];
+        const temp = document.createElement('div');
+        temp.innerHTML = last;
+        const txt = temp.querySelector('.activity-text-part');
+        return txt ? txt.innerText : 'أضف ملاحظة...';
     }
 
     function openNote(el) {
