@@ -95,7 +95,6 @@
         .id-link { color: #3b82f6; font-weight: 800; text-decoration: none; display: inline-block; width: 100%; height: 100%; line-height: 45px; transition: 0.2s; }
         .id-link:hover { color: #2563eb; text-decoration: underline; }
 
-        /* تنسيق خلية رقم الاتصال مع أيقونة الواتساب */
         .phone-cell-container { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; padding: 0 4px; box-sizing: border-box; }
         .whatsapp-icon-btn { color: #25d366; font-size: 14px; text-decoration: none; margin-right: 5px; cursor: pointer; transition: transform 0.2s; display: inline-flex; align-items: center; }
         .whatsapp-icon-btn:hover { transform: scale(1.2); }
@@ -287,7 +286,7 @@
         .col-address { width: 14%; } 
         .col-records { width: 9%; }
         .col-contact { width: 9%; }
-        .col-phone { width: 11%; } /* توسيع عمود الهاتف قليلاً ليستوعب الأيقونة بصورة مريحة */
+        .col-phone { width: 11%; } 
         .col-email { width: 11%; }
         .col-type { width: 7%; }
         .col-status { width: 7%; }
@@ -311,7 +310,8 @@
         <div class="action-bar">
             <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة عميل جديد</button>
             <div class="search-wrapper">
-                <input type="text" id="searchInput" class="search-input" placeholder="بحث في العملاء 🔍" onkeyup="filterTable()">
+                <!-- تم تعديل كلمة مربع البحث لتصبح (بحث 🔍) فقط بناءً على طلبك -->
+                <input type="text" id="searchInput" class="search-input" placeholder="بحث 🔍" onkeyup="filterTable()">
             </div>
             
             <div class="stats-bar">
@@ -448,7 +448,6 @@
         document.getElementById('stat-today').innerText = countToday;
     }
 
-    // دالة فتح الواتساب البرمجية الذكية لفلترة الأرقام بدقة وتحويلها
     function openWhatsAppChat(el) {
         const inputEl = el.closest('.phone-cell-container').querySelector('input');
         let rawPhone = inputEl.value.trim();
@@ -458,10 +457,8 @@
             return;
         }
         
-        // إزالة أي رموز أو مسافات، الإبقاء على الأرقام فقط
         let cleanNumber = rawPhone.replace(/\D/g, '');
         
-        // تعديل الصيغ للرقم تلقائياً
         if (cleanNumber.startsWith('00966')) {
             cleanNumber = cleanNumber.substring(2);
         } else if (cleanNumber.startsWith('05')) {
@@ -491,20 +488,14 @@
             <td class="col-id"><a href="customer-profile.html?id=${generatedId}" class="id-link" target="_blank">${generatedId}</a></td>
             <td><input type="text" class="excel-input" value="${c.comp || ''}" data-old="${c.comp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('اسم المنشأة الشركة', this.getAttribute('data-old'), this.value, this.value); saveAllDataSilently();"></td>
             <td><input type="text" class="excel-input" value="${c.subRecord || ''}" data-old="${c.subRecord || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('العنوان', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
-            
-            <!-- عمود السجل الرئيسي: مضاف إليه تقييد الحروف لقبول أرقام فقط -->
             <td><input type="text" class="excel-input" value="${c.mainRecord || ''}" data-old="${c.mainRecord || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('السجل الرئيسي', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
-            
             <td><input type="text" class="excel-input" value="${c.contact || ''}" data-old="${c.contact || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الشخص المسؤول', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
-            
-            <!-- عمود رقم التواصل: يحتوي على تقييد مدخلات الأرقام وزر واتساب مرن -->
             <td>
                 <div class="phone-cell-container">
                     <a class="whatsapp-icon-btn" onclick="openWhatsAppChat(this)" title="مراسلة عبر واتساب"><i class="fab fa-whatsapp"></i></a>
                     <input type="text" class="excel-input" value="${c.phone || ''}" data-old="${c.phone || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('رقم التواصل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();">
                 </div>
             </td>
-            
             <td><input type="text" class="excel-input" value="${c.email || ''}" data-old="${c.email || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('البريد الإلكتروني', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
             <td>
                 <select class="excel-input" data-old="${c.type || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('التصنيف', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();">
@@ -591,11 +582,27 @@
 
     function insertNewRow() { renderRow({}, true); saveAllDataSilently(); }
 
+    // دالة الفلترة الذكية المخصصة للأعمدة الستة المحددة فقط
     function filterTable() {
-        const q = document.getElementById('searchInput').value.toLowerCase();
+        const q = document.getElementById('searchInput').value.toLowerCase().trim();
         document.querySelectorAll('.main-row').forEach(r => {
-            const match = [2,3,4,5,6,7].some(idx => r.cells[idx].querySelector('input') ? r.cells[idx].querySelector('input').value.toLowerCase().includes(q) : false);
-            r.style.display = match ? "" : "none";
+            // جلب نصوص المدخلات من الخلايا المحددة للبحث فقط بدقة
+            const idVal = r.cells[1].querySelector('.id-link').innerText.toLowerCase();
+            const compVal = r.cells[2].querySelector('input').value.toLowerCase();
+            const mainRecVal = r.cells[4].querySelector('input').value.toLowerCase();
+            const contactVal = r.cells[5].querySelector('input').value.toLowerCase();
+            const phoneVal = r.cells[6].querySelector('input').value.toLowerCase();
+            const emailVal = r.cells[7].querySelector('input').value.toLowerCase();
+
+            // فحص المطابقة المباشرة مع استعلام المربع
+            const isMatch = idVal.includes(q) || 
+                            compVal.includes(q) || 
+                            mainRecVal.includes(q) || 
+                            contactVal.includes(q) || 
+                            phoneVal.includes(q) || 
+                            emailVal.includes(q);
+
+            r.style.display = isMatch ? "" : "none";
         });
     }
 
