@@ -107,10 +107,26 @@
         .dropdown-menu .del-btn:hover { background: #fee2e2; color: #ef4444; }
         .show { display: block; }
 
+        /* مطابقة تنسيق خلايا عمود سجل المتابعة مع الصورة المرفقة طبق الأصل */
         .notes-preview { 
-            width: 95%; height: 20px; border: none; background: transparent; font-family: 'Cairo'; 
-            font-size: 11px; text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700; 
-            overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; margin: 0 auto; 
+            width: 95%; 
+            height: 24px; 
+            line-height: 24px;
+            border: none; 
+            background: transparent; 
+            font-family: 'Cairo'; 
+            font-size: 11px; /* مطابق لحجم الخط في الصورة المعروضة للحقول النصية */
+            text-align: center; 
+            cursor: pointer; 
+            color: #3b82f6; 
+            font-weight: 700; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            white-space: nowrap; 
+            display: block; 
+            margin: 0 auto; 
+            padding: 0 4px;
+            box-sizing: border-box;
         }
 
         .activity-log-section { 
@@ -346,7 +362,7 @@
         
         let actionText = "";
         if (fieldName === "إجراء") {
-            actionText = newVal; // يستقبل النص المخصص من زر الإجراء مباشرة
+            actionText = newVal; 
         } else {
             actionText = `تغيير ${fieldName} من [${val1}] إلى [${val2}] للعميل ( ${cleanCompany} )`;
         }
@@ -450,12 +466,10 @@
 
         if (action === 'حذف' && confirm('هل أنت متأكد من حذف العملاء المحددين؟')) {
             selected.forEach(chk => chk.closest('tr').remove());
-            // نشر الإجراء في السجل العام عند الحذف
             addToActivityLog('إجراء', '', `تنفيذ إجراء [حذف بيانات] لعدد (${selected.length}) من العملاء: [ ${companiesNames.join(' ، ')} ]`, '');
             saveAllDataSilently();
             updateStats();
         } else {
-            // نشر أي إجراء آخر يتم اختياره من قائمة "إجراء" في السجل العام فوراً
             addToActivityLog('إجراء', '', `تنفيذ إجراء [${action}] لعدد (${selected.length}) من العملاء: [ ${companiesNames.join(' ، ')} ]`, '');
             alert('تم طلب تنفيذ ' + action + ' على ' + selected.length + ' عميل');
         }
@@ -526,8 +540,6 @@
             let updated = old === "" ? entry : old + "\n--------------------\n" + entry;
             currentActivePreview.setAttribute('data-full-notes', updated);
             currentActivePreview.innerText = txt;
-            
-            // تم إزالة استدعاء دالة addToActivityLog من هنا لضمان عدم نشر أي نشاط في السجل العام عند إضافة ملاحظة
             saveAllDataSilently();
         }
         closeNote();
