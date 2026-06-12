@@ -133,28 +133,109 @@
             line-height: 20px;
         }
 
+        /* 1. الحاوية الرئيسية لسجل النشاطات (.activity-log-section) */
         .activity-log-section { 
-            margin: 1px 0 0px 0; padding: 10px 18px; background: #ffffff; border-radius: 10px; 
-            border: 1px solid var(--border-soft); box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
-            flex-shrink: 0; height: 100px; display: flex; flex-direction: column; box-sizing: border-box;
+            margin: 1px 0 0px 0; 
+            padding: 10px 18px; 
+            background: #ffffff; 
+            border-radius: 10px; 
+            border: 1px solid #cbd5e1; 
+            box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
+            flex-shrink: 0; 
+            height: 90px; 
+            display: flex; 
+            flex-direction: column; 
+            box-sizing: border-box;
             transition: height 0.3s ease;
         }
-        .activity-log-section.expanded { height: 200px; }
+        .activity-log-section.expanded { 
+            height: 200px; 
+        }
         
-        .activity-log-header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; border-bottom: 1px solid #f1f5f9; padding-bottom: 4px; flex-shrink: 0; }
-        .activity-log-title { color: var(--dark-yellow); font-size: 11.5px; font-weight: 800; margin: 0; text-align: right; }
+        /* 2. شريط العنوان العلوي (.activity-log-header-container) */
+        .activity-log-header-container { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 5px; 
+            border-bottom: 1px solid #f1f5f9; 
+            padding-bottom: 4px; 
+            flex-shrink: 0; 
+        }
         
-        .btn-toggle-expand { background: none; border: none; color: #64748b; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 4px; transition: 0.2s; padding: 0; }
-        .btn-toggle-expand:hover { background: #f1f5f9; color: var(--accent-blue); }
+        /* أ. نص العنوان (.activity-log-title) */
+        .activity-log-title { 
+            color: #c29103; 
+            font-family: 'Cairo', sans-serif;
+            font-size: 11.5px; 
+            font-weight: 800; 
+            margin: 0; 
+            text-align: right; 
+        }
+        
+        /* ب. زر التوسيع والتقليص (.btn-toggle-expand) */
+        .btn-toggle-expand { 
+            background: none; 
+            border: none; 
+            color: #64748b; 
+            font-size: 12px; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            width: 22px; 
+            height: 22px; 
+            border-radius: 4px; 
+            transition: 0.2s; 
+            padding: 0; 
+        }
+        .btn-toggle-expand:hover { 
+            background: #f1f5f9; 
+            color: #3b82f6; 
+        }
 
-        .activity-list { flex: 1; overflow-y: auto; font-size: 9.5px; line-height: 1.4; text-align: right; }
-        .activity-item { margin-bottom: 4px; border-bottom: 1px dashed #f1f5f9; padding-bottom: 4px; color: #1e293b; display: block; white-space: normal; text-align: right; font-weight: 700; direction: rtl; }
+        /* 3. قائمة السجلات والنشاطات (.activity-list & .activity-item) */
+        .activity-list { 
+            flex: 1; 
+            overflow-y: auto; 
+            font-size: 9.5px; 
+            text-align: right; 
+        }
+        .activity-item { 
+            margin-bottom: 4px; 
+            border-bottom: 1px dashed #f1f5f9; 
+            padding-bottom: 4px; 
+            color: #1e293b; 
+            display: block; 
+            white-space: normal; 
+            text-align: right; 
+            font-weight: 700; 
+            line-height: 1.4;
+            direction: rtl; 
+        }
          
-        .activity-header-part { font-size: 9.5px; color: var(--chat-yellow); font-weight: 800; display: inline-block; direction: rtl; }
-        .activity-time-part { font-size: 8.5px; font-weight: normal; color: #64748b; }
-        .activity-text-part { font-size: 9.5px; color: #2563eb; font-weight: 700; display: inline; margin-right: 6px; }
+        /* 4. تفاصيل الأجزاء الداخلية للنص (Inline Styles) */
+        .activity-header-part { 
+            font-size: 9.5px; 
+            color: #b45309; 
+            font-weight: 800; 
+            display: inline-block; 
+            direction: rtl; 
+        }
+        .activity-time-part { 
+            font-size: 10px; 
+            font-weight: normal; 
+            color: #64748b; 
+        }
+        .activity-text-part { 
+            font-size: 9.5px; 
+            color: #2563eb; 
+            font-weight: 700; 
+            display: inline; 
+            margin-right: 6px; 
+        }
 
-        /* تطبيق المواصفات القياسية والهندسية المطلوبة للنافذة المنبثقة حرفياً */
+        /* هندسة المودال القياسي المحدث للملاحظات */
         .modal-notes { 
             display: none; 
             position: fixed; 
@@ -172,19 +253,19 @@
             background: white; 
             padding: 22px; 
             border-radius: 12px; 
-            width: 490px; /* العرض الثابت المطلوب */
-            height: 500px; /* الارتفاع الثابت المطلوب */
+            width: 490px; 
+            height: 500px; 
             display: flex; 
             flex-direction: column; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15); /* الظل الناعم المطلوب */
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
             box-sizing: border-box; 
         }
         
         .history-log { 
             flex-grow: 1; 
-            overflow-y: auto; /* التمرير العمودي الذكي */
-            background: #ffffff; /* خلفية بيضاء تماماً */
-            border: 1px solid #e2e8f0; /* حدود خفيفة جداً */
+            overflow-y: auto; 
+            background: #ffffff; 
+            border: 1px solid #e2e8f0; 
             border-radius: 8px; 
             padding: 12px; 
             margin-bottom: 12px; 
@@ -192,10 +273,9 @@
             direction: rtl;
         }
 
-        /* هندسة كتل المحادثة المحدثة */
         .chat-msg-block {
             display: flex;
-            flex-direction: column; /* حاوية مرنة عمودية تضمن النص أسفل الترويسة مباشرة */
+            flex-direction: column; 
             align-items: flex-start;
             text-align: right;
             margin-bottom: 14px;
@@ -204,9 +284,9 @@
         }
         
         .chat-msg-header {
-            font-size: 10.5px; /* الحجم المطلوب */
-            color: var(--chat-yellow); /* اللون الأصفر الغامق الموحد */
-            font-weight: 800; /* خط سميك المطلوب */
+            font-size: 10.5px; 
+            color: #b45309; 
+            font-weight: 800; 
             margin-bottom: 3px;
             display: block;
             width: 100%;
@@ -214,18 +294,18 @@
         }
         
         .chat-msg-text {
-            font-size: 11px; /* الحجم المطلوب */
-            color: #1e293b; /* لون داكن مريح للعين */
-            font-weight: 700; /* وزن خط 700 المطلوب */
+            font-size: 11px; 
+            color: #1e293b; 
+            font-weight: 700; 
             line-height: 1.5;
             display: block;
             width: 100%;
             text-align: right;
-            white-space: pre-wrap; /* تفعيل خاصية الحفاظ على المسافات والأسطر */
+            white-space: pre-wrap; 
         }
 
         .note-area { 
-            height: 95px; /* الارتفاع الثابت المطلوب */
+            height: 95px; 
             width: 100%; 
             border: 1px solid #cbd5e1; 
             border-radius: 8px; 
@@ -234,7 +314,7 @@
             resize: none; 
             outline: none; 
             font-size: 11.5px; 
-            text-align: right; /* محاذاة النص لليمين */
+            text-align: right; 
             box-sizing: border-box; 
             direction: rtl;
         }
@@ -332,7 +412,7 @@
 
         <div class="activity-log-section" id="oppActivityLogSection">
             <div class="activity-log-header-container">
-                <div class="activity-log-title">📋 سجل نشاط الفرص البيعية</div>
+                <div class="activity-log-title">📋 سجل نشاط إدارة الفرص البيعية</div>
                 <button class="btn-toggle-expand" onclick="toggleActivityLogHeight()" title="توسيع / تقليص" id="toggleLogBtn">⤢</button>
             </div>
             <div id="activityList" class="activity-list"></div>
@@ -365,14 +445,7 @@
 
     function getTimeFormatted() {
         const d = new Date();
-        return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-    }
-
-    function generateStyledHeader() {
-        const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-        const d = new Date();
-        const timeFormatted = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-        return `👤 أحمد  🗓️ ${days[d.getDay()]} ${getTodayFormatted()} ${timeFormatted}`;
+        return String(d.getHours()).padStart(2, '0') + ":" + String(d.getMinutes()).padStart(2, '0');
     }
 
     function toggleActivityLogHeight() {
@@ -387,11 +460,10 @@
         }
     }
 
+    // بناء وتفصيل الأسطر برمجياً متوافقاً مع التقسيم الثلاثي المطلوب
     function addToActivityLog(fieldName, oldVal, newVal, companyName) {
         const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
         const d = new Date();
-        const timeFormatted = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-        const headerHTML = `<span class="activity-header-part">👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${getTodayFormatted()}  <span class="activity-time-part">${timeFormatted}</span>&nbsp;&nbsp;</span>`;
         
         const cleanCompany = (companyName && companyName.toString().trim() !== "") ? companyName : "شركة جديدة";
         const v1 = (oldVal && oldVal.toString().trim() !== "") ? oldVal : "فارغ";
@@ -401,10 +473,14 @@
         if (fieldName === "إجراء") {
             actionText = `${oldVal} لفرصة شركة ( ${cleanCompany} )`;
         } else {
-            actionText = `تعديل ${fieldName} من [${v1}] إلى [${v2}] في ( ${cleanCompany} )`;
+            actionText = `تغيير ${fieldName} من [${v1}] إلى [${v2}] للعميل ( ${cleanCompany} )`;
         }
+
+        const headerHTML = `<span class="activity-header-part">👤 (أحمد) 🗓️ ${days[d.getDay()]} ${getTodayFormatted()} </span>`;
+        const timeHTML = `<span class="activity-time-part">${getTimeFormatted()}</span>`;
+        const textHTML = `<span class="activity-text-part">${actionText}</span>`;
         
-        const fullLogHTML = `${headerHTML}<span class="activity-text-part">${actionText}</span>`;
+        const fullLogHTML = `${headerHTML}${timeHTML}${textHTML}`;
         let logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
         logs.unshift(fullLogHTML);
         localStorage.setItem(LOGS_KEY, JSON.stringify(logs.slice(0, 100)));
@@ -467,11 +543,7 @@
         rows.sort((a, b) => {
             const dateA = a.querySelector('.expected-date-input').value || '9999-12-31';
             const dateB = b.querySelector('.expected-date-input').value || '9999-12-31';
-            
-            if (dateA !== dateB) {
-                return dateA.localeCompare(dateB);
-            }
-
+            if (dateA !== dateB) return dateA.localeCompare(dateB);
             const statusA = a.querySelector('.status-select').value;
             const statusB = b.querySelector('.status-select').value;
             const getRank = (status) => {
@@ -515,9 +587,7 @@
         const mainRow = document.getElementById(rowId);
         if (mainRow) {
             const oppValueInput = mainRow.querySelector('.opp-value-input');
-            if (oppValueInput) {
-                oppValueInput.value = grandTotal > 0 ? grandTotal : '';
-            }
+            if (oppValueInput) oppValueInput.value = grandTotal > 0 ? grandTotal : '';
         }
         saveAllDataSilently();
         updateStats();
@@ -584,7 +654,6 @@
         else addProductRow(rowId);
 
         calculateOpportunityTotal(rowId);
-
         updateStats();
         if(!prepend) reorderRows();
     }
@@ -635,7 +704,7 @@
                 const row = chk.closest('tr');
                 const id = row.id;
                 const companyName = row.cells[1].querySelector('input').value;
-                addToActivityLog('إجراء', 'حذف', '', companyName);
+                addToActivityLog('إجراء', 'حذف الفرصة البيعية', '', companyName);
                 row.remove();
                 if(document.getElementById('sub-' + id)) document.getElementById('sub-' + id).remove();
             });
@@ -695,7 +764,7 @@
             const newOpps = JSON.parse(incomingData);
             newOpps.forEach(opp => {
                 renderRow(opp, true);
-                addToActivityLog("إجراء", "تأهيل من زيارة", "", opp.comp);
+                addToActivityLog("إجراء", "تأهيل وتصدير الفرصة البيعية من شاشة الزيارات", "", opp.comp);
             });
             saveAllDataSilently();
             localStorage.removeItem(INCOMING_KEY);
@@ -708,9 +777,7 @@
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = "";
         saved.forEach(v => renderRow(v));
-        
         checkIncomingOpportunities();
-
         renderActivityLog();
         updateStats();
         reorderRows();
@@ -726,7 +793,6 @@
         });
     }
 
-    // استخراج النص الأخير من مصفوفة الـ JSON للمعاينة في الخلايا
     function getLastNoteOnly(fullJsonText) {
         if (!fullJsonText || fullJsonText === '[]') return 'أضف ملاحظة...';
         try {
@@ -738,7 +804,6 @@
         }
     }
 
-    // فتح سجل المحادثة بالبنية العمودية والكتل الهندسية المحدثة
     function openNote(el) {
         currentActivePreview = el;
         const raw = el.getAttribute('data-full-notes') || "[]";
@@ -760,7 +825,6 @@
         document.getElementById('modalTextArea').focus();
     }
 
-    // حفظ الملاحظة الجديدة بداخل مصفوفة المحادثة القياسية
     function saveNote() {
         const txt = document.getElementById('modalTextArea').value.trim();
         if (txt && currentActivePreview) {
@@ -770,7 +834,7 @@
             
             const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
             const d = new Date();
-            const timeFormatted = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+            const timeFormatted = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
 
             const newMsg = {
                 user: "أحمد " + "🗓️ " + days[d.getDay()],
