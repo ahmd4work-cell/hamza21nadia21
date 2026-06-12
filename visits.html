@@ -152,9 +152,27 @@
         .activity-time-part { font-size: 11.5px; font-weight: 800; }
         .activity-text-part { font-size: 11.5px; color: #475569; display: inline-block; text-align: right; margin-right: 5px; }
 
+        /* مواصفات نافذة سجل الملاحظات والمتابعة المحددة حرفياً */
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-        .modal-content { background: white; padding: 18px; border-radius: 12px; width: 400px; }
-        .note-area { height: 100px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; direction: rtl; }
+        .modal-content { 
+            background: white; padding: 18px; border-radius: 12px; 
+            width: 490px; height: 500px; display: flex; flex-direction: column; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15); box-sizing: border-box;
+        }
+        .history-log { 
+            flex-grow: 1; overflow-y: auto; background: #ffffff; 
+            border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; 
+            margin-bottom: 12px; display: flex; flex-direction: column; gap: 12px;
+            direction: rtl; box-sizing: border-box;
+        }
+        .chat-block { display: flex; flex-direction: column; text-align: right; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; }
+        .chat-header { color: #b45309; font-weight: 800; font-size: 10.5px; margin-bottom: 4px; }
+        .chat-text { font-weight: 700; color: #1e293b; font-size: 11px; white-space: pre-wrap; line-height: 1.4; }
+        .note-area { 
+            height: 95px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; 
+            padding: 10px; font-family: 'Cairo'; resize: none; outline: none; 
+            font-size: 12px; text-align: right; box-sizing: border-box; direction: rtl; flex-shrink: 0;
+        }
 
         .col-select { width: 3%; }
         .col-company { width: 10%; } 
@@ -244,10 +262,12 @@
 
 <div id="noteModal" class="modal">
     <div class="modal-content">
-        <textarea id="modalTextArea" class="note-area"></textarea>
+        <div style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right; font-size:13px;">سجل الملاحظات والمتابعة</div>
+        <div id="historyLog" class="history-log"></div>
+        <textarea id="modalTextArea" class="note-area" placeholder="أدخل تفاصيل الملاحظة هنا..."></textarea>
         <div style="display:flex; justify-content: flex-end; gap:8px; margin-top:10px;">
-            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:5px 15px; border-radius:6px; cursor:pointer; font-family:Cairo;">إلغاء</button>
-            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:5px 15px; border-radius:6px; cursor:pointer; font-family:Cairo;">حفظ</button>
+            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:6px 16px; border-radius:6px; cursor:pointer; font-family:Cairo; font-size:11px; font-weight:700;">إلغاء</button>
+            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:6px 16px; border-radius:6px; cursor:pointer; font-family:Cairo; font-size:11px; font-weight:bold;">حفظ</button>
         </div>
     </div>
 </div>
@@ -285,6 +305,15 @@
         const datePart = parts[0];
         const timePart = parts[1];
         return `<span class="edit-date-d">${datePart}</span><span class="edit-date-t">${timePart}</span>`;
+    }
+
+    function generateHeaderString() {
+        const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+        const d = new Date();
+        const dateFormatted = d.toISOString().split('T')[0];
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        return `👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${dateFormatted}  ${hours}:${minutes}`;
     }
 
     function addToActivityLog(fieldName, oldVal, newVal, companyName) {
@@ -379,6 +408,8 @@
 
         const today = getTodayFormatted();
         const visitDate = v.visitDate || today;
+        const notes = v.notes || '';
+        const lastNoteText = getLastNoteOnly(notes);
         const editDateHTML = parseEditDateHTML(v.editDate || '');
 
         mainRow.innerHTML = `
@@ -398,7 +429,7 @@
             </td>
             <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الخدمة الحالية', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
             <td><input type="number" class="excel-input opp-value-input" value="${v.oppValue || '0'}" readonly></td>
-            <td><div class="notes-preview" onclick="openNote(this)">${v.notes || ''}</div></td>
+            <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
             <td>
                 <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleStatusChange(this, '${rowId}')">
                     <option value="" ${v.status === '' ? 'selected' : ''}></option>
@@ -470,7 +501,7 @@
             oppDate: getTodayFormatted(),
             curServ: row.querySelector('.cur-serv-val').value,
             oppValue: row.querySelector('.opp-value-input').value,
-            notes: row.querySelector('.notes-preview').innerText || '',
+            notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '',
             status: "مهتم",
             editDate: row.querySelector('.edit-date-val').value,
             owner: row.cells[13].querySelector('input').value,
@@ -585,7 +616,7 @@
                 visitDate: row.querySelector('.visit-date-val').value, 
                 curServ: row.querySelector('.cur-serv-val').value, 
                 oppValue: row.querySelector('.opp-value-input').value, 
-                notes: row.querySelector('.notes-preview').innerText || '', 
+                notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '', 
                 status: row.querySelector('.status-select').value, 
                 editDate: row.querySelector('.edit-date-val').value, 
                 owner: row.cells[13].querySelector('input').value, 
@@ -611,23 +642,58 @@
         });
     }
 
+    /* دوال معالجة نافذة الملاحظات القياسية بهندسة الكتل المطلوبة */
     function openNote(previewEl) {
         currentActivePreview = previewEl;
-        document.getElementById('modalTextArea').value = previewEl.innerText;
+        const rawNotes = previewEl.getAttribute('data-full-notes') || "";
+        const historyContainer = document.getElementById('historyLog');
+        
+        if (rawNotes.trim() === "") {
+            historyContainer.innerHTML = "";
+        } else {
+            historyContainer.innerHTML = rawNotes.split('\n--------------------\n').map(entry => {
+                if(!entry.includes('||')) return `<div class="chat-block"><div class="chat-header">👤 (أحمد)</div><div class="chat-text">${entry}</div></div>`;
+                const parts = entry.split('||');
+                const header = parts[0];
+                const text = parts[1];
+                return `<div class="chat-block"><div class="chat-header">${header}</div><div class="chat-text">${text}</div></div>`;
+            }).join('');
+        }
+        
         document.getElementById('noteModal').style.display = "flex";
         document.getElementById('modalTextArea').focus();
+        historyContainer.scrollTop = historyContainer.scrollHeight;
     }
 
     function saveNote() {
-        if (currentActivePreview) {
-            currentActivePreview.innerText = document.getElementById('modalTextArea').value;
+        const newText = document.getElementById('modalTextArea').value.trim();
+        if (newText && currentActivePreview) {
+            let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
+            const headerString = generateHeaderString();
+            let newEntry = `${headerString}||${newText}`;
+            let updatedFullNotes = oldNotes === "" ? newEntry : oldNotes + "\n--------------------\n" + newEntry;
+            
+            currentActivePreview.setAttribute('data-full-notes', updatedFullNotes);
+            currentActivePreview.innerText = newText;
+            
             updateEditDateField(currentActivePreview.closest('tr'));
             saveAllDataSilently();
+            addToActivityLog("ملاحظة ومتابعة", "إضافة", newText, currentActivePreview.closest('tr').cells[1].querySelector('input').value);
         }
         closeNote();
     }
 
     function closeNote() { document.getElementById('noteModal').style.display = "none"; document.getElementById('modalTextArea').value = ""; }
+    
+    function getLastNoteOnly(fullNotes) { 
+        if(!fullNotes) return ""; 
+        const parts = fullNotes.split('\n--------------------\n'); 
+        const last = parts[parts.length - 1]; 
+        if(last.includes('||')) {
+            return last.split('||')[1] || "";
+        }
+        return last;
+    }
 
     window.onclick = (e) => {
         if (!e.target.matches('.btn-bulk-trigger')) {
