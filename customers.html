@@ -113,7 +113,6 @@
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; margin: 0 auto; 
         }
 
-        /* 1. الحاوية الرئيسية (The Section Container) */
         .activity-log-section { 
             margin: 1px 0 0px 0; 
             padding: 10px 18px; 
@@ -132,7 +131,6 @@
             height: 200px; 
         }
 
-        /* 2. شريط العنوان العلوي (The Header Container) */
         .activity-log-header-container { 
             display: flex; 
             justify-content: space-between; 
@@ -142,7 +140,6 @@
             padding-bottom: 4px; 
             flex-shrink: 0; 
         }
-        /* أ. نص العنوان */
         .activity-log-title { 
             color: #c29103; 
             font-size: 11.5px; 
@@ -150,7 +147,6 @@
             margin: 0; 
             text-align: right; 
         }
-        /* ب. زر التوسيع والتقليص */
         .btn-toggle-expand { 
             background: none; 
             border: none; 
@@ -171,7 +167,6 @@
             color: #3b82f6; 
         }
 
-        /* 3. قائمة السجلات والنشاطات (The Activity List & Items) */
         .activity-list { 
             flex: 1; 
             overflow-y: auto; 
@@ -191,7 +186,6 @@
             direction: rtl; 
         }
          
-        /* 4. تفاصيل الأجزاء الداخلية للنص (Text Composition & Inline Styles) */
         .activity-header-part { 
             font-size: 9.5px; 
             color: #b45309; 
@@ -217,11 +211,10 @@
         .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
         .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
 
-        /* تعديل نسب عرض الأعمدة بما يتناسب مع الترتيب الجديد للجدول */
         .col-select { width: 3%; }
         .col-id { width: 6%; } 
         .col-company { width: 15%; }
-        .col-address { width: 14%; } /* العنوان بعد الشركة */
+        .col-address { width: 14%; } 
         .col-records { width: 9%; }
         .col-contact { width: 9%; }
         .col-phone { width: 9%; }
@@ -276,7 +269,8 @@
                         <th class="col-select"><input type="checkbox" onclick="toggleAllCheckboxes(this)"></th>
                         <th class="col-id">ID</th>
                         <th class="col-company">اسم المنشأة / الشركة</th>
-                        <th class="col-address">العنوان</th> <th class="col-records">السجل الرئيسي</th>
+                        <th class="col-address">العنوان</th> 
+                        <th class="col-records">السجل الرئيسي</th>
                         <th class="col-contact">الشخص المسؤول</th>
                         <th class="col-phone">رقم التواصل</th>
                         <th class="col-email">البريد الإلكتروني</th>
@@ -349,7 +343,14 @@
         const cleanCompany = companyName && companyName.trim() !== "" ? companyName : "عميل جديد";
         const val1 = (oldVal && oldVal.trim() !== "") ? oldVal : "فارغ";
         const val2 = (newVal && newVal.trim() !== "") ? newVal : "فارغ";
-        let actionText = fieldName === "إجراء" ? `حذف بيانات العميل ( ${cleanCompany} )` : `تغيير ${fieldName} من [${val1}] إلى [${val2}] للعميل ( ${cleanCompany} )`;
+        
+        let actionText = "";
+        if (fieldName === "إجراء") {
+            actionText = newVal; // يستقبل النص المخصص من زر الإجراء مباشرة
+        } else {
+            actionText = `تغيير ${fieldName} من [${val1}] إلى [${val2}] للعميل ( ${cleanCompany} )`;
+        }
+        
         const fullLogHTML = `${headerHTML}<span class="activity-text-part">${actionText}</span>`;
         let logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
         logs.unshift(fullLogHTML);
@@ -395,7 +396,6 @@
         const createdAt = c.createdDate || getTodayFormatted();
         const generatedId = c.id || Math.floor(1000 + Math.random() * 9000);
 
-        // تم نقل مدخل العنوان ليكون بعد مدخل الشركة مباشرة، وتم ربط الأحداث بجميع المدخلات بشكل صحيح وسليم
         mainRow.innerHTML = `
             <td class="col-select"><input type="checkbox" class="select-check"></td>
             <td class="col-id"><a href="customer-profile.html?id=${generatedId}" class="id-link" target="_blank">${generatedId}</a></td>
@@ -441,16 +441,22 @@
     function handleBulkAction(action) {
         const selected = document.querySelectorAll('.select-check:checked');
         if (selected.length === 0) return alert('يرجى تحديد العملاء أولاً');
+        
+        let companiesNames = [];
+        selected.forEach(chk => {
+            const name = chk.closest('tr').cells[2].querySelector('input').value;
+            companiesNames.push(name && name.trim() !== "" ? name : "عميل جديد");
+        });
+
         if (action === 'حذف' && confirm('هل أنت متأكد من حذف العملاء المحددين؟')) {
-            selected.forEach(chk => {
-                const row = chk.closest('tr');
-                const companyName = row.cells[2].querySelector('input').value;
-                addToActivityLog('إجراء', '', '', companyName);
-                row.remove();
-            });
+            selected.forEach(chk => chk.closest('tr').remove());
+            // نشر الإجراء في السجل العام عند الحذف
+            addToActivityLog('إجراء', '', `تنفيذ إجراء [حذف بيانات] لعدد (${selected.length}) من العملاء: [ ${companiesNames.join(' ، ')} ]`, '');
             saveAllDataSilently();
             updateStats();
         } else {
+            // نشر أي إجراء آخر يتم اختياره من قائمة "إجراء" في السجل العام فوراً
+            addToActivityLog('إجراء', '', `تنفيذ إجراء [${action}] لعدد (${selected.length}) من العملاء: [ ${companiesNames.join(' ، ')} ]`, '');
             alert('تم طلب تنفيذ ' + action + ' على ' + selected.length + ' عميل');
         }
     }
@@ -461,7 +467,7 @@
             data.push({
                 id: row.cells[1].querySelector('.id-link').innerText,
                 comp: row.cells[2].querySelector('input').value,
-                subRecord: row.cells[3].querySelector('input').value, // تم التعديل لحفظ الحقل في مكانه الجديد
+                subRecord: row.cells[3].querySelector('input').value, 
                 mainRecord: row.cells[4].querySelector('input').value,
                 contact: row.cells[5].querySelector('input').value,
                 phone: row.cells[6].querySelector('input').value,
@@ -521,8 +527,7 @@
             currentActivePreview.setAttribute('data-full-notes', updated);
             currentActivePreview.innerText = txt;
             
-            const companyName = currentActivePreview.closest('tr').cells[2].querySelector('input').value;
-            addToActivityLog('الملاحظات', '...', txt, companyName);
+            // تم إزالة استدعاء دالة addToActivityLog من هنا لضمان عدم نشر أي نشاط في السجل العام عند إضافة ملاحظة
             saveAllDataSilently();
         }
         closeNote();
