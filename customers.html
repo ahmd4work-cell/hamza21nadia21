@@ -217,16 +217,18 @@
         .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
         .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
 
+        /* تعديل نسب عرض الأعمدة بما يتناسب مع الترتيب الجديد للجدول */
         .col-select { width: 3%; }
         .col-id { width: 6%; } 
         .col-company { width: 15%; }
+        .col-address { width: 14%; } /* العنوان بعد الشركة */
         .col-records { width: 9%; }
         .col-contact { width: 9%; }
         .col-phone { width: 9%; }
         .col-email { width: 11%; }
         .col-type { width: 7%; }
         .col-status { width: 7%; }
-        .col-notes { width: 14%; }
+        .col-notes { width: 10%; }
         .col-created { width: 10%; }
         .col-owner { width: 7%; }
     </style>
@@ -274,8 +276,7 @@
                         <th class="col-select"><input type="checkbox" onclick="toggleAllCheckboxes(this)"></th>
                         <th class="col-id">ID</th>
                         <th class="col-company">اسم المنشأة / الشركة</th>
-                        <th class="col-records">السجل الرئيسي</th>
-                        <th class="col-records">العنوان</th>
+                        <th class="col-address">العنوان</th> <th class="col-records">السجل الرئيسي</th>
                         <th class="col-contact">الشخص المسؤول</th>
                         <th class="col-phone">رقم التواصل</th>
                         <th class="col-email">البريد الإلكتروني</th>
@@ -394,15 +395,16 @@
         const createdAt = c.createdDate || getTodayFormatted();
         const generatedId = c.id || Math.floor(1000 + Math.random() * 9000);
 
+        // تم نقل مدخل العنوان ليكون بعد مدخل الشركة مباشرة، وتم ربط الأحداث بجميع المدخلات بشكل صحيح وسليم
         mainRow.innerHTML = `
             <td class="col-select"><input type="checkbox" class="select-check"></td>
             <td class="col-id"><a href="customer-profile.html?id=${generatedId}" class="id-link" target="_blank">${generatedId}</a></td>
-            <td><input type="text" class="excel-input" value="${c.comp || ''}" data-old="${c.comp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الشركة', this.getAttribute('data-old'), this.value, this.value); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${c.mainRecord || ''}" data-old="${c.mainRecord || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('السجل الرئيسي', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${c.comp || ''}" data-old="${c.comp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('اسم المنشأة الشركة', this.getAttribute('data-old'), this.value, this.value); saveAllDataSilently();"></td>
             <td><input type="text" class="excel-input" value="${c.subRecord || ''}" data-old="${c.subRecord || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('العنوان', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${c.contact || ''}" data-old="${c.contact || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المسؤول', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${c.phone || ''}" data-old="${c.phone || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الهاتف', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${c.email || ''}" data-old="${c.email || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الإيميل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${c.mainRecord || ''}" data-old="${c.mainRecord || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('السجل الرئيسي', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${c.contact || ''}" data-old="${c.contact || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الشخص المسؤول', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${c.phone || ''}" data-old="${c.phone || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('رقم التواصل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${c.email || ''}" data-old="${c.email || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('البريد الإلكتروني', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
             <td>
                 <select class="excel-input" data-old="${c.type || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('التصنيف', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();">
                     <option value="VIP" ${c.type === 'VIP' ? 'selected' : ''}>VIP</option>
@@ -419,7 +421,7 @@
             </td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
             <td><input type="text" class="excel-input readonly-input" value="${createdAt}" readonly><input type="hidden" class="created-date-val" value="${createdAt}"></td>
-            <td><input type="text" class="excel-input" value="${c.owner || 'أحمد'}" onchange="saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${c.owner || 'أحمد'}" data-old="${c.owner || 'أحمد'}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المالك', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
         `;
         updateStats();
     }
@@ -459,8 +461,8 @@
             data.push({
                 id: row.cells[1].querySelector('.id-link').innerText,
                 comp: row.cells[2].querySelector('input').value,
-                mainRecord: row.cells[3].querySelector('input').value,
-                subRecord: row.cells[4].querySelector('input').value,
+                subRecord: row.cells[3].querySelector('input').value, // تم التعديل لحفظ الحقل في مكانه الجديد
+                mainRecord: row.cells[4].querySelector('input').value,
                 contact: row.cells[5].querySelector('input').value,
                 phone: row.cells[6].querySelector('input').value,
                 email: row.cells[7].querySelector('input').value,
@@ -487,7 +489,7 @@
     function filterTable() {
         const q = document.getElementById('searchInput').value.toLowerCase();
         document.querySelectorAll('.main-row').forEach(r => {
-            const match = [2,3,4,5,6].some(idx => r.cells[idx].querySelector('input').value.toLowerCase().includes(q));
+            const match = [2,3,4,5,6,7].some(idx => r.cells[idx].querySelector('input') ? r.cells[idx].querySelector('input').value.toLowerCase().includes(q) : false);
             r.style.display = match ? "" : "none";
         });
     }
