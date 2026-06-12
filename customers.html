@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASGate - إدارة العملاء</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+    <!-- تم إضافة مكتبة الفونت أوسم لجلب أيقونة الواتساب الرسمية -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --nav-shiny-navy: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
@@ -92,6 +94,11 @@
 
         .id-link { color: #3b82f6; font-weight: 800; text-decoration: none; display: inline-block; width: 100%; height: 100%; line-height: 45px; transition: 0.2s; }
         .id-link:hover { color: #2563eb; text-decoration: underline; }
+
+        /* تنسيق خلية رقم الاتصال مع أيقونة الواتساب */
+        .phone-cell-container { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; padding: 0 4px; box-sizing: border-box; }
+        .whatsapp-icon-btn { color: #25d366; font-size: 14px; text-decoration: none; margin-right: 5px; cursor: pointer; transition: transform 0.2s; display: inline-flex; align-items: center; }
+        .whatsapp-icon-btn:hover { transform: scale(1.2); }
 
         .dropdown-menu { 
             display: none; position: absolute; left: 0; 
@@ -245,10 +252,9 @@
             direction: rtl;
         }
         
-        /* تعديل العنوان ليكون باللون الأصفر الغامق للكامل (اسم المستخدم، التاريخ، والوقت) */
         .chat-msg-header {
             font-size: 10.5px;
-            color: var(--chat-yellow); /* تم التحويل للون الأصفر الغامق المعتمد في التصميم */
+            color: var(--chat-yellow); 
             font-weight: 800;
             margin-bottom: 3px;
             display: block;
@@ -258,7 +264,7 @@
         .chat-msg-time {
             font-size: 10px;
             font-weight: 800;
-            color: var(--chat-yellow); /* تطبيق نفس اللون الأصفر الغامق بدلاً من الرمادي */
+            color: var(--chat-yellow); 
             margin-right: 4px;
         }
         
@@ -281,7 +287,7 @@
         .col-address { width: 14%; } 
         .col-records { width: 9%; }
         .col-contact { width: 9%; }
-        .col-phone { width: 9%; }
+        .col-phone { width: 11%; } /* توسيع عمود الهاتف قليلاً ليستوعب الأيقونة بصورة مريحة */
         .col-email { width: 11%; }
         .col-type { width: 7%; }
         .col-status { width: 7%; }
@@ -442,6 +448,32 @@
         document.getElementById('stat-today').innerText = countToday;
     }
 
+    // دالة فتح الواتساب البرمجية الذكية لفلترة الأرقام بدقة وتحويلها
+    function openWhatsAppChat(el) {
+        const inputEl = el.closest('.phone-cell-container').querySelector('input');
+        let rawPhone = inputEl.value.trim();
+        
+        if (!rawPhone) {
+            alert("يرجى إدخال رقم الجوال أولاً");
+            return;
+        }
+        
+        // إزالة أي رموز أو مسافات، الإبقاء على الأرقام فقط
+        let cleanNumber = rawPhone.replace(/\D/g, '');
+        
+        // تعديل الصيغ للرقم تلقائياً
+        if (cleanNumber.startsWith('00966')) {
+            cleanNumber = cleanNumber.substring(2);
+        } else if (cleanNumber.startsWith('05')) {
+            cleanNumber = '966' + cleanNumber.substring(1);
+        } else if (cleanNumber.startsWith('5') && cleanNumber.length === 9) {
+            cleanNumber = '966' + cleanNumber;
+        }
+        
+        const url = "https://wa.me/" + cleanNumber;
+        window.open(url, '_blank');
+    }
+
     function renderRow(c = {}, prepend = false) {
         const tbody = document.getElementById('tableBody');
         const rowId = 'cust-' + Date.now() + Math.random().toString(36).substr(2, 5);
@@ -459,9 +491,20 @@
             <td class="col-id"><a href="customer-profile.html?id=${generatedId}" class="id-link" target="_blank">${generatedId}</a></td>
             <td><input type="text" class="excel-input" value="${c.comp || ''}" data-old="${c.comp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('اسم المنشأة الشركة', this.getAttribute('data-old'), this.value, this.value); saveAllDataSilently();"></td>
             <td><input type="text" class="excel-input" value="${c.subRecord || ''}" data-old="${c.subRecord || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('العنوان', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${c.mainRecord || ''}" data-old="${c.mainRecord || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('السجل الرئيسي', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
+            
+            <!-- عمود السجل الرئيسي: مضاف إليه تقييد الحروف لقبول أرقام فقط -->
+            <td><input type="text" class="excel-input" value="${c.mainRecord || ''}" data-old="${c.mainRecord || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('السجل الرئيسي', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
+            
             <td><input type="text" class="excel-input" value="${c.contact || ''}" data-old="${c.contact || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الشخص المسؤول', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${c.phone || ''}" data-old="${c.phone || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('رقم التواصل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
+            
+            <!-- عمود رقم التواصل: يحتوي على تقييد مدخلات الأرقام وزر واتساب مرن -->
+            <td>
+                <div class="phone-cell-container">
+                    <a class="whatsapp-icon-btn" onclick="openWhatsAppChat(this)" title="مراسلة عبر واتساب"><i class="fab fa-whatsapp"></i></a>
+                    <input type="text" class="excel-input" value="${c.phone || ''}" data-old="${c.phone || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('رقم التواصل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();">
+                </div>
+            </td>
+            
             <td><input type="text" class="excel-input" value="${c.email || ''}" data-old="${c.email || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('البريد الإلكتروني', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
             <td>
                 <select class="excel-input" data-old="${c.type || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('التصنيف', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();">
