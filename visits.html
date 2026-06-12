@@ -139,20 +139,101 @@
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; margin: 0 auto; 
         }
 
+        /* 1. الحاوية الرئيسية للهيكل الجديد لسجل النشاط */
         .activity-log-section { 
-            margin: 15px 0 10px 0; padding: 12px 18px; background: #ffffff; border-radius: 10px; 
-            border: 1px solid var(--border-soft); box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
-            flex-shrink: 0; height: 140px; display: flex; flex-direction: column; box-sizing: border-box;
+            margin: 1px 0 0px 0; 
+            padding: 10px 18px; 
+            background: #ffffff; 
+            border-radius: 10px; 
+            border: 1px solid #cbd5e1; 
+            box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
+            flex-shrink: 0; 
+            height: 90px; 
+            display: flex; 
+            flex-direction: column; 
+            box-sizing: border-box;
+            transition: height 0.3s ease;
         }
-        .activity-log-title { color: var(--dark-yellow); font-size: 13.5px; font-weight: 800; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; flex-shrink: 0; }
-        .activity-list { flex: 1; overflow-y: auto; font-size: 11.5px; line-height: 1.6; }
-        .activity-item { margin-bottom: 4px; border-bottom: 1px dashed #f8fafc; padding-bottom: 4px; color: #475569; display: flex; align-items: center; }
-        
-        .activity-header-part { font-size: 11.5px; color: var(--chat-yellow); font-weight: 800; display: inline-block; }
-        .activity-time-part { font-size: 11.5px; font-weight: 800; }
-        .activity-text-part { font-size: 11.5px; color: #475569; display: inline-block; text-align: right; margin-right: 5px; }
+        /* كلاس التوسيع الديناميكي */
+        .activity-log-section.expanded { height: 200px; }
 
-        /* مواصفات نافذة سجل الملاحظات والمتابعة المحددة حرفياً */
+        /* 2. شريط العنوان العلوي */
+        .activity-log-header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f1f5f9;
+            margin-bottom: 5px;
+            padding-bottom: 4px;
+            flex-shrink: 0;
+        }
+        .activity-log-title { 
+            color: #c29103; 
+            font-size: 11.5px; 
+            font-weight: 800; 
+            font-family: 'Cairo';
+        }
+        .btn-toggle-expand {
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            border: none;
+            background: transparent;
+            font-size: 12px;
+            color: #64748b;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        .btn-toggle-expand:hover {
+            background: #f1f5f9;
+            color: #3b82f6;
+        }
+
+        /* 3. قائمة السجلات والنشاطات */
+        .activity-list { 
+            flex: 1; 
+            overflow-y: auto; 
+            font-size: 9.5px; 
+            text-align: right; 
+        }
+        .activity-item { 
+            margin-bottom: 4px; 
+            padding-bottom: 4px; 
+            border-bottom: 1px dashed #f1f5f9; 
+            color: #1e293b; 
+            font-weight: 700;
+            line-height: 1.4;
+            display: flex; 
+            align-items: center; 
+            flex-wrap: wrap;
+        }
+        
+        /* 4. تفاصيل الأجزاء الداخلية للنص */
+        .activity-header-part { 
+            font-size: 9.5px; 
+            color: #b45309; 
+            font-weight: 800; 
+            display: inline-block; 
+        }
+        .activity-time-part { 
+            font-size: 10px; 
+            font-weight: normal; 
+            color: #64748b;
+            display: inline-block;
+            margin-right: 4px;
+        }
+        .activity-text-part { 
+            font-size: 9.5px; 
+            color: #2563eb; 
+            font-weight: 700;
+            display: inline-block; 
+            margin-right: 6px; 
+        }
+
+        /* مواصفات نافذة سجل الملاحظات والمتابعة */
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-content { 
             background: white; padding: 18px; border-radius: 12px; 
@@ -253,8 +334,11 @@
             </table>
         </div>
 
-        <div class="activity-log-section">
-            <div class="activity-log-title">📋 سجل نشاط إدارة الزيارات</div>
+        <div id="activityLogSection" class="activity-log-section">
+            <div class="activity-log-header-container">
+                <div class="activity-log-title">📋 سجل نشاط إدارة الزيارات</div>
+                <button id="toggleExpandBtn" class="btn-toggle-expand" onclick="toggleLogExpansion()">⤢</button>
+            </div>
             <div id="activityList" class="activity-list"></div>
         </div>
     </div>
@@ -281,6 +365,19 @@
     function getTodayFormatted() {
         const d = new Date();
         return d.toISOString().split('T')[0];
+    }
+
+    // دالة توسيع وتقليص سجل النشاط هيدروليكياً
+    function toggleLogExpansion() {
+        const logSection = document.getElementById('activityLogSection');
+        const toggleBtn = document.getElementById('toggleExpandBtn');
+        if (logSection.classList.contains('expanded')) {
+            logSection.classList.remove('expanded');
+            toggleBtn.innerText = '⤢';
+        } else {
+            logSection.classList.add('expanded');
+            toggleBtn.innerText = '⤡';
+        }
     }
 
     function updateEditDateField(row) {
@@ -316,6 +413,7 @@
         return `👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${dateFormatted}  ${hours}:${minutes}`;
     }
 
+    // معالجة وحفظ البيانات مقسمة ومقولبة برمجياً في الأجزاء الثلاثة المطلوبة
     function addToActivityLog(fieldName, oldVal, newVal, companyName) {
         const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
         const d = new Date();
@@ -324,7 +422,6 @@
         const minutes = String(d.getMinutes()).padStart(2, '0');
         const time24 = `${hours}:${minutes}`;
 
-        const headerHTML = `<span class="activity-header-part">👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${dateFormatted}  <span class="activity-time-part">${time24}</span></span>`;
         const cleanCompany = companyName && companyName.trim() !== "" ? companyName : "شركة جديدة";
         const val1 = oldVal && oldVal.trim() !== "" ? oldVal : "فارغ";
         const val2 = newVal && newVal.trim() !== "" ? newVal : "فارغ";
@@ -336,9 +433,15 @@
             actionText = `تعديل ${fieldName} من [${val1}] إلى [${val2}] في ( ${cleanCompany} )`;
         }
         
-        const fullLogHTML = `${headerHTML}<span class="activity-text-part">${actionText}</span>`;
+        // بناء الهيكل الثلاثي بعناية تامة
+        const partHeader = `👤 (أحمد) 🗓️ ${days[d.getDay()]} ${dateFormatted}`;
+        const partTime = `${time24}`;
+        const partText = `${actionText}`;
+
+        const packedLog = `${partHeader}||${partTime}||${partText}`;
+
         let logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
-        logs.unshift(fullLogHTML);
+        logs.unshift(packedLog);
         localStorage.setItem(LOGS_KEY, JSON.stringify(logs.slice(0, 100)));
         renderActivityLog();
     }
@@ -346,7 +449,20 @@
     function renderActivityLog() {
         const list = document.getElementById('activityList');
         const logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
-        list.innerHTML = logs.map(log => `<div class="activity-item">${log}</div>`).join('');
+        
+        list.innerHTML = logs.map(log => {
+            if (log.includes('||')) {
+                const parts = log.split('||');
+                return `<div class="activity-item">
+                    <span class="activity-header-part">${parts[0]}</span>
+                    <span class="activity-time-part">${parts[1]}</span>
+                    <span class="activity-text-part">${parts[2]}</span>
+                </div>`;
+            } else {
+                // للتوافق مع السجلات القديمة إن وجدت
+                return `<div class="activity-item"><span class="activity-text-part">${log}</span></div>`;
+            }
+        }).join('');
     }
 
     function updateStats() {
@@ -642,7 +758,6 @@
         });
     }
 
-    /* دوال معالجة نافذة الملاحظات القياسية بهندسة الكتل المطلوبة */
     function openNote(previewEl) {
         currentActivePreview = previewEl;
         const rawNotes = previewEl.getAttribute('data-full-notes') || "";
