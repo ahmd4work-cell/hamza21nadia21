@@ -90,7 +90,6 @@
         .readonly-input { color: #64748b; cursor: default; }
         .select-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent-blue); vertical-align: middle; }
 
-        /* تنسيق الرابط الخاص بالـ ID ليظهر بشكل احترافي وجذاب */
         .id-link { color: #3b82f6; font-weight: 800; text-decoration: none; display: inline-block; width: 100%; height: 100%; line-height: 45px; transition: 0.2s; }
         .id-link:hover { color: #2563eb; text-decoration: underline; }
 
@@ -114,36 +113,122 @@
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; margin: 0 auto; 
         }
 
+        /* 1. الحاوية الرئيسية (The Section Container) */
         .activity-log-section { 
-            margin: 15px 0 10px 0; padding: 12px 18px; background: #ffffff; border-radius: 10px; 
-            border: 1px solid var(--border-soft); box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
-            flex-shrink: 0; height: 140px; display: flex; flex-direction: column; box-sizing: border-box;
+            margin: 1px 0 0px 0; 
+            padding: 10px 18px; 
+            background: #ffffff; 
+            border-radius: 10px; 
+            border: 1px solid #cbd5e1; 
+            box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
+            flex-shrink: 0; 
+            height: 90px; 
+            display: flex; 
+            flex-direction: column; 
+            box-sizing: border-box;
+            transition: height 0.3s ease;
         }
-        .activity-log-title { color: var(--dark-yellow); font-size: 13.5px; font-weight: 800; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; flex-shrink: 0; }
-        .activity-list { flex: 1; overflow-y: auto; font-size: 11.5px; line-height: 1.6; }
-        .activity-item { margin-bottom: 4px; border-bottom: 1px dashed #f8fafc; padding-bottom: 4px; color: #475569; display: flex; align-items: center; }
-        
-        .activity-header-part { font-size: 11.5px; color: var(--chat-yellow); font-weight: 800; }
-        .activity-time-part { font-size: 10px; font-weight: normal; }
-        .activity-text-part { font-size: 11.5px; color: #475569; }
+        .activity-log-section.expanded { 
+            height: 200px; 
+        }
+
+        /* 2. شريط العنوان العلوي (The Header Container) */
+        .activity-log-header-container { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 5px; 
+            border-bottom: 1px solid #f1f5f9; 
+            padding-bottom: 4px; 
+            flex-shrink: 0; 
+        }
+        /* أ. نص العنوان */
+        .activity-log-title { 
+            color: #c29103; 
+            font-size: 11.5px; 
+            font-weight: 800; 
+            margin: 0; 
+            text-align: right; 
+        }
+        /* ب. زر التوسيع والتقليص */
+        .btn-toggle-expand { 
+            background: none; 
+            border: none; 
+            color: #64748b; 
+            font-size: 12px; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            width: 22px; 
+            height: 22px; 
+            border-radius: 4px; 
+            transition: 0.2s; 
+            padding: 0; 
+        }
+        .btn-toggle-expand:hover { 
+            background: #f1f5f9; 
+            color: #3b82f6; 
+        }
+
+        /* 3. قائمة السجلات والنشاطات (The Activity List & Items) */
+        .activity-list { 
+            flex: 1; 
+            overflow-y: auto; 
+            font-size: 9.5px; 
+            line-height: 1.4; 
+            text-align: right; 
+        }
+        .activity-item { 
+            margin-bottom: 4px; 
+            border-bottom: 1px dashed #f1f5f9; 
+            padding-bottom: 4px; 
+            color: #1e293b; 
+            display: block; 
+            white-space: normal; 
+            text-align: right; 
+            font-weight: 700; 
+            direction: rtl; 
+        }
+         
+        /* 4. تفاصيل الأجزاء الداخلية للنص (Text Composition & Inline Styles) */
+        .activity-header-part { 
+            font-size: 9.5px; 
+            color: #b45309; 
+            font-weight: 800; 
+            display: inline-block; 
+            direction: rtl; 
+        }
+        .activity-time-part { 
+            font-size: 10px; 
+            font-weight: normal; 
+            color: #64748b; 
+        }
+        .activity-text-part { 
+            font-size: 9.5px; 
+            color: #2563eb; 
+            font-weight: 700; 
+            display: inline; 
+            margin-right: 6px; 
+        }
 
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-content { background: white; padding: 18px; border-radius: 12px; width: 440px; height: 480px; display: flex; flex-direction: column; }
         .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
         .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
 
-        .col-select { width: 30px; }
-        .col-id { width: 45px; }
-        .col-company { width: 140px; }
-        .col-records { width: 90px; }
-        .col-contact { width: 100px; }
-        .col-phone { width: 100px; }
-        .col-email { width: 130px; }
-        .col-type { width: 80px; }
-        .col-status { width: 80px; }
-        .col-notes { width: 130px; }
-        .col-created { width: 90px; }
-        .col-owner { width: 80px; }
+        .col-select { width: 3%; }
+        .col-id { width: 6%; } 
+        .col-company { width: 15%; }
+        .col-records { width: 9%; }
+        .col-contact { width: 9%; }
+        .col-phone { width: 9%; }
+        .col-email { width: 11%; }
+        .col-type { width: 7%; }
+        .col-status { width: 7%; }
+        .col-notes { width: 14%; }
+        .col-created { width: 10%; }
+        .col-owner { width: 7%; }
     </style>
 </head>
 <body onload="loadSavedData()">
@@ -205,8 +290,11 @@
             </table>
         </div>
 
-        <div class="activity-log-section">
-            <div class="activity-log-title">📋 سجل نشاط إدارة العملاء</div>
+        <div class="activity-log-section" id="custActivityLogSection">
+            <div class="activity-log-header-container">
+                <div class="activity-log-title">📋 سجل نشاط إدارة العملاء</div>
+                <button class="btn-toggle-expand" onclick="toggleActivityLogHeight()" title="توسيع / تقليص" id="toggleLogBtn">⤢</button>
+            </div>
             <div id="activityList" class="activity-list"></div>
         </div>
     </div>
@@ -237,8 +325,22 @@
     function generateStyledHeader() {
         const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
         const d = new Date();
-        const timeFormatted = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-        return `<span class="activity-header-part">👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${getTodayFormatted()}  <span class="activity-time-part">${timeFormatted}</span>&nbsp;&nbsp;</span>`;
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        const time24Formatted = `${hours}:${minutes}`;
+        return `<span class="activity-header-part">👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${getTodayFormatted()}  <span class="activity-time-part">${time24Formatted}</span>&nbsp;&nbsp;</span>`;
+    }
+
+    function toggleActivityLogHeight() {
+        const section = document.getElementById('custActivityLogSection');
+        const btn = document.getElementById('toggleLogBtn');
+        if (section.classList.contains('expanded')) {
+            section.classList.remove('expanded');
+            btn.innerText = '⤢';
+        } else {
+            section.classList.add('expanded');
+            btn.innerText = '⤡';
+        }
     }
 
     function addToActivityLog(fieldName, oldVal, newVal, companyName) {
@@ -263,7 +365,7 @@
     function updateStats() {
         const rows = document.querySelectorAll('#tableBody .main-row');
         const today = getTodayFormatted();
-        const currentMonth = today.substring(0, 7); // YYYY-MM
+        const currentMonth = today.substring(0, 7);
         
         let total = rows.length;
         let countToday = 0;
@@ -411,7 +513,7 @@
     function saveNote() {
         const txt = document.getElementById('modalTextArea').value.trim();
         if (txt && currentActivePreview) {
-            let old = currentActivePreview.getAttribute('data-full-notes') || "";
+            let old = currentActivePreview.getAttribute('data-full-notes'] || "";
             let entry = `${generateStyledHeader()}<span class="activity-text-part">${txt}</span>`;
             let updated = old === "" ? entry : old + "\n--------------------\n" + entry;
             currentActivePreview.setAttribute('data-full-notes', updated);
