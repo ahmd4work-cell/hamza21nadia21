@@ -275,7 +275,7 @@
                         <th class="col-id">ID</th>
                         <th class="col-company">اسم المنشأة / الشركة</th>
                         <th class="col-records">السجل الرئيسي</th>
-                        <th class="col-records">السجل الفرعي</th>
+                        <th class="col-records">العنوان</th>
                         <th class="col-contact">الشخص المسؤول</th>
                         <th class="col-phone">رقم التواصل</th>
                         <th class="col-email">البريد الإلكتروني</th>
@@ -399,7 +399,7 @@
             <td class="col-id"><a href="customer-profile.html?id=${generatedId}" class="id-link" target="_blank">${generatedId}</a></td>
             <td><input type="text" class="excel-input" value="${c.comp || ''}" data-old="${c.comp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الشركة', this.getAttribute('data-old'), this.value, this.value); saveAllDataSilently();"></td>
             <td><input type="text" class="excel-input" value="${c.mainRecord || ''}" data-old="${c.mainRecord || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('السجل الرئيسي', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${c.subRecord || ''}" data-old="${c.subRecord || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('السجل الفرعي', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${c.subRecord || ''}" data-old="${c.subRecord || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('العنوان', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
             <td><input type="text" class="excel-input" value="${c.contact || ''}" data-old="${c.contact || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المسؤول', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
             <td><input type="text" class="excel-input" value="${c.phone || ''}" data-old="${c.phone || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الهاتف', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
             <td><input type="text" class="excel-input" value="${c.email || ''}" data-old="${c.email || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الإيميل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[2].querySelector('input').value); saveAllDataSilently();"></td>
@@ -513,7 +513,7 @@
     function saveNote() {
         const txt = document.getElementById('modalTextArea').value.trim();
         if (txt && currentActivePreview) {
-            let old = currentActivePreview.getAttribute('data-full-notes'] || "";
+            let old = currentActivePreview.getAttribute('data-full-notes') || "";
             let entry = `${generateStyledHeader()}<span class="activity-text-part">${txt}</span>`;
             let updated = old === "" ? entry : old + "\n--------------------\n" + entry;
             currentActivePreview.setAttribute('data-full-notes', updated);
