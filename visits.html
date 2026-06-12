@@ -45,20 +45,20 @@
 
         .search-wrapper { position: relative; width: 15%; display: flex; align-items: center; }
         .search-input {
-            width: 100%; height: 35px; padding: 0 10px; border-radius: 8px;
+            width: 100%; height: 30px; padding: 0 10px; border-radius: 8px;
             border: 1px solid var(--border-soft); background: #fff;
             font-family: 'Cairo'; font-size: 12px; font-weight: 700; outline: none;
         }
 
-        .stats-bar-visit { margin-right: auto; display: flex; gap: 12px; align-items: center; background: #fff; padding: 0 15px; border-radius: 5px; height: 35px; border: 1px solid var(--border-soft); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .stat-item { font-size: 11px; font-weight: 800; color: #475569; white-space: nowrap; }
+        .stats-bar-visit { margin-right: auto; display: flex; gap: 12px; align-items: center; background: #fff; padding: 0 15px; border-radius: 5px; height: 25px; border: 1px solid var(--border-soft); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .stat-item { font-size: 10px; font-weight: 800; color: #475569; white-space: nowrap; }
         .stat-val { color: var(--accent-blue); margin-right: 3px; }
         .stat-divider { color: #cbd5e1; font-weight: normal; margin: 0 2px; }
 
         .bulk-action-wrapper { position: relative; display: flex; align-items: center; margin-right: 5px; }
         .btn-bulk-trigger { 
-            height: 35px; padding: 0 15px; border-radius: 5px; border: 1px solid var(--border-soft);
-            background: #fff; color: var(--text-dark); font-family: 'Cairo'; font-size: 12px; font-weight: 800;
+            height: 25px; padding: 0 12px; border-radius: 5px; border: 1px solid var(--border-soft);
+            background: #fff; color: var(--text-dark); font-family: 'Cairo'; font-size: 11px; font-weight: 800;
             cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: 0.2s;
             display: flex; align-items: center; gap: 5px;
         }
@@ -116,9 +116,11 @@
 
         .select-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent-blue); vertical-align: middle; }
 
+        .action-cell { position: relative; overflow: visible !important; }
+        
         .dropdown-menu { 
             display: none; position: absolute; left: 0; 
-            top: 38px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; 
+            top: 28px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; 
             box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 1000; min-width: 110px; padding: 4px;
         }
 
@@ -135,196 +137,29 @@
             width: 95%; height: 20px; border: none; background: transparent; font-family: 'Cairo'; 
             font-size: 11px; text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700; 
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; margin: 0 auto; 
-            line-height: 20px;
         }
 
-        /* 1. الحاوية الرئيسية لسجل نشاطات الزيارات الهيدروليكية المرنة */
         .activity-log-section { 
-            margin: 1px 0 0px 0; 
-            padding: 10px 18px; 
-            background: #ffffff; 
-            border-radius: 10px; 
-            border: 1px solid #cbd5e1; 
-            box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
-            flex-shrink: 0; 
-            height: 90px; 
-            display: flex; 
-            flex-direction: column; 
-            box-sizing: border-box;
-            transition: height 0.3s ease;
+            margin: 15px 0 10px 0; padding: 12px 18px; background: #ffffff; border-radius: 10px; 
+            border: 1px solid var(--border-soft); box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
+            flex-shrink: 0; height: 140px; display: flex; flex-direction: column; box-sizing: border-box;
         }
-        .activity-log-section.expanded { 
-            height: 200px; 
-        }
+        .activity-log-title { color: var(--dark-yellow); font-size: 13.5px; font-weight: 800; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; flex-shrink: 0; }
+        .activity-list { flex: 1; overflow-y: auto; font-size: 11.5px; line-height: 1.6; }
+        .activity-item { margin-bottom: 4px; border-bottom: 1px dashed #f8fafc; padding-bottom: 4px; color: #475569; display: flex; align-items: center; }
         
-        /* 2. شريط العنوان العلوي للسجل */
-        .activity-log-header-container { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 5px; 
-            border-bottom: 1px solid #f1f5f9; 
-            padding-bottom: 4px; 
-            flex-shrink: 0; 
-        }
-        
-        /* أ. نص العنوان المطور للسجل */
-        .activity-log-title { 
-            color: #c29103; 
-            font-family: 'Cairo', sans-serif;
-            font-size: 11.5px; 
-            font-weight: 800; 
-            margin: 0; 
-            text-align: right; 
-        }
-        
-        /* ب. زر التوسيع والتقليص الرمزي المتناسق */
-        .btn-toggle-expand { 
-            background: none; 
-            border: none; 
-            color: #64748b; 
-            font-size: 12px; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            width: 22px; 
-            height: 22px; 
-            border-radius: 4px; 
-            transition: 0.2s; 
-            padding: 0; 
-        }
-        .btn-toggle-expand:hover { 
-            background: #f1f5f9; 
-            color: #3b82f6; 
-        }
+        .activity-header-part { font-size: 11.5px; color: var(--chat-yellow); font-weight: 800; display: inline-block; }
+        .activity-time-part { font-size: 11.5px; font-weight: 800; }
+        .activity-text-part { font-size: 11.5px; color: #475569; display: block; text-align: right; white-space: pre-wrap; margin-top: 2px; }
 
-        /* 3. قائمة السجلات والنشاطات */
-        .activity-list { 
-            flex: 1; 
-            overflow-y: auto; 
-            font-size: 9.5px; 
-            text-align: right; 
-        }
-        .activity-item { 
-            margin-bottom: 4px; 
-            border-bottom: 1px dashed #f1f5f9; 
-            padding-bottom: 4px; 
-            color: #1e293b; 
-            display: block; 
-            white-space: normal; 
-            text-align: right; 
-            font-weight: 700; 
-            line-height: 1.4;
-            direction: rtl; 
-        }
-         
-        /* 4. تفاصيل الأجزاء الداخلية للنص الثلاثي المخصص */
-        .activity-header-part { 
-            font-size: 9.5px; 
-            color: #b45309; 
-            font-weight: 800; 
-            display: inline-block; 
-            direction: rtl; 
-        }
-        .activity-time-part { 
-            font-size: 10px; 
-            font-weight: normal; 
-            color: #64748b; 
-        }
-        .activity-text-part { 
-            font-size: 9.5px; 
-            color: #2563eb; 
-            font-weight: 700; 
-            display: inline; 
-            margin-right: 6px; 
-        }
-
-        /* هندسة مودال المحادثة والدردشة الدقيق للملاحظات */
-        .modal { 
-            display: none; 
-            position: fixed; 
-            z-index: 2000; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(0,0,0,0.5); 
-            align-items: center; 
-            justify-content: center; 
-            backdrop-filter: blur(2px); 
-        }
-        .modal-content { 
-            background: white; 
-            padding: 22px; 
-            border-radius: 12px; 
-            width: 490px; 
-            height: 500px; 
-            display: flex; 
-            flex-direction: column; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
-            box-sizing: border-box; 
-        }
+        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .modal-content { background: white; padding: 18px; border-radius: 12px; width: 440px; height: 480px; display: flex; flex-direction: column; }
+        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; direction: rtl; }
         
-        .history-log { 
-            flex-grow: 1; 
-            overflow-y: auto; 
-            background: #ffffff; 
-            border: 1px solid #e2e8f0; 
-            border-radius: 8px; 
-            padding: 12px; 
-            margin-bottom: 12px; 
-            box-sizing: border-box;
-            direction: rtl;
-        }
+        .history-log .activity-item { display: block; margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
 
-        .chat-msg-block {
-            display: flex;
-            flex-direction: column; 
-            align-items: flex-start;
-            text-align: right;
-            margin-bottom: 14px;
-            font-family: 'Cairo', sans-serif;
-            direction: rtl;
-        }
-        
-        .chat-msg-header {
-            font-size: 10.5px; 
-            color: #b45309; 
-            font-weight: 800; 
-            margin-bottom: 3px;
-            display: block;
-            width: 100%;
-            text-align: right;
-        }
-        
-        .chat-msg-text {
-            font-size: 11px; 
-            color: #1e293b; 
-            font-weight: 700; 
-            line-height: 1.5;
-            display: block;
-            width: 100%;
-            text-align: right;
-            white-space: pre-wrap; 
-        }
+        .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; direction: rtl; }
 
-        .note-area { 
-            height: 95px; 
-            width: 100%; 
-            border: 1px solid #cbd5e1; 
-            border-radius: 8px; 
-            padding: 10px; 
-            font-family: 'Cairo'; 
-            resize: none; 
-            outline: none; 
-            font-size: 11.5px; 
-            text-align: right; 
-            box-sizing: border-box; 
-            direction: rtl;
-        }
-
-        /* توزيع عرض أعمدة جدول شاشة الزيارات الـ 14 الأصلي */
         .col-select { width: 3%; }
         .col-company { width: 10%; } 
         .col-address { width: 9%; } 
@@ -356,7 +191,7 @@
         <div class="action-bar">
             <button class="btn-top btn-add" onclick="insertNewRow()">+ إضافة زيارة جديدة</button>
             <div class="search-wrapper">
-                <input type="text" id="searchInput" class="search-input" placeholder="بحث باسم الشركة أو المسؤول... 🔍" onkeyup="filterTable()">
+                <input type="text" id="searchInput" class="search-input" placeholder="بحث 🔍" onkeyup="filterTable()">
             </div>
             
             <div class="stats-bar-visit">
@@ -404,11 +239,8 @@
             </table>
         </div>
 
-        <div class="activity-log-section" id="visitActivityLogSection">
-            <div class="activity-log-header-container">
-                <div class="activity-log-title">📋 سجل نشاط إدارة الزيارات</div>
-                <button class="btn-toggle-expand" onclick="toggleActivityLogHeight()" title="توسيع / تقليص" id="toggleLogBtn">⤢</button>
-            </div>
+        <div class="activity-log-section">
+            <div class="activity-log-title">📋 سجل نشاط إدارة الزيارات</div>
             <div id="activityList" class="activity-list"></div>
         </div>
     </div>
@@ -416,12 +248,12 @@
 
 <div id="noteModal" class="modal">
     <div class="modal-content">
-        <div style="font-weight: 800; color: #4c1d95; font-size:13px; margin-bottom: 12px; text-align: center;">سجل ملاحظات ومتابعة الزيارة والنتائج</div>
+        <div style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right;">سجل متابعة الزيارة والنتائج</div>
         <div id="historyLog" class="history-log"></div>
-        <textarea id="modalTextArea" class="note-area" placeholder="أضف ملاحظة أو متابعة جديدة بخصوص هذه الزيارة..."></textarea>
-        <div style="display:flex; justify-content: flex-end; gap:8px; margin-top:12px;">
-            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:6px 16px; border-radius:6px; cursor:pointer; font-family:Cairo; font-size:11.5px;">تراجع</button>
-            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:6px 16px; border-radius:6px; cursor:pointer; font-family:Cairo; font-size:11.5px; font-weight:bold;">حفظ الملاحظة</button>
+        <textarea id="modalTextArea" class="note-area" placeholder="أدخل تفاصيل الملاحظة هنا..."></textarea>
+        <div style="display:flex; justify-content: flex-end; gap:8px; margin-top:10px;">
+            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px;">تراجع</button>
+            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px; font-weight:bold;">حفظ الملاحظة</button>
         </div>
     </div>
 </div>
@@ -437,28 +269,13 @@
         return d.toISOString().split('T')[0];
     }
 
-    function getTimeFormatted() {
-        const d = new Date();
-        return String(d.getHours()).padStart(2, '0') + ":" + String(d.getMinutes()).padStart(2, '0');
-    }
-
-    function toggleActivityLogHeight() {
-        const section = document.getElementById('visitActivityLogSection');
-        const btn = document.getElementById('toggleLogBtn');
-        if (section.classList.contains('expanded')) {
-            section.classList.remove('expanded');
-            btn.innerText = '⤢';
-        } else {
-            section.classList.add('expanded');
-            btn.innerText = '⤡';
-        }
-    }
-
     function updateEditDateField(row) {
         if (!row) return;
         const d = new Date();
         const dateFormatted = d.toISOString().split('T')[0];
-        const time24 = getTimeFormatted();
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        const time24 = `${hours}:${minutes}`;
         const fullDateTime = `${dateFormatted} ${time24}`;
         const container = row.querySelector('.edit-date-container');
         const hiddenInput = row.querySelector('.edit-date-val');
@@ -476,27 +293,29 @@
         return `<span class="edit-date-d">${datePart}</span><span class="edit-date-t">${timePart}</span>`;
     }
 
-    // بناء وتفصيل الأسطر برمجياً متوافقاً مع التقسيم الثلاثي المعتمد بالفرص البيعية
-    function addToActivityLog(fieldName, oldVal, newVal, companyName) {
+    function generateStyledHeader() {
         const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
         const d = new Date();
-        
-        const cleanCompany = (companyName && companyName.toString().trim() !== "") ? companyName : "شركة جديدة";
-        const v1 = (oldVal && oldVal.toString().trim() !== "") ? oldVal : "فارغ";
-        const v2 = (newVal && newVal.toString().trim() !== "") ? newVal : "فارغ";
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        const time24 = `${hours}:${minutes}`;
+        return `<span class="activity-header-part">👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${getTodayFormatted()}  <span class="activity-time-part">${time24}</span></span>`;
+    }
+
+    function addToActivityLog(fieldName, oldVal, newVal, companyName) {
+        const headerHTML = generateStyledHeader();
+        const cleanCompany = companyName && companyName.trim() !== "" ? companyName : "شركة جديدة";
+        const val1 = oldVal && oldVal.trim() !== "" ? oldVal : "فارغ";
+        const val2 = newVal && newVal.trim() !== "" ? newVal : "فارغ";
         
         let actionText = "";
         if (fieldName === "إجراء") {
-            actionText = `${oldVal} لزيارة شركة ( ${cleanCompany} )`;
+            actionText = `${val1} لزيارة شركة ( ${cleanCompany} )`;
         } else {
-            actionText = `تعديل ${fieldName} من [${v1}] إلى [${v2}] في ( ${cleanCompany} )`;
+            actionText = `تعديل ${fieldName} من [${val1}] إلى [${val2}] في ( ${cleanCompany} )`;
         }
-
-        const headerHTML = `<span class="activity-header-part">👤 (أحمد) 🗓️ ${days[d.getDay()]} ${getTodayFormatted()} </span>`;
-        const timeHTML = `<span class="activity-time-part">${getTimeFormatted()}</span>`;
-        const textHTML = `<span class="activity-text-part">${actionText}</span>`;
         
-        const fullLogHTML = `${headerHTML}${timeHTML}${textHTML}`;
+        const fullLogHTML = `${headerHTML}<span class="activity-text-part">${actionText}</span>`;
         let logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
         logs.unshift(fullLogHTML);
         localStorage.setItem(LOGS_KEY, JSON.stringify(logs.slice(0, 100)));
@@ -568,7 +387,7 @@
 
         const today = getTodayFormatted();
         const visitDate = v.visitDate || today;
-        const notes = v.notes || '[]';
+        const notes = v.notes || '';
         const lastNoteText = getLastNoteOnly(notes);
         const editDateHTML = parseEditDateHTML(v.editDate || '');
 
@@ -584,11 +403,11 @@
             <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الإيميل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
             <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('السجل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
             <td>
-                <input type="text" class="excel-input readonly-input" value="${visitDate}" readonly style="color:#64748b; font-weight:700;">
+                <input type="text" class="excel-input readonly-input" value="${visitDate}" readonly>
                 <input type="hidden" class="visit-date-val" value="${visitDate}">
             </td>
             <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الخدمة الحالية', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
-            <td><input type="number" class="excel-input opp-value-input" value="${v.oppValue || '0'}" readonly style="color: #1e3a8a; font-weight: 800; cursor: not-allowed;"></td>
+            <td><input type="number" class="excel-input opp-value-input" value="${v.oppValue || '0'}" readonly></td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
             <td>
                 <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleStatusChange(this, '${rowId}')">
@@ -603,7 +422,7 @@
                 <div class="edit-date-container">${editDateHTML}</div>
                 <input type="hidden" class="edit-date-val" value="${v.editDate || ''}">
             </td>
-            <td><input type="text" class="excel-input" value="${v.owner || 'أحمد'}" data-old="${v.owner || 'أحمد'}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المالك', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.owner || ''}" data-old="${v.owner || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المالك', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
         `;
 
         subRow.innerHTML = `<td colspan="14"><div class="sub-table-container"><table class="inner-table"><thead><tr><th>نوع المنتج</th><th>تفاصيل المنتج</th><th>العدد</th><th>الاشتراك</th><th>الإجمالي</th><th style="width:65px">إجراء</th></tr></thead><tbody class="product-body"></tbody></table></div></td>`;
@@ -658,12 +477,12 @@
             mob: row.cells[4].querySelector('input').value,
             email: row.cells[5].querySelector('input').value,
             record: row.cells[6].querySelector('input').value,
-            visitDate: row.querySelector('.visit-date-val').value,
+            oppDate: getTodayFormatted(),
             curServ: row.querySelector('.cur-serv-val').value,
             oppValue: row.querySelector('.opp-value-input').value,
-            notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '[]',
+            notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '',
             status: "مهتم",
-            expectedDate: getTodayFormatted(),
+            editDate: row.querySelector('.edit-date-val').value,
             owner: row.cells[13].querySelector('input').value,
             products: products
         };
@@ -698,7 +517,7 @@
             <td><input type="text" value="${data.desc || ''}" onchange="saveAllDataSilently()"></td>
             <td><input type="number" class="p-qty" min="0" value="${data.qty || ''}" oninput="calculateProductRow(this, '${rowId}')"></td>
             <td><input type="number" class="p-sub" min="0" value="${data.sub || ''}" oninput="calculateProductRow(this, '${rowId}')"></td>
-            <td><input type="number" class="p-total" value="${data.total || '0'}" readonly style="color:#475569; font-weight:700; cursor:not-allowed;"></td>
+            <td><input type="number" class="p-total" value="${data.total || '0'}" readonly></td>
             <td><div style="display:flex; justify-content:center; gap:5px;"><button class="sub-action-btn btn-plus" onclick="addProductRow('${rowId}')">+</button><button class="sub-action-btn btn-minus" onclick="removeProductRow(this, '${rowId}')">×</button></div></td>
         `;
     }
@@ -738,17 +557,25 @@
     }
 
     function toggleAllCheckboxes(source) { document.querySelectorAll('.select-check').forEach(chk => chk.checked = source.checked); }
-    
     function toggleDropdown(e, btn) { e.stopPropagation(); const menu = btn.nextElementSibling; document.querySelectorAll('.dropdown-menu').forEach(m => { if(m !== menu) m.classList.remove('show'); }); menu.classList.toggle('show'); }
 
     function handleBulkAction(action) {
         const selected = document.querySelectorAll('.select-check:checked');
         if (selected.length === 0) return alert('حدد صفاً أولاً');
         if (action === 'حذف' && confirm('تأكيد الحذف؟')) {
-            selected.forEach(chk => { const row = chk.closest('tr'); const id = row.id; addToActivityLog('إجراء', 'حذف الزيارة', '', row.cells[1].querySelector('input').value); row.remove(); if(document.getElementById('sub-' + id)) document.getElementById('sub-' + id).remove(); });
+            selected.forEach(chk => { 
+                const row = chk.closest('tr'); 
+                const id = row.id; 
+                addToActivityLog('إجراء', 'حذف الزيارة', '', row.cells[1].querySelector('input').value); 
+                row.remove(); 
+                if(document.getElementById('sub-' + id)) document.getElementById('sub-' + id).remove(); 
+            });
             saveAllDataSilently(); updateStats();
         } else { 
-            selected.forEach(chk => { const row = chk.closest('tr'); addToActivityLog('إجراء', action, '', row.cells[1].querySelector('input').value); });
+            selected.forEach(chk => {
+                const row = chk.closest('tr');
+                addToActivityLog('إجراء', action, '', row.cells[1].querySelector('input').value);
+            });
             alert('تم تنفيذ ' + action); 
         }
     }
@@ -768,7 +595,7 @@
                 visitDate: row.querySelector('.visit-date-val').value, 
                 curServ: row.querySelector('.cur-serv-val').value, 
                 oppValue: row.querySelector('.opp-value-input').value, 
-                notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '[]', 
+                notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '', 
                 status: row.querySelector('.status-select').value, 
                 editDate: row.querySelector('.edit-date-val').value, 
                 owner: row.cells[13].querySelector('input').value, 
@@ -780,10 +607,8 @@
 
     function loadSavedData() {
         const saved = localStorage.getItem(STORAGE_KEY);
-        const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = "";
         if (saved) { JSON.parse(saved).forEach(v => renderRow(v)); }
-        renderActivityLog(); updateStats(); reorderRows();
+        renderActivityLog(); updateStats();
     }
 
     function filterTable() {
@@ -796,70 +621,31 @@
         });
     }
 
-    function getLastNoteOnly(fullJsonText) {
-        if (!fullJsonText || fullJsonText === '[]') return 'أضف ملاحظة...';
-        try {
-            const arr = JSON.parse(fullJsonText);
-            if (arr.length === 0) return 'أضف ملاحظة...';
-            return arr[arr.length - 1].text;
-        } catch(e) {
-            return 'أضف ملاحظة...';
-        }
-    }
-
     function openNote(previewEl) {
         currentActivePreview = previewEl;
-        const raw = previewEl.getAttribute('data-full-notes') || "[]";
-        let arr = [];
-        try { arr = JSON.parse(raw); } catch(e) { arr = []; }
-        
-        let htmlContent = "";
-        arr.forEach(msg => {
-            htmlContent += `
-                <div class="chat-msg-block">
-                    <span class="chat-msg-header">👤 ${msg.user} <span style="font-weight: normal; color: inherit; margin-right: 4px;">🗓️ ${msg.date} ${msg.time}</span></span>
-                    <span class="chat-msg-text">${msg.text}</span>
-                </div>
-            `;
-        });
-        
-        document.getElementById('historyLog').innerHTML = htmlContent;
+        const rawNotes = previewEl.getAttribute('data-full-notes') || "";
+        document.getElementById('historyLog').innerHTML = rawNotes.split('\n--------------------\n').map(entry => `<div class="activity-item">${entry}</div>`).join('');
         document.getElementById('noteModal').style.display = "flex";
         document.getElementById('modalTextArea').focus();
     }
 
     function saveNote() {
-        const txt = document.getElementById('modalTextArea').value.trim();
-        if (txt && currentActivePreview) {
-            const raw = currentActivePreview.getAttribute('data-full-notes') || "[]";
-            let arr = [];
-            try { arr = JSON.parse(raw); } catch(e) { arr = []; }
-            
-            const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-            const d = new Date();
-            const timeFormatted = getTimeFormatted();
-
-            const newMsg = {
-                user: "أحمد " + "🗓️ " + days[d.getDay()],
-                date: getTodayFormatted(),
-                time: timeFormatted,
-                text: txt
-            };
-            arr.push(newMsg);
-            
-            const updatedJson = JSON.stringify(arr);
-            currentActivePreview.setAttribute('data-full-notes', updatedJson);
-            currentActivePreview.innerText = txt;
+        const newText = document.getElementById('modalTextArea').value.trim();
+        if (newText && currentActivePreview) {
+            let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
+            let newEntry = `${generateStyledHeader()}<span class="activity-text-part">${newText}</span>`;
+            let updatedFullNotes = oldNotes === "" ? newEntry : oldNotes + "\n--------------------\n" + newEntry;
+            currentActivePreview.setAttribute('data-full-notes', updatedFullNotes);
+            currentActivePreview.innerText = newText;
             updateEditDateField(currentActivePreview.closest('tr'));
             saveAllDataSilently();
-            
-            const companyName = currentActivePreview.closest('tr').cells[1].querySelector('input').value || "غير مسمى";
-            addToActivityLog("ملاحظة ومتابعة", "إضافة", txt, companyName);
+            addToActivityLog("ملاحظة", "إضافة", newText, currentActivePreview.closest('tr').cells[1].querySelector('input').value);
         }
         closeNote();
     }
 
     function closeNote() { document.getElementById('noteModal').style.display = "none"; document.getElementById('modalTextArea').value = ""; }
+    function getLastNoteOnly(fullNotes) { if(!fullNotes) return ""; const parts = fullNotes.split('\n--------------------\n'); const last = parts[parts.length - 1]; const tempDiv = document.createElement('div'); tempDiv.innerHTML = last; return tempDiv.querySelector('.activity-text-part')?.innerText || tempDiv.innerText || ""; }
 
     window.onclick = (e) => {
         if (!e.target.matches('.btn-bulk-trigger')) {
