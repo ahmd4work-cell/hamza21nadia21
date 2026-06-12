@@ -189,16 +189,13 @@
             line-height: 1.4; 
             text-align: right; 
         }
-        
-        /* تعديل نظام العرض لتبدأ الرسالة في سطر جديد تماماً من بداية المربع تحت العنوان */
         .activity-item { 
-            margin-bottom: 6px; 
+            margin-bottom: 4px; 
             border-bottom: 1px dashed #f1f5f9; 
-            padding-bottom: 6px; 
+            padding-bottom: 4px; 
             color: #1e293b; 
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
+            display: block; 
+            white-space: normal; 
             text-align: right; 
             font-weight: 700; 
             direction: rtl; 
@@ -208,8 +205,7 @@
             font-size: 9.5px; 
             color: #b45309; 
             font-weight: 800; 
-            display: block; 
-            margin-bottom: 3px;
+            display: inline-block; 
             direction: rtl; 
         }
         .activity-time-part { 
@@ -221,15 +217,62 @@
             font-size: 9.5px; 
             color: #2563eb; 
             font-weight: 700; 
-            display: block; 
+            display: inline; 
+            margin-right: 6px; 
+        }
+
+        /* تنسيق النافذة المنبثقة طبق الأصل من الصورة المعروضة والمحادثة أسفل الاسم */
+        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .modal-content { background: white; padding: 22px; border-radius: 12px; width: 490px; height: 500px; display: flex; flex-direction: column; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+        
+        .history-log { 
+            flex-grow: 1; 
+            overflow-y: auto; 
+            background: #ffffff; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 8px; 
+            padding: 12px; 
+            margin-bottom: 12px; 
+            box-sizing: border-box;
+        }
+
+        /* جعل عناصر المحادثة المنبثقة تعرض النص أسفل شريط اسم المستخدم والتاريخ وبمسافات دقيقة وطبق الأصل */
+        .chat-msg-block {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: right;
+            margin-bottom: 14px;
+            font-family: 'Cairo', sans-serif;
+            direction: rtl;
+        }
+        .chat-msg-header {
+            font-size: 10.5px;
+            color: #475569;
+            font-weight: 800;
+            margin-bottom: 3px;
+            display: block;
             width: 100%;
             text-align: right;
         }
+        .chat-msg-time {
+            font-size: 10px;
+            font-weight: normal;
+            color: #94a3b8;
+            margin-right: 4px;
+        }
+        .chat-msg-text {
+            font-size: 11px;
+            color: #1e293b;
+            font-weight: 700;
+            line-height: 1.5;
+            display: block;
+            width: 100%;
+            text-align: right;
+            white-space: pre-wrap;
+        }
 
-        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-        .modal-content { background: white; padding: 18px; border-radius: 12px; width: 440px; height: 480px; display: flex; flex-direction: column; }
-        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; }
-        .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; }
+        .note-area { height: 95px; width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 11.5px; text-align: right; box-sizing: border-box; }
 
         .col-select { width: 3%; }
         .col-id { width: 6%; } 
@@ -317,12 +360,12 @@
 
 <div id="noteModal" class="modal">
     <div class="modal-content">
-        <div style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right;">سجل ملاحظات ومتابعة العميل</div>
+        <div style="font-weight: 800; color: #4c1d95; font-size:13px; margin-bottom: 12px; text-align: center;">سجل ملاحظات ومتابعة العميل</div>
         <div id="historyLog" class="history-log"></div>
         <textarea id="modalTextArea" class="note-area" placeholder="أضف ملاحظة جديدة بخصوص هذا العميل..."></textarea>
-        <div style="display:flex; justify-content: flex-end; gap:8px; margin-top:10px;">
-            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px;">إلغاء</button>
-            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px; font-weight:bold;">تحديث الملاحظات</button>
+        <div style="display:flex; justify-content: flex-end; gap:8px; margin-top:12px;">
+            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:6px 16px; border-radius:6px; cursor:pointer; font-family:Cairo; font-size:11.5px;">إلغاء</button>
+            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:6px 16px; border-radius:6px; cursor:pointer; font-family:Cairo; font-size:11.5px; font-weight:bold;">تحديث الملاحظات</button>
         </div>
     </div>
 </div>
@@ -337,13 +380,9 @@
         return d.toISOString().split('T')[0];
     }
 
-    function generateStyledHeader() {
-        const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+    function getTimeFormatted() {
         const d = new Date();
-        const hours = String(d.getHours()).padStart(2, '0');
-        const minutes = String(d.getMinutes()).padStart(2, '0');
-        const time24Formatted = `${hours}:${minutes}`;
-        return `<span class="activity-header-part">👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${getTodayFormatted()}  <span class="activity-time-part">${time24Formatted}</span></span>`;
+        return String(d.getHours()).padStart(2, '0') + ":" + String(d.getMinutes()).padStart(2, '0');
     }
 
     function toggleActivityLogHeight() {
@@ -359,19 +398,17 @@
     }
 
     function addToActivityLog(fieldName, oldVal, newVal, companyName) {
-        const headerHTML = generateStyledHeader();
+        const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+        const d = new Date();
+        const headerHTML = `<span class="activity-header-part">👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${getTodayFormatted()}  <span class="activity-time-part">${getTimeFormatted()}</span>&nbsp;&nbsp;</span>`;
+        
         const cleanCompany = companyName && companyName.trim() !== "" ? companyName : "عميل جديد";
         const val1 = (oldVal && oldVal.trim() !== "") ? oldVal : "فارغ";
         const val2 = (newVal && newVal.trim() !== "") ? newVal : "فارغ";
         
-        let actionText = "";
-        if (fieldName === "إجراء") {
-            actionText = newVal; 
-        } else {
-            actionText = `تغيير ${fieldName} من [${val1}] إلى [${val2}] للعميل ( ${cleanCompany} )`;
-        }
-        
+        let actionText = fieldName === "إجراء" ? newVal : `تغيير ${fieldName} من [${val1}] إلى [${val2}] للعميل ( ${cleanCompany} )`;
         const fullLogHTML = `${headerHTML}<span class="activity-text-part">${actionText}</span>`;
+        
         let logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
         logs.unshift(fullLogHTML);
         localStorage.setItem(LOGS_KEY, JSON.stringify(logs.slice(0, 100)));
@@ -518,20 +555,35 @@
         });
     }
 
-    function getLastNoteOnly(fullText) {
-        if (!fullText) return 'أضف ملاحظة...';
-        const arr = fullText.split('\n--------------------\n');
-        const last = arr[arr.length - 1];
-        const temp = document.createElement('div');
-        temp.innerHTML = last;
-        const txt = temp.querySelector('.activity-text-part');
-        return txt ? txt.innerText : 'أضف ملاحظة...';
+    function getLastNoteOnly(fullJsonText) {
+        if (!fullJsonText) return 'أضف ملاحظة...';
+        try {
+            const arr = JSON.parse(fullJsonText);
+            if (arr.length === 0) return 'أضف ملاحظة...';
+            return arr[arr.length - 1].text;
+        } catch(e) {
+            return 'أضف ملاحظة...';
+        }
     }
 
     function openNote(el) {
         currentActivePreview = el;
-        const raw = el.getAttribute('data-full-notes') || "";
-        document.getElementById('historyLog').innerHTML = raw.split('\n--------------------\n').map(e => `<div class="activity-item">${e}</div>`).join('');
+        const raw = el.getAttribute('data-full-notes') || "[]";
+        let arr = [];
+        try { arr = JSON.parse(raw); } catch(e) { arr = []; }
+        
+        // بناء الهيكل الداخلي طبق الأصل ليكون النص أسفل الاسم والتاريخ
+        let htmlContent = "";
+        arr.forEach(msg => {
+            htmlContent += `
+                <div class="chat-msg-block">
+                    <span class="chat-msg-header">👤 ${msg.user} <span class="chat-msg-time">🗓️ ${msg.date} ${msg.time}</span></span>
+                    <span class="chat-msg-text">${msg.text}</span>
+                </div>
+            `;
+        });
+        
+        document.getElementById('historyLog').innerHTML = htmlContent;
         document.getElementById('noteModal').style.display = "flex";
         document.getElementById('modalTextArea').focus();
     }
@@ -539,10 +591,21 @@
     function saveNote() {
         const txt = document.getElementById('modalTextArea').value.trim();
         if (txt && currentActivePreview) {
-            let old = currentActivePreview.getAttribute('data-full-notes') || "";
-            let entry = `<span class="activity-header-part">${generateStyledHeader()}</span><span class="activity-text-part">${txt}</span>`;
-            let updated = old === "" ? entry : old + "\n--------------------\n" + entry;
-            currentActivePreview.setAttribute('data-full-notes', updated);
+            const raw = currentActivePreview.getAttribute('data-full-notes') || "[]";
+            let arr = [];
+            try { arr = JSON.parse(raw); } catch(e) { arr = []; }
+            
+            // إضافة كائن المحادثة الجديد متضمناً تفاصيل الوقت والتاريخ الحاليين بنفس التنسيق
+            const newMsg = {
+                user: "أحمد",
+                date: getTodayFormatted(),
+                time: getTimeFormatted(),
+                text: txt
+            };
+            arr.push(newMsg);
+            
+            const updatedJson = JSON.stringify(arr);
+            currentActivePreview.setAttribute('data-full-notes', updatedJson);
             currentActivePreview.innerText = txt;
             saveAllDataSilently();
         }
