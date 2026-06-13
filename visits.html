@@ -245,12 +245,11 @@
             direction: rtl; box-sizing: border-box;
         }
         
-        /* تعديل كلاس نافذة الملاحظات - تمت إزالة السطور والحد السفلي الداخلي بنجاح */
         .chat-block { 
             display: flex; 
             flex-direction: column; 
             text-align: right; 
-            border-bottom: none; /* تم إزالة الخط الفاصل بين المشاركات بداخل المربع */
+            border-bottom: none;
             padding-bottom: 4px; 
         }
         .chat-header { color: #b45309; font-weight: 800; font-size: 10.5px; margin-bottom: 4px; }
@@ -324,11 +323,11 @@
                         <th class="col-company">الشركة</th>
                         <th class="col-address">العنوان</th> 
                         <th class="col-manager">المسؤول</th>
-                        <th class="col-mobile">الموبايل</th>
+                        <th class="col-mobile">رقم التواصل</th>
                         <th class="col-email">الإيميل</th>
                         <th class="col-record">السجل</th>
                         <th class="col-date">تاريخ الزيارة</th>
-                        <th class="col-service">الخدمة الحالية</th>
+                        <th class="col-service">الخدمة المقترحة</th>
                         <th class="col-val">قيمة الزيارة</th>
                         <th class="col-notes">ملاحظات الزيارة</th>
                         <th class="col-status">الحالة</th>
@@ -538,14 +537,14 @@
             <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الشركة', this.getAttribute('data-old'), this.value, this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats();"></td>
             <td><input type="text" class="excel-input" value="${v.address || ''}" data-old="${v.address || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('العنوان', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
             <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المسؤول', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الموبايل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('رقم التواصل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
             <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الإيميل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('السجل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('السجل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
             <td>
                 <input type="text" class="excel-input readonly-input" value="${visitDate}" readonly>
                 <input type="hidden" class="visit-date-val" value="${visitDate}">
             </td>
-            <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الخدمة الحالية', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الخدمة المقترحة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
             <td><input type="number" class="excel-input opp-value-input" value="${v.oppValue || '0'}" readonly></td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
             <td>
@@ -682,15 +681,6 @@
         }
     }
 
-    function removeProductRow(btn, rowId) {
-        const tbody = btn.closest('tbody');
-        if(tbody.rows.length > 1) {
-            btn.closest('tr').remove();
-            calculateMainVisitValue(rowId);
-            saveAllDataSilently();
-        }
-    }
-
     function calculateMainVisitValue(rowId) {
         const subRow = document.getElementById('sub-' + rowId);
         const mainRow = document.getElementById(rowId);
@@ -760,12 +750,22 @@
     }
 
     function filterTable() {
-        const q = document.getElementById('searchInput').value.toLowerCase();
+        const q = document.getElementById('searchInput').value.toLowerCase().trim();
         document.querySelectorAll('.main-row').forEach(row => {
-            const text = row.innerText.toLowerCase();
+            const companyValue = row.cells[1].querySelector('input').value.toLowerCase();
+            const managerValue = row.cells[3].querySelector('input').value.toLowerCase();
+            const mobileValue = row.cells[4].querySelector('input').value.toLowerCase();
+            const emailValue = row.cells[5].querySelector('input').value.toLowerCase();
+            const recordValue = row.cells[6].querySelector('input').value.toLowerCase();
+            
             const subRow = document.getElementById('sub-' + row.id);
-            if (text.includes(q)) { row.style.display = 'table-row'; } 
-            else { row.style.display = 'none'; if(subRow) subRow.style.display = 'none'; }
+            
+            if (companyValue.includes(q) || managerValue.includes(q) || mobileValue.includes(q) || emailValue.includes(q) || recordValue.includes(q)) { 
+                row.style.display = 'table-row'; 
+            } else { 
+                row.style.display = 'none'; 
+                if(subRow) subRow.style.display = 'none'; 
+            }
         });
     }
 
