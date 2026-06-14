@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASGate - الزيارات</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --nav-shiny-navy: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
@@ -116,8 +117,11 @@
 
         .select-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent-blue); vertical-align: middle; }
 
-        .action-cell { position: relative; overflow: visible !important; }
-        
+        /* حاوية أيقونة الواتساب والمدخل */
+        .phone-cell-container { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; padding: 0 4px; box-sizing: border-box; }
+        .whatsapp-icon-btn { color: #25d366; font-size: 14px; text-decoration: none; margin-right: 5px; cursor: pointer; transition: transform 0.2s; display: inline-flex; align-items: center; }
+        .whatsapp-icon-btn:hover { transform: scale(1.2); }
+
         .dropdown-menu { 
             display: none; position: absolute; left: 0; 
             top: 28px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; 
@@ -140,21 +144,122 @@
         }
 
         .activity-log-section { 
-            margin: 15px 0 10px 0; padding: 12px 18px; background: #ffffff; border-radius: 10px; 
-            border: 1px solid var(--border-soft); box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
-            flex-shrink: 0; height: 140px; display: flex; flex-direction: column; box-sizing: border-box;
+            margin: 1px 0 0px 0; 
+            padding: 10px 18px; 
+            background: #ffffff; 
+            border-radius: 10px; 
+            border: 1px solid #cbd5e1; 
+            box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
+            flex-shrink: 0; 
+            height: 90px; 
+            display: flex; 
+            flex-direction: column; 
+            box-sizing: border-box;
+            transition: height 0.3s ease;
         }
-        .activity-log-title { color: var(--dark-yellow); font-size: 13.5px; font-weight: 800; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; flex-shrink: 0; }
-        .activity-list { flex: 1; overflow-y: auto; font-size: 11.5px; line-height: 1.6; }
-        .activity-item { margin-bottom: 4px; border-bottom: 1px dashed #f8fafc; padding-bottom: 4px; color: #475569; text-align: right; }
+        .activity-log-section.expanded { height: 200px; }
+
+        .activity-log-header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f1f5f9;
+            margin-bottom: 5px;
+            padding-bottom: 4px;
+            flex-shrink: 0;
+        }
+        .activity-log-title { 
+            color: #c29103; 
+            font-size: 11.5px; 
+            font-weight: 800; 
+            font-family: 'Cairo';
+        }
+        .btn-toggle-expand {
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            border: none;
+            background: transparent;
+            font-size: 12px;
+            color: #64748b;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        .btn-toggle-expand:hover {
+            background: #f1f5f9;
+            color: #3b82f6;
+        }
+
+        .activity-list { 
+            flex: 1; 
+            overflow-y: auto; 
+            font-size: 9.5px; 
+            text-align: right; 
+        }
+        .activity-item { 
+            margin-bottom: 4px; 
+            padding-bottom: 4px; 
+            border-bottom: 1px dashed #f1f5f9; 
+            color: #1e293b; 
+            font-weight: 700;
+            line-height: 1.4;
+            display: flex; 
+            align-items: center; 
+            flex-wrap: wrap;
+        }
+        
+        .activity-header-part { 
+            font-size: 9.5px; 
+            color: #b45309; 
+            font-weight: 800; 
+            display: inline-block; 
+        }
+        .activity-time-part { 
+            font-size: 10px; 
+            font-weight: normal; 
+            color: #64748b;
+            display: inline-block;
+            margin-right: 4px;
+        }
+        .activity-text-part { 
+            font-size: 9.5px; 
+            color: #2563eb; 
+            font-weight: 700;
+            display: inline-block; 
+            margin-right: 6px; 
+        }
 
         .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-        .modal-content { background: white; padding: 18px; border-radius: 12px; width: 440px; height: 480px; display: flex; flex-direction: column; }
-        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; text-align: right; white-space: pre-wrap; line-height: 1.7; direction: rtl; }
+        .modal-content { 
+            background: white; padding: 18px; border-radius: 12px; 
+            width: 490px; height: 500px; display: flex; flex-direction: column; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15); box-sizing: border-box;
+        }
+        .history-log { 
+            flex-grow: 1; overflow-y: auto; background: #ffffff; 
+            border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; 
+            margin-bottom: 12px; display: flex; flex-direction: column; gap: 12px;
+            direction: rtl; box-sizing: border-box;
+        }
+        
+        .chat-block { 
+            display: flex; 
+            flex-direction: column; 
+            text-align: right; 
+            border-bottom: none;
+            padding-bottom: 4px; 
+        }
+        .chat-header { color: #b45309; font-weight: 800; font-size: 10.5px; margin-bottom: 4px; }
+        .chat-text { font-weight: 700; color: #1e293b; font-size: 11px; white-space: pre-wrap; line-height: 1.4; }
+        .note-area { 
+            height: 95px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; 
+            padding: 10px; font-family: 'Cairo'; resize: none; outline: none; 
+            font-size: 12px; text-align: right; box-sizing: border-box; direction: rtl; flex-shrink: 0;
+        }
 
-        .note-area { height: 90px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 13px; text-align: right; box-sizing: border-box; direction: rtl; }
-
-        /* تعديل توزيع عرض الأعمدة لإضافة العنوان */
         .col-select { width: 3%; }
         .col-company { width: 10%; } 
         .col-address { width: 9%; } 
@@ -218,11 +323,11 @@
                         <th class="col-company">الشركة</th>
                         <th class="col-address">العنوان</th> 
                         <th class="col-manager">المسؤول</th>
-                        <th class="col-mobile">الموبايل</th>
+                        <th class="col-mobile">رقم التواصل</th>
                         <th class="col-email">الإيميل</th>
                         <th class="col-record">السجل</th>
                         <th class="col-date">تاريخ الزيارة</th>
-                        <th class="col-service">الخدمة الحالية</th>
+                        <th class="col-service">الخدمة المقترحة</th>
                         <th class="col-val">قيمة الزيارة</th>
                         <th class="col-notes">ملاحظات الزيارة</th>
                         <th class="col-status">الحالة</th>
@@ -234,8 +339,11 @@
             </table>
         </div>
 
-        <div class="activity-log-section">
-            <div class="activity-log-title">📋 سجل نشاط الزيارات</div>
+        <div id="activityLogSection" class="activity-log-section">
+            <div class="activity-log-header-container">
+                <div class="activity-log-title">📋 سجل نشاط إدارة الزيارات</div>
+                <button id="toggleExpandBtn" class="btn-toggle-expand" onclick="toggleLogExpansion()">⤢</button>
+            </div>
             <div id="activityList" class="activity-list"></div>
         </div>
     </div>
@@ -243,12 +351,12 @@
 
 <div id="noteModal" class="modal">
     <div class="modal-content">
-        <div style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right;">سجل متابعة الزيارة والنتائج</div>
+        <div style="font-weight: 800; color: #2e1065; margin-bottom: 12px; text-align: right; font-size:13px;">سجل الملاحظات والمتابعة</div>
         <div id="historyLog" class="history-log"></div>
         <textarea id="modalTextArea" class="note-area" placeholder="أدخل تفاصيل الملاحظة هنا..."></textarea>
         <div style="display:flex; justify-content: flex-end; gap:8px; margin-top:10px;">
-            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px;">تراجع</button>
-            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:8px 18px; border-radius:8px; cursor:pointer; font-family:Cairo; font-size:12px; font-weight:bold;">حفظ الملاحظة</button>
+            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:6px 16px; border-radius:6px; cursor:pointer; font-family:Cairo; font-size:11px; font-weight:700;">إلغاء</button>
+            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:6px 16px; border-radius:6px; cursor:pointer; font-family:Cairo; font-size:11px; font-weight:bold;">حفظ</button>
         </div>
     </div>
 </div>
@@ -262,6 +370,42 @@
     function getTodayFormatted() {
         const d = new Date();
         return d.toISOString().split('T')[0];
+    }
+
+    // دالة لفتح الواتساب الذكي للرقم
+    function openWhatsAppChat(el) {
+        const inputEl = el.closest('.phone-cell-container').querySelector('input');
+        let rawPhone = inputEl.value.trim();
+
+        if (!rawPhone) {
+            alert("يرجى إدخال رقم الجوال أولاً");
+            return;
+        }
+
+        let cleanNumber = rawPhone.replace(/\D/g, '');
+
+        if (cleanNumber.startsWith('00966')) {
+            cleanNumber = cleanNumber.substring(2);
+        } else if (cleanNumber.startsWith('05')) {
+            cleanNumber = '966' + cleanNumber.substring(1);
+        } else if (cleanNumber.startsWith('5') && cleanNumber.length === 9) {
+            cleanNumber = '966' + cleanNumber;
+        }
+
+        const url = "https://wa.me/" + cleanNumber;
+        window.open(url, '_blank');
+    }
+
+    function toggleLogExpansion() {
+        const logSection = document.getElementById('activityLogSection');
+        const toggleBtn = document.getElementById('toggleExpandBtn');
+        if (logSection.classList.contains('expanded')) {
+            logSection.classList.remove('expanded');
+            toggleBtn.innerText = '⤢';
+        } else {
+            logSection.classList.add('expanded');
+            toggleBtn.innerText = '⤡';
+        }
     }
 
     function updateEditDateField(row) {
@@ -288,13 +432,42 @@
         return `<span class="edit-date-d">${datePart}</span><span class="edit-date-t">${timePart}</span>`;
     }
 
+    function generateHeaderString() {
+        const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+        const d = new Date();
+        const dateFormatted = d.toISOString().split('T')[0];
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        return `👤 (أحمد)  🗓️ ${days[d.getDay()]}  ${dateFormatted}  ${hours}:${minutes}`;
+    }
+
     function addToActivityLog(fieldName, oldVal, newVal, companyName) {
+        const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+        const d = new Date();
+        const dateFormatted = d.toISOString().split('T')[0];
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        const time24 = `${hours}:${minutes}`;
+
         const cleanCompany = companyName && companyName.trim() !== "" ? companyName : "شركة جديدة";
         const val1 = oldVal && oldVal.trim() !== "" ? oldVal : "فارغ";
         const val2 = newVal && newVal.trim() !== "" ? newVal : "فارغ";
-        let actionText = fieldName === "إجراء" ? `حذف زيارة شركة ( ${cleanCompany} )` : `تعديل ${fieldName} من [${val1}] إلى [${val2}] في ( ${cleanCompany} )`;
+        
+        let actionText = "";
+        if (fieldName === "إجراء") {
+            actionText = `${val1} لزيارة شركة ( ${cleanCompany} )`;
+        } else {
+            actionText = `تعديل ${fieldName} من [${val1}] إلى [${val2}] في ( ${cleanCompany} )`;
+        }
+        
+        const partHeader = `👤 (أحمد) 🗓️ ${days[d.getDay()]} ${dateFormatted}`;
+        const partTime = `${time24}`;
+        const partText = `${actionText}`;
+
+        const packedLog = `${partHeader}||${partTime}||${partText}`;
+
         let logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
-        logs.unshift(actionText);
+        logs.unshift(packedLog);
         localStorage.setItem(LOGS_KEY, JSON.stringify(logs.slice(0, 100)));
         renderActivityLog();
     }
@@ -302,7 +475,19 @@
     function renderActivityLog() {
         const list = document.getElementById('activityList');
         const logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
-        list.innerHTML = logs.map(log => `<div class="activity-item">${log}</div>`).join('');
+        
+        list.innerHTML = logs.map(log => {
+            if (log.includes('||')) {
+                const parts = log.split('||');
+                return `<div class="activity-item">
+                    <span class="activity-header-part">${parts[0]}</span>
+                    <span class="activity-time-part">${parts[1]}</span>
+                    <span class="activity-text-part">${parts[2]}</span>
+                </div>`;
+            } else {
+                return `<div class="activity-item"><span class="activity-text-part">${log}</span></div>`;
+            }
+        }).join('');
     }
 
     function updateStats() {
@@ -373,20 +558,25 @@
                 <input type="checkbox" class="select-check">
                 <span class="toggle-arrow" onclick="toggleSubTable('${rowId}')">▶</span>
             </td>
-            <td class="col-company"><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الشركة', this.getAttribute('data-old'), this.value, this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats();"></td>
-            <td class="col-address"><input type="text" class="excel-input" value="${v.address || ''}" data-old="${v.address || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('العنوان', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
-            <td class="col-manager"><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المسؤول', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
-            <td class="col-mobile"><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الموبايل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
-            <td class="col-email"><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الإيميل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
-            <td class="col-record"><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('السجل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
-            <td class="col-date">
+            <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الشركة', this.getAttribute('data-old'), this.value, this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats();"></td>
+            <td><input type="text" class="excel-input" value="${v.address || ''}" data-old="${v.address || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('العنوان', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المسؤول', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td>
+                <div class="phone-cell-container">
+                    <a class="whatsapp-icon-btn" onclick="openWhatsAppChat(this)" title="مراسلة عبر واتساب"><i class="fa-brands fa-whatsapp"></i></a>
+                    <input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('رقم التواصل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();">
+                </div>
+            </td>
+            <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الإيميل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('السجل', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td>
                 <input type="text" class="excel-input readonly-input" value="${visitDate}" readonly>
                 <input type="hidden" class="visit-date-val" value="${visitDate}">
             </td>
-            <td class="col-service"><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الخدمة الحالية', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
-            <td class="col-val"><input type="number" class="excel-input opp-value-input" value="${v.oppValue || '0'}" readonly></td>
-            <td class="col-notes"><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText || "ملاحظات"}</div></td>
-            <td class="col-status">
+            <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('الخدمة المقترحة', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="number" class="excel-input opp-value-input" value="${v.oppValue || '0'}" readonly></td>
+            <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notes.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
+            <td>
                 <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleStatusChange(this, '${rowId}')">
                     <option value="" ${v.status === '' ? 'selected' : ''}></option>
                     <option value="تأهيل لفرصة" ${v.status === 'تأهيل لفرصة' ? 'selected' : ''}>تأهيل لفرصة</option>
@@ -395,11 +585,11 @@
                     <option value="فقدان" ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option>
                 </select>
             </td>
-            <td class="col-edit">
+            <td>
                 <div class="edit-date-container">${editDateHTML}</div>
                 <input type="hidden" class="edit-date-val" value="${v.editDate || ''}">
             </td>
-            <td class="col-owner"><input type="text" class="excel-input" value="${v.owner || ''}" data-old="${v.owner || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المالك', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.owner || ''}" data-old="${v.owner || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="addToActivityLog('المالك', this.getAttribute('data-old'), this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
         `;
 
         subRow.innerHTML = `<td colspan="14"><div class="sub-table-container"><table class="inner-table"><thead><tr><th>نوع المنتج</th><th>تفاصيل المنتج</th><th>العدد</th><th>الاشتراك</th><th>الإجمالي</th><th style="width:65px">إجراء</th></tr></thead><tbody class="product-body"></tbody></table></div></td>`;
@@ -468,7 +658,7 @@
         opps.unshift(visitData);
         localStorage.setItem(OPPORTUNITIES_KEY, JSON.stringify(opps));
 
-        addToActivityLog('إجراء', '', '', `نقل إلى الفرص: ${visitData.comp}`);
+        addToActivityLog('إجراء', 'تأهيل ونقل الفرصة البيعية', '', visitData.comp);
 
         row.remove();
         if(subRow) subRow.remove();
@@ -540,9 +730,21 @@
         const selected = document.querySelectorAll('.select-check:checked');
         if (selected.length === 0) return alert('حدد صفاً أولاً');
         if (action === 'حذف' && confirm('تأكيد الحذف؟')) {
-            selected.forEach(chk => { const row = chk.closest('tr'); const id = row.id; addToActivityLog('إجراء', '', '', row.cells[1].querySelector('input').value); row.remove(); if(document.getElementById('sub-' + id)) document.getElementById('sub-' + id).remove(); });
+            selected.forEach(chk => { 
+                const row = chk.closest('tr'); 
+                const id = row.id; 
+                addToActivityLog('إجراء', 'حذف الزيارة', '', row.cells[1].querySelector('input').value); 
+                row.remove(); 
+                if(document.getElementById('sub-' + id)) document.getElementById('sub-' + id).remove(); 
+            });
             saveAllDataSilently(); updateStats();
-        } else { alert('تم تنفيذ ' + action); }
+        } else { 
+            selected.forEach(chk => {
+                const row = chk.closest('tr');
+                addToActivityLog('إجراء', action, '', row.cells[1].querySelector('input').value);
+            });
+            alert('تم تنفيذ ' + action); 
+        }
     }
 
     function saveAllDataSilently() {
@@ -577,38 +779,77 @@
     }
 
     function filterTable() {
-        const q = document.getElementById('searchInput').value.toLowerCase();
+        const q = document.getElementById('searchInput').value.toLowerCase().trim();
         document.querySelectorAll('.main-row').forEach(row => {
-            const text = row.innerText.toLowerCase();
+            const companyValue = row.cells[1].querySelector('input').value.toLowerCase();
+            const managerValue = row.cells[3].querySelector('input').value.toLowerCase();
+            const mobileValue = row.cells[4].querySelector('input').value.toLowerCase();
+            const emailValue = row.cells[5].querySelector('input').value.toLowerCase();
+            const recordValue = row.cells[6].querySelector('input').value.toLowerCase();
+            
             const subRow = document.getElementById('sub-' + row.id);
-            if (text.includes(q)) { row.style.display = 'table-row'; } 
-            else { row.style.display = 'none'; if(subRow) subRow.style.display = 'none'; }
+            
+            if (companyValue.includes(q) || managerValue.includes(q) || mobileValue.includes(q) || emailValue.includes(q) || recordValue.includes(q)) { 
+                row.style.display = 'table-row'; 
+            } else { 
+                row.style.display = 'none'; 
+                if(subRow) subRow.style.display = 'none'; 
+            }
         });
     }
 
     function openNote(previewEl) {
         currentActivePreview = previewEl;
         const rawNotes = previewEl.getAttribute('data-full-notes') || "";
-        document.getElementById('historyLog').innerHTML = rawNotes.split('\n--------------------\n').map(entry => `<div class="activity-item">${entry}</div>`).join('');
+        const historyContainer = document.getElementById('historyLog');
+        
+        if (rawNotes.trim() === "") {
+            historyContainer.innerHTML = "";
+        } else {
+            historyContainer.innerHTML = rawNotes.split('\n--------------------\n').map(entry => {
+                if(!entry.includes('||')) return `<div class="chat-block"><div class="chat-header">👤 (أحمد)</div><div class="chat-text">${entry}</div></div>`;
+                const parts = entry.split('||');
+                const header = parts[0];
+                const text = parts[1];
+                return `<div class="chat-block"><div class="chat-header">${header}</div><div class="chat-text">${text}</div></div>`;
+            }).join('');
+        }
+        
         document.getElementById('noteModal').style.display = "flex";
         document.getElementById('modalTextArea').focus();
+        historyContainer.scrollTop = historyContainer.scrollHeight;
     }
 
     function saveNote() {
         const newText = document.getElementById('modalTextArea').value.trim();
         if (newText && currentActivePreview) {
             let oldNotes = currentActivePreview.getAttribute('data-full-notes') || "";
-            let updatedFullNotes = oldNotes === "" ? newText : oldNotes + "\n--------------------\n" + newText;
+            const headerString = generateHeaderString();
+            let newEntry = `${headerString}||${newText}`;
+            let updatedFullNotes = oldNotes === "" ? newEntry : oldNotes + "\n--------------------\n" + newEntry;
+            
             currentActivePreview.setAttribute('data-full-notes', updatedFullNotes);
             currentActivePreview.innerText = newText;
+            
+            updateEditDateField(currentActivePreview.closest('tr'));
             saveAllDataSilently();
-            addToActivityLog("ملاحظة", "إضافة", newText, currentActivePreview.closest('tr').cells[1].querySelector('input').value);
+            
+            // تم إزالة ربط الملاحظات بسجل النشاط من هنا بناءً على طلبك
         }
         closeNote();
     }
 
     function closeNote() { document.getElementById('noteModal').style.display = "none"; document.getElementById('modalTextArea').value = ""; }
-    function getLastNoteOnly(fullNotes) { if(!fullNotes) return ""; const parts = fullNotes.split('\n--------------------\n'); const last = parts[parts.length - 1]; return last || ""; }
+    
+    function getLastNoteOnly(fullNotes) { 
+        if(!fullNotes) return ""; 
+        const parts = fullNotes.split('\n--------------------\n'); 
+        const last = parts[parts.length - 1]; 
+        if(last.includes('||')) {
+            return last.split('||')[1] || "";
+        }
+        return last;
+    }
 
     window.onclick = (e) => {
         if (!e.target.matches('.btn-bulk-trigger')) {
