@@ -361,7 +361,7 @@
     <div class="main-content">
         <div class="action-bar">
             <div class="search-wrapper">
-                <input type="text" id="searchInput" class="search-input" placeholder="بحث باسم الشركة أو المسؤول... 🔍" onkeyup="filterTable()">
+                <input type="text" id="searchInput" class="search-input" placeholder="بحث 🔍" onkeyup="filterTable()">
             </div>
              
             <div class="stats-bar-visit">
@@ -394,7 +394,7 @@
                         <th class="col-company">الشركة</th>
                         <th class="col-location">العنوان</th> 
                         <th class="col-manager">المسؤول</th>
-                        <th class="col-mobile">الموبايل</th>
+                        <th class="col-mobile">رقم التواصل</th>
                         <th class="col-email">الإيميل</th>
                         <th class="col-record">السجل</th>
                         <th class="col-date">تاريخ الزيارة الأصلية</th>
@@ -460,7 +460,6 @@
         }
     }
 
-    // بناء وتفصيل الأسطر برمجياً متوافقاً مع التقسيم الثلاثي المطلوب
     function addToActivityLog(fieldName, oldVal, newVal, companyName) {
         const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
         const d = new Date();
@@ -607,7 +606,6 @@
         const oppDate = v.oppDate || today;
         const notesJson = v.notes || "[]";
         const lastNoteText = getLastNoteOnlyFromJSON(notesJson);
-        const editDateHTML = parseEditDateHTML(v.editDate || '');
 
         const locationUrl = v.locationUrl || '';
         let locationTdHTML = `<span class="no-location">لا يوجد</span>`;
@@ -620,24 +618,24 @@
                 <input type="checkbox" class="select-check">
                 <span class="toggle-arrow" onclick="toggleSubTable('${rowId}')">▶</span>
             </td>
-            <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الشركة', this.dataset.old, this.value, this.value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats();"></td>
+            <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الشركة', this.dataset.old, this.value, this.value); saveAllDataSilently(); updateStats();"></td>
             <td>
                 ${locationTdHTML}
                 <input type="hidden" class="location-url-val" value="${locationUrl}">
             </td>
-            <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المسؤول', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('رقم التواصل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الإيميل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('السجل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المسؤول', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('رقم التواصل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الإيميل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('السجل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
             <td>
                 <input type="text" class="excel-input readonly-input" value="${oppDate}" readonly style="color:#64748b; font-weight:700;">
-                <input type="hidden" class="opp-date-val" value="${oppDate}">
+                <input type="hidden" class="visit-date-val" value="${oppDate}">
             </td>
-            <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الخدمة الحالية', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الخدمة الحالية', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
             <td><input type="number" class="excel-input opp-value-input readonly-opp-val" value="${v.oppValue || ''}" readonly></td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notesJson.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
             <td>
-                <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الحالة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); updateEditDateField(this.closest('tr')); saveAllDataSilently(); updateStats(); reorderRows();">
+                <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الحالة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); updateStats(); reorderRows();">
                     <option value="" ${v.status === '' ? 'selected' : ''}></option>
                     <option value="مهتم" ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option>
                     <option value="تأجيل" ${v.status === 'تأجيل' ? 'selected' : ''}>تأجيل</option>
@@ -645,7 +643,7 @@
                     <option value="فقدان" ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option>
                 </select>
             </td>
-            <td><input type="date" class="excel-input expected-date-input" value="${expectedDate}" data-old="${expectedDate}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('التاريخ المتوقع', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); reorderRows();"></td>
+            <td><input type="date" class="excel-input expected-date-input" value="${v.expectedDate || today}" data-old="${v.expectedDate || today}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('التاريخ المتوقع', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); reorderRows();"></td>
             <td><input type="text" class="excel-input" value="${v.owner || 'أحمد'}" data-old="${v.owner || 'أحمد'}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المالك', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
         `;
 
@@ -745,7 +743,7 @@
                 mob: row.cells[4].querySelector('input').value,
                 email: row.cells[5].querySelector('input').value,
                 record: row.cells[6].querySelector('input').value,
-                visitDate: row.querySelector('.visit-date-val').value,
+                oppDate: row.querySelector('.visit-date-val').value,
                 curServ: row.querySelector('.cur-serv-val').value,
                 oppValue: row.querySelector('.opp-value-input').value,
                 notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '[]',
@@ -759,16 +757,23 @@
     }
 
     function checkIncomingOpportunities() {
-        const incomingData = localStorage.getItem(INCOMING_KEY);
-        if (incomingData) {
-            const newOpps = JSON.parse(incomingData);
-            newOpps.forEach(opp => {
-                renderRow(opp, true);
-                addToActivityLog("إجراء", "تأهيل وتصدير الفرصة البيعية من شاشة الزيارات", "", opp.comp);
-            });
-            saveAllDataSilently();
+        try {
+            const incomingData = localStorage.getItem(INCOMING_KEY);
+            if (incomingData) {
+                const newOpps = JSON.parse(incomingData);
+                if (Array.isArray(newOpps) && newOpps.length > 0) {
+                    newOpps.forEach(opp => {
+                        renderRow(opp, true);
+                        addToActivityLog("إجراء", "تأهيل وتصدير الفرصة البيعية من شاشة الزيارات", "", opp.comp);
+                    });
+                    saveAllDataSilently();
+                    reorderRows(); 
+                }
+                localStorage.removeItem(INCOMING_KEY);
+            }
+        } catch (error) {
+            console.error("Error reading incoming opportunities:", error);
             localStorage.removeItem(INCOMING_KEY);
-            reorderRows(); 
         }
     }
 
@@ -784,19 +789,29 @@
     }
 
     function filterTable() {
-        const q = document.getElementById('searchInput').value.toLowerCase();
+        const q = document.getElementById('searchInput').value.toLowerCase().trim();
         document.querySelectorAll('.main-row').forEach(row => {
-            const text = row.innerText.toLowerCase();
+            const companyValue = (row.cells[1].querySelector('input').value || '').toLowerCase();
+            const managerValue = (row.cells[3].querySelector('input').value || '').toLowerCase();
+            const mobileValue = (row.cells[4].querySelector('input').value || '').toLowerCase();
+            const emailValue = (row.cells[5].querySelector('input').value || '').toLowerCase();
+            const recordValue = (row.cells[6].querySelector('input').value || '').toLowerCase();
+            
             const subRow = document.getElementById('sub-' + row.id);
-            row.style.display = text.includes(q) ? "" : "none";
-            if(subRow) subRow.style.display = "none";
+            
+            if (companyValue.includes(q) || managerValue.includes(q) || mobileValue.includes(q) || emailValue.includes(q) || recordValue.includes(q)) { 
+                row.style.display = 'table-row'; 
+            } else { 
+                row.style.display = 'none'; 
+                if(subRow) subRow.style.display = 'none'; 
+            }
         });
     }
 
-    function getLastNoteOnly(fullJsonText) {
-        if (!fullJsonText || fullJsonText === '[]') return 'أضف ملاحظة...';
+    function getLastNoteOnlyFromJSON(jsonStr) {
+        if (!jsonStr || jsonStr === '[]') return 'أضف ملاحظة...';
         try {
-            const arr = JSON.parse(fullJsonText);
+            const arr = JSON.parse(jsonStr);
             if (arr.length === 0) return 'أضف ملاحظة...';
             return arr[arr.length - 1].text;
         } catch(e) {
@@ -848,7 +863,6 @@
             currentActivePreview.setAttribute('data-full-notes', updatedJson);
             currentActivePreview.innerText = txt;
             
-            updateEditDateField(currentActivePreview.closest('tr'));
             saveAllDataSilently();
             
             const companyName = currentActivePreview.closest('tr').cells[1].querySelector('input').value || "غير مسمى";
