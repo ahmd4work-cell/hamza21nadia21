@@ -580,7 +580,7 @@
                 <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.setAttribute('data-old', this.value)" onchange="handleStatusChange(this, '${rowId}')">
                     <option value="" ${v.status === '' ? 'selected' : ''}></option>
                     <option value="تأهيل لفرصة" ${v.status === 'تأهيل لفرصة' ? 'selected' : ''}>تأهيل لفرصة</option>
-                    <option value="متابعة" ${v.status === 'متابعة' ? 'selected' : ''}>متابعة</option>
+                    <option value="متابعة" ${v.status === 'عرض سعر' ? 'selected' : ''}>عرض سعر</option>
                     <option value="غير مهتم" ${v.status === 'غير مهتم' ? 'selected' : ''}>غير مهتم</option>
                     <option value="فقدان" ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option>
                 </select>
