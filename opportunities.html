@@ -133,7 +133,6 @@
             line-height: 20px;
         }
 
-        /* 1. الحاوية الرئيسية لسجل النشاطات (.activity-log-section) */
         .activity-log-section { 
             margin: 1px 0 0px 0; 
             padding: 10px 18px; 
@@ -152,7 +151,6 @@
             height: 200px; 
         }
         
-        /* 2. شريط العنوان العلوي (.activity-log-header-container) */
         .activity-log-header-container { 
             display: flex; 
             justify-content: space-between; 
@@ -163,7 +161,6 @@
             flex-shrink: 0; 
         }
         
-        /* أ. نص العنوان (.activity-log-title) */
         .activity-log-title { 
             color: #c29103; 
             font-family: 'Cairo', sans-serif;
@@ -173,7 +170,6 @@
             text-align: right; 
         }
         
-        /* ب. زر التوسيع والتقليص (.btn-toggle-expand) */
         .btn-toggle-expand { 
             background: none; 
             border: none; 
@@ -194,7 +190,6 @@
             color: #3b82f6; 
         }
 
-        /* 3. قائمة السجلات والنشاطات (.activity-list & .activity-item) */
         .activity-list { 
             flex: 1; 
             overflow-y: auto; 
@@ -214,7 +209,6 @@
             direction: rtl; 
         }
          
-        /* 4. تفاصيل الأجزاء الداخلية للنص (Inline Styles) */
         .activity-header-part { 
             font-size: 9.5px; 
             color: #b45309; 
@@ -235,7 +229,6 @@
             margin-right: 6px; 
         }
 
-        /* هندسة المودال القياسي المحدث للملاحظات */
         .modal-notes { 
             display: none; 
             position: fixed; 
@@ -319,21 +312,11 @@
             direction: rtl;
         }
 
-        .location-btn {
-            background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;
-            padding: 3px 8px; border-radius: 4px; font-family: 'Cairo';
-            font-size: 10.5px; font-weight: 700; cursor: pointer; text-decoration: none;
-            display: inline-flex; align-items: center; gap: 4px; transition: 0.2s;
-        }
-        .location-btn:hover { background: #dbeafe; color: #1d4ed8; }
-        .no-location { color: #94a3b8; font-size: 10.5px; font-style: italic; }
-
         .date-overdue { background-color: #ffeeeb !important; color: #dc2626 !important; font-weight: 800 !important; border-radius: 4px; }
         .date-today { background-color: #f0fdf4 !important; color: #16a34a !important; font-weight: 800 !important; border-radius: 4px; }
 
         .col-select { width: 3%; }
         .col-company { width: 11%; } 
-        .col-location { width: 6%; } 
         .col-manager { width: 7%; } 
         .col-mobile { width: 7%; } 
         .col-email { width: 7%; } 
@@ -392,7 +375,6 @@
                     <tr>
                         <th class="col-select"><input type="checkbox" onclick="toggleAllCheckboxes(this)"></th>
                         <th class="col-company">الشركة</th>
-                        <th class="col-location">العنوان</th> 
                         <th class="col-manager">المسؤول</th>
                         <th class="col-mobile">رقم التواصل</th>
                         <th class="col-email">الإيميل</th>
@@ -606,23 +588,15 @@
         const oppDate = v.oppDate || today;
         const notesJson = v.notes || "[]";
         const lastNoteText = getLastNoteOnlyFromJSON(notesJson);
-
         const locationUrl = v.locationUrl || '';
-        let locationTdHTML = `<span class="no-location">لا يوجد</span>`;
-        if (locationUrl && locationUrl.trim() !== '') {
-            locationTdHTML = `<a href="${locationUrl}" target="_blank" class="location-btn">📍 فتح الموقع</a>`;
-        }
 
         mainRow.innerHTML = `
             <td class="col-select">
                 <input type="checkbox" class="select-check">
                 <span class="toggle-arrow" onclick="toggleSubTable('${rowId}')">▶</span>
-            </td>
-            <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الشركة', this.dataset.old, this.value, this.value); saveAllDataSilently(); updateStats();"></td>
-            <td>
-                ${locationTdHTML}
                 <input type="hidden" class="location-url-val" value="${locationUrl}">
             </td>
+            <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الشركة', this.dataset.old, this.value, this.value); saveAllDataSilently(); updateStats();"></td>
             <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المسؤول', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
             <td><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('رقم التواصل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
             <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الإيميل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
@@ -647,7 +621,7 @@
             <td><input type="text" class="excel-input" value="${v.owner || 'أحمد'}" data-old="${v.owner || 'أحمد'}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المالك', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
         `;
 
-        subRow.innerHTML = `<td colspan="14"><div class="sub-table-container"><table class="inner-table"><thead><tr><th>نوع المنتج</th><th>تفاصيل المنتج</th><th>العدد</th><th>الاشتراك</th><th>الإجمالي</th><th style="width:65px">إجراء</th></tr></thead><tbody class="product-body"></tbody></table></div></td>`;
+        subRow.innerHTML = `<td colspan="13"><div class="sub-table-container"><table class="inner-table"><thead><tr><th>نوع المنتج</th><th>تفاصيل المنتج</th><th>العدد</th><th>الاشتراك</th><th>الإجمالي</th><th style="width:65px">إجراء</th></tr></thead><tbody class="product-body"></tbody></table></div></td>`;
         if (v.products && v.products.length > 0) v.products.forEach(p => addProductRow(rowId, p));
         else addProductRow(rowId);
 
@@ -739,17 +713,17 @@
             data.push({
                 comp: row.cells[1].querySelector('input').value,
                 locationUrl: row.querySelector('.location-url-val').value, 
-                mgr: row.cells[3].querySelector('input').value,
-                mob: row.cells[4].querySelector('input').value,
-                email: row.cells[5].querySelector('input').value,
-                record: row.cells[6].querySelector('input').value,
+                mgr: row.cells[2].querySelector('input').value,
+                mob: row.cells[3].querySelector('input').value,
+                email: row.cells[4].querySelector('input').value,
+                record: row.cells[5].querySelector('input').value,
                 oppDate: row.querySelector('.visit-date-val').value,
                 curServ: row.querySelector('.cur-serv-val').value,
                 oppValue: row.querySelector('.opp-value-input').value,
                 notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '[]',
                 status: row.querySelector('.status-select').value,
                 expectedDate: row.querySelector('.expected-date-input').value,
-                owner: row.cells[13].querySelector('input').value,
+                owner: row.cells[12].querySelector('input').value,
                 products: products
             });
         });
@@ -792,10 +766,10 @@
         const q = document.getElementById('searchInput').value.toLowerCase().trim();
         document.querySelectorAll('.main-row').forEach(row => {
             const companyValue = (row.cells[1].querySelector('input').value || '').toLowerCase();
-            const managerValue = (row.cells[3].querySelector('input').value || '').toLowerCase();
-            const mobileValue = (row.cells[4].querySelector('input').value || '').toLowerCase();
-            const emailValue = (row.cells[5].querySelector('input').value || '').toLowerCase();
-            const recordValue = (row.cells[6].querySelector('input').value || '').toLowerCase();
+            const managerValue = (row.cells[2].querySelector('input').value || '').toLowerCase();
+            const mobileValue = (row.cells[3].querySelector('input').value || '').toLowerCase();
+            const emailValue = (row.cells[4].querySelector('input').value || '').toLowerCase();
+            const recordValue = (row.cells[5].querySelector('input').value || '').toLowerCase();
             
             const subRow = document.getElementById('sub-' + row.id);
             
