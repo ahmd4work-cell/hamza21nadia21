@@ -579,6 +579,7 @@
         let arr = []; try { arr = JSON.parse(raw); } catch(e) { arr = []; }
         let htmlContent = arr.map(msg => `<div class="chat-msg-block"><span class="chat-msg-header">👤 ${msg.user} <span style="font-weight: normal; margin-right: 4px;">🗓️ ${msg.date} ${msg.time}</span></span><span class="chat-msg-text">${msg.text}</span></div>`).join('');
         document.getElementById('historyLog').innerHTML = htmlContent;
+        document.getElementById('modalModal').style.display = "flex"; // Correction: Assuming ID was modal-notes in structure, sticking to original naming
         document.getElementById('noteModal').style.display = "flex";
         document.getElementById('modalTextArea').focus();
     }
