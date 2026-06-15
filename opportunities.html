@@ -74,7 +74,6 @@
             text-align: center; border-bottom: 2px solid #2e1065; position: sticky; top: 0; z-index: 50; height: 40px;
         }
          
-        /* تم تقليل ارتفاع الصف إلى 40 بيكسل */
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 40px; max-height: 40px; font-size: 11px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; }
         
         .month-separator { height: 35px; }
@@ -309,6 +308,13 @@
         return d.toISOString().split('T')[0];
     }
 
+    // دالة مساعدة لتوحيد تنسيق التاريخ
+    function standardizeDate(d) {
+        if (!d) return getTodayFormatted();
+        // إذا كان التنسيق يحتوي على / نقوم بتبديله، وإلا نرجع التاريخ كما هو
+        return d.replace(/\//g, '-');
+    }
+
     function getTimeFormatted() {
         const d = new Date();
         return String(d.getHours()).padStart(2, '0') + ":" + String(d.getMinutes()).padStart(2, '0');
@@ -457,7 +463,11 @@
         subRow.className = 'sub-table-row';
         subRow.id = 'sub-' + rowId;
 
-        const today = getTodayFormatted(), oppDate = v.oppDate || today, notesJson = v.notes || "[]", lastNoteText = getLastNoteOnlyFromJSON(notesJson);
+        // استخدام دالة standardizeDate لضمان تنسيق YYYY-MM-DD
+        const today = getTodayFormatted(), 
+              oppDate = standardizeDate(v.oppDate || today), 
+              notesJson = v.notes || "[]", 
+              lastNoteText = getLastNoteOnlyFromJSON(notesJson);
 
         mainRow.innerHTML = `
             <td class="col-select"><input type="checkbox" class="select-check"><span class="toggle-arrow" onclick="toggleSubTable('${rowId}')">▶</span></td>
@@ -593,7 +603,6 @@
             currentActivePreview.setAttribute('data-full-notes', JSON.stringify(arr));
             currentActivePreview.innerText = txt;
             saveAllDataSilently();
-            // تم إيقاف التسجيل في سجل النشاط للملاحظات كما طلبت
         }
         closeNote();
     }
