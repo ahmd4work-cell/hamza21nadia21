@@ -75,7 +75,12 @@
         }
          
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; max-height: 45px; font-size: 11px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; }
-         
+        
+        /* تصميم الفاصل الشهري */
+        .month-separator { background-color: #dcfce7; height: 25px; border-top: 1px solid #fda4af; border-bottom: 1px solid #fda4af; }
+        .month-separator td { padding: 0 !important; height: 25px !important; }
+        .sep-text { width: 50%; margin: 0 auto; color: #000; font-weight: 800; font-size: 11px; }
+
         .sub-table-row { display: none; background-color: #f8fafc; }
         .sub-table-container { padding: 8px 12% 12px 5%; } 
         .inner-table { width: 65%; background: white; border: 1px solid var(--border-soft); border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden; }
@@ -283,7 +288,6 @@
 
 <script>
     let currentActivePreview = null;
-    // تم إرجاع المفتاح إلى v33 لاستعادة البيانات
     const STORAGE_KEY = 'asgate_opportunities_final_v33'; 
     const LOGS_KEY = 'asgate_opportunities_logs_v33';
     const INCOMING_KEY = 'asgate_opportunities_final_v31'; 
@@ -301,24 +305,12 @@
     function openWhatsAppChat(el) {
         const inputEl = el.closest('.phone-cell-container').querySelector('input');
         let rawPhone = inputEl.value.trim();
-
-        if (!rawPhone) {
-            alert("يرجى إدخال رقم الجوال أولاً");
-            return;
-        }
-
+        if (!rawPhone) { alert("يرجى إدخال رقم الجوال أولاً"); return; }
         let cleanNumber = rawPhone.replace(/\D/g, '');
-
-        if (cleanNumber.startsWith('00966')) {
-            cleanNumber = cleanNumber.substring(2);
-        } else if (cleanNumber.startsWith('05')) {
-            cleanNumber = '966' + cleanNumber.substring(1);
-        } else if (cleanNumber.startsWith('5') && cleanNumber.length === 9) {
-            cleanNumber = '966' + cleanNumber;
-        }
-
-        const url = "https://wa.me/" + cleanNumber;
-        window.open(url, '_blank');
+        if (cleanNumber.startsWith('00966')) cleanNumber = cleanNumber.substring(2);
+        else if (cleanNumber.startsWith('05')) cleanNumber = '966' + cleanNumber.substring(1);
+        else if (cleanNumber.startsWith('5') && cleanNumber.length === 9) cleanNumber = '966' + cleanNumber;
+        window.open("https://wa.me/" + cleanNumber, '_blank');
     }
 
     function toggleActivityLogHeight() {
@@ -336,25 +328,12 @@
     function addToActivityLog(fieldName, oldVal, newVal, companyName) {
         const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
         const d = new Date();
-        
-        let dd = String(d.getDate()).padStart(2, '0');
-        let mm = String(d.getMonth() + 1).padStart(2, '0');
-        let yyyy = d.getFullYear();
-        let formattedDate = dd + '-' + mm + '-' + yyyy;
-        
+        let dd = String(d.getDate()).padStart(2, '0'), mm = String(d.getMonth() + 1).padStart(2, '0'), yyyy = d.getFullYear();
         const cleanCompany = (companyName && companyName.toString().trim() !== "") ? companyName : "شركة جديدة";
         const v1 = (oldVal && oldVal.toString().trim() !== "") ? oldVal : "فارغ";
         const v2 = (newVal && newVal.toString().trim() !== "") ? newVal : "فارغ";
-        
-        let actionText = "";
-        if (fieldName === "إجراء") {
-            actionText = `${oldVal} لفرصة شركة ( ${cleanCompany} )`;
-        } else {
-            actionText = `تغيير ${fieldName} من [${v1}] إلى [${v2}] للعميل ( ${cleanCompany} )`;
-        }
-
-        const fullLogHTML = `<span class="activity-header-part" style="color: #b45309; font-weight: 800;">👤 (أحمد) 🗓️ ${days[d.getDay()]} ${formattedDate} ${getTimeFormatted()} &nbsp;&nbsp;</span><span class="activity-text-part" style="color: #2563eb; font-weight: 700;">${actionText}</span>`;
-        
+        let actionText = (fieldName === "إجراء") ? `${oldVal} لفرصة شركة ( ${cleanCompany} )` : `تغيير ${fieldName} من [${v1}] إلى [${v2}] للعميل ( ${cleanCompany} )`;
+        const fullLogHTML = `<span style="color: #b45309; font-weight: 800;">👤 (أحمد) 🗓️ ${days[d.getDay()]} ${dd}-${mm}-${yyyy} ${getTimeFormatted()} &nbsp;&nbsp;</span><span style="color: #2563eb; font-weight: 700;">${actionText}</span>`;
         let logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
         logs.unshift(fullLogHTML);
         localStorage.setItem(LOGS_KEY, JSON.stringify(logs.slice(0, 100)));
@@ -369,8 +348,7 @@
 
     function updateStats() {
         const rows = document.querySelectorAll('#tableBody .main-row');
-        const today = getTodayFormatted();
-        const currentMonth = today.substring(0, 7);
+        const today = getTodayFormatted(), currentMonth = today.substring(0, 7);
         let total = rows.length, tDay = 0, tMonth = 0, valTotal = 0, valMonth = 0;
         rows.forEach(row => {
             const dateInput = row.querySelector('.visit-date-val');
@@ -396,43 +374,51 @@
             const dateInput = row.querySelector('.expected-date-input');
             const statusSelect = row.querySelector('.status-select');
             if (!dateInput || !statusSelect) return;
-
-            const targetDate = dateInput.value;
-            const currentStatus = statusSelect.value;
-
+            const targetDate = dateInput.value, currentStatus = statusSelect.value;
             dateInput.classList.remove('date-overdue', 'date-today');
             if (currentStatus === 'مكتمل' || currentStatus === 'فقدان') return;
-
-            if (targetDate && targetDate < today) {
-                dateInput.classList.add('date-overdue');
-            } else if (targetDate === today) {
-                dateInput.classList.add('date-today');
-            }
+            if (targetDate && targetDate < today) dateInput.classList.add('date-overdue');
+            else if (targetDate === today) dateInput.classList.add('date-today');
         });
     }
 
+    // الدالة المحدثة للترتيب والتجميع حسب الشهر
     function reorderRows() {
         const tbody = document.getElementById('tableBody');
         const rows = Array.from(tbody.querySelectorAll('.main-row'));
-        rows.sort((a, b) => {
-            const dateA = a.querySelector('.expected-date-input').value || '9999-12-31';
-            const dateB = b.querySelector('.expected-date-input').value || '9999-12-31';
-            if (dateA !== dateB) return dateA.localeCompare(dateB);
-            const statusA = a.querySelector('.status-select').value;
-            const statusB = b.querySelector('.status-select').value;
-            const getRank = (status) => {
-                if (status === 'مهتم') return 4;
-                if (status === 'تأجيل') return 3;
-                if (status === 'مكتمل') return 2;
-                if (status === 'فقدان') return 1;
-                return 0;
-            };
-            return getRank(statusB) - getRank(statusA);
+        
+        // ربط الصف بالبيانات
+        const rowsData = rows.map(row => ({
+            row: row,
+            subRow: document.getElementById('sub-' + row.id),
+            date: row.querySelector('.expected-date-input').value || '9999-12-31'
+        }));
+
+        // الترتيب: الأحدث في الأعلى، الأقدم في الأسفل
+        rowsData.sort((a, b) => b.date.localeCompare(a.date));
+
+        // تجميع حسب الشهر
+        const groups = {};
+        rowsData.forEach(item => {
+            const month = item.date.substring(0, 7); // YYYY-MM
+            if (!groups[month]) groups[month] = [];
+            groups[month].push(item);
         });
-        rows.forEach(mainRow => {
-            const subRow = document.getElementById('sub-' + mainRow.id);
-            tbody.appendChild(mainRow);
-            if(subRow) tbody.appendChild(subRow);
+
+        // إعادة بناء الجدول
+        tbody.innerHTML = '';
+        Object.keys(groups).sort((a, b) => b.localeCompare(a)).forEach(month => {
+            // إضافة صف الفاصل
+            const sepRow = document.createElement('tr');
+            sepRow.className = 'month-separator';
+            sepRow.innerHTML = `<td colspan="14"><div class="sep-text">شهر ${month}</div></td>`;
+            tbody.appendChild(sepRow);
+
+            // إضافة الصفوف
+            groups[month].forEach(item => {
+                tbody.appendChild(item.row);
+                if(item.subRow) tbody.appendChild(item.subRow);
+            });
         });
         applyDateAlerts();
     }
@@ -440,24 +426,14 @@
     function calculateOpportunityTotal(rowId) {
         const subRow = document.getElementById('sub-' + rowId);
         if (!subRow) return;
-
         let grandTotal = 0;
         subRow.querySelectorAll('.product-body tr').forEach(pRow => {
-            const qtyInput = pRow.querySelector('.prod-qty');
-            const subInput = pRow.querySelector('.prod-sub');
-            const totalInput = pRow.querySelector('.prod-total');
-
-            let qty = parseFloat(qtyInput.value);
-            if (isNaN(qty) || qty < 0) { qty = 0; qtyInput.value = qty; }
-            
-            let sub = parseFloat(subInput.value);
-            if (isNaN(sub) || sub < 0) { sub = 0; subInput.value = sub; }
-
+            const qtyInput = pRow.querySelector('.prod-qty'), subInput = pRow.querySelector('.prod-sub'), totalInput = pRow.querySelector('.prod-total');
+            let qty = parseFloat(qtyInput.value) || 0, sub = parseFloat(subInput.value) || 0;
             const rowTotal = qty * sub;
             totalInput.value = rowTotal > 0 ? rowTotal : '';
             grandTotal += rowTotal;
         });
-
         const mainRow = document.getElementById(rowId);
         if (mainRow) {
             const oppValueInput = mainRow.querySelector('.opp-value-input');
@@ -470,61 +446,42 @@
     function renderRow(v = {}, prepend = false) {
         const tbody = document.getElementById('tableBody');
         const rowId = 'row-' + Date.now() + Math.random().toString(36).substr(2, 5);
-        const mainRow = prepend ? tbody.insertRow(0) : tbody.insertRow();
+        const mainRow = document.createElement('tr');
         mainRow.className = 'main-row';
         mainRow.id = rowId;
-        const subRow = prepend ? tbody.insertRow(1) : tbody.insertRow();
+        const subRow = document.createElement('tr');
         subRow.className = 'sub-table-row';
         subRow.id = 'sub-' + rowId;
 
-        const today = getTodayFormatted();
-        const oppDate = v.oppDate || today;
-        const notesJson = v.notes || "[]";
-        const lastNoteText = getLastNoteOnlyFromJSON(notesJson);
+        const today = getTodayFormatted(), oppDate = v.oppDate || today, notesJson = v.notes || "[]", lastNoteText = getLastNoteOnlyFromJSON(notesJson);
 
         mainRow.innerHTML = `
-            <td class="col-select">
-                <input type="checkbox" class="select-check">
-                <span class="toggle-arrow" onclick="toggleSubTable('${rowId}')">▶</span>
-            </td>
+            <td class="col-select"><input type="checkbox" class="select-check"><span class="toggle-arrow" onclick="toggleSubTable('${rowId}')">▶</span></td>
             <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الشركة', this.dataset.old, this.value, this.value); saveAllDataSilently(); updateStats();"></td>
             <td><input type="text" class="excel-input" value="${v.address || ''}" data-old="${v.address || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('العنوان', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
             <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المسؤول', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
-            <td>
-                <div class="phone-cell-container">
-                    <a class="whatsapp-icon-btn" onclick="openWhatsAppChat(this)" title="مراسلة عبر واتساب"><i class="fa-brands fa-whatsapp"></i></a>
-                    <input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('رقم التواصل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();">
-                </div>
-            </td>
+            <td><div class="phone-cell-container"><a class="whatsapp-icon-btn" onclick="openWhatsAppChat(this)" title="مراسلة"><i class="fa-brands fa-whatsapp"></i></a><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('رقم التواصل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></div></td>
             <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الإيميل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
             <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('السجل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
-            <td>
-                <input type="text" class="excel-input readonly-input" value="${oppDate}" readonly style="color:#64748b; font-weight:700;">
-                <input type="hidden" class="visit-date-val" value="${oppDate}">
-            </td>
+            <td><input type="text" class="excel-input readonly-input" value="${oppDate}" readonly style="color:#64748b; font-weight:700;"><input type="hidden" class="visit-date-val" value="${oppDate}"></td>
             <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الخدمة الحالية', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
             <td><input type="number" class="excel-input opp-value-input readonly-opp-val" value="${v.oppValue || ''}" readonly></td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notesJson.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
-            <td>
-                <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الحالة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); updateStats(); reorderRows();">
-                    <option value="" ${v.status === '' ? 'selected' : ''}></option>
-                    <option value="مهتم" ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option>
-                    <option value="تأجيل" ${v.status === 'تأجيل' ? 'selected' : ''}>تأجيل</option>
-                    <option value="مكتمل" ${v.status === 'مكتمل' ? 'selected' : ''}>مكتمل</option>
-                    <option value="فقدان" ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option>
-                </select>
-            </td>
+            <td><select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الحالة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); updateStats(); reorderRows();"><option value="" ${v.status === '' ? 'selected' : ''}></option><option value="مهتم" ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option><option value="تأجيل" ${v.status === 'تأجيل' ? 'selected' : ''}>تأجيل</option><option value="مكتمل" ${v.status === 'مكتمل' ? 'selected' : ''}>مكتمل</option><option value="فقدان" ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option></select></td>
             <td><input type="date" class="excel-input expected-date-input" value="${v.expectedDate || today}" data-old="${v.expectedDate || today}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('التاريخ المتوقع', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); reorderRows();"></td>
             <td><input type="text" class="excel-input" value="${v.owner || 'أحمد'}" data-old="${v.owner || 'أحمد'}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المالك', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
         `;
 
-        subRow.innerHTML = `<td colspan="14"><div class="sub-table-container"><table class="inner-table"><thead><tr><th>نوع المنتج</th><th>تفاصيل المنتج</th><th>العدد</th><th>الاشتراك</th><th>الإجمالي</th><th style="width:75px">إجراء <button class="header-plus-btn" onclick="addProductRow('${rowId}')" title="إضافة منتج جديد">+</button></th></tr></thead><tbody class="product-body"></tbody></table></div></td>`;
+        subRow.innerHTML = `<td colspan="14"><div class="sub-table-container"><table class="inner-table"><thead><tr><th>نوع المنتج</th><th>تفاصيل المنتج</th><th>العدد</th><th>الاشتراك</th><th>الإجمالي</th><th style="width:75px">إجراء <button class="header-plus-btn" onclick="addProductRow('${rowId}')" title="إضافة منتج">+</button></th></tr></thead><tbody class="product-body"></tbody></table></div></td>`;
+        tbody.appendChild(mainRow);
+        tbody.appendChild(subRow);
+        
         if (v.products && v.products.length > 0) v.products.forEach(p => addProductRow(rowId, p));
         else addProductRow(rowId);
-
+        
         calculateOpportunityTotal(rowId);
         updateStats();
-        if(!prepend) reorderRows();
+        reorderRows();
     }
 
     function toggleSubTable(rowId) {
@@ -538,29 +495,10 @@
     function addProductRow(rowId, data = {}) {
         const tbody = document.querySelector(`#sub-${rowId} .product-body`);
         const row = tbody.insertRow();
-        
-        row.innerHTML = `
-            <td><select onchange="saveAllDataSilently()">
-                <option value="" ${data.type === '' ? 'selected' : ''}></option>
-                <option value="جوال" ${data.type === 'جوال' ? 'selected' : ''}>جوال</option>
-                <option value="بيانات" ${data.type === 'بيانات' ? 'selected' : ''}>بيانات</option>
-                <option value="هاتف" ${data.type === 'هاتف' ? 'selected' : ''}>هاتف</option>
-                <option value="فايبر نت" ${data.type === 'فايبر نت' ? 'selected' : ''}>فايبر نت</option>
-                <option value="DIA" ${data.type === 'DIA' ? 'selected' : ''}>DIA</option>
-                <option value="IPVPN" ${data.type === 'IPVPN' ? 'selected' : ''}>IPVPN</option>
-                <option value="SIP" ${data.type === 'SIP' ? 'selected' : ''}>SIP</option>
-            </select></td>
-            <td><input type="text" value="${data.desc || ''}" onchange="saveAllDataSilently()"></td>
-            <td><input type="number" class="prod-qty" min="0" value="${data.qty || ''}" oninput="calculateOpportunityTotal('${rowId}')"></td>
-            <td><input type="number" class="prod-sub" min="0" value="${data.sub || ''}" oninput="calculateOpportunityTotal('${rowId}')"></td>
-            <td><input type="number" class="prod-total" value="${data.total || ''}" readonly style="color:#475569; font-weight:700; cursor:not-allowed;"></td>
-            <td><div style="display:flex; justify-content:center; gap:5px;"><button class="sub-action-btn btn-minus" title="حذف هذا المنتج" onclick="if(this.closest('tbody').rows.length > 1) { this.closest('tr').remove(); calculateOpportunityTotal('${rowId}'); }">×</button></div></td>
-        `;
+        row.innerHTML = `<td><select onchange="saveAllDataSilently()"><option value="">-</option><option value="جوال" ${data.type === 'جوال' ? 'selected' : ''}>جوال</option><option value="بيانات" ${data.type === 'بيانات' ? 'selected' : ''}>بيانات</option><option value="هاتف" ${data.type === 'هاتف' ? 'selected' : ''}>هاتف</option><option value="فايبر نت" ${data.type === 'فايبر نت' ? 'selected' : ''}>فايبر نت</option><option value="DIA" ${data.type === 'DIA' ? 'selected' : ''}>DIA</option><option value="IPVPN" ${data.type === 'IPVPN' ? 'selected' : ''}>IPVPN</option><option value="SIP" ${data.type === 'SIP' ? 'selected' : ''}>SIP</option></select></td><td><input type="text" value="${data.desc || ''}" onchange="saveAllDataSilently()"></td><td><input type="number" class="prod-qty" min="0" value="${data.qty || ''}" oninput="calculateOpportunityTotal('${rowId}')"></td><td><input type="number" class="prod-sub" min="0" value="${data.sub || ''}" oninput="calculateOpportunityTotal('${rowId}')"></td><td><input type="number" class="prod-total" value="${data.total || ''}" readonly style="color:#475569; font-weight:700; cursor:not-allowed;"></td><td><div style="display:flex; justify-content:center; gap:5px;"><button class="sub-action-btn btn-minus" title="حذف" onclick="if(this.closest('tbody').rows.length > 1) { this.closest('tr').remove(); calculateOpportunityTotal('${rowId}'); }">×</button></div></td>`;
     }
 
-    function toggleAllCheckboxes(source) {
-        document.querySelectorAll('.select-check').forEach(chk => chk.checked = source.checked);
-    }
+    function toggleAllCheckboxes(source) { document.querySelectorAll('.select-check').forEach(chk => chk.checked = source.checked); }
 
     function toggleDropdown(event, btn) {
         event.stopPropagation();
@@ -574,22 +512,10 @@
         const selected = document.querySelectorAll('.select-check:checked');
         if (selected.length === 0) return alert('حدد صفاً أولاً');
         if (action === 'حذف' && confirm('تأكيد الحذف؟')) {
-            selected.forEach(chk => {
-                const row = chk.closest('tr');
-                const id = row.id;
-                const companyName = row.cells[1].querySelector('input').value;
-                addToActivityLog('إجراء', 'حذف الفرصة البيعية', '', companyName);
-                row.remove();
-                if(document.getElementById('sub-' + id)) document.getElementById('sub-' + id).remove();
-            });
-            saveAllDataSilently();
-            updateStats();
+            selected.forEach(chk => { const row = chk.closest('tr'); const id = row.id; const companyName = row.cells[1].querySelector('input').value; addToActivityLog('إجراء', 'حذف الفرصة البيعية', '', companyName); row.remove(); if(document.getElementById('sub-' + id)) document.getElementById('sub-' + id).remove(); });
+            saveAllDataSilently(); updateStats();
         } else {
-            selected.forEach(chk => {
-                const row = chk.closest('tr');
-                const companyName = row.cells[1].querySelector('input').value;
-                addToActivityLog('إجراء', action, '', companyName);
-            });
+            selected.forEach(chk => { const row = chk.closest('tr'); const companyName = row.cells[1].querySelector('input').value; addToActivityLog('إجراء', action, '', companyName); });
             alert('تم تنفيذ ' + action + ' على ' + selected.length + ' من الصفوف');
         }
     }
@@ -597,37 +523,9 @@
     function saveAllDataSilently() {
         const data = [];
         document.querySelectorAll('.main-row').forEach(row => {
-            const id = row.id;
-            const products = [];
-            const subRow = document.getElementById('sub-' + id);
-            if(subRow) {
-                subRow.querySelectorAll('.product-body tr').forEach(pRow => {
-                    const inputs = pRow.querySelectorAll('input, select');
-                    products.push({ 
-                        type: inputs[0].value, 
-                        desc: inputs[1].value, 
-                        qty: inputs[2].value, 
-                        sub: inputs[3].value, 
-                        total: inputs[4].value 
-                    });
-                });
-            }
-            data.push({
-                comp: row.cells[1].querySelector('input').value,
-                address: row.cells[2].querySelector('input').value,
-                mgr: row.cells[3].querySelector('input').value,
-                mob: row.cells[4].querySelector('input').value,
-                email: row.cells[5].querySelector('input').value,
-                record: row.cells[6].querySelector('input').value,
-                oppDate: row.querySelector('.visit-date-val').value,
-                curServ: row.querySelector('.cur-serv-val').value,
-                oppValue: row.querySelector('.opp-value-input').value,
-                notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '[]',
-                status: row.querySelector('.status-select').value,
-                expectedDate: row.querySelector('.expected-date-input').value,
-                owner: row.cells[13].querySelector('input').value,
-                products: products
-            });
+            const id = row.id; const products = []; const subRow = document.getElementById('sub-' + id);
+            if(subRow) subRow.querySelectorAll('.product-body tr').forEach(pRow => { const inputs = pRow.querySelectorAll('input, select'); products.push({ type: inputs[0].value, desc: inputs[1].value, qty: inputs[2].value, sub: inputs[3].value, total: inputs[4].value }); });
+            data.push({ comp: row.cells[1].querySelector('input').value, address: row.cells[2].querySelector('input').value, mgr: row.cells[3].querySelector('input').value, mob: row.cells[4].querySelector('input').value, email: row.cells[5].querySelector('input').value, record: row.cells[6].querySelector('input').value, oppDate: row.querySelector('.visit-date-val').value, curServ: row.querySelector('.cur-serv-val').value, oppValue: row.querySelector('.opp-value-input').value, notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '[]', status: row.querySelector('.status-select').value, expectedDate: row.querySelector('.expected-date-input').value, owner: row.cells[13].querySelector('input').value, products: products });
         });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
@@ -638,19 +536,12 @@
             if (incomingData) {
                 const newOpps = JSON.parse(incomingData);
                 if (Array.isArray(newOpps) && newOpps.length > 0) {
-                    newOpps.forEach(opp => {
-                        renderRow(opp, true);
-                        addToActivityLog("إجراء", "تأهيل وتصدير الفرصة البيعية من شاشة الزيارات", "", opp.comp);
-                    });
+                    newOpps.forEach(opp => { renderRow(opp); addToActivityLog("إجراء", "تأهيل وتصدير الفرصة البيعية من شاشة الزيارات", "", opp.comp); });
                     saveAllDataSilently();
-                    reorderRows(); 
                 }
                 localStorage.removeItem(INCOMING_KEY);
             }
-        } catch (error) {
-            console.error("Error reading incoming opportunities:", error);
-            localStorage.removeItem(INCOMING_KEY);
-        }
+        } catch (e) { localStorage.removeItem(INCOMING_KEY); }
     }
 
     function loadSavedData() {
@@ -667,51 +558,23 @@
     function filterTable() {
         const q = document.getElementById('searchInput').value.toLowerCase().trim();
         document.querySelectorAll('.main-row').forEach(row => {
-            const companyValue = (row.cells[1].querySelector('input').value || '').toLowerCase();
-            const addressValue = (row.cells[2].querySelector('input').value || '').toLowerCase();
-            const managerValue = (row.cells[3].querySelector('input').value || '').toLowerCase();
-            const mobileValue = (row.cells[4].querySelector('input').value || '').toLowerCase();
-            const emailValue = (row.cells[5].querySelector('input').value || '').toLowerCase();
-            const recordValue = (row.cells[6].querySelector('input').value || '').toLowerCase();
-            
+            const rowText = row.innerText.toLowerCase();
             const subRow = document.getElementById('sub-' + row.id);
-            
-            if (companyValue.includes(q) || addressValue.includes(q) || managerValue.includes(q) || mobileValue.includes(q) || emailValue.includes(q) || recordValue.includes(q)) { 
-                row.style.display = 'table-row'; 
-            } else { 
-                row.style.display = 'none'; 
-                if(subRow) subRow.style.display = 'none'; 
-            }
+            if (rowText.includes(q)) { row.style.display = 'table-row'; } 
+            else { row.style.display = 'none'; if(subRow) subRow.style.display = 'none'; }
         });
+        // ملاحظة: الفواصل الشهرية تظهر دائماً في التصفية، يمكن تحسينها لاحقاً إذا لزم الأمر
     }
 
     function getLastNoteOnlyFromJSON(jsonStr) {
-        if (!jsonStr || jsonStr === '[]') return 'أضف ملاحظة...';
-        try {
-            const arr = JSON.parse(jsonStr);
-            if (arr.length === 0) return 'أضف ملاحظة...';
-            return arr[arr.length - 1].text;
-        } catch(e) {
-            return 'أضف ملاحظة...';
-        }
+        try { const arr = JSON.parse(jsonStr); return arr.length > 0 ? arr[arr.length - 1].text : 'أضف ملاحظة...'; } catch(e) { return 'أضف ملاحظة...'; }
     }
 
     function openNote(el) {
         currentActivePreview = el;
         const raw = el.getAttribute('data-full-notes') || "[]";
-        let arr = [];
-        try { arr = JSON.parse(raw); } catch(e) { arr = []; }
-        
-        let htmlContent = "";
-        arr.forEach(msg => {
-            htmlContent += `
-                <div class="chat-msg-block">
-                    <span class="chat-msg-header">👤 ${msg.user} <span style="font-weight: normal; color: inherit; margin-right: 4px;">🗓️ ${msg.date} ${msg.time}</span></span>
-                    <span class="chat-msg-text">${msg.text}</span>
-                </div>
-            `;
-        });
-        
+        let arr = []; try { arr = JSON.parse(raw); } catch(e) { arr = []; }
+        let htmlContent = arr.map(msg => `<div class="chat-msg-block"><span class="chat-msg-header">👤 ${msg.user} <span style="font-weight: normal; margin-right: 4px;">🗓️ ${msg.date} ${msg.time}</span></span><span class="chat-msg-text">${msg.text}</span></div>`).join('');
         document.getElementById('historyLog').innerHTML = htmlContent;
         document.getElementById('noteModal').style.display = "flex";
         document.getElementById('modalTextArea').focus();
@@ -721,40 +584,20 @@
         const txt = document.getElementById('modalTextArea').value.trim();
         if (txt && currentActivePreview) {
             const raw = currentActivePreview.getAttribute('data-full-notes') || "[]";
-            let arr = [];
-            try { arr = JSON.parse(raw); } catch(e) { arr = []; }
-            
-            const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+            let arr = []; try { arr = JSON.parse(raw); } catch(e) { arr = []; }
             const d = new Date();
-            const timeFormatted = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-
-            const newMsg = {
-                user: "أحمد " + "🗓️ " + days[d.getDay()],
-                date: getTodayFormatted(),
-                time: timeFormatted,
-                text: txt
-            };
-            arr.push(newMsg);
-            
-            const updatedJson = JSON.stringify(arr);
-            currentActivePreview.setAttribute('data-full-notes', updatedJson);
+            arr.push({ user: "أحمد", date: getTodayFormatted(), time: d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }), text: txt });
+            currentActivePreview.setAttribute('data-full-notes', JSON.stringify(arr));
             currentActivePreview.innerText = txt;
-            
             saveAllDataSilently();
-            
-            const companyName = currentActivePreview.closest('tr').cells[1].querySelector('input').value || "غير مسمى";
-            addToActivityLog("ملاحظة ومتابعة", "إضافة", txt, companyName);
+            addToActivityLog("ملاحظة ومتابعة", "إضافة", txt, currentActivePreview.closest('tr').cells[1].querySelector('input').value);
         }
         closeNote();
     }
 
     function closeNote() { document.getElementById('noteModal').style.display = "none"; document.getElementById('modalTextArea').value = ""; }
 
-    window.onclick = (e) => {
-        if (!e.target.matches('.btn-bulk-trigger')) {
-            document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
-        }
-    };
+    window.onclick = (e) => { if (!e.target.matches('.btn-bulk-trigger')) document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show')); };
 </script>
 
 </body>
