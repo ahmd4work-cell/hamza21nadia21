@@ -345,7 +345,7 @@
         const v1 = (oldVal && oldVal.toString().trim() !== "") ? oldVal : "فارغ";
         const v2 = (newVal && newVal.toString().trim() !== "") ? newVal : "فارغ";
         let actionText = (fieldName === "إجراء") ? `${oldVal} لفرصة شركة ( ${cleanCompany} )` : `تغيير ${fieldName} من [${v1}] إلى [${v2}] للعميل ( ${cleanCompany} )`;
-        const fullLogHTML = `<span style="color: #b45309; font-weight: 800;">👤 (أحمد) 🗓️ ${days[d.getDay()]} ${dd}-${mm}-${yyyy} ${getTimeFormatted()} &nbsp;&nbsp;</span><span style="color: #2563eb; font-weight: 700;">${actionText}</span>`;
+        const fullLogHTML = `<span style="color: #b45309; font-weight: 800;">👤 (أحمد) 🗓️ ${days[d.getDay()]} ${yyyy}-${mm}-${dd} ${getTimeFormatted()} &nbsp;&nbsp;</span><span style="color: #2563eb; font-weight: 700;">${actionText}</span>`;
         let logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
         logs.unshift(fullLogHTML);
         localStorage.setItem(LOGS_KEY, JSON.stringify(logs.slice(0, 100)));
@@ -573,7 +573,6 @@
         try { const arr = JSON.parse(jsonStr); return arr.length > 0 ? arr[arr.length - 1].text : 'أضف ملاحظة...'; } catch(e) { return 'أضف ملاحظة...'; }
     }
 
-    // تم إصلاح دالة فتح الملاحظات
     function openNote(el) {
         currentActivePreview = el;
         const raw = el.getAttribute('data-full-notes') || "[]";
