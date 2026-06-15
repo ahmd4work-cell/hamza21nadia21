@@ -76,10 +76,22 @@
          
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; max-height: 45px; font-size: 11px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; }
         
-        /* تصميم الفاصل الشهري */
-        .month-separator { background-color: #dcfce7; height: 25px; border-top: 1px solid #fda4af; border-bottom: 1px solid #fda4af; }
-        .month-separator td { padding: 0 !important; height: 25px !important; }
-        .sep-text { width: 50%; margin: 0 auto; color: #000; font-weight: 800; font-size: 11px; }
+        /* تصميم الفاصل الشهري المُحدث */
+        .month-separator { height: 25px; }
+        .month-separator td { padding: 0 !important; border: none !important; }
+        .sep-text { 
+            width: 50%; 
+            margin: 0 auto; 
+            color: #000; 
+            font-weight: 800; 
+            font-size: 11px; 
+            background-color: #dcfce7; /* أخضر هادئ */
+            border-top: 1px solid #fda4af; /* سطر وردي نحيف */
+            border-bottom: 1px solid #fda4af; /* سطر وردي نحيف */
+            text-align: center;
+            height: 25px;
+            line-height: 25px;
+        }
 
         .sub-table-row { display: none; background-color: #f8fafc; }
         .sub-table-container { padding: 8px 12% 12px 5%; } 
@@ -382,39 +394,31 @@
         });
     }
 
-    // الدالة المحدثة للترتيب والتجميع حسب الشهر
     function reorderRows() {
         const tbody = document.getElementById('tableBody');
         const rows = Array.from(tbody.querySelectorAll('.main-row'));
-        
-        // ربط الصف بالبيانات
         const rowsData = rows.map(row => ({
             row: row,
             subRow: document.getElementById('sub-' + row.id),
             date: row.querySelector('.expected-date-input').value || '9999-12-31'
         }));
 
-        // الترتيب: الأحدث في الأعلى، الأقدم في الأسفل
         rowsData.sort((a, b) => b.date.localeCompare(a.date));
 
-        // تجميع حسب الشهر
         const groups = {};
         rowsData.forEach(item => {
-            const month = item.date.substring(0, 7); // YYYY-MM
+            const month = item.date.substring(0, 7); 
             if (!groups[month]) groups[month] = [];
             groups[month].push(item);
         });
 
-        // إعادة بناء الجدول
         tbody.innerHTML = '';
         Object.keys(groups).sort((a, b) => b.localeCompare(a)).forEach(month => {
-            // إضافة صف الفاصل
             const sepRow = document.createElement('tr');
             sepRow.className = 'month-separator';
             sepRow.innerHTML = `<td colspan="14"><div class="sep-text">شهر ${month}</div></td>`;
             tbody.appendChild(sepRow);
 
-            // إضافة الصفوف
             groups[month].forEach(item => {
                 tbody.appendChild(item.row);
                 if(item.subRow) tbody.appendChild(item.subRow);
@@ -443,7 +447,7 @@
         updateStats();
     }
 
-    function renderRow(v = {}, prepend = false) {
+    function renderRow(v = {}) {
         const tbody = document.getElementById('tableBody');
         const rowId = 'row-' + Date.now() + Math.random().toString(36).substr(2, 5);
         const mainRow = document.createElement('tr');
@@ -563,7 +567,6 @@
             if (rowText.includes(q)) { row.style.display = 'table-row'; } 
             else { row.style.display = 'none'; if(subRow) subRow.style.display = 'none'; }
         });
-        // ملاحظة: الفواصل الشهرية تظهر دائماً في التصفية، يمكن تحسينها لاحقاً إذا لزم الأمر
     }
 
     function getLastNoteOnlyFromJSON(jsonStr) {
