@@ -76,16 +76,6 @@
          
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 40px; max-height: 40px; font-size: 10px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; }
         
-        /* التحكم في ارتفاع الصف بناء على الحالة */
-        .row-h-40 td { height: 40px !important; }
-        .row-h-30 td { height: 30px !important; }
-
-        /* الألوان الشرطية */
-        .status-interested-bg { background-color: #fef9c3 !important; }
-        .status-completed-bg { background-color: #dcfce7 !important; }
-        .status-lost-bg { background-color: #dc2626 !important; color: white !important; }
-        .status-lost-bg input, .status-lost-bg select { color: white !important; }
-
         .month-separator { height: 35px; }
         .month-separator td { padding: 5px !important; border: none !important; }
         .sep-text { 
@@ -144,8 +134,7 @@
         }
         .arrow-open { transform: rotate(90deg); }
 
-        /* اللون الأزرق المخفف */
-        tbody tr.main-row:nth-child(4n+1) { background-color: #f8fbff; }
+        tbody tr.main-row:nth-child(4n+1) { background-color: #eff6ff; }
 
         .excel-input { 
             width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; 
@@ -329,25 +318,6 @@
         return String(d.getHours()).padStart(2, '0') + ":" + String(d.getMinutes()).padStart(2, '0');
     }
 
-    // دالة تحديث شكل الصف بناءً على الحالة
-    function updateRowStatus(row) {
-        const select = row.querySelector('.status-select');
-        const val = select.value;
-        
-        row.classList.remove('status-interested-bg', 'status-completed-bg', 'status-lost-bg', 'row-h-30', 'row-h-40');
-        row.classList.add('row-h-40'); 
-
-        if (val === 'مهتم') {
-            row.classList.add('status-interested-bg');
-        } else if (val === 'مكتمل') {
-            row.classList.add('status-completed-bg', 'row-h-30');
-            row.classList.remove('row-h-40');
-        } else if (val === 'فقدان') {
-            row.classList.add('status-lost-bg', 'row-h-30');
-            row.classList.remove('row-h-40');
-        }
-    }
-
     function openWhatsAppChat(el) {
         const inputEl = el.closest('.phone-cell-container').querySelector('input');
         let rawPhone = inputEl.value.trim();
@@ -485,7 +455,7 @@
         const tbody = document.getElementById('tableBody');
         const rowId = 'row-' + Date.now() + Math.random().toString(36).substr(2, 5);
         const mainRow = document.createElement('tr');
-        mainRow.className = 'main-row row-h-40';
+        mainRow.className = 'main-row';
         mainRow.id = rowId;
         const subRow = document.createElement('tr');
         subRow.className = 'sub-table-row';
@@ -508,7 +478,7 @@
             <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الخدمة الحالية', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
             <td><input type="number" class="excel-input opp-value-input readonly-opp-val" value="${v.oppValue || ''}" readonly></td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notesJson.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
-            <td><select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الحالة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); updateStats(); reorderRows(); updateRowStatus(this.closest('tr'));"><option value="" ${v.status === '' ? 'selected' : ''}></option><option value="مهتم" ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option><option value="تأجيل" ${v.status === 'تأجيل' ? 'selected' : ''}>تأجيل</option><option value="مكتمل" ${v.status === 'مكتمل' ? 'selected' : ''}>مكتمل</option><option value="فقدان" ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option></select></td>
+            <td><select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الحالة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); updateStats(); reorderRows();"><option value="" ${v.status === '' ? 'selected' : ''}></option><option value="مهتم" ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option><option value="تأجيل" ${v.status === 'تأجيل' ? 'selected' : ''}>تأجيل</option><option value="مكتمل" ${v.status === 'مكتمل' ? 'selected' : ''}>مكتمل</option><option value="فقدان" ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option></select></td>
             <td><input type="date" class="excel-input expected-date-input" value="${v.expectedDate || today}" data-old="${v.expectedDate || today}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('التاريخ المتوقع', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); reorderRows();"></td>
             <td><input type="text" class="excel-input" value="${v.owner || 'أحمد'}" data-old="${v.owner || 'أحمد'}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المالك', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
         `;
@@ -517,12 +487,6 @@
         tbody.appendChild(mainRow);
         tbody.appendChild(subRow);
         
-        // تطبيق اللون والارتفاع فور إنشاء الصف
-        if (v.status) {
-             mainRow.querySelector('.status-select').value = v.status;
-             updateRowStatus(mainRow);
-        }
-
         if (v.products && v.products.length > 0) v.products.forEach(p => addProductRow(rowId, p));
         else addProductRow(rowId);
         
