@@ -152,184 +152,48 @@
         }
 
         .activity-log-section { 
-            margin: 1px 0 0px 0; 
-            padding: 10px 18px; 
-            background: #ffffff; 
-            border-radius: 10px; 
-            border: 1px solid #cbd5e1; 
-            box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
-            flex-shrink: 0; 
-            height: 90px; 
-            display: flex; 
-            flex-direction: column; 
-            box-sizing: border-box;
-            transition: height 0.3s ease;
+            margin: 1px 0 0px 0; padding: 10px 18px; background: #ffffff; border-radius: 10px; border: 1px solid #cbd5e1; 
+            box-shadow: 0 -3px 10px rgba(0,0,0,0.03); flex-shrink: 0; height: 90px; display: flex; 
+            flex-direction: column; box-sizing: border-box; transition: height 0.3s ease;
         }
-        .activity-log-section.expanded { 
-            height: 200px; 
-        }
+        .activity-log-section.expanded { height: 200px; }
         
-        .activity-log-header-container { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 5px; 
-            border-bottom: 1px solid #f1f5f9; 
-            padding-bottom: 4px; 
-            flex-shrink: 0; 
-        }
-        
-        .activity-log-title { 
-            color: #c29103; 
-            font-family: 'Cairo', sans-serif;
-            font-size: 11.5px; 
-            font-weight: 800; 
-            margin: 0; 
-            text-align: right; 
-        }
-        
-        .btn-toggle-expand { 
-            background: none; 
-            border: none; 
-            color: #64748b; 
-            font-size: 12px; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            width: 22px; 
-            height: 22px; 
-            border-radius: 4px; 
-            transition: 0.2s; 
-            padding: 0; 
-        }
-        .btn-toggle-expand:hover { 
-            background: #f1f5f9; 
-            color: #3b82f6; 
-        }
-
-        .activity-list { 
-            flex: 1; 
-            overflow-y: auto; 
-            font-size: 9.5px; 
-            text-align: right; 
-        }
-        .activity-item { 
-            margin-bottom: 4px; 
-            border-bottom: 1px dashed #f1f5f9; 
-            padding-bottom: 4px; 
-            color: #1e293b; 
-            display: block; 
-            white-space: normal; 
-            text-align: right; 
-            font-weight: 700; 
-            line-height: 1.4;
-            direction: rtl; 
-        }
+        .activity-log-header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; border-bottom: 1px solid #f1f5f9; padding-bottom: 4px; flex-shrink: 0; }
+        .activity-log-title { color: #c29103; font-family: 'Cairo', sans-serif; font-size: 11.5px; font-weight: 800; margin: 0; text-align: right; }
+        .btn-toggle-expand { background: none; border: none; color: #64748b; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 4px; transition: 0.2s; padding: 0; }
+        .btn-toggle-expand:hover { background: #f1f5f9; color: #3b82f6; }
+        .activity-list { flex: 1; overflow-y: auto; font-size: 9.5px; text-align: right; }
+        .activity-item { margin-bottom: 4px; border-bottom: 1px dashed #f1f5f9; padding-bottom: 4px; color: #1e293b; display: block; white-space: normal; text-align: right; font-weight: 700; line-height: 1.4; direction: rtl; }
          
         .phone-cell-container { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; padding: 0 4px; box-sizing: border-box; }
         .whatsapp-icon-btn { color: #25d366; font-size: 14px; text-decoration: none; margin-left: 5px; cursor: pointer; transition: transform 0.2s; display: inline-flex; align-items: center; }
         .whatsapp-icon-btn:hover { transform: scale(1.2); }
 
-        .modal-notes { 
-            display: none; 
-            position: fixed; 
-            z-index: 2000; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(0,0,0,0.5); 
-            align-items: center; 
-            justify-content: center; 
-            backdrop-filter: blur(2px); 
-        }
-        .modal-notes-content { 
-            background: white; 
-            padding: 22px; 
-            border-radius: 12px; 
-            width: 490px; 
-            height: 500px; 
-            display: flex; 
-            flex-direction: column; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
-            box-sizing: border-box; 
-        }
-        
-        .history-log { 
-            flex-grow: 1; 
-            overflow-y: auto; 
-            background: #ffffff; 
-            border: 1px solid #e2e8f0; 
-            border-radius: 8px; 
-            padding: 12px; 
-            margin-bottom: 12px; 
-            box-sizing: border-box;
-            direction: rtl;
-        }
-
-        .chat-msg-block {
-            display: flex;
-            flex-direction: column; 
-            align-items: flex-start;
-            text-align: right;
-            margin-bottom: 14px;
-            font-family: 'Cairo', sans-serif;
-            direction: rtl;
-        }
-        
-        .chat-msg-header {
-            font-size: 10.5px; 
-            color: #b45309; 
-            font-weight: 800; 
-            margin-bottom: 3px;
-            display: block;
-            width: 100%;
-            text-align: right;
-        }
-        
-        .chat-msg-text {
-            font-size: 11px; 
-            color: #1e293b; 
-            font-weight: 700; 
-            line-height: 1.5;
-            display: block;
-            width: 100%;
-            text-align: right;
-            white-space: pre-wrap; 
-        }
-
-        .note-area { 
-            height: 95px; 
-            width: 100%; 
-            border: 1px solid #cbd5e1; 
-            border-radius: 8px; 
-            padding: 10px; 
-            font-family: 'Cairo'; 
-            resize: none; 
-            outline: none; 
-            font-size: 11.5px; 
-            text-align: right; 
-            box-sizing: border-box; 
-            direction: rtl;
-        }
+        .modal-notes { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .modal-notes-content { background: white; padding: 22px; border-radius: 12px; width: 490px; height: 500px; display: flex; flex-direction: column; box-shadow: 0 4px 20px rgba(0,0,0,0.15); box-sizing: border-box; }
+        .history-log { flex-grow: 1; overflow-y: auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-sizing: border-box; direction: rtl; }
+        .chat-msg-block { display: flex; flex-direction: column; align-items: flex-start; text-align: right; margin-bottom: 14px; font-family: 'Cairo', sans-serif; direction: rtl; }
+        .chat-msg-header { font-size: 10.5px; color: #b45309; font-weight: 800; margin-bottom: 3px; display: block; width: 100%; text-align: right; }
+        .chat-msg-text { font-size: 11px; color: #1e293b; font-weight: 700; line-height: 1.5; display: block; width: 100%; text-align: right; white-space: pre-wrap; }
+        .note-area { height: 95px; width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 11.5px; text-align: right; box-sizing: border-box; direction: rtl; }
 
         .date-overdue { background-color: #ffeeeb !important; color: #dc2626 !important; font-weight: 800 !important; border-radius: 4px; }
         .date-today { background-color: #f0fdf4 !important; color: #16a34a !important; font-weight: 800 !important; border-radius: 4px; }
 
         .col-select { width: 3%; }
-        .col-company { width: 13%; } 
-        .col-manager { width: 8%; } 
+        .col-company { width: 11%; }
+        .col-address { width: 10%; } 
+        .col-manager { width: 7%; } 
         .col-mobile { width: 10%; } 
         .col-email { width: 8%; } 
         .col-record { width: 7%; } 
         .col-date { width: 8%; } 
         .col-service { width: 8%; } 
         .col-val { width: 7%; } 
-        .col-notes { width: 11%; } 
-        .col-status { width: 7%; }
-        .col-edit { width: 9%; } 
-        .col-owner { width: 6%; }
+        .col-notes { width: 10%; } 
+        .col-status { width: 6%; }
+        .col-edit { width: 8%; } 
+        .col-owner { width: 5%; }
     </style>
 </head>
 <body onload="loadSavedData()">
@@ -377,6 +241,7 @@
                     <tr>
                         <th class="col-select"><input type="checkbox" onclick="toggleAllCheckboxes(this)"></th>
                         <th class="col-company">الشركة</th>
+                        <th class="col-address">العنوان</th>
                         <th class="col-manager">المسؤول</th>
                         <th class="col-mobile">رقم التواصل</th>
                         <th class="col-email">الإيميل</th>
@@ -418,8 +283,8 @@
 
 <script>
     let currentActivePreview = null;
-    const STORAGE_KEY = 'asgate_opportunities_final_v33'; 
-    const LOGS_KEY = 'asgate_opportunities_logs_v33';
+    const STORAGE_KEY = 'asgate_opportunities_final_v34'; 
+    const LOGS_KEY = 'asgate_opportunities_logs_v34';
     const INCOMING_KEY = 'asgate_opportunities_final_v31'; 
 
     function getTodayFormatted() {
@@ -622,6 +487,7 @@
                 <span class="toggle-arrow" onclick="toggleSubTable('${rowId}')">▶</span>
             </td>
             <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الشركة', this.dataset.old, this.value, this.value); saveAllDataSilently(); updateStats();"></td>
+            <td><input type="text" class="excel-input" value="${v.address || ''}" data-old="${v.address || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('العنوان', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
             <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المسؤول', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
             <td>
                 <div class="phone-cell-container">
@@ -651,7 +517,7 @@
             <td><input type="text" class="excel-input" value="${v.owner || 'أحمد'}" data-old="${v.owner || 'أحمد'}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المالك', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
         `;
 
-        subRow.innerHTML = `<td colspan="13"><div class="sub-table-container"><table class="inner-table"><thead><tr><th>نوع المنتج</th><th>تفاصيل المنتج</th><th>العدد</th><th>الاشتراك</th><th>الإجمالي</th><th style="width:75px">إجراء <button class="header-plus-btn" onclick="addProductRow('${rowId}')" title="إضافة منتج جديد">+</button></th></tr></thead><tbody class="product-body"></tbody></table></div></td>`;
+        subRow.innerHTML = `<td colspan="14"><div class="sub-table-container"><table class="inner-table"><thead><tr><th>نوع المنتج</th><th>تفاصيل المنتج</th><th>العدد</th><th>الاشتراك</th><th>الإجمالي</th><th style="width:75px">إجراء <button class="header-plus-btn" onclick="addProductRow('${rowId}')" title="إضافة منتج جديد">+</button></th></tr></thead><tbody class="product-body"></tbody></table></div></td>`;
         if (v.products && v.products.length > 0) v.products.forEach(p => addProductRow(rowId, p));
         else addProductRow(rowId);
 
@@ -747,17 +613,18 @@
             }
             data.push({
                 comp: row.cells[1].querySelector('input').value,
-                mgr: row.cells[2].querySelector('input').value,
-                mob: row.cells[3].querySelector('input').value,
-                email: row.cells[4].querySelector('input').value,
-                record: row.cells[5].querySelector('input').value,
+                address: row.cells[2].querySelector('input').value,
+                mgr: row.cells[3].querySelector('input').value,
+                mob: row.cells[4].querySelector('input').value,
+                email: row.cells[5].querySelector('input').value,
+                record: row.cells[6].querySelector('input').value,
                 oppDate: row.querySelector('.visit-date-val').value,
                 curServ: row.querySelector('.cur-serv-val').value,
                 oppValue: row.querySelector('.opp-value-input').value,
                 notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '[]',
                 status: row.querySelector('.status-select').value,
                 expectedDate: row.querySelector('.expected-date-input').value,
-                owner: row.cells[12].querySelector('input').value,
+                owner: row.cells[13].querySelector('input').value,
                 products: products
             });
         });
@@ -800,14 +667,15 @@
         const q = document.getElementById('searchInput').value.toLowerCase().trim();
         document.querySelectorAll('.main-row').forEach(row => {
             const companyValue = (row.cells[1].querySelector('input').value || '').toLowerCase();
-            const managerValue = (row.cells[2].querySelector('input').value || '').toLowerCase();
-            const mobileValue = (row.cells[3].querySelector('input').value || '').toLowerCase();
-            const emailValue = (row.cells[4].querySelector('input').value || '').toLowerCase();
-            const recordValue = (row.cells[5].querySelector('input').value || '').toLowerCase();
+            const addressValue = (row.cells[2].querySelector('input').value || '').toLowerCase();
+            const managerValue = (row.cells[3].querySelector('input').value || '').toLowerCase();
+            const mobileValue = (row.cells[4].querySelector('input').value || '').toLowerCase();
+            const emailValue = (row.cells[5].querySelector('input').value || '').toLowerCase();
+            const recordValue = (row.cells[6].querySelector('input').value || '').toLowerCase();
             
             const subRow = document.getElementById('sub-' + row.id);
             
-            if (companyValue.includes(q) || managerValue.includes(q) || mobileValue.includes(q) || emailValue.includes(q) || recordValue.includes(q)) { 
+            if (companyValue.includes(q) || addressValue.includes(q) || managerValue.includes(q) || mobileValue.includes(q) || emailValue.includes(q) || recordValue.includes(q)) { 
                 row.style.display = 'table-row'; 
             } else { 
                 row.style.display = 'none'; 
