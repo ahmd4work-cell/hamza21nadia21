@@ -331,13 +331,13 @@
         .date-overdue { background-color: #ffeeeb !important; color: #dc2626 !important; font-weight: 800 !important; border-radius: 4px; }
         .date-today { background-color: #f0fdf4 !important; color: #16a34a !important; font-weight: 800 !important; border-radius: 4px; }
 
+        /* تعديل توزيع نسب الأعمدة بعد حذف أحد الأعمدة */
         .col-select { width: 3%; }
-        .col-company { width: 11%; } 
-        .col-address { width: 10%; } 
-        .col-location { width: 6%; } 
-        .col-manager { width: 7%; } 
-        .col-mobile { width: 7%; } 
-        .col-email { width: 7%; } 
+        .col-company { width: 13%; } 
+        .col-address { width: 12%; } 
+        .col-manager { width: 8%; } 
+        .col-mobile { width: 8%; } 
+        .col-email { width: 8%; } 
         .col-record { width: 7%; } 
         .col-date { width: 8%; } 
         .col-service { width: 8%; } 
@@ -394,7 +394,6 @@
                         <th class="col-select"><input type="checkbox" onclick="toggleAllCheckboxes(this)"></th>
                         <th class="col-company">الشركة</th>
                         <th class="col-address">العنوان</th> 
-                        <th class="col-location">العنوان</th> 
                         <th class="col-manager">المسؤول</th>
                         <th class="col-mobile">رقم التواصل</th>
                         <th class="col-email">الإيميل</th>
@@ -608,12 +607,7 @@
         const oppDate = v.oppDate || today;
         const notesJson = v.notes || "[]";
         const lastNoteText = getLastNoteOnlyFromJSON(notesJson);
-
         const locationUrl = v.locationUrl || '';
-        let locationTdHTML = `<span class="no-location">لا يوجد</span>`;
-        if (locationUrl && locationUrl.trim() !== '') {
-            locationTdHTML = `<a href="${locationUrl}" target="_blank" class="location-btn">📍 فتح الموقع</a>`;
-        }
 
         mainRow.innerHTML = `
             <td class="col-select">
@@ -621,9 +615,8 @@
                 <span class="toggle-arrow" onclick="toggleSubTable('${rowId}')">▶</span>
             </td>
             <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الشركة', this.dataset.old, this.value, this.value); saveAllDataSilently(); updateStats();"></td>
-            <td><input type="text" class="excel-input address-val" value="${v.address || ''}" data-old="${v.address || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('العنوان', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
             <td>
-                ${locationTdHTML}
+                <input type="text" class="excel-input address-val" value="${v.address || ''}" data-old="${v.address || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('العنوان', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();">
                 <input type="hidden" class="location-url-val" value="${locationUrl}">
             </td>
             <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المسؤول', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
@@ -650,7 +643,7 @@
             <td><input type="text" class="excel-input" value="${v.owner || 'أحمد'}" data-old="${v.owner || 'أحمد'}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المالك', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
         `;
 
-        subRow.innerHTML = `<td colspan="15"><div class="sub-table-container"><table class="inner-table"><thead><tr><th>نوع المنتج</th><th>تفاصيل المنتج</th><th>العدد</th><th>الاشتراك</th><th>الإجمالي</th><th style="width:65px">إجراء</th></tr></thead><tbody class="product-body"></tbody></table></div></td>`;
+        subRow.innerHTML = `<td colspan="14"><div class="sub-table-container"><table class="inner-table"><thead><tr><th>نوع المنتج</th><th>تفاصيل المنتج</th><th>العدد</th><th>الاشتراك</th><th>الإجمالي</th><th style="width:65px">إجراء</th></tr></thead><tbody class="product-body"></tbody></table></div></td>`;
         if (v.products && v.products.length > 0) v.products.forEach(p => addProductRow(rowId, p));
         else addProductRow(rowId);
 
@@ -743,17 +736,17 @@
                 comp: row.cells[1].querySelector('input').value,
                 address: row.cells[2].querySelector('input').value, 
                 locationUrl: row.querySelector('.location-url-val').value, 
-                mgr: row.cells[4].querySelector('input').value, 
-                mob: row.cells[5].querySelector('input').value, 
-                email: row.cells[6].querySelector('input').value, 
-                record: row.cells[7].querySelector('input').value, 
+                mgr: row.cells[3].querySelector('input').value, 
+                mob: row.cells[4].querySelector('input').value, 
+                email: row.cells[5].querySelector('input').value, 
+                record: row.cells[6].querySelector('input').value, 
                 oppDate: row.querySelector('.visit-date-val').value,
                 curServ: row.querySelector('.cur-serv-val').value,
                 oppValue: row.querySelector('.opp-value-input').value,
                 notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '[]',
                 status: row.querySelector('.status-select').value,
                 expectedDate: row.querySelector('.expected-date-input').value,
-                owner: row.cells[14].querySelector('input').value, 
+                owner: row.cells[13].querySelector('input').value, 
                 products: products
             });
         });
@@ -797,10 +790,10 @@
         document.querySelectorAll('.main-row').forEach(row => {
             const companyValue = (row.cells[1].querySelector('input').value || '').toLowerCase();
             const addressValue = (row.cells[2].querySelector('input').value || '').toLowerCase(); 
-            const managerValue = (row.cells[4].querySelector('input').value || '').toLowerCase();
-            const mobileValue = (row.cells[5].querySelector('input').value || '').toLowerCase();
-            const emailValue = (row.cells[6].querySelector('input').value || '').toLowerCase();
-            const recordValue = (row.cells[7].querySelector('input').value || '').toLowerCase();
+            const managerValue = (row.cells[3].querySelector('input').value || '').toLowerCase();
+            const mobileValue = (row.cells[4].querySelector('input').value || '').toLowerCase();
+            const emailValue = (row.cells[5].querySelector('input').value || '').toLowerCase();
+            const recordValue = (row.cells[6].querySelector('input').value || '').toLowerCase();
             
             const subRow = document.getElementById('sub-' + row.id);
             
