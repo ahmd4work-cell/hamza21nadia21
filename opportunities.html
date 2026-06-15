@@ -77,17 +77,17 @@
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 45px; max-height: 45px; font-size: 11px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; }
         
         /* تصميم الفاصل الشهري المُحدث */
-        .month-separator { height: 25px; }
-        .month-separator td { padding: 0 !important; border: none !important; }
+        .month-separator { height: 35px; }
+        .month-separator td { padding: 5px !important; border: none !important; }
         .sep-text { 
             width: 50%; 
             margin: 0 auto; 
             color: #000; 
             font-weight: 800; 
             font-size: 11px; 
-            background-color: #dcfce7; /* أخضر هادئ */
-            border-top: 1px solid #fda4af; /* سطر وردي نحيف */
-            border-bottom: 1px solid #fda4af; /* سطر وردي نحيف */
+            background-color: #dcfce7; /* أخضر فاتح */
+            border-radius: 6px; /* حواف دائرية */
+            border: none !important; /* بدون خطوط */
             text-align: center;
             height: 25px;
             line-height: 25px;
@@ -593,7 +593,7 @@
             currentActivePreview.setAttribute('data-full-notes', JSON.stringify(arr));
             currentActivePreview.innerText = txt;
             saveAllDataSilently();
-            addToActivityLog("ملاحظة ومتابعة", "إضافة", txt, currentActivePreview.closest('tr').cells[1].querySelector('input').value);
+            // تم إيقاف التسجيل في سجل النشاط للملاحظات كما طلبت
         }
         closeNote();
     }
