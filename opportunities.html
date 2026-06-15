@@ -74,18 +74,18 @@
             text-align: center; border-bottom: 2px solid #2e1065; position: sticky; top: 0; z-index: 50; height: 40px;
         }
          
-        /* تم تقليل ارتفاع الصف إلى 40 بيكسل */
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 40px; max-height: 40px; font-size: 11px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; }
         
+        /* تصميم الفاصل الشهري المُحدث */
         .month-separator { height: 35px; }
         .month-separator td { padding: 5px !important; border: none !important; }
         .sep-text { 
             width: 50%; 
             margin: 0 auto; 
-            color: #000; 
+            color: #ffffff; 
             font-weight: 800; 
             font-size: 11px; 
-            background-color: #dcfce7;
+            background: var(--header-shiny-purple); 
             border-radius: 6px; 
             border: none !important; 
             text-align: center;
@@ -360,17 +360,25 @@
 
     function updateStats() {
         const rows = document.querySelectorAll('#tableBody .main-row');
-        const today = getTodayFormatted(), currentMonth = today.substring(0, 7);
+        const today = getTodayFormatted(); 
+        const currentMonth = today.substring(0, 7); // yyyy-mm
         let total = rows.length, tDay = 0, tMonth = 0, valTotal = 0, valMonth = 0;
+        
         rows.forEach(row => {
-            const dateInput = row.querySelector('.visit-date-val');
+            const dateInput = row.querySelector('.expected-date-input');
             const oppValInput = row.querySelector('.opp-value-input');
             const oppVal = oppValInput ? parseFloat(oppValInput.value) || 0 : 0;
+            
             valTotal += oppVal;
+            
             if(dateInput) {
                 const date = dateInput.value;
                 if (date === today) tDay++;
-                if (date.startsWith(currentMonth)) { tMonth++; valMonth += oppVal; }
+                // حساب الفرص والقيم بناءً على الشهر الحالي
+                if (date.startsWith(currentMonth)) { 
+                    tMonth++; 
+                    valMonth += oppVal; 
+                }
             }
         });
         document.getElementById('stat-total').innerText = total;
@@ -425,6 +433,7 @@
             });
         });
         applyDateAlerts();
+        updateStats(); // تحديث الاحصائيات بعد إعادة الترتيب
     }
 
     function calculateOpportunityTotal(rowId) {
@@ -484,8 +493,7 @@
         else addProductRow(rowId);
         
         calculateOpportunityTotal(rowId);
-        updateStats();
-        reorderRows();
+        // updateStats() يتم استدعاؤها داخل reorderRows و calculate
     }
 
     function toggleSubTable(rowId) {
@@ -555,8 +563,7 @@
         saved.forEach(v => renderRow(v));
         checkIncomingOpportunities();
         renderActivityLog();
-        updateStats();
-        reorderRows();
+        reorderRows(); // هذه الدالة ستقوم بتحديث الاحصائيات تلقائياً
     }
 
     function filterTable() {
@@ -573,7 +580,6 @@
         try { const arr = JSON.parse(jsonStr); return arr.length > 0 ? arr[arr.length - 1].text : 'أضف ملاحظة...'; } catch(e) { return 'أضف ملاحظة...'; }
     }
 
-    // تم إصلاح دالة فتح الملاحظات
     function openNote(el) {
         currentActivePreview = el;
         const raw = el.getAttribute('data-full-notes') || "[]";
@@ -594,7 +600,6 @@
             currentActivePreview.setAttribute('data-full-notes', JSON.stringify(arr));
             currentActivePreview.innerText = txt;
             saveAllDataSilently();
-            // تم إيقاف التسجيل في سجل النشاط للملاحظات كما طلبت
         }
         closeNote();
     }
