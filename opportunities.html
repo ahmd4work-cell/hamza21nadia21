@@ -333,7 +333,7 @@
 
         .col-select { width: 3%; }
         .col-company { width: 11%; } 
-        .col-address { width: 10%; } /* تم ضبط الحجم ليتناسب مع الجدول المتناسق */
+        .col-address { width: 10%; } 
         .col-location { width: 6%; } 
         .col-manager { width: 7%; } 
         .col-mobile { width: 7%; } 
@@ -393,7 +393,8 @@
                     <tr>
                         <th class="col-select"><input type="checkbox" onclick="toggleAllCheckboxes(this)"></th>
                         <th class="col-company">الشركة</th>
-                        <th class="col-address">العنوان</th> <th class="col-location">العنوان</th> 
+                        <th class="col-address">العنوان</th> 
+                        <th class="col-location">العنوان</th> 
                         <th class="col-manager">المسؤول</th>
                         <th class="col-mobile">رقم التواصل</th>
                         <th class="col-email">الإيميل</th>
@@ -423,7 +424,7 @@
 
 <div id="noteModal" class="modal-notes">
     <div class="modal-notes-content">
-        <div style="font-weight: 800; color: #4c1d95; font-size:13px; margin-bottom: 12px; text-align: center;">سجل ملاحظات ومتابعة الفرصة</div>
+        <div style="font-weight: 800; color: #4c1d95; font-size:13px; margin-bottom: 12px; text-align: center;">سجل ملاحظات الفرصة</div>
         <div id="historyLog" class="history-log"></div>
         <textarea id="modalTextArea" class="note-area" placeholder="أضف ملاحظة أو متابعة جديدة بخصوص هذه الفرصة..."></textarea>
         <div style="display:flex; justify-content: flex-end; gap:8px; margin-top:12px;">
@@ -620,7 +621,8 @@
                 <span class="toggle-arrow" onclick="toggleSubTable('${rowId}')">▶</span>
             </td>
             <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الشركة', this.dataset.old, this.value, this.value); saveAllDataSilently(); updateStats();"></td>
-            <td><input type="text" class="excel-input address-val" value="${v.address || ''}" data-old="${v.address || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('العنوان', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td> <td>
+            <td><input type="text" class="excel-input address-val" value="${v.address || ''}" data-old="${v.address || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('العنوان', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
+            <td>
                 ${locationTdHTML}
                 <input type="hidden" class="location-url-val" value="${locationUrl}">
             </td>
@@ -739,19 +741,19 @@
             }
             data.push({
                 comp: row.cells[1].querySelector('input').value,
-                address: row.cells[2].querySelector('input').value, /* حفظ قيمة حقل العنوان الجديد في الـ LocalStorage */
+                address: row.cells[2].querySelector('input').value, 
                 locationUrl: row.querySelector('.location-url-val').value, 
-                mgr: row.cells[4].querySelector('input').value, /* تم تعديل رقم الخلية لمواكبة العمود الإضافي */
-                mob: row.cells[5].querySelector('input').value, /* تم تعديل رقم الخلية لمواكبة العمود الإضافي */
-                email: row.cells[6].querySelector('input').value, /* تم تعديل رقم الخلية لمواكبة العمود الإضافي */
-                record: row.cells[7].querySelector('input').value, /* تم تعديل رقم الخلية لمواكبة العمود الإضافي */
+                mgr: row.cells[4].querySelector('input').value, 
+                mob: row.cells[5].querySelector('input').value, 
+                email: row.cells[6].querySelector('input').value, 
+                record: row.cells[7].querySelector('input').value, 
                 oppDate: row.querySelector('.visit-date-val').value,
                 curServ: row.querySelector('.cur-serv-val').value,
                 oppValue: row.querySelector('.opp-value-input').value,
                 notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '[]',
                 status: row.querySelector('.status-select').value,
                 expectedDate: row.querySelector('.expected-date-input').value,
-                owner: row.cells[14].querySelector('input').value, /* تم تعديل رقم الخلية لمواكبة العمود الإضافي */
+                owner: row.cells[14].querySelector('input').value, 
                 products: products
             });
         });
@@ -794,7 +796,7 @@
         const q = document.getElementById('searchInput').value.toLowerCase().trim();
         document.querySelectorAll('.main-row').forEach(row => {
             const companyValue = (row.cells[1].querySelector('input').value || '').toLowerCase();
-            const addressValue = (row.cells[2].querySelector('input').value || '').toLowerCase(); /* تضمين حقل العنوان الجديد في البحث */
+            const addressValue = (row.cells[2].querySelector('input').value || '').toLowerCase(); 
             const managerValue = (row.cells[4].querySelector('input').value || '').toLowerCase();
             const mobileValue = (row.cells[5].querySelector('input').value || '').toLowerCase();
             const emailValue = (row.cells[6].querySelector('input').value || '').toLowerCase();
