@@ -25,7 +25,7 @@
         html, body { 
             height: 100%; margin: 0; padding: 0; overflow: hidden; 
             background-color: var(--bg-color); font-family: 'Cairo', sans-serif; 
-            font-size: 13px; line-height: 1.2; color: var(--text-dark); 
+            font-size: 12px; line-height: 1.2; color: var(--text-dark); 
         }
 
         .dashboard-container { display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; }
@@ -35,7 +35,7 @@
             border-radius: 12px; height: 37px; flex-shrink: 0;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.1); border: 1px solid #1e293b;
         }
-        .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 12px; height: 26px; line-height: 26px; display: inline-block; transition: 0.3s; }
+        .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 11px; height: 26px; line-height: 26px; display: inline-block; transition: 0.3s; }
         .navbar a.active { background-color: var(--nav-active); color: #0f172a; border-radius: 6px; }
 
         .main-content { flex: 1; display: flex; flex-direction: column; padding: 0 15px; min-height: 0; }
@@ -46,18 +46,18 @@
         .search-input {
             width: 100%; height: 35px; padding: 0 10px; border-radius: 8px;
             border: 1px solid var(--border-soft); background: #fff;
-            font-family: 'Cairo'; font-size: 12px; font-weight: 700; outline: none;
+            font-family: 'Cairo'; font-size: 11px; font-weight: 700; outline: none;
         }
 
         .stats-bar-visit { margin-right: auto; display: flex; gap: 12px; align-items: center; background: #fff; padding: 0 15px; border-radius: 5px; height: 35px; border: 1px solid var(--border-soft); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .stat-item { font-size: 11px; font-weight: 800; color: #475569; white-space: nowrap; }
+        .stat-item { font-size: 10px; font-weight: 800; color: #475569; white-space: nowrap; }
         .stat-val { color: var(--accent-blue); margin-right: 3px; }
         .stat-divider { color: #cbd5e1; font-weight: normal; margin: 0 2px; }
 
         .bulk-action-wrapper { position: relative; display: flex; align-items: center; margin-right: 5px; }
         .btn-bulk-trigger { 
             height: 35px; padding: 0 15px; border-radius: 5px; border: 1px solid var(--border-soft);
-            background: #fff; color: var(--text-dark); font-family: 'Cairo'; font-size: 12px; font-weight: 800;
+            background: #fff; color: var(--text-dark); font-family: 'Cairo'; font-size: 11px; font-weight: 800;
             cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: 0.2s;
             display: flex; align-items: center; gap: 5px;
         }
@@ -70,11 +70,11 @@
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
          
         th { 
-            background: var(--header-shiny-purple); color: white; padding: 0 5px; font-size: 11px; font-weight: 800; 
+            background: var(--header-shiny-purple); color: white; padding: 0 5px; font-size: 10px; font-weight: 800; 
             text-align: center; border-bottom: 2px solid #2e1065; position: sticky; top: 0; z-index: 50; height: 40px;
         }
          
-        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 40px; max-height: 40px; font-size: 11px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; }
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 40px; max-height: 40px; font-size: 10px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; }
         
         .month-separator { height: 35px; }
         .month-separator td { padding: 5px !important; border: none !important; }
@@ -83,7 +83,7 @@
             margin: 0 auto; 
             color: #000; 
             font-weight: 800; 
-            font-size: 11px; 
+            font-size: 10px; 
             background-color: #dcfce7;
             border-radius: 6px; 
             border: none !important; 
@@ -95,9 +95,9 @@
         .sub-table-row { display: none; background-color: #f8fafc; }
         .sub-table-container { padding: 8px 12% 12px 5%; } 
         .inner-table { width: 65%; background: white; border: 1px solid var(--border-soft); border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden; }
-        .inner-table th { background: var(--accent-blue); color: #fff; height: 24px; font-size: 9.5px; border-left: 1px solid rgba(255,255,255,0.2); vertical-align: middle; }
+        .inner-table th { background: var(--accent-blue); color: #fff; height: 24px; font-size: 8.5px; border-left: 1px solid rgba(255,255,255,0.2); vertical-align: middle; }
         .inner-table td { height: 28px; border: 1px solid #edf2f7; padding: 0; }
-        .inner-table input, .inner-table select { width: 100%; height: 100%; border: none; text-align: center; font-family: 'Cairo'; font-size: 10.5px; outline: none; background: transparent; }
+        .inner-table input, .inner-table select { width: 100%; height: 100%; border: none; text-align: center; font-family: 'Cairo'; font-size: 9.5px; outline: none; background: transparent; }
         .inner-table select { text-align-last: center; cursor: pointer; }
          
         .header-plus-btn {
@@ -107,7 +107,7 @@
             border-radius: 3px;
             width: 18px;
             height: 18px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
             cursor: pointer;
             margin-right: 5px;
@@ -121,14 +121,14 @@
 
         .sub-action-btn { 
             width: 22px; height: 22px; border: none; border-radius: 4px; cursor: pointer; 
-            font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: bold; display: flex; align-items: center; justify-content: center;
             transition: 0.2s;
         }
         .btn-minus { background: #fee2e2; color: #ef4444; }
         .btn-minus:hover { background: #fecaca; }
 
         .toggle-arrow { 
-            cursor: pointer; font-size: 13px; color: var(--accent-blue); margin-right: 5px; 
+            cursor: pointer; font-size: 12px; color: var(--accent-blue); margin-right: 5px; 
             display: inline-block; transition: transform 0.2s; vertical-align: middle;
             font-weight: bold;
         }
@@ -138,7 +138,7 @@
 
         .excel-input { 
             width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; 
-            background: transparent; font-size: 11.5px; color: inherit; font-weight: inherit; 
+            background: transparent; font-size: 10.5px; color: inherit; font-weight: inherit; 
             height: 100%; overflow: hidden; text-overflow: ellipsis; 
         }
         .readonly-opp-val { color: #1e3a8a !important; font-weight: 800 !important; cursor: not-allowed; }
@@ -153,7 +153,7 @@
 
         .dropdown-menu button { 
             width: 100%; padding: 6px 10px; border: none; background: none; font-family: 'Cairo'; 
-            font-size: 10.5px; text-align: right; cursor: pointer; color: #475569; font-weight: 700; 
+            font-size: 9.5px; text-align: right; cursor: pointer; color: #475569; font-weight: 700; 
             border-radius: 4px; transition: 0.2s; display: block;
         }
         .dropdown-menu button:hover { background: #f1f5f9; color: var(--accent-blue); }
@@ -162,7 +162,7 @@
 
         .notes-preview { 
             width: 95%; height: 20px; border: none; background: transparent; font-family: 'Cairo'; 
-            font-size: 11px; text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700; 
+            font-size: 10px; text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700; 
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; margin: 0 auto; 
             line-height: 20px;
         }
@@ -175,10 +175,10 @@
         .activity-log-section.expanded { height: 200px; }
         
         .activity-log-header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; border-bottom: 1px solid #f1f5f9; padding-bottom: 4px; flex-shrink: 0; }
-        .activity-log-title { color: #c29103; font-family: 'Cairo', sans-serif; font-size: 11.5px; font-weight: 800; margin: 0; text-align: right; }
+        .activity-log-title { color: #c29103; font-family: 'Cairo', sans-serif; font-size: 10.5px; font-weight: 800; margin: 0; text-align: right; }
         .btn-toggle-expand { background: none; border: none; color: #64748b; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 4px; transition: 0.2s; padding: 0; }
         .btn-toggle-expand:hover { background: #f1f5f9; color: #3b82f6; }
-        .activity-list { flex: 1; overflow-y: auto; font-size: 9.5px; text-align: right; }
+        .activity-list { flex: 1; overflow-y: auto; font-size: 8.5px; text-align: right; }
         .activity-item { margin-bottom: 4px; border-bottom: 1px dashed #f1f5f9; padding-bottom: 4px; color: #1e293b; display: block; white-space: normal; text-align: right; font-weight: 700; line-height: 1.4; direction: rtl; }
          
         .phone-cell-container { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; padding: 0 4px; box-sizing: border-box; }
@@ -189,9 +189,9 @@
         .modal-notes-content { background: white; padding: 22px; border-radius: 12px; width: 490px; height: 500px; display: flex; flex-direction: column; box-shadow: 0 4px 20px rgba(0,0,0,0.15); box-sizing: border-box; }
         .history-log { flex-grow: 1; overflow-y: auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-sizing: border-box; direction: rtl; }
         .chat-msg-block { display: flex; flex-direction: column; align-items: flex-start; text-align: right; margin-bottom: 14px; font-family: 'Cairo', sans-serif; direction: rtl; }
-        .chat-msg-header { font-size: 10.5px; color: #b45309; font-weight: 800; margin-bottom: 3px; display: block; width: 100%; text-align: right; }
-        .chat-msg-text { font-size: 11px; color: #1e293b; font-weight: 700; line-height: 1.5; display: block; width: 100%; text-align: right; white-space: pre-wrap; }
-        .note-area { height: 95px; width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 11.5px; text-align: right; box-sizing: border-box; direction: rtl; }
+        .chat-msg-header { font-size: 9.5px; color: #b45309; font-weight: 800; margin-bottom: 3px; display: block; width: 100%; text-align: right; }
+        .chat-msg-text { font-size: 10px; color: #1e293b; font-weight: 700; line-height: 1.5; display: block; width: 100%; text-align: right; white-space: pre-wrap; }
+        .note-area { height: 95px; width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 10.5px; text-align: right; box-sizing: border-box; direction: rtl; }
 
         .date-overdue { background-color: #ffeeeb !important; color: #dc2626 !important; font-weight: 800 !important; border-radius: 4px; }
         .date-today { background-color: #f0fdf4 !important; color: #16a34a !important; font-weight: 800 !important; border-radius: 4px; }
@@ -287,12 +287,12 @@
 
 <div id="noteModal" class="modal-notes">
     <div class="modal-notes-content">
-        <div style="font-weight: 800; color: #4c1d95; font-size:13px; margin-bottom: 12px; text-align: center;">سجل ملاحظات الفرصة</div>
+        <div style="font-weight: 800; color: #4c1d95; font-size:12px; margin-bottom: 12px; text-align: center;">سجل ملاحظات الفرصة</div>
         <div id="historyLog" class="history-log"></div>
         <textarea id="modalTextArea" class="note-area" placeholder="أضف ملاحظة أو متابعة جديدة بخصوص هذه الفرصة..."></textarea>
         <div style="display:flex; justify-content: flex-end; gap:8px; margin-top:12px;">
-            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:6px 16px; border-radius:6px; cursor:pointer; font-family:Cairo; font-size:11.5px;">تراجع</button>
-            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:6px 16px; border-radius:6px; cursor:pointer; font-family:Cairo; font-size:11.5px; font-weight:bold;">حفظ الملاحظة</button>
+            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:6px 16px; border-radius:6px; cursor:pointer; font-family:Cairo; font-size:10.5px;">تراجع</button>
+            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:6px 16px; border-radius:6px; cursor:pointer; font-family:Cairo; font-size:10.5px; font-weight:bold;">حفظ الملاحظة</button>
         </div>
     </div>
 </div>
@@ -308,10 +308,8 @@
         return d.toISOString().split('T')[0];
     }
 
-    // دالة مساعدة لتوحيد تنسيق التاريخ
     function standardizeDate(d) {
         if (!d) return getTodayFormatted();
-        // إذا كان التنسيق يحتوي على / نقوم بتبديله، وإلا نرجع التاريخ كما هو
         return d.replace(/\//g, '-');
     }
 
@@ -463,7 +461,6 @@
         subRow.className = 'sub-table-row';
         subRow.id = 'sub-' + rowId;
 
-        // استخدام دالة standardizeDate لضمان تنسيق YYYY-MM-DD
         const today = getTodayFormatted(), 
               oppDate = standardizeDate(v.oppDate || today), 
               notesJson = v.notes || "[]", 
