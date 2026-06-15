@@ -74,6 +74,7 @@
             text-align: center; border-bottom: 2px solid #2e1065; position: sticky; top: 0; z-index: 50; height: 40px;
         }
          
+        /* تم تقليل ارتفاع الصف إلى 40 بيكسل */
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 40px; max-height: 40px; font-size: 11px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; }
         
         .month-separator { height: 35px; }
@@ -81,10 +82,10 @@
         .sep-text { 
             width: 50%; 
             margin: 0 auto; 
-            color: #ffffff; 
+            color: #000; 
             font-weight: 800; 
             font-size: 11px; 
-            background: var(--header-shiny-purple); 
+            background-color: #dcfce7;
             border-radius: 6px; 
             border: none !important; 
             text-align: center;
@@ -305,7 +306,7 @@
 
     function getTodayFormatted() {
         const d = new Date();
-        return d.toISOString().split('T')[0]; // YYYY-MM-DD
+        return d.toISOString().split('T')[0];
     }
 
     function getTimeFormatted() {
@@ -337,13 +338,14 @@
     }
 
     function addToActivityLog(fieldName, oldVal, newVal, companyName) {
+        const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
         const d = new Date();
-        const dateFormatted = d.toISOString().split('T')[0]; // YYYY-MM-DD
+        let dd = String(d.getDate()).padStart(2, '0'), mm = String(d.getMonth() + 1).padStart(2, '0'), yyyy = d.getFullYear();
         const cleanCompany = (companyName && companyName.toString().trim() !== "") ? companyName : "شركة جديدة";
         const v1 = (oldVal && oldVal.toString().trim() !== "") ? oldVal : "فارغ";
         const v2 = (newVal && newVal.toString().trim() !== "") ? newVal : "فارغ";
         let actionText = (fieldName === "إجراء") ? `${oldVal} لفرصة شركة ( ${cleanCompany} )` : `تغيير ${fieldName} من [${v1}] إلى [${v2}] للعميل ( ${cleanCompany} )`;
-        const fullLogHTML = `<span style="color: #b45309; font-weight: 800;">👤 أحمد 🗓️ ${dateFormatted} ${getTimeFormatted()} &nbsp;&nbsp;</span><span style="color: #2563eb; font-weight: 700;">${actionText}</span>`;
+        const fullLogHTML = `<span style="color: #b45309; font-weight: 800;">👤 (أحمد) 🗓️ ${days[d.getDay()]} ${dd}-${mm}-${yyyy} ${getTimeFormatted()} &nbsp;&nbsp;</span><span style="color: #2563eb; font-weight: 700;">${actionText}</span>`;
         let logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
         logs.unshift(fullLogHTML);
         localStorage.setItem(LOGS_KEY, JSON.stringify(logs.slice(0, 100)));
@@ -358,24 +360,17 @@
 
     function updateStats() {
         const rows = document.querySelectorAll('#tableBody .main-row');
-        const today = getTodayFormatted(); 
-        const currentMonth = today.substring(0, 7); 
+        const today = getTodayFormatted(), currentMonth = today.substring(0, 7);
         let total = rows.length, tDay = 0, tMonth = 0, valTotal = 0, valMonth = 0;
-        
         rows.forEach(row => {
-            const dateInput = row.querySelector('.expected-date-input');
+            const dateInput = row.querySelector('.visit-date-val');
             const oppValInput = row.querySelector('.opp-value-input');
             const oppVal = oppValInput ? parseFloat(oppValInput.value) || 0 : 0;
-            
             valTotal += oppVal;
-            
             if(dateInput) {
                 const date = dateInput.value;
                 if (date === today) tDay++;
-                if (date.startsWith(currentMonth)) { 
-                    tMonth++; 
-                    valMonth += oppVal; 
-                }
+                if (date.startsWith(currentMonth)) { tMonth++; valMonth += oppVal; }
             }
         });
         document.getElementById('stat-total').innerText = total;
@@ -430,7 +425,6 @@
             });
         });
         applyDateAlerts();
-        updateStats(); 
     }
 
     function calculateOpportunityTotal(rowId) {
@@ -490,6 +484,8 @@
         else addProductRow(rowId);
         
         calculateOpportunityTotal(rowId);
+        updateStats();
+        reorderRows();
     }
 
     function toggleSubTable(rowId) {
@@ -559,7 +555,8 @@
         saved.forEach(v => renderRow(v));
         checkIncomingOpportunities();
         renderActivityLog();
-        reorderRows(); 
+        updateStats();
+        reorderRows();
     }
 
     function filterTable() {
@@ -576,6 +573,7 @@
         try { const arr = JSON.parse(jsonStr); return arr.length > 0 ? arr[arr.length - 1].text : 'أضف ملاحظة...'; } catch(e) { return 'أضف ملاحظة...'; }
     }
 
+    // تم إصلاح دالة فتح الملاحظات
     function openNote(el) {
         currentActivePreview = el;
         const raw = el.getAttribute('data-full-notes') || "[]";
@@ -592,18 +590,11 @@
             const raw = currentActivePreview.getAttribute('data-full-notes') || "[]";
             let arr = []; try { arr = JSON.parse(raw); } catch(e) { arr = []; }
             const d = new Date();
-            // استخدام التنسيق الموحد الجديد
-            const newMsg = {
-                user: "أحمد",
-                date: getTodayFormatted(), 
-                time: getTimeFormatted(),
-                text: txt
-            };
-            arr.push(newMsg);
+            arr.push({ user: "أحمد", date: getTodayFormatted(), time: d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }), text: txt });
             currentActivePreview.setAttribute('data-full-notes', JSON.stringify(arr));
             currentActivePreview.innerText = txt;
             saveAllDataSilently();
-            addToActivityLog("ملاحظة", "إضافة", txt, currentActivePreview.closest('tr').cells[1].querySelector('input').value);
+            // تم إيقاف التسجيل في سجل النشاط للملاحظات كما طلبت
         }
         closeNote();
     }
