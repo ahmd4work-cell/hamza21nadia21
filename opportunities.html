@@ -151,7 +151,6 @@
             line-height: 20px;
         }
 
-        /* 1. الحاوية الرئيسية لسجل النشاطات (.activity-log-section) */
         .activity-log-section { 
             margin: 1px 0 0px 0; 
             padding: 10px 18px; 
@@ -170,7 +169,6 @@
             height: 200px; 
         }
         
-        /* 2. شريط العنوان العلوي (.activity-log-header-container) */
         .activity-log-header-container { 
             display: flex; 
             justify-content: space-between; 
@@ -181,7 +179,6 @@
             flex-shrink: 0; 
         }
         
-        /* أ. نص العنوان (.activity-log-title) */
         .activity-log-title { 
             color: #c29103; 
             font-family: 'Cairo', sans-serif;
@@ -191,7 +188,6 @@
             text-align: right; 
         }
         
-        /* ب. زر التوسيع والتقليص (.btn-toggle-expand) */
         .btn-toggle-expand { 
             background: none; 
             border: none; 
@@ -212,7 +208,6 @@
             color: #3b82f6; 
         }
 
-        /* 3. قائمة السجلات والنشاطات (.activity-list & .activity-item) */
         .activity-list { 
             flex: 1; 
             overflow-y: auto; 
@@ -232,12 +227,10 @@
             direction: rtl; 
         }
          
-        /* حاوية أيقونة الواتساب والمدخل */
         .phone-cell-container { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; padding: 0 4px; box-sizing: border-box; }
         .whatsapp-icon-btn { color: #25d366; font-size: 14px; text-decoration: none; margin-left: 5px; cursor: pointer; transition: transform 0.2s; display: inline-flex; align-items: center; }
         .whatsapp-icon-btn:hover { transform: scale(1.2); }
 
-        /* هندسة المودال القياسي المحدث للملاحظات */
         .modal-notes { 
             display: none; 
             position: fixed; 
@@ -658,7 +651,6 @@
             <td><input type="text" class="excel-input" value="${v.owner || 'أحمد'}" data-old="${v.owner || 'أحمد'}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المالك', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
         `;
 
-        // إضافة زر + إلى رأس جدول المنتجات
         subRow.innerHTML = `<td colspan="13"><div class="sub-table-container"><table class="inner-table"><thead><tr><th>نوع المنتج</th><th>تفاصيل المنتج</th><th>العدد</th><th>الاشتراك</th><th>الإجمالي</th><th style="width:75px">إجراء <button class="header-plus-btn" onclick="addProductRow('${rowId}')" title="إضافة منتج جديد">+</button></th></tr></thead><tbody class="product-body"></tbody></table></div></td>`;
         if (v.products && v.products.length > 0) v.products.forEach(p => addProductRow(rowId, p));
         else addProductRow(rowId);
@@ -680,13 +672,16 @@
         const tbody = document.querySelector(`#sub-${rowId} .product-body`);
         const row = tbody.insertRow();
         
-        // إزالة زر الـ + من هنا والإبقاء على علامة × فقط
         row.innerHTML = `
             <td><select onchange="saveAllDataSilently()">
                 <option value="" ${data.type === '' ? 'selected' : ''}></option>
                 <option value="جوال" ${data.type === 'جوال' ? 'selected' : ''}>جوال</option>
                 <option value="بيانات" ${data.type === 'بيانات' ? 'selected' : ''}>بيانات</option>
-                <option value="فايبر" ${data.type === 'فايبر' ? 'selected' : ''}>فايبر</option>
+                <option value="هاتف" ${data.type === 'هاتف' ? 'selected' : ''}>هاتف</option>
+                <option value="فايبر نت" ${data.type === 'فايبر نت' ? 'selected' : ''}>فايبر نت</option>
+                <option value="DIA" ${data.type === 'DIA' ? 'selected' : ''}>DIA</option>
+                <option value="IPVPN" ${data.type === 'IPVPN' ? 'selected' : ''}>IPVPN</option>
+                <option value="SIP" ${data.type === 'SIP' ? 'selected' : ''}>SIP</option>
             </select></td>
             <td><input type="text" value="${data.desc || ''}" onchange="saveAllDataSilently()"></td>
             <td><input type="number" class="prod-qty" min="0" value="${data.qty || ''}" oninput="calculateOpportunityTotal('${rowId}')"></td>
