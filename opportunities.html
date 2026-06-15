@@ -74,8 +74,17 @@
             text-align: center; border-bottom: 2px solid #2e1065; position: sticky; top: 0; z-index: 50; height: 40px;
         }
          
-        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 40px; max-height: 40px; font-size: 10px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; }
+        /* تعديل الارتفاع الافتراضي */
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 37px; max-height: 37px; font-size: 10px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; }
         
+        /* كلاسات تغيير الحالة */
+        .row-interested { background-color: #fef08a !important; }
+        .row-completed { background-color: #bbf7d0 !important; }
+        .row-completed td { height: 27px !important; }
+        .row-lost { background-color: #991b1b !important; color: white !important; }
+        .row-lost td { height: 27px !important; }
+        .row-lost input, .row-lost select { color: white !important; }
+
         .month-separator { height: 35px; }
         .month-separator td { padding: 5px !important; border: none !important; }
         .sep-text { 
@@ -303,6 +312,16 @@
     const LOGS_KEY = 'asgate_opportunities_logs_v33';
     const INCOMING_KEY = 'asgate_opportunities_final_v31'; 
 
+    // وظيفة لتطبيق التنسيق الشرطي على الصف
+    function applyRowStatusStyle(row) {
+        const select = row.querySelector('.status-select');
+        const val = select.value;
+        row.classList.remove('row-interested', 'row-completed', 'row-lost');
+        if (val === 'مهتم') row.classList.add('row-interested');
+        else if (val === 'مكتمل') row.classList.add('row-completed');
+        else if (val === 'فقدان') row.classList.add('row-lost');
+    }
+
     function getTodayFormatted() {
         const d = new Date();
         return d.toISOString().split('T')[0];
@@ -478,7 +497,7 @@
             <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الخدمة الحالية', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
             <td><input type="number" class="excel-input opp-value-input readonly-opp-val" value="${v.oppValue || ''}" readonly></td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notesJson.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
-            <td><select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الحالة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); updateStats(); reorderRows();"><option value="" ${v.status === '' ? 'selected' : ''}></option><option value="مهتم" ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option><option value="تأجيل" ${v.status === 'تأجيل' ? 'selected' : ''}>تأجيل</option><option value="مكتمل" ${v.status === 'مكتمل' ? 'selected' : ''}>مكتمل</option><option value="فقدان" ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option></select></td>
+            <td><select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الحالة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); updateStats(); reorderRows(); applyRowStatusStyle(this.closest('tr'));"><option value="" ${v.status === '' ? 'selected' : ''}></option><option value="مهتم" ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option><option value="تأجيل" ${v.status === 'تأجيل' ? 'selected' : ''}>تأجيل</option><option value="مكتمل" ${v.status === 'مكتمل' ? 'selected' : ''}>مكتمل</option><option value="فقدان" ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option></select></td>
             <td><input type="date" class="excel-input expected-date-input" value="${v.expectedDate || today}" data-old="${v.expectedDate || today}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('التاريخ المتوقع', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); reorderRows();"></td>
             <td><input type="text" class="excel-input" value="${v.owner || 'أحمد'}" data-old="${v.owner || 'أحمد'}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المالك', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
         `;
@@ -487,6 +506,11 @@
         tbody.appendChild(mainRow);
         tbody.appendChild(subRow);
         
+        if (v.status) {
+            mainRow.querySelector('.status-select').value = v.status;
+            applyRowStatusStyle(mainRow);
+        }
+
         if (v.products && v.products.length > 0) v.products.forEach(p => addProductRow(rowId, p));
         else addProductRow(rowId);
         
