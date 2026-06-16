@@ -74,10 +74,8 @@
             text-align: center; border-bottom: 2px solid #2e1065; position: sticky; top: 0; z-index: 50; height: 40px;
         }
          
-        /* تعديل الارتفاع الافتراضي للصفوف إلى 37 بيكسل */
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 37px; max-height: 37px; font-size: 10px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; }
         
-        /* كلاسات التنسيق الديناميكي لخلية الحالة فقط */
         .status-cell-interested { background-color: #fef08a !important; }
         .status-cell-completed { background-color: #22c55e !important; }
         .status-cell-lost { background-color: #991b1b !important; }
@@ -200,8 +198,9 @@
         .chat-msg-text { font-size: 10px; color: #1e293b; font-weight: 700; line-height: 1.5; display: block; width: 100%; text-align: right; white-space: pre-wrap; }
         .note-area { height: 95px; width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 10.5px; text-align: right; box-sizing: border-box; direction: rtl; }
 
-        .date-overdue { background-color: #ffeeeb !important; color: #dc2626 !important; font-weight: 800 !important; border-radius: 4px; }
-        .date-today { background-color: #f0fdf4 !important; color: #16a34a !important; font-weight: 800 !important; border-radius: 4px; }
+        /* كلاسات تغيير لون خط التاريخ المتوقع */
+        .text-warning-yellow { color: #d97706 !important; font-weight: 900 !important; background-color: transparent !important; }
+        .text-danger-red { color: #dc2626 !important; font-weight: 900 !important; background-color: transparent !important; }
 
         .col-select { width: 3%; }
         .col-company { width: 11%; }
@@ -270,7 +269,7 @@
                         <th class="col-email">الإيميل</th>
                         <th class="col-record">السجل</th>
                         <th class="col-date">تاريخ الزيارة الأصلية</th>
-                        <th class="col-service">الخدمة الحالية</th>
+                        <th class="col-service">الخدمة المقترحة</th>
                         <th class="col-val">قيمة الفرصة</th>
                         <th class="col-notes">ملاحظات الفرصة</th>
                         <th class="col-status">الحالة</th>
@@ -310,28 +309,11 @@
     const LOGS_KEY = 'asgate_opportunities_logs_v33';
     const INCOMING_KEY = 'asgate_opportunities_final_v31'; 
 
-    function getTodayFormatted() {
-        const d = new Date();
-        return d.toISOString().split('T')[0];
-    }
-
-    function standardizeDate(d) {
-        if (!d) return getTodayFormatted();
-        return d.replace(/\//g, '-');
-    }
-
-    function getTimeFormatted() {
-        const d = new Date();
-        return String(d.getHours()).padStart(2, '0') + ":" + String(d.getMinutes()).padStart(2, '0');
-    }
-
-    // دالة التحكم الحصري والكامل في لون وارتفاع خلية الحالة والصف التابع لها
     function updateStatusStyle(selectEl) {
         if (!selectEl) return;
         const td = selectEl.parentElement;
         const tr = selectEl.closest('tr');
         
-        // إعادة تهيئة التنسيقات قبل التطبيق الجديد
         td.classList.remove('status-cell-interested', 'status-cell-completed', 'status-cell-lost');
         tr.style.height = '';
         tr.querySelectorAll('td').forEach(cell => cell.style.height = '');
@@ -351,6 +333,21 @@
             tr.querySelectorAll('td').forEach(cell => cell.style.height = '27px');
             selectEl.style.color = '#ffffff';
         }
+    }
+
+    function getTodayFormatted() {
+        const d = new Date();
+        return d.toISOString().split('T')[0];
+    }
+
+    function standardizeDate(d) {
+        if (!d) return getTodayFormatted();
+        return d.replace(/\//g, '-');
+    }
+
+    function getTimeFormatted() {
+        const d = new Date();
+        return String(d.getHours()).padStart(2, '0') + ":" + String(d.getMinutes()).padStart(2, '0');
     }
 
     function openWhatsAppChat(el) {
@@ -397,7 +394,6 @@
         list.innerHTML = logs.map(log => `<div class="activity-item">${log}</div>`).join('');
     }
 
-    // تحديث الإحصائيات مع الحساب الدقيق لقيمة فرص وعمليات الشهر الجاري بناء على التواريخ
     function updateStats() {
         const rows = document.querySelectorAll('#tableBody .main-row');
         const today = getTodayFormatted(), currentMonth = today.substring(0, 7);
@@ -427,21 +423,34 @@
         document.getElementById('stat-value-month').innerText = valMonth.toLocaleString();
     }
 
+    // دالة تغيير لون خط التاريخ المتوقع بذكاء بناءً على الموعد
     function applyDateAlerts() {
-        const today = getTodayFormatted();
+        const todayStr = getTodayFormatted();
+        const t1 = new Date(todayStr + "T00:00:00").getTime();
+
         document.querySelectorAll('.main-row').forEach(row => {
             const dateInput = row.querySelector('.expected-date-input');
             const statusSelect = row.querySelector('.status-select');
             if (!dateInput || !statusSelect) return;
-            const targetDate = dateInput.value, currentStatus = statusSelect.value;
-            dateInput.classList.remove('date-overdue', 'date-today');
-            if (currentStatus === 'مكتمل' || currentStatus === 'فقدان') return;
-            if (targetDate && targetDate < today) dateInput.classList.add('date-overdue');
-            else if (targetDate === today) dateInput.classList.add('date-today');
+
+            const targetDateStr = dateInput.value;
+            const currentStatus = statusSelect.value;
+
+            dateInput.classList.remove('text-warning-yellow', 'text-danger-red');
+
+            if (currentStatus === 'مكتمل' || currentStatus === 'فقدان' || !targetDateStr) return;
+
+            const t2 = new Date(targetDateStr + "T00:00:00").getTime();
+            const diffDays = Math.round((t2 - t1) / (1000 * 60 * 60 * 24));
+
+            if (diffDays <= 0) {
+                dateInput.classList.add('text-danger-red');
+            } else if (diffDays === 2 || diffDays === 3) {
+                dateInput.classList.add('text-warning-yellow');
+            }
         });
     }
 
-    // إعادة فرز وترتيب الصفوف وتوليد الفواصل الزمنية وتمييز الفاصل الحالي بالبنفسجي
     function reorderRows() {
         const tbody = document.getElementById('tableBody');
         const rows = Array.from(tbody.querySelectorAll('.main-row'));
@@ -466,7 +475,6 @@
             const sepRow = document.createElement('tr');
             sepRow.className = 'month-separator';
             
-            // التحقق البرمجي الدقيق لتمييز الشهر الجاري باللون البنفسجي
             const isCurrentMonth = (month === currentMonth);
             const sepStyle = isCurrentMonth ? 'background-color: #7c3aed !important; color: #ffffff !important;' : '';
             
@@ -524,11 +532,11 @@
             <td><div class="phone-cell-container"><a class="whatsapp-icon-btn" onclick="openWhatsAppChat(this)" title="مراسلة"><i class="fa-brands fa-whatsapp"></i></a><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('رقم التواصل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></div></td>
             <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الإيميل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
             <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('السجل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input readonly-input" value="${oppDate}" readonly style="color:#64748b; font-weight:700;"><input type="hidden" class="visit-date-val" value="${oppDate}"></td>
-            <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الخدمة الحالية', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input readonly-input" dir="ltr" value="${oppDate}" readonly style="color:#64748b; font-weight:700;"><input type="hidden" class="visit-date-val" value="${oppDate}"></td>
+            <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الخدمة المقترحة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
             <td><input type="number" class="excel-input opp-value-input readonly-opp-val" value="${v.oppValue || ''}" readonly></td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notesJson.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
-            <td><select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الحالة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); updateStats(); updateStatusStyle(this); reorderRows();"><option value="" ${v.status === '' ? 'selected' : ''}></option><option value="مهتم" ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option><option value="تأجيل" ${v.status === 'تأجيل' ? 'selected' : ''}>تأجيل</option><option value="مكتمل" ${v.status === 'مكتمل' ? 'selected' : ''}>مكتمل</option><option value="فقدان" ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option></select></td>
+            <td><select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الحالة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); updateStats(); updateStatusStyle(this); reorderRows();"><option value="" ${v.status === '' ? 'selected' : ''}></option><option value="مهتم" ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option><option value="مكتمل" ${v.status === 'مكتمل' ? 'selected' : ''}>مكتمل</option><option value="فقدان" ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option></select></td>
             <td><input type="date" class="excel-input expected-date-input" value="${v.expectedDate || today}" data-old="${v.expectedDate || today}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('التاريخ المتوقع', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); reorderRows();"></td>
             <td><input type="text" class="excel-input" value="${v.owner || 'أحمد'}" data-old="${v.owner || 'أحمد'}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المالك', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
         `;
@@ -537,11 +545,10 @@
         tbody.appendChild(mainRow);
         tbody.appendChild(subRow);
         
+        updateStatusStyle(mainRow.querySelector('.status-select'));
+        
         if (v.products && v.products.length > 0) v.products.forEach(p => addProductRow(rowId, p));
         else addProductRow(rowId);
-        
-        // تطبيق الأنماط لخلية الحالة بشكل فوري عند تحميل أو توليد الصف
-        updateStatusStyle(mainRow.querySelector('.status-select'));
         
         calculateOpportunityTotal(rowId);
         updateStats();
