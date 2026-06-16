@@ -74,14 +74,14 @@
             text-align: center; border-bottom: 2px solid #2e1065; position: sticky; top: 0; z-index: 50; height: 40px;
         }
          
-        /* تم تعديل ارتفاع الصف الافتراضي إلى 37 بيكسل */
+        /* تعديل الارتفاع الافتراضي للصفوف إلى 37 بيكسل */
         td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 37px; max-height: 37px; font-size: 10px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; }
         
-        /* كلاسات خاصة لتلوين خلية الحالة فقط */
+        /* كلاسات التنسيق الديناميكي لخلية الحالة فقط */
         .status-cell-interested { background-color: #fef08a !important; }
-        .status-cell-completed { background-color: #22c55e !important; height: 27px !important; }
-        .status-cell-lost { background-color: #991b1b !important; height: 27px !important; }
-        .status-cell-lost select { color: #ffffff !important; font-weight: bold !important; }
+        .status-cell-completed { background-color: #22c55e !important; }
+        .status-cell-lost { background-color: #991b1b !important; }
+        .status-cell-completed select option, .status-cell-lost select option { color: #1e293b !important; }
 
         .month-separator { height: 35px; }
         .month-separator td { padding: 5px !important; border: none !important; }
@@ -310,19 +310,6 @@
     const LOGS_KEY = 'asgate_opportunities_logs_v33';
     const INCOMING_KEY = 'asgate_opportunities_final_v31'; 
 
-    // وظيفة تلوين خلية الحالة
-    function applyStatusCellColor(selectEl) {
-        const td = selectEl.parentElement;
-        td.classList.remove('status-cell-interested', 'status-cell-completed', 'status-cell-lost');
-        if (selectEl.value === 'مهتم') {
-            td.classList.add('status-cell-interested');
-        } else if (selectEl.value === 'مكتمل') {
-            td.classList.add('status-cell-completed');
-        } else if (selectEl.value === 'فقدان') {
-            td.classList.add('status-cell-lost');
-        }
-    }
-
     function getTodayFormatted() {
         const d = new Date();
         return d.toISOString().split('T')[0];
@@ -336,6 +323,34 @@
     function getTimeFormatted() {
         const d = new Date();
         return String(d.getHours()).padStart(2, '0') + ":" + String(d.getMinutes()).padStart(2, '0');
+    }
+
+    // دالة التحكم الحصري والكامل في لون وارتفاع خلية الحالة والصف التابع لها
+    function updateStatusStyle(selectEl) {
+        if (!selectEl) return;
+        const td = selectEl.parentElement;
+        const tr = selectEl.closest('tr');
+        
+        // إعادة تهيئة التنسيقات قبل التطبيق الجديد
+        td.classList.remove('status-cell-interested', 'status-cell-completed', 'status-cell-lost');
+        tr.style.height = '';
+        tr.querySelectorAll('td').forEach(cell => cell.style.height = '');
+        selectEl.style.color = '';
+
+        const val = selectEl.value;
+        if (val === 'مهتم') {
+            td.classList.add('status-cell-interested');
+        } else if (val === 'مكتمل') {
+            td.classList.add('status-cell-completed');
+            tr.style.height = '27px';
+            tr.querySelectorAll('td').forEach(cell => cell.style.height = '27px');
+            selectEl.style.color = '#ffffff';
+        } else if (val === 'فقدان') {
+            td.classList.add('status-cell-lost');
+            tr.style.height = '27px';
+            tr.querySelectorAll('td').forEach(cell => cell.style.height = '27px');
+            selectEl.style.color = '#ffffff';
+        }
     }
 
     function openWhatsAppChat(el) {
@@ -382,19 +397,27 @@
         list.innerHTML = logs.map(log => `<div class="activity-item">${log}</div>`).join('');
     }
 
+    // تحديث الإحصائيات مع الحساب الدقيق لقيمة فرص وعمليات الشهر الجاري بناء على التواريخ
     function updateStats() {
         const rows = document.querySelectorAll('#tableBody .main-row');
         const today = getTodayFormatted(), currentMonth = today.substring(0, 7);
         let total = rows.length, tDay = 0, tMonth = 0, valTotal = 0, valMonth = 0;
         rows.forEach(row => {
-            const dateInput = row.querySelector('.visit-date-val');
+            const visitDateInput = row.querySelector('.visit-date-val');
+            const expDateInput = row.querySelector('.expected-date-input');
             const oppValInput = row.querySelector('.opp-value-input');
             const oppVal = oppValInput ? parseFloat(oppValInput.value) || 0 : 0;
             valTotal += oppVal;
-            if(dateInput) {
-                const date = dateInput.value;
-                if (date === today) tDay++;
-                if (date.startsWith(currentMonth)) { tMonth++; valMonth += oppVal; }
+            
+            if (visitDateInput && visitDateInput.value === today) {
+                tDay++;
+            }
+            if (expDateInput) {
+                const expDate = expDateInput.value;
+                if (expDate && expDate.startsWith(currentMonth)) {
+                    tMonth++;
+                    valMonth += oppVal;
+                }
             }
         });
         document.getElementById('stat-total').innerText = total;
@@ -418,9 +441,11 @@
         });
     }
 
+    // إعادة فرز وترتيب الصفوف وتوليد الفواصل الزمنية وتمييز الفاصل الحالي بالبنفسجي
     function reorderRows() {
         const tbody = document.getElementById('tableBody');
         const rows = Array.from(tbody.querySelectorAll('.main-row'));
+        const today = getTodayFormatted(), currentMonth = today.substring(0, 7);
         const rowsData = rows.map(row => ({
             row: row,
             subRow: document.getElementById('sub-' + row.id),
@@ -440,7 +465,12 @@
         Object.keys(groups).sort((a, b) => b.localeCompare(a)).forEach(month => {
             const sepRow = document.createElement('tr');
             sepRow.className = 'month-separator';
-            sepRow.innerHTML = `<td colspan="14"><div class="sep-text">شهر ${month}</div></td>`;
+            
+            // التحقق البرمجي الدقيق لتمييز الشهر الجاري باللون البنفسجي
+            const isCurrentMonth = (month === currentMonth);
+            const sepStyle = isCurrentMonth ? 'background-color: #7c3aed !important; color: #ffffff !important;' : '';
+            
+            sepRow.innerHTML = `<td colspan="14"><div class="sep-text" style="${sepStyle}">شهر ${month}</div></td>`;
             tbody.appendChild(sepRow);
 
             groups[month].forEach(item => {
@@ -498,7 +528,7 @@
             <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الخدمة الحالية', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
             <td><input type="number" class="excel-input opp-value-input readonly-opp-val" value="${v.oppValue || ''}" readonly></td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notesJson.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
-            <td><select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الحالة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); updateStats(); reorderRows(); applyStatusCellColor(this);"><option value="" ${v.status === '' ? 'selected' : ''}></option><option value="مهتم" ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option><option value="تأجيل" ${v.status === 'تأجيل' ? 'selected' : ''}>تأجيل</option><option value="مكتمل" ${v.status === 'مكتمل' ? 'selected' : ''}>مكتمل</option><option value="فقدان" ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option></select></td>
+            <td><select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الحالة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); updateStats(); updateStatusStyle(this); reorderRows();"><option value="" ${v.status === '' ? 'selected' : ''}></option><option value="مهتم" ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option><option value="تأجيل" ${v.status === 'تأجيل' ? 'selected' : ''}>تأجيل</option><option value="مكتمل" ${v.status === 'مكتمل' ? 'selected' : ''}>مكتمل</option><option value="فقدان" ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option></select></td>
             <td><input type="date" class="excel-input expected-date-input" value="${v.expectedDate || today}" data-old="${v.expectedDate || today}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('التاريخ المتوقع', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); reorderRows();"></td>
             <td><input type="text" class="excel-input" value="${v.owner || 'أحمد'}" data-old="${v.owner || 'أحمد'}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المالك', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
         `;
@@ -507,11 +537,11 @@
         tbody.appendChild(mainRow);
         tbody.appendChild(subRow);
         
-        // تطبيق اللون عند التحميل
-        applyStatusCellColor(mainRow.querySelector('.status-select'));
-
         if (v.products && v.products.length > 0) v.products.forEach(p => addProductRow(rowId, p));
         else addProductRow(rowId);
+        
+        // تطبيق الأنماط لخلية الحالة بشكل فوري عند تحميل أو توليد الصف
+        updateStatusStyle(mainRow.querySelector('.status-select'));
         
         calculateOpportunityTotal(rowId);
         updateStats();
