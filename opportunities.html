@@ -82,6 +82,10 @@
         .status-cell-lost { background-color: #991b1b !important; }
         .status-cell-completed select option, .status-cell-lost select option { color: #1e293b !important; }
 
+        /* كلاس تصغير الخط درجة واحدة */
+        .row-small-text td { font-size: 9px !important; }
+        .row-small-text input, .row-small-text select, .row-small-text .notes-preview { font-size: 9.5px !important; }
+
         .month-separator { height: 35px; }
         .month-separator td { padding: 5px !important; border: none !important; }
         .sep-text { 
@@ -217,7 +221,6 @@
         .col-edit { width: 8%; } 
         .col-owner { width: 5%; }
         
-        /* تجميل خطوط مكتبة SweetAlert لتتناسب مع خط Cairo */
         div:where(.swal2-container) { font-family: 'Cairo', sans-serif !important; }
     </style>
 </head>
@@ -236,6 +239,15 @@
         <div class="action-bar">
             <div class="search-wrapper">
                 <input type="text" id="searchInput" class="search-input" placeholder="بحث 🔍" onkeyup="debouncedFilterTable()">
+            </div>
+            
+            <div class="search-wrapper" style="width: 12%; margin-right: 10px;">
+                <select id="statusFilter" class="search-input" onchange="debouncedFilterTable()" style="cursor: pointer;">
+                    <option value="">حالة الفرصة (الكل)</option>
+                    <option value="مهتم">مهتم</option>
+                    <option value="مكتمل">مكتمل</option>
+                    <option value="فقدان">فقدان</option>
+                </select>
             </div>
              
             <div class="stats-bar-visit">
@@ -318,6 +330,7 @@
         const tr = selectEl.closest('tr');
         
         td.classList.remove('status-cell-interested', 'status-cell-completed', 'status-cell-lost');
+        tr.classList.remove('row-small-text'); // إزالة كلاس تصغير الخط افتراضياً
         tr.style.height = '';
         tr.querySelectorAll('td').forEach(cell => cell.style.height = '');
         selectEl.style.color = '';
@@ -327,11 +340,13 @@
             td.classList.add('status-cell-interested');
         } else if (val === 'مكتمل') {
             td.classList.add('status-cell-completed');
+            tr.classList.add('row-small-text'); // إضافة تصغير الخط
             tr.style.height = '27px';
             tr.querySelectorAll('td').forEach(cell => cell.style.height = '27px');
             selectEl.style.color = '#ffffff';
         } else if (val === 'فقدان') {
             td.classList.add('status-cell-lost');
+            tr.classList.add('row-small-text'); // إضافة تصغير الخط
             tr.style.height = '27px';
             tr.querySelectorAll('td').forEach(cell => cell.style.height = '27px');
             selectEl.style.color = '#ffffff';
@@ -475,7 +490,6 @@
             groups[month].push(item);
         });
 
-        // استخدام DocumentFragment لتسريع ترتيب وعرض البيانات
         tbody.innerHTML = '';
         const fragment = document.createDocumentFragment();
 
@@ -536,17 +550,17 @@
 
         mainRow.innerHTML = `
             <td class="col-select"><input type="checkbox" class="select-check"><span class="toggle-arrow" onclick="toggleSubTable('${rowId}')">▶</span></td>
-            <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الشركة', this.dataset.old, this.value, this.value); saveAllDataSilently(); updateStats();"></td>
+            <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الشركة', this.dataset.old, this.value, this.value); saveAllDataSilently(); updateStats(); debouncedFilterTable();"></td>
             <td><input type="text" class="excel-input" value="${v.address || ''}" data-old="${v.address || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('العنوان', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المسؤول', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
-            <td><div class="phone-cell-container"><a class="whatsapp-icon-btn" onclick="openWhatsAppChat(this)" title="مراسلة"><i class="fa-brands fa-whatsapp"></i></a><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('رقم التواصل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></div></td>
-            <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الإيميل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
-            <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('السجل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
+            <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المسؤول', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); debouncedFilterTable();"></td>
+            <td><div class="phone-cell-container"><a class="whatsapp-icon-btn" onclick="openWhatsAppChat(this)" title="مراسلة"><i class="fa-brands fa-whatsapp"></i></a><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('رقم التواصل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); debouncedFilterTable();"></div></td>
+            <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الإيميل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); debouncedFilterTable();"></td>
+            <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, '')" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('السجل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); debouncedFilterTable();"></td>
             <td><input type="text" class="excel-input readonly-input" dir="ltr" value="${oppDate}" readonly style="color:#64748b; font-weight:700;"><input type="hidden" class="visit-date-val" value="${oppDate}"></td>
             <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الخدمة المقترحة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
             <td><input type="number" class="excel-input opp-value-input readonly-opp-val" value="${v.oppValue || ''}" readonly></td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notesJson.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
-            <td><select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الحالة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); updateStats(); updateStatusStyle(this); reorderRows();"><option value="" ${v.status === '' ? 'selected' : ''}></option><option value="مهتم" ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option><option value="مكتمل" ${v.status === 'مكتمل' ? 'selected' : ''}>مكتمل</option><option value="فقدان" ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option></select></td>
+            <td><select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('الحالة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); updateStats(); updateStatusStyle(this); reorderRows(); debouncedFilterTable();"><option value="" ${v.status === '' ? 'selected' : ''}></option><option value="مهتم" ${v.status === 'مهتم' ? 'selected' : ''}>مهتم</option><option value="مكتمل" ${v.status === 'مكتمل' ? 'selected' : ''}>مكتمل</option><option value="فقدان" ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option></select></td>
             <td><input type="date" class="excel-input expected-date-input" value="${v.expectedDate || today}" data-old="${v.expectedDate || today}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('التاريخ المتوقع', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently(); reorderRows();"></td>
             <td><input type="text" class="excel-input" value="${v.owner || 'أحمد'}" data-old="${v.owner || 'أحمد'}" onfocus="this.dataset.old=this.value" onchange="addToActivityLog('المالك', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); saveAllDataSilently();"></td>
         `;
@@ -587,7 +601,6 @@
         if(!isOpen) menu.classList.add('show');
     }
 
-    // دالة الإجراءات الجماعية باستخدام SweetAlert
     async function handleBulkAction(action) {
         const selected = document.querySelectorAll('.select-check:checked');
         if (selected.length === 0) {
@@ -656,7 +669,6 @@
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = "";
         
-        // التحميل في الذاكرة أولاً لسرعة الإدراج
         saved.forEach(v => renderRow(v)); 
         
         checkIncomingOpportunities();
@@ -665,20 +677,40 @@
         reorderRows();
     }
 
-    // دالة تأخير البحث لتحسين الأداء
     let searchTimeout;
     function debouncedFilterTable() {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(filterTable, 250);
     }
 
+    // دالة الفلترة المحدثة (تبحث في أعمدة محددة وتفلتر حسب الحالة)
     function filterTable() {
         const q = document.getElementById('searchInput').value.toLowerCase().trim();
+        const statusQ = document.getElementById('statusFilter').value;
+        
         document.querySelectorAll('.main-row').forEach(row => {
-            const rowText = row.innerText.toLowerCase();
             const subRow = document.getElementById('sub-' + row.id);
-            if (rowText.includes(q)) { row.style.display = 'table-row'; } 
-            else { row.style.display = 'none'; if(subRow) subRow.style.display = 'none'; }
+            
+            // جلب القيم من الأعمدة المطلوبة فقط (الشركة، المسؤول، رقم التواصل، الإيميل، السجل)
+            const comp = row.cells[1].querySelector('input').value.toLowerCase();
+            const mgr = row.cells[3].querySelector('input').value.toLowerCase();
+            const mob = row.cells[4].querySelector('input').value.toLowerCase();
+            const email = row.cells[5].querySelector('input').value.toLowerCase();
+            const record = row.cells[6].querySelector('input').value.toLowerCase();
+            
+            // التحقق من المطابقة النصية
+            const matchesText = comp.includes(q) || mgr.includes(q) || mob.includes(q) || email.includes(q) || record.includes(q);
+            
+            // التحقق من فلتر الحالة
+            const rowStatus = row.querySelector('.status-select').value;
+            const matchesStatus = statusQ === "" || rowStatus === statusQ;
+
+            if (matchesText && matchesStatus) { 
+                row.style.display = 'table-row'; 
+            } else { 
+                row.style.display = 'none'; 
+                if(subRow) subRow.style.display = 'none'; 
+            }
         });
     }
 
