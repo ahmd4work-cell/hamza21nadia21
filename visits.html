@@ -142,8 +142,6 @@
         }
         .arrow-open { transform: rotate(90deg); }
 
-        tbody tr.main-row:nth-child(4n+1) { background-color: #eff6ff; }
-
         .excel-input { 
             width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; 
             background: transparent; font-size: 10.5px; color: inherit; font-weight: inherit; 
@@ -481,7 +479,12 @@
             sepRow.innerHTML = `<td colspan="14"><div class="sep-text" style="${sepStyle}">زيارات شهر ${month}</div></td>`;
             fragment.appendChild(sepRow);
 
-            groups[month].forEach(item => {
+            groups[month].forEach((item, index) => {
+                if (index % 2 === 0) {
+                    item.row.style.backgroundColor = '#fef2f2'; // اللون الأحمر الفاتح جداً
+                } else {
+                    item.row.style.backgroundColor = ''; // بدون لون شفاف
+                }
                 fragment.appendChild(item.row);
                 if(item.subRow) fragment.appendChild(item.subRow);
             });
@@ -493,6 +496,7 @@
     function insertNewRow() {
         renderRow({}, true);
         saveAllDataSilently();
+        reorderRows();
     }
 
     function renderRow(v = {}, prepend = false) {
