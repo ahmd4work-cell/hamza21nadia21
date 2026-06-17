@@ -82,7 +82,6 @@
         .status-cell-lost { background-color: #991b1b !important; }
         .status-cell-completed select option, .status-cell-lost select option { color: #1e293b !important; }
 
-        /* كلاس تصغير الخط درجة واحدة */
         .row-small-text td { font-size: 9px !important; }
         .row-small-text input, .row-small-text select, .row-small-text .notes-preview { font-size: 9.5px !important; }
 
@@ -144,7 +143,8 @@
         }
         .arrow-open { transform: rotate(90deg); }
 
-        tbody tr.main-row:nth-child(4n+1) { background-color: #eff6ff; }
+        /* تغيير لون الصفوف المتبادلة ليكون أصفر خفيف جداً لامع */
+        tbody tr.main-row:nth-child(4n+1) { background-color: #fffde7; }
 
         .excel-input { 
             width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; 
@@ -241,7 +241,7 @@
                 <input type="text" id="searchInput" class="search-input" placeholder="بحث 🔍" onkeyup="debouncedFilterTable()">
             </div>
             
-            <div class="search-wrapper" style="width: 12%; margin-right: 10px;">
+            <div class="search-wrapper" style="width: 9.5%; margin-right: 10px;">
                 <select id="statusFilter" class="search-input" onchange="debouncedFilterTable()" style="cursor: pointer;">
                     <option value="">حالة الفرصة (الكل)</option>
                     <option value="مهتم">مهتم</option>
@@ -330,7 +330,7 @@
         const tr = selectEl.closest('tr');
         
         td.classList.remove('status-cell-interested', 'status-cell-completed', 'status-cell-lost');
-        tr.classList.remove('row-small-text'); // إزالة كلاس تصغير الخط افتراضياً
+        tr.classList.remove('row-small-text'); 
         tr.style.height = '';
         tr.querySelectorAll('td').forEach(cell => cell.style.height = '');
         selectEl.style.color = '';
@@ -340,13 +340,13 @@
             td.classList.add('status-cell-interested');
         } else if (val === 'مكتمل') {
             td.classList.add('status-cell-completed');
-            tr.classList.add('row-small-text'); // إضافة تصغير الخط
+            tr.classList.add('row-small-text'); 
             tr.style.height = '27px';
             tr.querySelectorAll('td').forEach(cell => cell.style.height = '27px');
             selectEl.style.color = '#ffffff';
         } else if (val === 'فقدان') {
             td.classList.add('status-cell-lost');
-            tr.classList.add('row-small-text'); // إضافة تصغير الخط
+            tr.classList.add('row-small-text'); 
             tr.style.height = '27px';
             tr.querySelectorAll('td').forEach(cell => cell.style.height = '27px');
             selectEl.style.color = '#ffffff';
@@ -683,7 +683,6 @@
         searchTimeout = setTimeout(filterTable, 250);
     }
 
-    // دالة الفلترة المحدثة (تبحث في أعمدة محددة وتفلتر حسب الحالة)
     function filterTable() {
         const q = document.getElementById('searchInput').value.toLowerCase().trim();
         const statusQ = document.getElementById('statusFilter').value;
@@ -691,17 +690,14 @@
         document.querySelectorAll('.main-row').forEach(row => {
             const subRow = document.getElementById('sub-' + row.id);
             
-            // جلب القيم من الأعمدة المطلوبة فقط (الشركة، المسؤول، رقم التواصل، الإيميل، السجل)
             const comp = row.cells[1].querySelector('input').value.toLowerCase();
             const mgr = row.cells[3].querySelector('input').value.toLowerCase();
             const mob = row.cells[4].querySelector('input').value.toLowerCase();
             const email = row.cells[5].querySelector('input').value.toLowerCase();
             const record = row.cells[6].querySelector('input').value.toLowerCase();
             
-            // التحقق من المطابقة النصية
             const matchesText = comp.includes(q) || mgr.includes(q) || mob.includes(q) || email.includes(q) || record.includes(q);
             
-            // التحقق من فلتر الحالة
             const rowStatus = row.querySelector('.status-select').value;
             const matchesStatus = statusQ === "" || rowStatus === statusQ;
 
