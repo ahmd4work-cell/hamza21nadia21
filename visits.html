@@ -83,6 +83,16 @@
         .status-yellow { background-color: #fef08a !important; color: #854d0e !important; font-weight: 800 !important; }
         .status-red { background-color: #fca5a5 !important; color: #991b1b !important; font-weight: 800 !important; }
 
+        /* تأثير حالة فقدان لتصغير الصف والخط */
+        .lost-row td {
+            height: 27px !important;
+            max-height: 27px !important;
+            font-size: 9px !important;
+        }
+        .lost-row .excel-input {
+            font-size: 9.5px !important;
+        }
+
         /* فاصل الشهور */
         .month-separator { height: 35px; }
         .month-separator td { padding: 5px !important; border: none !important; }
@@ -141,6 +151,8 @@
             font-weight: bold;
         }
         .arrow-open { transform: rotate(90deg); }
+
+        tbody tr.main-row:nth-child(4n+1) { background-color: #eff6ff; }
 
         .excel-input { 
             width: 95%; border: none; text-align: center; font-family: 'Cairo'; outline: none; 
@@ -307,7 +319,7 @@
 
 <script>
     let currentActivePreview = null;
-    const STORAGE_KEY = 'asgate_visits_final_v31'; // محفوظاتك القديمة ستعمل بدون مشاكل
+    const STORAGE_KEY = 'asgate_visits_final_v31'; 
     const LOGS_KEY = 'asgate_visits_logs_v32';
     const OPPORTUNITIES_KEY = 'asgate_opportunities_final_v31'; 
 
@@ -391,7 +403,6 @@
         const list = document.getElementById('activityList');
         const logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
         list.innerHTML = logs.map(log => {
-            // توافق مع السجلات القديمة إذا وجدت
             if(log.includes('||')) {
                 const parts = log.split('||');
                 return `<div class="activity-item"><span style="color: #b45309; font-weight: 800;">${parts[0]} &nbsp;&nbsp;</span><span style="color: #2563eb; font-weight: 700;">${parts[2]}</span></div>`;
@@ -430,10 +441,12 @@
     function applyStatusColor(selectEl) {
         const val = selectEl.value;
         const parentCell = selectEl.closest('td');
+        const mainRow = selectEl.closest('.main-row');
         if (!parentCell) return;
         
         parentCell.classList.remove('status-yellow', 'status-red');
         selectEl.classList.remove('status-yellow', 'status-red');
+        if (mainRow) mainRow.classList.remove('lost-row');
 
         if (val === "عرض سعر") {
             parentCell.classList.add('status-yellow');
@@ -441,10 +454,10 @@
         } else if (val === "فقدان") {
             parentCell.classList.add('status-red');
             selectEl.classList.add('status-red');
+            if (mainRow) mainRow.classList.add('lost-row');
         }
     }
 
-    // ترتيب الصفوف وفواصل الشهور
     function reorderRows() {
         const tbody = document.getElementById('tableBody');
         const rows = Array.from(tbody.querySelectorAll('.main-row'));
@@ -456,7 +469,6 @@
             date: row.querySelector('.visit-date-val').value || '9999-12-31'
         }));
 
-        // الترتيب من الأحدث للأقدم بناءً على تاريخ الزيارة
         rowsData.sort((a, b) => b.date.localeCompare(a.date));
 
         const groups = {};
@@ -479,12 +491,7 @@
             sepRow.innerHTML = `<td colspan="14"><div class="sep-text" style="${sepStyle}">زيارات شهر ${month}</div></td>`;
             fragment.appendChild(sepRow);
 
-            groups[month].forEach((item, index) => {
-                if (index % 2 === 0) {
-                    item.row.style.backgroundColor = '#fef2f2'; // اللون الأحمر الفاتح جداً
-                } else {
-                    item.row.style.backgroundColor = ''; // بدون لون شفاف
-                }
+            groups[month].forEach(item => {
                 fragment.appendChild(item.row);
                 if(item.subRow) fragment.appendChild(item.subRow);
             });
@@ -496,7 +503,6 @@
     function insertNewRow() {
         renderRow({}, true);
         saveAllDataSilently();
-        reorderRows();
     }
 
     function renderRow(v = {}, prepend = false) {
@@ -779,7 +785,6 @@
             const arr = JSON.parse(jsonStr); 
             return arr.length > 0 ? arr[arr.length - 1].text : 'أضف ملاحظة...'; 
         } catch(e) { 
-            // توافق مع النظام القديم
             if(jsonStr && typeof jsonStr === 'string' && jsonStr.trim() !== "") {
                 const parts = jsonStr.split('\n--------------------\n'); 
                 const last = parts[parts.length - 1]; 
@@ -797,7 +802,6 @@
         try { 
             arr = JSON.parse(raw); 
         } catch(e) { 
-            // تحويل البيانات القديمة لعرضها في الشكل الجديد
             arr = [];
             if(raw.trim() !== "") {
                 raw.split('\n--------------------\n').forEach(entry => {
@@ -819,11 +823,10 @@
     function saveNote() {
         const txt = document.getElementById('modalTextArea').value.trim();
         if (txt && currentActivePreview) {
-            const raw = currentActivePreview.getAttribute('data-full-notes') || "[]";
+            const raw = currentActivePreview.getAttribute('data-full-notes'] || "[]";
             let arr = []; 
             try { arr = JSON.parse(raw); } 
             catch(e) { 
-                // توافق مع القديم وحفظه بالشكل الجديد لتنظيم البيانات
                 arr = [];
                 if(raw.trim() !== "") {
                     raw.split('\n--------------------\n').forEach(entry => {
