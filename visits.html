@@ -823,7 +823,7 @@
     function saveNote() {
         const txt = document.getElementById('modalTextArea').value.trim();
         if (txt && currentActivePreview) {
-            const raw = currentActivePreview.getAttribute('data-full-notes'] || "[]";
+            const raw = currentActivePreview.getAttribute('data-full-notes') || "[]";
             let arr = []; 
             try { arr = JSON.parse(raw); } 
             catch(e) { 
