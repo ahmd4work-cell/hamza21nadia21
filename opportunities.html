@@ -6,6 +6,7 @@
     <title>ASGate - الفرص البيعية</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
             --nav-shiny-navy: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
@@ -198,7 +199,6 @@
         .chat-msg-text { font-size: 10px; color: #1e293b; font-weight: 700; line-height: 1.5; display: block; width: 100%; text-align: right; white-space: pre-wrap; }
         .note-area { height: 95px; width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; font-family: 'Cairo'; resize: none; outline: none; font-size: 10.5px; text-align: right; box-sizing: border-box; direction: rtl; }
 
-        /* كلاسات تغيير لون خط التاريخ المتوقع */
         .text-warning-yellow { color: #d97706 !important; font-weight: 900 !important; background-color: transparent !important; }
         .text-danger-red { color: #dc2626 !important; font-weight: 900 !important; background-color: transparent !important; }
 
@@ -216,6 +216,9 @@
         .col-status { width: 6%; }
         .col-edit { width: 8%; } 
         .col-owner { width: 5%; }
+        
+        /* تجميل خطوط مكتبة SweetAlert لتتناسب مع خط Cairo */
+        div:where(.swal2-container) { font-family: 'Cairo', sans-serif !important; }
     </style>
 </head>
 <body onload="loadSavedData()">
@@ -232,7 +235,7 @@
     <div class="main-content">
         <div class="action-bar">
             <div class="search-wrapper">
-                <input type="text" id="searchInput" class="search-input" placeholder="بحث 🔍" onkeyup="filterTable()">
+                <input type="text" id="searchInput" class="search-input" placeholder="بحث 🔍" onkeyup="debouncedFilterTable()">
             </div>
              
             <div class="stats-bar-visit">
@@ -353,7 +356,10 @@
     function openWhatsAppChat(el) {
         const inputEl = el.closest('.phone-cell-container').querySelector('input');
         let rawPhone = inputEl.value.trim();
-        if (!rawPhone) { alert("يرجى إدخال رقم الجوال أولاً"); return; }
+        if (!rawPhone) { 
+            Swal.fire({icon: 'warning', title: 'تنبيه', text: 'يرجى إدخال رقم الجوال أولاً', confirmButtonText: 'حسناً', confirmButtonColor: '#3b82f6'});
+            return; 
+        }
         let cleanNumber = rawPhone.replace(/\D/g, '');
         if (cleanNumber.startsWith('00966')) cleanNumber = cleanNumber.substring(2);
         else if (cleanNumber.startsWith('05')) cleanNumber = '966' + cleanNumber.substring(1);
@@ -423,7 +429,6 @@
         document.getElementById('stat-value-month').innerText = valMonth.toLocaleString();
     }
 
-    // دالة تغيير لون خط التاريخ المتوقع بذكاء بناءً على الموعد
     function applyDateAlerts() {
         const todayStr = getTodayFormatted();
         const t1 = new Date(todayStr + "T00:00:00").getTime();
@@ -470,7 +475,10 @@
             groups[month].push(item);
         });
 
+        // استخدام DocumentFragment لتسريع ترتيب وعرض البيانات
         tbody.innerHTML = '';
+        const fragment = document.createDocumentFragment();
+
         Object.keys(groups).sort((a, b) => b.localeCompare(a)).forEach(month => {
             const sepRow = document.createElement('tr');
             sepRow.className = 'month-separator';
@@ -479,13 +487,15 @@
             const sepStyle = isCurrentMonth ? 'background-color: #7c3aed !important; color: #ffffff !important;' : '';
             
             sepRow.innerHTML = `<td colspan="14"><div class="sep-text" style="${sepStyle}">شهر ${month}</div></td>`;
-            tbody.appendChild(sepRow);
+            fragment.appendChild(sepRow);
 
             groups[month].forEach(item => {
-                tbody.appendChild(item.row);
-                if(item.subRow) tbody.appendChild(item.subRow);
+                fragment.appendChild(item.row);
+                if(item.subRow) fragment.appendChild(item.subRow);
             });
         });
+        
+        tbody.appendChild(fragment);
         applyDateAlerts();
     }
 
@@ -551,8 +561,6 @@
         else addProductRow(rowId);
         
         calculateOpportunityTotal(rowId);
-        updateStats();
-        reorderRows();
     }
 
     function toggleSubTable(rowId) {
@@ -579,15 +587,43 @@
         if(!isOpen) menu.classList.add('show');
     }
 
-    function handleBulkAction(action) {
+    // دالة الإجراءات الجماعية باستخدام SweetAlert
+    async function handleBulkAction(action) {
         const selected = document.querySelectorAll('.select-check:checked');
-        if (selected.length === 0) return alert('حدد صفاً أولاً');
-        if (action === 'حذف' && confirm('تأكيد الحذف؟')) {
-            selected.forEach(chk => { const row = chk.closest('tr'); const id = row.id; const companyName = row.cells[1].querySelector('input').value; addToActivityLog('إجراء', 'حذف الفرصة البيعية', '', companyName); row.remove(); if(document.getElementById('sub-' + id)) document.getElementById('sub-' + id).remove(); });
-            saveAllDataSilently(); updateStats();
+        if (selected.length === 0) {
+            Swal.fire({icon: 'info', text: 'يرجى تحديد صف واحد على الأقل أولاً', confirmButtonText: 'حسناً', confirmButtonColor: '#3b82f6'});
+            return;
+        }
+        if (action === 'حذف') {
+            const result = await Swal.fire({
+                title: 'تأكيد الحذف؟',
+                text: "لن تتمكن من التراجع عن هذا الإجراء!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#94a3b8',
+                confirmButtonText: 'نعم، احذف',
+                cancelButtonText: 'إلغاء'
+            });
+            if (result.isConfirmed) {
+                selected.forEach(chk => { 
+                    const row = chk.closest('tr'); 
+                    const id = row.id; 
+                    const companyName = row.cells[1].querySelector('input').value; 
+                    addToActivityLog('إجراء', 'حذف الفرصة البيعية', '', companyName); 
+                    row.remove(); 
+                    if(document.getElementById('sub-' + id)) document.getElementById('sub-' + id).remove(); 
+                });
+                saveAllDataSilently(); updateStats();
+                Swal.fire({icon: 'success', title: 'تم الحذف', showConfirmButton: false, timer: 1500});
+            }
         } else {
-            selected.forEach(chk => { const row = chk.closest('tr'); const companyName = row.cells[1].querySelector('input').value; addToActivityLog('إجراء', action, '', companyName); });
-            alert('تم تنفيذ ' + action + ' على ' + selected.length + ' من الصفوف');
+            selected.forEach(chk => { 
+                const row = chk.closest('tr'); 
+                const companyName = row.cells[1].querySelector('input').value; 
+                addToActivityLog('إجراء', action, '', companyName); 
+            });
+            Swal.fire({icon: 'success', title: 'تم الإجراء', text: 'تم تنفيذ ' + action + ' على ' + selected.length + ' من الصفوف', showConfirmButton: false, timer: 2000});
         }
     }
 
@@ -619,11 +655,21 @@
         const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = "";
-        saved.forEach(v => renderRow(v));
+        
+        // التحميل في الذاكرة أولاً لسرعة الإدراج
+        saved.forEach(v => renderRow(v)); 
+        
         checkIncomingOpportunities();
         renderActivityLog();
         updateStats();
         reorderRows();
+    }
+
+    // دالة تأخير البحث لتحسين الأداء
+    let searchTimeout;
+    function debouncedFilterTable() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(filterTable, 250);
     }
 
     function filterTable() {
