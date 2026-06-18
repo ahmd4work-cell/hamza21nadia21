@@ -76,6 +76,7 @@
         .table-wrapper { 
             background: white; border-radius: 10px; overflow-y: auto; border: 1px solid var(--border-soft); 
             flex: 1; min-height: 0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); position: relative;
+            scroll-behavior: smooth;
         }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         
@@ -85,7 +86,7 @@
             letter-spacing: 0.3px;
         }
         
-        /* توحيد لون الصفوف وتأثير التمرير */
+        /* توحيد لون الصفوف وتأثير التمرير (كما في الزيارات تماماً) */
         tbody tr.main-row td { background-color: #ffffff; border-bottom: 1px solid #f1f5f9; text-align: center; height: 37px; max-height: 37px; font-size: 10.5px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; transition: background-color 0.2s; }
         tbody tr.main-row:hover td { background-color: #f1f5f9; cursor: default; }
 
@@ -101,12 +102,14 @@
             outline: none; cursor: pointer; transition: 0.2s; border-radius: 0; margin: 0;
         }
         
-        /* ألوان قائمة الحالة بناءً على التحديد */
         .status-cell-interested .status-select { color: #1e293b; }
         .status-cell-completed .status-select, .status-cell-lost .status-select { color: #ffffff; }
         .status-cell-completed .status-select option, .status-cell-lost .status-select option { color: #1e293b !important; background: #fff; }
 
-        /* تأثير التمرير للمربعات في عمود الخدمة المقترحة */
+        .row-small-text td { font-size: 9px !important; }
+        .row-small-text input, .row-small-text select, .row-small-text .notes-preview { font-size: 9.5px !important; }
+
+        /* تأثير التمرير للمربعات في عمود الخدمة المقترحة (تماماً ككود الزيارات) */
         .cur-serv-val { 
             transition: all 0.2s ease; border-radius: 6px; 
         }
@@ -119,9 +122,6 @@
             position: relative;
             cursor: pointer;
         }
-
-        .row-small-text td { font-size: 9px !important; }
-        .row-small-text input, .row-small-text select, .row-small-text .notes-preview { font-size: 9.5px !important; }
 
         .month-separator { height: 38px; }
         .month-separator td { padding: 5px !important; border: none !important; background: #fff !important; }
@@ -363,7 +363,6 @@
         }, 600);
     }
 
-    // التحكم بلون وارتفاع خلية الحالة وتصغير الخط
     function updateStatusStyle(selectEl) {
         if (!selectEl) return;
         const td = selectEl.parentElement;
@@ -548,6 +547,8 @@
             const isCurrentMonth = (month === currentMonth);
             const sepStyle = isCurrentMonth ? 'background-color: var(--header-shiny-purple) !important; color: #ffffff !important; box-shadow: 0 2px 4px rgba(76,29,149,0.3);' : '';
             
+            if (isCurrentMonth) sepRow.id = 'current-month-separator'; 
+
             sepRow.innerHTML = `<td colspan="14"><div class="sep-text" style="${sepStyle}"><i class="far fa-calendar-alt"></i> الاستهداف لشهر ${month}</div></td>`;
             fragment.appendChild(sepRow);
 
@@ -591,7 +592,7 @@
             <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.dataset.old=this.value" onkeyup="debouncedSaveAllData();" onblur="addToActivityLog('الإيميل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); this.dataset.old=this.value;"></td>
             <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, ''); debouncedSaveAllData();" onfocus="this.dataset.old=this.value" onblur="addToActivityLog('السجل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); this.dataset.old=this.value;"></td>
             <td><input type="text" class="excel-input readonly-input" dir="ltr" value="${oppDate}" readonly style="color:var(--text-muted); font-weight:700;"><input type="hidden" class="visit-date-val" value="${oppDate}"></td>
-            <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.dataset.old=this.value" onkeyup="debouncedSaveAllData();" onblur="addToActivityLog('الخدمة المقترحة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); this.dataset.old=this.value;"></td>
+            <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.dataset.old=this.value" onkeyup="debouncedSaveAllData();" onblur="addToActivityLog('الخدمة المقترحة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); this.dataset.old=this.value;" onmouseenter="showStatusTooltip(this)" onmouseleave="hideStatusTooltip()"></td>
             <td><input type="number" class="excel-input opp-value-input readonly-input" value="${v.oppValue || ''}" readonly style="color:var(--accent-blue); font-weight:800; cursor:not-allowed; background: transparent;"></td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notesJson.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
             <td>
@@ -811,107 +812,119 @@
         }
         checkIncomingOpportunities();
         renderActivityLog(); updateStats(); reorderRows();
+        
+        // خاصية القفز التلقائي والانزلاق الذكي لشهر الاستهداف الحالي
+        setTimeout(() => {
+            const currentMonthSep = document.getElementById('current-month-separator');
+            const tableWrapper = document.querySelector('.table-wrapper');
+            if (currentMonthSep && tableWrapper) {
+                tableWrapper.scrollTo({
+                    top: currentMonthSep.offsetTop,
+                    behavior: 'smooth'
+                });
+            }
+        }, 400);
     }
 
     let searchTimeout;
     function debouncedFilterTable() { clearTimeout(searchTimeout); searchTimeout = setTimeout(filterTable, 300); }
 
     function filterTable() {
-        const query = document.getElementById('searchInput').value.toLowerCase();
-        const statusVal = document.getElementById('statusFilter').value;
+        const q = document.getElementById('searchInput').value.toLowerCase().trim();
+        const statusQ = document.getElementById('statusFilter').value;
+        
         document.querySelectorAll('.main-row').forEach(row => {
-            const txt = row.innerText.toLowerCase();
-            const rowStatus = row.querySelector('.status-select').value;
-            const matchQuery = txt.includes(query);
-            const matchStatus = statusVal === "" || rowStatus === statusVal;
-            const match = matchQuery && matchStatus;
+            const comp = row.cells[1].querySelector('input').value.toLowerCase();
+            const mgr = row.cells[3].querySelector('input').value.toLowerCase();
+            const mob = row.cells[4].querySelector('input').value.toLowerCase();
+            const email = row.cells[5].querySelector('input').value.toLowerCase();
+            const record = row.cells[6].querySelector('input').value.toLowerCase();
+            const subRow = document.getElementById('sub-' + row.id);
             
-            row.style.display = match ? '' : 'none';
-            const sub = document.getElementById('sub-' + row.id);
-            if (sub && !match) {
-                sub.style.display = 'none';
-                row.querySelector('.toggle-arrow').classList.remove('arrow-open');
-                row.querySelector('.toggle-arrow').innerHTML = '<i class="fas fa-caret-left"></i>';
+            const matchesText = comp.includes(q) || mgr.includes(q) || mob.includes(q) || email.includes(q) || record.includes(q);
+            const rowStatus = row.querySelector('.status-select').value;
+            const matchesStatus = statusQ === "" || rowStatus === statusQ;
+
+            if (matchesText && matchesStatus) { 
+                row.style.display = 'table-row'; 
+            } else { 
+                row.style.display = 'none'; 
+                if(subRow) subRow.style.display = 'none'; 
             }
         });
-        document.querySelectorAll('.month-separator').forEach(sep => {
-            let nxt = sep.nextElementSibling; let hasVis = false;
-            while(nxt && nxt.classList.contains('main-row')) { if(nxt.style.display !== 'none') { hasVis = true; break; } nxt = nxt.nextElementSibling; if(nxt && nxt.classList.contains('sub-table-row')) nxt = nxt.nextElementSibling; }
-            sep.style.display = hasVis ? '' : 'none';
-        });
     }
 
-    function openNote(previewEl) {
-        currentActivePreview = previewEl;
-        const modal = document.getElementById('noteModal');
-        const historyLog = document.getElementById('historyLog');
-        const notesJson = previewEl.getAttribute('data-full-notes') || "[]";
-        
-        let notesArr = [];
-        try { notesArr = JSON.parse(notesJson); } catch(e) { notesArr = []; }
-
-        historyLog.innerHTML = '';
-        if(notesArr.length === 0) {
-            historyLog.innerHTML = '<div style="text-align:center; color:#94a3b8; margin-top:20px; font-size:11px;">لا توجد ملاحظات سابقة لهذه الفرصة</div>';
-        } else {
-            notesArr.forEach(noteObj => {
-                historyLog.innerHTML += `<div class="chat-msg-block"><div class="chat-msg-header"><span><i class="fas fa-user-circle"></i> ${noteObj.user}</span><span style="color:#64748b; font-size:9px;">${noteObj.timestamp}</span></div><div class="chat-msg-text">${noteObj.text}</div></div>`;
-            });
+    function showStatusTooltip(el) {
+        const val = el.value || "فارغ";
+        let tooltip = document.getElementById('status-custom-tooltip');
+        if(!tooltip) {
+            tooltip = document.createElement('div');
+            tooltip.id = 'status-custom-tooltip';
+            tooltip.style.position = 'absolute';
+            tooltip.style.background = '#1e293b';
+            tooltip.style.color = '#fff';
+            tooltip.style.padding = '5px 10px';
+            tooltip.style.borderRadius = '4px';
+            tooltip.style.fontSize = '11px';
+            tooltip.style.fontFamily = 'Cairo';
+            tooltip.style.zIndex = '3000';
+            tooltip.style.pointerEvents = 'none';
+            tooltip.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+            tooltip.style.display = 'none';
+            document.body.appendChild(tooltip);
         }
+        tooltip.innerText = val;
+        tooltip.style.display = 'block';
         
-        document.getElementById('modalTextArea').value = '';
-        modal.style.display = 'flex';
-        setTimeout(() => { historyLog.scrollTop = historyLog.scrollHeight; document.getElementById('modalTextArea').focus(); }, 100);
+        const rect = el.getBoundingClientRect();
+        tooltip.style.top = (rect.top + window.scrollY - tooltip.offsetHeight - 6) + 'px';
+        tooltip.style.left = (rect.left + window.scrollX + (rect.width/2) - (tooltip.offsetWidth/2)) + 'px';
     }
 
-    function closeNote() { document.getElementById('noteModal').style.display = 'none'; currentActivePreview = null; }
-
-    function saveNote() {
-        if (!currentActivePreview) return;
-        const newText = document.getElementById('modalTextArea').value.trim();
-        if (!newText) { closeNote(); return; }
-
-        const notesJson = currentActivePreview.getAttribute('data-full-notes') || "[]";
-        let notesArr = [];
-        try { notesArr = JSON.parse(notesJson); } catch(e) { notesArr = []; }
-
-        const d = new Date();
-        const timestamp = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${getTimeFormatted()}`;
-        
-        const tr = currentActivePreview.closest('tr');
-        const ownerName = tr.cells[13].querySelector('input').value || 'أحمد';
-        const companyName = tr.cells[1].querySelector('input').value || 'شركة غير محددة';
-
-        notesArr.push({ user: ownerName, timestamp: timestamp, text: newText });
-        
-        const updatedJson = JSON.stringify(notesArr);
-        currentActivePreview.setAttribute('data-full-notes', updatedJson);
-        currentActivePreview.innerText = getLastNoteOnlyFromJSON(updatedJson);
-        
-        addToActivityLog('الملاحظات', '', `إضافة ملاحظة جديدة`, companyName);
-        debouncedSaveAllData();
-        closeNote();
+    function hideStatusTooltip() {
+        const tooltip = document.getElementById('status-custom-tooltip');
+        if(tooltip) tooltip.style.display = 'none';
     }
 
     function getLastNoteOnlyFromJSON(jsonStr) {
-        try {
-            const arr = JSON.parse(jsonStr);
-            if (Array.isArray(arr) && arr.length > 0) {
-                const lastNote = arr[arr.length - 1].text;
-                return lastNote.length > 30 ? lastNote.substring(0, 30) + '...' : lastNote;
-            }
-        } catch(e) {}
-        return 'إضافة أو عرض الملاحظات...';
-    }
-
-    window.onclick = function(event) {
-        const modal = document.getElementById('noteModal');
-        if (event.target === modal) closeNote();
-        
-        if (!event.target.matches('.btn-bulk-trigger') && !event.target.closest('.bulk-action-wrapper')) {
-            document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
+        try { const arr = JSON.parse(jsonStr); return arr.length > 0 ? arr[arr.length - 1].text : 'تحديث المتابعة...'; } 
+        catch(e) { 
+            if(jsonStr && typeof jsonStr === 'string' && jsonStr.trim() !== "") { const parts = jsonStr.split('\n--------------------\n'); const last = parts[parts.length - 1]; if(last.includes('||')) return last.split('||')[1] || ""; return last; }
+            return 'تحديث المتابعة...'; 
         }
     }
+
+    function openNote(el) {
+        currentActivePreview = el; const raw = el.getAttribute('data-full-notes') || "[]"; let arr = []; 
+        try { arr = JSON.parse(raw); } 
+        catch(e) { 
+            arr = [];
+            if(raw.trim() !== "") { raw.split('\n--------------------\n').forEach(entry => { if(entry.includes('||')) { const parts = entry.split('||'); arr.push({user: "النظام", date: "", time: "", text: parts[1]}); } else { arr.push({user: "النظام", date: "", time: "", text: entry}); } }); }
+        }
+        let htmlContent = arr.map(msg => `<div class="chat-msg-block"><span class="chat-msg-header"><span><i class="fas fa-user-circle"></i> ${msg.user}</span> <span style="font-weight: 600; color:#94a3b8; font-size:9px;">${msg.date} ${msg.time}</span></span><span class="chat-msg-text">${msg.text}</span></div>`).join('');
+        document.getElementById('historyLog').innerHTML = htmlContent;
+        document.getElementById('noteModal').style.display = "flex";
+        document.getElementById('modalTextArea').focus();
+    }
+
+    function saveNote() {
+        const txt = document.getElementById('modalTextArea').value.trim();
+        if (txt && currentActivePreview) {
+            const raw = currentActivePreview.getAttribute('data-full-notes') || "[]"; let arr = []; 
+            try { arr = JSON.parse(raw); } catch(e) { arr = []; }
+            const d = new Date();
+            arr.push({ user: document.querySelector('.main-row').cells[13].querySelector('input').value || "المستخدم", date: getTodayFormatted(), time: getTimeFormatted(), text: txt });
+            currentActivePreview.setAttribute('data-full-notes', JSON.stringify(arr));
+            currentActivePreview.innerText = txt;
+            saveAllDataSilently();
+        }
+        closeNote();
+    }
+
+    function closeNote() { document.getElementById('noteModal').style.display = "none"; document.getElementById('modalTextArea').value = ""; }
+
+    window.onclick = (e) => { if (!e.target.matches('.btn-bulk-trigger') && !e.target.matches('.fa-chevron-down')) document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show')); };
 </script>
+
 </body>
 </html>
