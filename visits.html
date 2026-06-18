@@ -95,8 +95,9 @@
         /* تأثير التمرير على الصفوف (Hover) */
         tbody tr.main-row:hover td { background-color: #f1f5f9; }
 
-        .status-yellow { background-color: #fef08a !important; color: #854d0e !important; font-weight: 800 !important; }
-        .status-red { background-color: #fca5a5 !important; color: #991b1b !important; font-weight: 800 !important; }
+        /* تخصيص الألوان والحواف للحالة */
+        .status-yellow { background-color: #fef08a !important; color: #854d0e !important; font-weight: 800 !important; border-radius: 4px !important; }
+        .status-red { background-color: #991b1b !important; color: #ffffff !important; font-weight: 800 !important; border-radius: 4px !important; }
 
         .lost-row td { height: 28px !important; max-height: 28px !important; font-size: 9.5px !important; opacity: 0.8; }
         .lost-row .excel-input { font-size: 10px !important; }
@@ -463,9 +464,9 @@
         if (mainRow) mainRow.classList.remove('lost-row');
 
         if (val === "عرض سعر") {
-            parentCell.classList.add('status-yellow'); selectEl.classList.add('status-yellow');
+            selectEl.classList.add('status-yellow');
         } else if (val === "فقدان") {
-            parentCell.classList.add('status-red'); selectEl.classList.add('status-red');
+            selectEl.classList.add('status-red');
             if (mainRow) mainRow.classList.add('lost-row');
         }
     }
@@ -537,7 +538,7 @@
             <td><input type="number" class="excel-input opp-value-input readonly-input" value="${v.oppValue || ''}" readonly style="color:var(--accent-blue); font-weight:800; cursor:not-allowed; background: transparent;"></td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notesJson.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
             <td>
-                <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.dataset.old=this.value" onchange="handleStatusChange(this, '${rowId}')">
+                <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.dataset.old=this.value" onchange="handleStatusChange(this, '${rowId}')" onmouseenter="showStatusTooltip(this)" onmouseleave="hideStatusTooltip()">
                     <option value="" ${v.status === '' ? 'selected' : ''}>-</option>
                     <option value="تأهيل لفرصة" ${v.status === 'تأهيل لفرصة' ? 'selected' : ''}>تأهيل لفرصة</option>
                     <option value="عرض سعر" ${v.status === 'عرض سعر' ? 'selected' : ''}>عرض سعر</option>
@@ -780,11 +781,44 @@
             const comp = row.cells[1].querySelector('input').value.toLowerCase();
             const mgr = row.cells[3].querySelector('input').value.toLowerCase();
             const mob = row.cells[4].querySelector('input').value.toLowerCase();
+            const email = row.cells[5].querySelector('input').value.toLowerCase();
             const record = row.cells[6].querySelector('input').value.toLowerCase();
             const subRow = document.getElementById('sub-' + row.id);
-            if (comp.includes(q) || mgr.includes(q) || mob.includes(q) || record.includes(q)) { row.style.display = 'table-row'; } 
+            if (comp.includes(q) || mgr.includes(q) || mob.includes(q) || email.includes(q) || record.includes(q)) { row.style.display = 'table-row'; } 
             else { row.style.display = 'none'; if(subRow) subRow.style.display = 'none'; }
         });
+    }
+
+    function showStatusTooltip(el) {
+        const val = el.value || "بدون حالة";
+        let tooltip = document.getElementById('status-custom-tooltip');
+        if(!tooltip) {
+            tooltip = document.createElement('div');
+            tooltip.id = 'status-custom-tooltip';
+            tooltip.style.position = 'absolute';
+            tooltip.style.background = '#1e293b';
+            tooltip.style.color = '#fff';
+            tooltip.style.padding = '5px 10px';
+            tooltip.style.borderRadius = '4px';
+            tooltip.style.fontSize = '11px';
+            tooltip.style.fontFamily = 'Cairo';
+            tooltip.style.zIndex = '3000';
+            tooltip.style.pointerEvents = 'none';
+            tooltip.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+            tooltip.style.display = 'none';
+            document.body.appendChild(tooltip);
+        }
+        tooltip.innerText = val;
+        tooltip.style.display = 'block';
+        
+        const rect = el.getBoundingClientRect();
+        tooltip.style.top = (rect.top + window.scrollY - tooltip.offsetHeight - 6) + 'px';
+        tooltip.style.left = (rect.left + window.scrollX + (rect.width/2) - (tooltip.offsetWidth/2)) + 'px';
+    }
+
+    function hideStatusTooltip() {
+        const tooltip = document.getElementById('status-custom-tooltip');
+        if(tooltip) tooltip.style.display = 'none';
     }
 
     function getLastNoteOnlyFromJSON(jsonStr) {
