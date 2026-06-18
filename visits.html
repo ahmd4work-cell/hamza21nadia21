@@ -13,12 +13,12 @@
             --header-shiny-purple: linear-gradient(180deg, #4c1d95 0%, #2e1065 100%);
             --nav-bg: #0f172a;
             --nav-active: #a78bfa;
-            --bg-color: #f8fafc; /* لون خلفية أهدأ وأكثر احترافية */
+            --bg-color: #f8fafc;
             --white: #ffffff;
             --accent-blue: #3b82f6;
             --accent-blue-hover: #2563eb;
             --accent-green-active: #22c55e;
-            --border-soft: #e2e8f0; /* حدود أنعم */
+            --border-soft: #e2e8f0;
             --text-dark: #0f172a;
             --text-muted: #64748b;
         }
@@ -326,14 +326,13 @@
     const LOGS_KEY = 'asgate_visits_logs_v32';
     const OPPORTUNITIES_KEY = 'asgate_opportunities_final_v31'; 
 
-    /* === دالة الحفظ الذكية (Debounce) لتحسين الأداء === */
     let saveTimeout;
     function debouncedSaveAllData() {
         clearTimeout(saveTimeout);
         saveTimeout = setTimeout(() => {
             saveAllDataSilently();
             updateStats();
-        }, 600); // ينتظر 600 جزء من الثانية بعد التوقف عن الكتابة قبل الحفظ
+        }, 600);
     }
 
     function getTodayFormatted() {
@@ -396,7 +395,7 @@
     }
 
     function addToActivityLog(fieldName, oldVal, newVal, companyName) {
-        if (oldVal === newVal) return; // منع تسجيل النشاط إذا لم يتغير شيء فعلياً
+        if (oldVal === newVal) return; 
         
         const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
         const d = new Date();
@@ -418,7 +417,7 @@
         const list = document.getElementById('activityList');
         const logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
         list.innerHTML = logs.map(log => {
-            if(log.includes('||')) { // للتوافق مع البيانات القديمة
+            if(log.includes('||')) { 
                 const parts = log.split('||');
                 return `<div class="activity-item"><span style="color: #94a3b8; font-size: 9px;">${parts[0]}</span> &nbsp;|&nbsp; <span>${parts[2]}</span></div>`;
             }
@@ -506,7 +505,7 @@
     function insertNewRow() {
         renderRow({}, true);
         saveAllDataSilently();
-        document.querySelector('.table-wrapper').scrollTop = 0; // رفع التمرير لأعلى لرؤية الصف الجديد
+        document.querySelector('.table-wrapper').scrollTop = 0; 
     }
 
     function renderRow(v = {}, prepend = false) {
@@ -521,7 +520,6 @@
         const lastNoteText = getLastNoteOnlyFromJSON(notesJson);
         const editDateHTML = parseEditDateHTML(v.editDate || '');
 
-        // تم استبدال saveAllDataSilently() بـ debouncedSaveAllData() داخل الأحداث
         mainRow.innerHTML = `
             <td class="col-select"><input type="checkbox" class="select-check"><span class="toggle-arrow" onclick="toggleSubTable('${rowId}')"><i class="fas fa-caret-left"></i></span></td>
             <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.dataset.old=this.value" onkeyup="updateEditDateField(this.closest('tr')); debouncedSaveAllData();" onblur="addToActivityLog('الشركة', this.dataset.old, this.value, this.value); this.dataset.old=this.value;"></td>
@@ -633,17 +631,116 @@
 
     async function handleBulkAction(action) {
         const selected = document.querySelectorAll('.select-check:checked');
-        if (selected.length === 0) { Swal.fire({icon: 'info', text: 'يرجى تحديد صف واحد على الأقل', confirmButtonText: 'حسناً', confirmButtonColor: '#3b82f6'}); return; }
+        if (selected.length === 0) { 
+            Swal.fire({icon: 'info', text: 'يرجى تحديد صف واحد على الأقل', confirmButtonText: 'حسناً', confirmButtonColor: '#3b82f6'}); 
+            return; 
+        }
+        
         if (action === 'حذف') {
             const result = await Swal.fire({ title: 'تأكيد الحذف؟', text: "سيتم حذف الزيارات المحددة نهائياً!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#94a3b8', confirmButtonText: 'نعم، احذف', cancelButtonText: 'إلغاء' });
             if (result.isConfirmed) {
                 selected.forEach(chk => { const row = chk.closest('tr'); const id = row.id; addToActivityLog('إجراء', 'حذف الزيارة', '', row.cells[1].querySelector('input').value); row.remove(); if(document.getElementById('sub-' + id)) document.getElementById('sub-' + id).remove(); });
                 saveAllDataSilently(); updateStats(); reorderRows(); Swal.fire({icon: 'success', title: 'تم الحذف', showConfirmButton: false, timer: 1500});
             }
+        } else if (action === 'تصدير') {
+            exportToExcel(selected);
+            addToActivityLog('إجراء', 'تصدير بيانات للإكسيل', '', 'مجموعة محددة');
+        } else if (action === 'طباعة') {
+            printSelected(selected);
+            addToActivityLog('إجراء', 'طباعة بيانات', '', 'مجموعة محددة');
         } else { 
             selected.forEach(chk => { const row = chk.closest('tr'); addToActivityLog('إجراء', action, '', row.cells[1].querySelector('input').value); });
             Swal.fire({icon: 'success', title: 'تم', text: 'تم تنفيذ الإجراء على ' + selected.length + ' صف', showConfirmButton: false, timer: 1500});
         }
+    }
+
+    function exportToExcel(selectedRows) {
+        let csvContent = "\uFEFF"; 
+        csvContent += "الشركة,العنوان,المسؤول,رقم التواصل,الإيميل,السجل,تاريخ الزيارة,الخدمة,القيمة,الحالة,المالك\n";
+        
+        selectedRows.forEach(chk => {
+            const row = chk.closest('tr');
+            const getVal = (index) => {
+                const input = row.cells[index].querySelector('input, select');
+                let val = input ? input.value.replace(/"/g, '""') : '';
+                return `"${val}"`; 
+            };
+            
+            const rowData = [
+                getVal(1), getVal(2), getVal(3), getVal(4), getVal(5), 
+                getVal(6), getVal(7), getVal(8), getVal(9), getVal(11), getVal(13)
+            ];
+            csvContent += rowData.join(",") + "\n";
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", "تقرير_الزيارات_" + getTodayFormatted() + ".csv");
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function printSelected(selectedRows) {
+        let printWindow = window.open('', '_blank');
+        let html = `
+            <html dir="rtl">
+            <head>
+                <title>تقرير الزيارات المحددة</title>
+                <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+                <style>
+                    body { font-family: 'Cairo', sans-serif; padding: 20px; color: #0f172a; }
+                    h2 { text-align: center; color: #4c1d95; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+                    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+                    th { background-color: #f1f5f9; color: #1e293b; padding: 10px; border: 1px solid #cbd5e1; font-weight: 700; }
+                    td { padding: 8px; border: 1px solid #cbd5e1; text-align: center; }
+                    tr:nth-child(even) { background-color: #f8fafc; }
+                    .footer { margin-top: 30px; text-align: left; font-size: 10px; color: #64748b; }
+                </style>
+            </head>
+            <body>
+                <h2>تقرير الزيارات (ASGate CRM)</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الشركة</th><th>المسؤول</th><th>رقم التواصل</th>
+                            <th>الخدمة</th><th>تاريخ الزيارة</th><th>الحالة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        selectedRows.forEach(chk => {
+            const row = chk.closest('tr');
+            const getVal = (index) => row.cells[index].querySelector('input, select')?.value || '';
+            html += `<tr>
+                <td><strong>${getVal(1)}</strong></td>
+                <td>${getVal(3)}</td>
+                <td dir="ltr">${getVal(4)}</td>
+                <td>${getVal(8)}</td>
+                <td>${getVal(7)}</td>
+                <td>${getVal(11)}</td>
+            </tr>`;
+        });
+
+        html += `
+                    </tbody>
+                </table>
+                <div class="footer">تاريخ الطباعة: ${getTodayFormatted()} - تم الإنشاء بواسطة نظام ASGate</div>
+            </body>
+            </html>
+        `;
+
+        printWindow.document.write(html);
+        printWindow.document.close();
+        
+        setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+        }, 500);
     }
 
     function saveAllDataSilently() {
