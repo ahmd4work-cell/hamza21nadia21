@@ -1,0 +1,25 @@
+/* التنسيقات العامة والخطوط */
+:root {
+    --nav-shiny-navy: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+    --header-shiny-purple: linear-gradient(180deg, #4c1d95 0%, #2e1065 100%);
+    --bg-color: #f8fafc;
+    --accent-blue: #3b82f6;
+    --border-soft: #e2e8f0;
+    --text-dark: #0f172a;
+}
+
+body { font-family: 'Cairo', sans-serif; background-color: var(--bg-color); margin: 0; }
+
+/* القائمة العلوية الموحدة */
+.navbar { 
+    background: var(--nav-shiny-navy); display: flex; align-items: center; padding: 0 20px; 
+    margin: 10px 10px 5px 10px; border-radius: 10px; height: 45px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.navbar a { color: white; padding: 0 15px; text-decoration: none; font-weight: 700; font-size: 12px; }
+.navbar a.active { background-color: #a78bfa; color: #0f172a; border-radius: 6px; }
+
+/* تنسيقات الجدول العامة */
+.table-wrapper { background: white; border-radius: 10px; border: 1px solid var(--border-soft); margin: 15px; }
+table { width: 100%; border-collapse: collapse; }
+th { background: var(--header-shiny-purple); color: white; padding: 10px; font-size: 12px; }
