@@ -57,7 +57,7 @@
 
         .search-wrapper { position: relative; width: 20%; display: flex; align-items: center; }
         .search-input {
-            width: 100%; height: 38px; padding: 0 12px 0 30px; border-radius: 8px;
+            width: 100%; height: 38px; padding: 0 10px; border-radius: 8px;
             border: 1px solid var(--border-soft); background: #fff;
             font-family: 'Cairo'; font-size: 11.5px; font-weight: 600; outline: none;
             transition: 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.02);
@@ -248,8 +248,7 @@
         <div class="action-bar">
             <button class="btn-top btn-add" onclick="insertNewRow()"><i class="fas fa-plus"></i> إضافة زيارة جديدة</button>
             <div class="search-wrapper">
-                <i class="fas fa-search" style="position: absolute; right: 12px; color: #94a3b8; font-size: 13px;"></i>
-                <input type="text" id="searchInput" class="search-input" placeholder="البحث في الزيارات..." onkeyup="debouncedFilterTable()">
+                <input type="text" id="searchInput" class="search-input" placeholder="بحث 🔍" onkeyup="debouncedFilterTable()">
             </div>
             
             <div class="stats-bar-visit">
@@ -258,6 +257,7 @@
                 <div class="stat-item">اليوم: <span id="stat-today" class="stat-val">0</span></div>
                 <div class="stat-divider">|</div>
                 <div class="stat-item">القيمة الإجمالية: <span id="stat-value-total" class="stat-val" style="color: #059669; background: #ecfdf5;">0</span></div>
+                <div class="stat-item">قيمة الشهر: <span id="stat-value-month" class="stat-val" style="color: #059669; background: #ecfdf5;">0</span></div>
             </div>
 
             <div class="bulk-action-wrapper">
@@ -430,7 +430,7 @@
         const today = getTodayFormatted();
         const currentMonth = today.substring(0, 7);
         let total = rows.length, tDay = 0, tMonth = 0;
-        let valTotal = 0;
+        let valTotal = 0, valMonth = 0;
         rows.forEach(row => {
             const dateInput = row.querySelector('.visit-date-val');
             const visitValInput = row.querySelector('.opp-value-input');
@@ -439,13 +439,17 @@
             if(dateInput) {
                 const date = dateInput.value;
                 if (date === today) tDay++;
-                if (date.startsWith(currentMonth)) tMonth++;
+                if (date.startsWith(currentMonth)) {
+                    tMonth++;
+                    valMonth += visitVal;
+                }
             }
         });
         document.getElementById('stat-total').innerText = total;
         document.getElementById('stat-today').innerText = tDay;
         document.getElementById('stat-month').innerText = tMonth;
         document.getElementById('stat-value-total').innerText = valTotal.toLocaleString() + ' ر.س';
+        document.getElementById('stat-value-month').innerText = valMonth.toLocaleString() + ' ر.س';
     }
 
     function applyStatusColor(selectEl) {
