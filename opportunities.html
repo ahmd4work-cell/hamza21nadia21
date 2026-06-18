@@ -50,10 +50,6 @@
         .main-content { flex: 1; display: flex; flex-direction: column; padding: 0 15px 10px 15px; min-height: 0; gap: 8px; }
         
         .action-bar { display: flex; align-items: center; gap: 12px; flex-shrink: 0; margin-top: 5px; }
-        
-        .btn-top { border: none; padding: 0 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: 800; cursor: pointer; color: white; transition: all 0.2s; font-size: 12px; height: 38px; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3); }
-        .btn-add { background-color: var(--accent-blue); }
-        .btn-add:hover { background-color: var(--accent-blue-hover); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(59, 130, 246, 0.4); }
 
         .search-wrapper { position: relative; width: 20%; display: flex; align-items: center; }
         .search-input {
@@ -248,7 +244,6 @@
 
     <div class="main-content">
         <div class="action-bar">
-            <button class="btn-top btn-add" onclick="insertNewRow()"><i class="fas fa-plus"></i> إضافة فرصة جديدة</button>
             <div class="search-wrapper">
                 <input type="text" id="searchInput" class="search-input" placeholder="بحث في الفرص 🔍" onkeyup="debouncedFilterTable()">
             </div>
@@ -507,12 +502,6 @@
         });
         
         tbody.appendChild(fragment);
-    }
-
-    function insertNewRow() {
-        renderRow({}, true);
-        saveAllDataSilently();
-        document.querySelector('.table-wrapper').scrollTop = 0; 
     }
 
     function renderRow(v = {}, prepend = false) {
