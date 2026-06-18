@@ -23,7 +23,6 @@
             --text-muted: #64748b;
         }
 
-        /* --- تخصيص شريط التمرير (Scrollbar) --- */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -86,19 +85,16 @@
             letter-spacing: 0.3px;
         }
         
-        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 38px; max-height: 38px; font-size: 10.5px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; transition: background-color 0.2s; }
+        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 37px; max-height: 37px; font-size: 10.5px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; transition: background-color 0.2s; }
 
-        /* تأثير التمرير على الصفوف (Hover) */
-        tbody tr.main-row:hover td { background-color: #f1f5f9; }
+        /* كلاسات التحكم الحصري في لون خلية الحالة وتصغير الخط */
+        .status-cell-interested { background-color: #fef08a !important; }
+        .status-cell-completed { background-color: #22c55e !important; }
+        .status-cell-lost { background-color: #991b1b !important; }
+        .status-cell-completed select option, .status-cell-lost select option { color: #1e293b !important; }
 
-        /* تخصيص الألوان والحواف للحالة */
-        .status-yellow { background-color: #fef08a !important; color: #854d0e !important; font-weight: 800 !important; border-radius: 4px !important; }
-        .status-green { background-color: #dcfce7 !important; color: #16a34a !important; font-weight: 800 !important; border-radius: 4px !important; }
-        .status-red { background-color: #991b1b !important; color: #ffffff !important; font-weight: 800 !important; border-radius: 4px !important; }
-
-        .lost-row td { height: 28px !important; max-height: 28px !important; font-size: 9.5px !important; opacity: 0.5; }
-        .lost-row .excel-input { font-size: 10px !important; }
-        .lost-row:hover td { opacity: 1; }
+        .row-small-text td { font-size: 9px !important; }
+        .row-small-text input, .row-small-text select, .row-small-text .notes-preview { font-size: 9.5px !important; }
 
         .month-separator { height: 38px; }
         .month-separator td { padding: 5px !important; border: none !important; background: #fff !important; }
@@ -146,7 +142,8 @@
         .toggle-arrow:hover { color: var(--accent-blue); background: #e0f2fe; }
         .arrow-open { transform: rotate(90deg); color: var(--accent-blue); background: #e0f2fe; }
 
-        tbody tr.main-row:nth-child(4n+1) { background-color: #fafafa; }
+        /* صف متبادل باللون الأصفر الخفيف جداً */
+        tbody tr.main-row:nth-child(4n+1) { background-color: #fffde7; }
 
         .excel-input { 
             width: 96%; border: 1px solid transparent; border-radius: 4px; text-align: center; font-family: 'Cairo'; outline: none; 
@@ -156,9 +153,9 @@
         .excel-input:focus { border-color: var(--accent-blue); background: #fff; box-shadow: 0 0 0 2px rgba(59,130,246,0.1); }
         .readonly-input:focus { border-color: transparent; background: transparent; box-shadow: none; }
 
-        .edit-date-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; line-height: 1.3; }
-        .edit-date-d { font-size: 10.5px; font-weight: 700; color: var(--text-dark); }
-        .edit-date-t { font-size: 9px; font-weight: 700; color: var(--text-muted); }
+        /* تنبيهات التواريخ المتوقعة */
+        .text-warning-yellow { color: #d97706 !important; font-weight: 900 !important; background-color: transparent !important; }
+        .text-danger-red { color: #dc2626 !important; font-weight: 900 !important; background-color: transparent !important; }
 
         .select-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent-blue); vertical-align: middle; margin-left: 4px; }
 
@@ -225,7 +222,7 @@
         .col-val { width: 6%; } 
         .col-notes { width: 9%; } 
         .col-status { width: 7%; }
-        .col-edit { width: 6%; } 
+        .col-edit { width: 8%; } 
         .col-owner { width: 5%; }
         
         div:where(.swal2-container) { font-family: 'Cairo', sans-serif !important; }
@@ -248,12 +245,21 @@
                 <input type="text" id="searchInput" class="search-input" placeholder="بحث في الفرص 🔍" onkeyup="debouncedFilterTable()">
             </div>
             
+            <div class="search-wrapper" style="width: 9.5%;">
+                <select id="statusFilter" class="search-input" onchange="debouncedFilterTable()" style="cursor: pointer;">
+                    <option value="">حالة الفرصة (الكل)</option>
+                    <option value="مهتم">مهتم</option>
+                    <option value="مغلق رابح">مغلق رابح</option>
+                    <option value="مغلق خاسر">مغلق خاسر</option>
+                </select>
+            </div>
+             
             <div class="stats-bar-visit">
                 <div class="stat-item">الفرص: <span id="stat-total" class="stat-val">0</span></div>
                 <div class="stat-item">هذا الشهر: <span id="stat-month" class="stat-val">0</span></div>
                 <div class="stat-item">اليوم: <span id="stat-today" class="stat-val">0</span></div>
                 <div class="stat-divider">|</div>
-                <div class="stat-item">القيمة الإجمالية للفرص: <span id="stat-value-total" class="stat-val" style="color: #1e3a8a; background: #eff6ff;">0</span></div>
+                <div class="stat-item">القيمة الإجمالية: <span id="stat-value-total" class="stat-val" style="color: #1e3a8a; background: #eff6ff;">0</span></div>
                 <div class="stat-item">فرص الشهر: <span id="stat-value-month" class="stat-val" style="color: #1e3a8a; background: #eff6ff;">0</span></div>
             </div>
 
@@ -280,12 +286,12 @@
                         <th class="col-mobile">رقم التواصل</th>
                         <th class="col-email">الإيميل</th>
                         <th class="col-record">السجل</th>
-                        <th class="col-date">تاريخ الفرصة</th>
-                        <th class="col-service">الخدمة المتوقعة</th>
-                        <th class="col-val">القيمة المتوقعة</th>
-                        <th class="col-notes">الملاحظات</th>
-                        <th class="col-status">حالة الفرصة</th>
-                        <th class="col-edit">آخر تعديل</th>
+                        <th class="col-date">تاريخ الزيارة الأصلية</th>
+                        <th class="col-service">الخدمة المقترحة</th>
+                        <th class="col-val">قيمة الفرصة</th>
+                        <th class="col-notes">ملاحظات الفرصة</th>
+                        <th class="col-status">الحالة</th>
+                        <th class="col-edit">التاريخ المتوقع</th>
                         <th class="col-owner">المالك</th>
                     </tr>
                 </thead>
@@ -319,8 +325,11 @@
 
 <script>
     let currentActivePreview = null;
-    const STORAGE_KEY = 'asgate_opportunities_final_v31'; 
-    const LOGS_KEY = 'asgate_opportunities_logs_v32';
+    
+    // إرجاع مفاتيح التخزين الصحيحة لظهور الفرص المحفوظة
+    const STORAGE_KEY = 'asgate_opportunities_final_v33'; 
+    const LOGS_KEY = 'asgate_opportunities_logs_v33';
+    const INCOMING_KEY = 'asgate_opportunities_final_v31'; 
 
     let saveTimeout;
     function debouncedSaveAllData() {
@@ -331,9 +340,44 @@
         }, 600);
     }
 
+    // دالة التحكم الحصري والكامل في لون وارتفاع خلية الحالة وتصغير الخط
+    function updateStatusStyle(selectEl) {
+        if (!selectEl) return;
+        const td = selectEl.parentElement;
+        const tr = selectEl.closest('tr');
+        
+        td.classList.remove('status-cell-interested', 'status-cell-completed', 'status-cell-lost');
+        tr.classList.remove('row-small-text'); 
+        tr.style.height = '';
+        tr.querySelectorAll('td').forEach(cell => cell.style.height = '');
+        selectEl.style.color = '';
+
+        const val = selectEl.value;
+        if (val === 'مهتم') {
+            td.classList.add('status-cell-interested');
+        } else if (val === 'مغلق رابح') {
+            td.classList.add('status-cell-completed');
+            tr.classList.add('row-small-text'); 
+            tr.style.height = '27px';
+            tr.querySelectorAll('td').forEach(cell => cell.style.height = '27px');
+            selectEl.style.color = '#ffffff';
+        } else if (val === 'مغلق خاسر') {
+            td.classList.add('status-cell-lost');
+            tr.classList.add('row-small-text'); 
+            tr.style.height = '27px';
+            tr.querySelectorAll('td').forEach(cell => cell.style.height = '27px');
+            selectEl.style.color = '#ffffff';
+        }
+    }
+
     function getTodayFormatted() {
         const d = new Date();
         return d.toISOString().split('T')[0];
+    }
+
+    function standardizeDate(d) {
+        if (!d) return getTodayFormatted();
+        return d.replace(/\//g, '-');
     }
 
     function getTimeFormatted() {
@@ -370,26 +414,6 @@
         }
     }
 
-    function updateEditDateField(row) {
-        if (!row) return;
-        const d = new Date();
-        const dateFormatted = d.toISOString().split('T')[0];
-        const time24 = getTimeFormatted();
-        const fullDateTime = `${dateFormatted} ${time24}`;
-        const container = row.querySelector('.edit-date-container');
-        const hiddenInput = row.querySelector('.edit-date-val');
-        if (container) {
-            container.innerHTML = `<span class="edit-date-d">${dateFormatted}</span><span class="edit-date-t">${time24}</span>`;
-        }
-        if (hiddenInput) hiddenInput.value = fullDateTime;
-    }
-
-    function parseEditDateHTML(fullDateTime) {
-        if (!fullDateTime || !fullDateTime.includes(' ')) return `<span class="edit-date-d">${fullDateTime || ''}</span><span class="edit-date-t"></span>`;
-        const parts = fullDateTime.split(' ');
-        return `<span class="edit-date-d">${parts[0]}</span><span class="edit-date-t">${parts[1]}</span>`;
-    }
-
     function addToActivityLog(fieldName, oldVal, newVal, companyName) {
         if (oldVal === newVal) return; 
         
@@ -400,7 +424,7 @@
         const v1 = (oldVal && oldVal.toString().trim() !== "") ? oldVal : "فارغ";
         const v2 = (newVal && newVal.toString().trim() !== "") ? newVal : "فارغ";
         
-        let actionText = (fieldName === "إجراء") ? `${oldVal} لفرصة شركة ( ${cleanCompany} )` : `تعديل ${fieldName} من [${v1}] إلى [${v2}] لفرصة العميل ( ${cleanCompany} )`;
+        let actionText = (fieldName === "إجراء") ? `${oldVal} لفرصة شركة ( ${cleanCompany} )` : `تغيير ${fieldName} من [${v1}] إلى [${v2}] للفرصة ( ${cleanCompany} )`;
         const fullLogHTML = `<span style="color: #64748b; font-size: 9px;"><i class="fas fa-clock"></i> ${days[d.getDay()]} ${yyyy}-${mm}-${dd} ${getTimeFormatted()}</span> &nbsp;|&nbsp; <span style="color: #0f172a; font-weight: 700;">${actionText}</span>`;
         
         let logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
@@ -423,19 +447,21 @@
 
     function updateStats() {
         const rows = document.querySelectorAll('#tableBody .main-row');
-        const today = getTodayFormatted();
-        const currentMonth = today.substring(0, 7);
-        let total = rows.length, tDay = 0, tMonth = 0;
-        let valTotal = 0, valMonth = 0;
+        const today = getTodayFormatted(), currentMonth = today.substring(0, 7);
+        let total = rows.length, tDay = 0, tMonth = 0, valTotal = 0, valMonth = 0;
         rows.forEach(row => {
-            const dateInput = row.querySelector('.opp-date-val');
+            const visitDateInput = row.querySelector('.visit-date-val');
+            const expDateInput = row.querySelector('.expected-date-input');
             const oppValInput = row.querySelector('.opp-value-input');
             const oppVal = oppValInput ? parseFloat(oppValInput.value) || 0 : 0;
             valTotal += oppVal;
-            if(dateInput) {
-                const date = dateInput.value;
-                if (date === today) tDay++;
-                if (date.startsWith(currentMonth)) {
+            
+            if (visitDateInput && visitDateInput.value === today) {
+                tDay++;
+            }
+            if (expDateInput) {
+                const expDate = expDateInput.value;
+                if (expDate && expDate.startsWith(currentMonth)) {
                     tMonth++;
                     valMonth += oppVal;
                 }
@@ -448,24 +474,31 @@
         document.getElementById('stat-value-month').innerText = valMonth.toLocaleString() + ' ر.س';
     }
 
-    function applyStatusColor(selectEl) {
-        const val = selectEl.value;
-        const parentCell = selectEl.closest('td');
-        const mainRow = selectEl.closest('.main-row');
-        if (!parentCell) return;
-        
-        parentCell.classList.remove('status-yellow', 'status-green', 'status-red');
-        selectEl.classList.remove('status-yellow', 'status-green', 'status-red');
-        if (mainRow) mainRow.classList.remove('lost-row');
+    function applyDateAlerts() {
+        const todayStr = getTodayFormatted();
+        const t1 = new Date(todayStr + "T00:00:00").getTime();
 
-        if (val === "تقديم عرض" || val === "مفاوضات") {
-            selectEl.classList.add('status-yellow');
-        } else if (val === "مغلق رابح") {
-            selectEl.classList.add('status-green');
-        } else if (val === "مغلق خاسر") {
-            selectEl.classList.add('status-red');
-            if (mainRow) mainRow.classList.add('lost-row');
-        }
+        document.querySelectorAll('.main-row').forEach(row => {
+            const dateInput = row.querySelector('.expected-date-input');
+            const statusSelect = row.querySelector('.status-select');
+            if (!dateInput || !statusSelect) return;
+
+            const targetDateStr = dateInput.value;
+            const currentStatus = statusSelect.value;
+
+            dateInput.classList.remove('text-warning-yellow', 'text-danger-red');
+
+            if (currentStatus === 'مغلق رابح' || currentStatus === 'مغلق خاسر' || !targetDateStr) return;
+
+            const t2 = new Date(targetDateStr + "T00:00:00").getTime();
+            const diffDays = Math.round((t2 - t1) / (1000 * 60 * 60 * 24));
+
+            if (diffDays <= 0) {
+                dateInput.classList.add('text-danger-red');
+            } else if (diffDays === 2 || diffDays === 3) {
+                dateInput.classList.add('text-warning-yellow');
+            }
+        });
     }
 
     function reorderRows() {
@@ -475,7 +508,7 @@
         
         const rowsData = rows.map(row => ({
             row: row, subRow: document.getElementById('sub-' + row.id),
-            date: row.querySelector('.opp-date-val').value || '9999-12-31'
+            date: row.querySelector('.expected-date-input').value || '9999-12-31'
         }));
 
         rowsData.sort((a, b) => b.date.localeCompare(a.date));
@@ -493,15 +526,29 @@
         Object.keys(groups).sort((a, b) => b.localeCompare(a)).forEach(month => {
             const sepRow = document.createElement('tr'); sepRow.className = 'month-separator';
             const isCurrentMonth = (month === currentMonth);
-            const sepStyle = isCurrentMonth ? 'background-color: var(--accent-blue) !important; color: #ffffff !important; box-shadow: 0 2px 4px rgba(59,130,246,0.3);' : '';
+            const sepStyle = isCurrentMonth ? 'background-color: var(--header-shiny-purple) !important; color: #ffffff !important; box-shadow: 0 2px 4px rgba(76,29,149,0.3);' : '';
             
-            sepRow.innerHTML = `<td colspan="14"><div class="sep-text" style="${sepStyle}"><i class="far fa-calendar-alt"></i> فرص شهر ${month}</div></td>`;
+            sepRow.innerHTML = `<td colspan="14"><div class="sep-text" style="${sepStyle}"><i class="far fa-calendar-alt"></i> الاستهداف لشهر ${month}</div></td>`;
             fragment.appendChild(sepRow);
 
             groups[month].forEach(item => { fragment.appendChild(item.row); if(item.subRow) fragment.appendChild(item.subRow); });
         });
         
         tbody.appendChild(fragment);
+        applyDateAlerts();
+    }
+
+    function calculateOpportunityTotal(rowId) {
+        const subRow = document.getElementById('sub-' + rowId); if (!subRow) return;
+        let grandTotal = 0;
+        subRow.querySelectorAll('.product-body tr').forEach(pRow => {
+            const qtyInput = pRow.querySelector('.prod-qty'), subInput = pRow.querySelector('.prod-sub'), totalInput = pRow.querySelector('.prod-total');
+            let qty = parseFloat(qtyInput.value) || 0, sub = parseFloat(subInput.value) || 0;
+            const rowTotal = qty * sub; totalInput.value = rowTotal > 0 ? rowTotal : ''; grandTotal += rowTotal;
+        });
+        const mainRow = document.getElementById(rowId);
+        if (mainRow) { const oppValueInput = mainRow.querySelector('.opp-value-input'); if (oppValueInput) oppValueInput.value = grandTotal > 0 ? grandTotal : ''; }
+        debouncedSaveAllData();
     }
 
     function renderRow(v = {}, prepend = false) {
@@ -511,58 +558,62 @@
         const subRow = document.createElement('tr'); subRow.className = 'sub-table-row'; subRow.id = 'sub-' + rowId;
 
         const today = getTodayFormatted();
-        const oppDate = v.oppDate || today;
+        const oppDate = standardizeDate(v.oppDate || today);
         const notesJson = v.notes || "[]";
         const lastNoteText = getLastNoteOnlyFromJSON(notesJson);
-        const editDateHTML = parseEditDateHTML(v.editDate || '');
 
         mainRow.innerHTML = `
             <td class="col-select"><input type="checkbox" class="select-check"><span class="toggle-arrow" onclick="toggleSubTable('${rowId}')"><i class="fas fa-caret-left"></i></span></td>
-            <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.dataset.old=this.value" onkeyup="updateEditDateField(this.closest('tr')); debouncedSaveAllData();" onblur="addToActivityLog('الشركة', this.dataset.old, this.value, this.value); this.dataset.old=this.value;"></td>
-            <td><input type="text" class="excel-input" value="${v.address || ''}" data-old="${v.address || ''}" onfocus="this.dataset.old=this.value" onkeyup="updateEditDateField(this.closest('tr')); debouncedSaveAllData();" onblur="addToActivityLog('العنوان', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); this.dataset.old=this.value;"></td>
-            <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.dataset.old=this.value" onkeyup="updateEditDateField(this.closest('tr')); debouncedSaveAllData();" onblur="addToActivityLog('المسؤول', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); this.dataset.old=this.value;"></td>
-            <td><div class="phone-cell-container"><a class="whatsapp-icon-btn" onclick="openWhatsAppChat(this)" title="مراسلة عبر واتساب"><i class="fa-brands fa-whatsapp"></i></a><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, ''); debouncedSaveAllData();" onfocus="this.dataset.old=this.value" onkeyup="updateEditDateField(this.closest('tr'));" onblur="addToActivityLog('رقم التواصل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); this.dataset.old=this.value;"></div></td>
-            <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.dataset.old=this.value" onkeyup="updateEditDateField(this.closest('tr')); debouncedSaveAllData();" onblur="addToActivityLog('الإيميل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); this.dataset.old=this.value;"></td>
-            <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, ''); debouncedSaveAllData();" onfocus="this.dataset.old=this.value" onkeyup="updateEditDateField(this.closest('tr'));" onblur="addToActivityLog('السجل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); this.dataset.old=this.value;"></td>
-            <td><input type="text" class="excel-input readonly-input" value="${oppDate}" style="color:var(--text-muted); font-weight:700;" readonly><input type="hidden" class="opp-date-val" value="${oppDate}"></td>
-            <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.dataset.old=this.value" onkeyup="updateEditDateField(this.closest('tr')); debouncedSaveAllData();" onblur="addToActivityLog('الخدمة المتوقعة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); this.dataset.old=this.value;" onmouseenter="showStatusTooltip(this)" onmouseleave="hideStatusTooltip()"></td>
+            <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.dataset.old=this.value" onkeyup="debouncedSaveAllData();" onblur="addToActivityLog('الشركة', this.dataset.old, this.value, this.value); this.dataset.old=this.value;"></td>
+            <td><input type="text" class="excel-input" value="${v.address || ''}" data-old="${v.address || ''}" onfocus="this.dataset.old=this.value" onkeyup="debouncedSaveAllData();" onblur="addToActivityLog('العنوان', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); this.dataset.old=this.value;"></td>
+            <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.dataset.old=this.value" onkeyup="debouncedSaveAllData();" onblur="addToActivityLog('المسؤول', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); this.dataset.old=this.value;"></td>
+            <td><div class="phone-cell-container"><a class="whatsapp-icon-btn" onclick="openWhatsAppChat(this)" title="مراسلة عبر واتساب"><i class="fa-brands fa-whatsapp"></i></a><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, ''); debouncedSaveAllData();" onfocus="this.dataset.old=this.value" onblur="addToActivityLog('رقم التواصل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); this.dataset.old=this.value;"></div></td>
+            <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.dataset.old=this.value" onkeyup="debouncedSaveAllData();" onblur="addToActivityLog('الإيميل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); this.dataset.old=this.value;"></td>
+            <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, ''); debouncedSaveAllData();" onfocus="this.dataset.old=this.value" onblur="addToActivityLog('السجل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); this.dataset.old=this.value;"></td>
+            <td><input type="text" class="excel-input readonly-input" dir="ltr" value="${oppDate}" readonly style="color:var(--text-muted); font-weight:700;"><input type="hidden" class="visit-date-val" value="${oppDate}"></td>
+            <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.dataset.old=this.value" onkeyup="debouncedSaveAllData();" onblur="addToActivityLog('الخدمة المقترحة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); this.dataset.old=this.value;"></td>
             <td><input type="number" class="excel-input opp-value-input readonly-input" value="${v.oppValue || ''}" readonly style="color:var(--accent-blue); font-weight:800; cursor:not-allowed; background: transparent;"></td>
             <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notesJson.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
             <td>
                 <select class="excel-input status-select" data-old="${v.status || 'مهتم'}" onfocus="this.dataset.old=this.value" onchange="handleStatusChange(this, '${rowId}')">
                     <option value="مهتم" ${v.status === 'مهتم' || !v.status ? 'selected' : ''}>مهتم</option>
-                    <option value="تقديم عرض" ${v.status === 'تقديم عرض' ? 'selected' : ''}>تقديم عرض</option>
-                    <option value="مفاوضات" ${v.status === 'مفاوضات' ? 'selected' : ''}>مفاوضات</option>
                     <option value="مغلق رابح" ${v.status === 'مغلق رابح' ? 'selected' : ''}>مغلق رابح</option>
                     <option value="مغلق خاسر" ${v.status === 'مغلق خاسر' ? 'selected' : ''}>مغلق خاسر</option>
                 </select>
             </td>
-            <td><div class="edit-date-container">${editDateHTML}</div><input type="hidden" class="edit-date-val" value="${v.editDate || ''}"></td>
-            <td><input type="text" class="excel-input" value="${v.owner || ''}" data-old="${v.owner || ''}" onfocus="this.dataset.old=this.value" onkeyup="debouncedSaveAllData();" onblur="addToActivityLog('المالك', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); this.dataset.old=this.value;"></td>
+            <td><input type="date" class="excel-input expected-date-input" value="${v.expectedDate || today}" data-old="${v.expectedDate || today}" onfocus="this.dataset.old=this.value" onchange="handleDateChange(this)"></td>
+            <td><input type="text" class="excel-input" value="${v.owner || 'أحمد'}" data-old="${v.owner || 'أحمد'}" onfocus="this.dataset.old=this.value" onkeyup="debouncedSaveAllData();" onblur="addToActivityLog('المالك', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); this.dataset.old=this.value;"></td>
         `;
 
-        subRow.innerHTML = `<td colspan="14"><div class="sub-table-container"><table class="inner-table"><thead><tr><th>المنتج المتوقع</th><th>التفاصيل</th><th>العدد</th><th>الاشتراك</th><th>الإجمالي</th><th style="width:75px"><button class="header-plus-btn" onclick="addProductRow('${rowId}')" title="إضافة منتج"><i class="fas fa-plus"></i></button></th></tr></thead><tbody class="product-body"></tbody></table></div></td>`;
+        subRow.innerHTML = `<td colspan="14"><div class="sub-table-container"><table class="inner-table"><thead><tr><th>نوع المنتج</th><th>التفاصيل</th><th>العدد</th><th>الاشتراك</th><th>الإجمالي</th><th style="width:75px">إجراء <button class="header-plus-btn" onclick="addProductRow('${rowId}')" title="إضافة منتج"><i class="fas fa-plus"></i></button></th></tr></thead><tbody class="product-body"></tbody></table></div></td>`;
         
         if (prepend) { tbody.insertBefore(subRow, tbody.firstChild); tbody.insertBefore(mainRow, subRow); } 
         else { tbody.appendChild(mainRow); tbody.appendChild(subRow); }
 
-        applyStatusColor(mainRow.querySelector('.status-select'));
+        updateStatusStyle(mainRow.querySelector('.status-select'));
+        
         if (v.products && v.products.length > 0) v.products.forEach(p => addProductRow(rowId, p)); 
         else addProductRow(rowId);
         
-        calculateMainOppValue(rowId);
-        if(!prepend) reorderRows();
+        calculateOpportunityTotal(rowId);
     }
 
     async function handleStatusChange(selectEl, rowId) {
         const newVal = selectEl.value; const oldVal = selectEl.dataset.old;
         const companyName = selectEl.closest('tr').cells[1].querySelector('input').value;
 
-        applyStatusColor(selectEl);
+        updateStatusStyle(selectEl);
         addToActivityLog('الحالة', oldVal, newVal, companyName);
-        updateEditDateField(selectEl.closest('tr'));
         saveAllDataSilently(); updateStats(); reorderRows();
         selectEl.dataset.old = newVal;
+    }
+
+    function handleDateChange(dateEl) {
+        const newVal = dateEl.value; const oldVal = dateEl.dataset.old;
+        const companyName = dateEl.closest('tr').cells[1].querySelector('input').value;
+        addToActivityLog('التاريخ المتوقع', oldVal, newVal, companyName);
+        saveAllDataSilently(); reorderRows();
+        dateEl.dataset.old = newVal;
     }
 
     function toggleSubTable(rowId) {
@@ -576,20 +627,7 @@
 
     function addProductRow(rowId, data = {}) {
         const tbody = document.querySelector(`#sub-${rowId} .product-body`); const row = tbody.insertRow();
-        row.innerHTML = `<td><select onchange="debouncedSaveAllData()"><option value="">-</option><option value="جوال" ${data.type === 'جوال' ? 'selected' : ''}>جوال</option><option value="بيانات" ${data.type === 'بيانات' ? 'selected' : ''}>بيانات</option><option value="هاتف" ${data.type === 'هاتف' ? 'selected' : ''}>هاتف</option><option value="فايبر نت" ${data.type === 'فايبر نت' ? 'selected' : ''}>فايبر نت</option><option value="DIA" ${data.type === 'DIA' ? 'selected' : ''}>DIA</option><option value="IPVPN" ${data.type === 'IPVPN' ? 'selected' : ''}>IPVPN</option><option value="SIP" ${data.type === 'SIP' ? 'selected' : ''}>SIP</option></select></td><td><input type="text" value="${data.desc || ''}" onkeyup="debouncedSaveAllData()"></td><td><input type="number" class="prod-qty" min="0" value="${data.qty || ''}" onkeyup="calculateMainOppValue('${rowId}')" oninput="calculateMainOppValue('${rowId}')"></td><td><input type="number" class="prod-sub" min="0" value="${data.sub || ''}" onkeyup="calculateMainOppValue('${rowId}')" oninput="calculateMainOppValue('${rowId}')"></td><td><input type="number" class="prod-total readonly-input" value="${data.total || ''}" readonly style="color:var(--text-muted); font-weight:700; cursor:not-allowed;"></td><td><div style="display:flex; justify-content:center; gap:5px;"><button class="sub-action-btn" title="حذف" onclick="if(this.closest('tbody').rows.length > 1) { this.closest('tr').remove(); calculateMainOppValue('${rowId}'); }"><i class="fas fa-trash-alt" style="font-size:10px;"></i></button></div></td>`;
-    }
-
-    function calculateMainOppValue(rowId) {
-        const subRow = document.getElementById('sub-' + rowId); if (!subRow) return;
-        let grandTotal = 0;
-        subRow.querySelectorAll('.product-body tr').forEach(pRow => {
-            const qtyInput = pRow.querySelector('.prod-qty'), subInput = pRow.querySelector('.prod-sub'), totalInput = pRow.querySelector('.prod-total');
-            let qty = parseFloat(qtyInput.value) || 0, sub = parseFloat(subInput.value) || 0;
-            const rowTotal = qty * sub; totalInput.value = rowTotal > 0 ? rowTotal : ''; grandTotal += rowTotal;
-        });
-        const mainRow = document.getElementById(rowId);
-        if (mainRow) { const oppValueInput = mainRow.querySelector('.opp-value-input'); if (oppValueInput) oppValueInput.value = grandTotal > 0 ? grandTotal : ''; }
-        debouncedSaveAllData();
+        row.innerHTML = `<td><select onchange="debouncedSaveAllData()"><option value="">-</option><option value="جوال" ${data.type === 'جوال' ? 'selected' : ''}>جوال</option><option value="بيانات" ${data.type === 'بيانات' ? 'selected' : ''}>بيانات</option><option value="هاتف" ${data.type === 'هاتف' ? 'selected' : ''}>هاتف</option><option value="فايبر نت" ${data.type === 'فايبر نت' ? 'selected' : ''}>فايبر نت</option><option value="DIA" ${data.type === 'DIA' ? 'selected' : ''}>DIA</option><option value="IPVPN" ${data.type === 'IPVPN' ? 'selected' : ''}>IPVPN</option><option value="SIP" ${data.type === 'SIP' ? 'selected' : ''}>SIP</option></select></td><td><input type="text" value="${data.desc || ''}" onkeyup="debouncedSaveAllData()"></td><td><input type="number" class="prod-qty" min="0" value="${data.qty || ''}" onkeyup="calculateOpportunityTotal('${rowId}')" oninput="calculateOpportunityTotal('${rowId}')"></td><td><input type="number" class="prod-sub" min="0" value="${data.sub || ''}" onkeyup="calculateOpportunityTotal('${rowId}')" oninput="calculateOpportunityTotal('${rowId}')"></td><td><input type="number" class="prod-total readonly-input" value="${data.total || ''}" readonly style="color:var(--text-muted); font-weight:700; cursor:not-allowed;"></td><td><div style="display:flex; justify-content:center; gap:5px;"><button class="sub-action-btn" title="حذف" onclick="if(this.closest('tbody').rows.length > 1) { this.closest('tr').remove(); calculateOpportunityTotal('${rowId}'); }"><i class="fas fa-trash-alt" style="font-size:10px;"></i></button></div></td>`;
     }
 
     function toggleAllCheckboxes(source) { document.querySelectorAll('.select-check').forEach(chk => chk.checked = source.checked); }
@@ -605,7 +643,7 @@
         if (action === 'حذف') {
             const result = await Swal.fire({ title: 'تأكيد الحذف؟', text: "سيتم حذف الفرص المحددة نهائياً من النظام!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#94a3b8', confirmButtonText: 'نعم، احذف', cancelButtonText: 'إلغاء' });
             if (result.isConfirmed) {
-                selected.forEach(chk => { const row = chk.closest('tr'); const id = row.id; addToActivityLog('إجراء', 'حذف الفرصة', '', row.cells[1].querySelector('input').value); row.remove(); if(document.getElementById('sub-' + id)) document.getElementById('sub-' + id).remove(); });
+                selected.forEach(chk => { const row = chk.closest('tr'); const id = row.id; addToActivityLog('إجراء', 'حذف الفرصة البيعية', '', row.cells[1].querySelector('input').value); row.remove(); if(document.getElementById('sub-' + id)) document.getElementById('sub-' + id).remove(); });
                 saveAllDataSilently(); updateStats(); reorderRows(); Swal.fire({icon: 'success', title: 'تم الحذف', showConfirmButton: false, timer: 1500});
             }
         } else if (action === 'تصدير') {
@@ -622,7 +660,7 @@
 
     function exportToExcel(selectedRows) {
         let csvContent = "\uFEFF"; 
-        csvContent += "الشركة,العنوان,المسؤول,رقم التواصل,الإيميل,السجل,تاريخ الفرصة,الخدمة المتوقعة,القيمة المتوقعة,الحالة,المالك\n";
+        csvContent += "الشركة,العنوان,المسؤول,رقم التواصل,الإيميل,السجل,تاريخ الزيارة الأصلية,الخدمة المقترحة,قيمة الفرصة,الحالة,التاريخ المتوقع,المالك\n";
         
         selectedRows.forEach(chk => {
             const row = chk.closest('tr');
@@ -634,7 +672,7 @@
             
             const rowData = [
                 getVal(1), getVal(2), getVal(3), getVal(4), getVal(5), 
-                getVal(6), getVal(7), getVal(8), getVal(9), getVal(11), getVal(13)
+                getVal(6), getVal(7), getVal(8), getVal(9), getVal(11), getVal(12), getVal(13)
             ];
             csvContent += rowData.join(",") + "\n";
         });
@@ -673,7 +711,7 @@
                     <thead>
                         <tr>
                             <th>الشركة</th><th>المسؤول</th><th>رقم التواصل</th>
-                            <th>الخدمة المتوقعة</th><th>تاريخ الفرصة</th><th>الحالة</th>
+                            <th>الخدمة المقترحة</th><th>التاريخ المتوقع</th><th>الحالة</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -687,7 +725,7 @@
                 <td>${getVal(3)}</td>
                 <td dir="ltr">${getVal(4)}</td>
                 <td>${getVal(8)}</td>
-                <td>${getVal(7)}</td>
+                <td>${getVal(12)}</td>
                 <td>${getVal(11)}</td>
             </tr>`;
         });
@@ -718,18 +756,40 @@
                 comp: row.cells[1].querySelector('input').value, address: row.cells[2].querySelector('input').value, 
                 mgr: row.cells[3].querySelector('input').value, mob: row.cells[4].querySelector('input').value, 
                 email: row.cells[5].querySelector('input').value, record: row.cells[6].querySelector('input').value, 
-                oppDate: row.querySelector('.opp-date-val').value, curServ: row.querySelector('.cur-serv-val').value, 
+                oppDate: row.querySelector('.visit-date-val').value, curServ: row.querySelector('.cur-serv-val').value, 
                 oppValue: row.querySelector('.opp-value-input').value, notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '[]', 
-                status: row.querySelector('.status-select').value, editDate: row.querySelector('.edit-date-val').value, 
+                status: row.querySelector('.status-select').value, expectedDate: row.querySelector('.expected-date-input').value, 
                 owner: row.cells[13].querySelector('input').value, products: products 
             });
         });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
 
+    function checkIncomingOpportunities() {
+        try {
+            const incomingData = localStorage.getItem(INCOMING_KEY);
+            if (incomingData) {
+                const newOpps = JSON.parse(incomingData);
+                if (Array.isArray(newOpps) && newOpps.length > 0) {
+                    newOpps.forEach(opp => { 
+                        if (!opp.expectedDate) opp.expectedDate = getTodayFormatted();
+                        renderRow(opp); 
+                        addToActivityLog("إجراء", "تأهيل وتصدير الفرصة البيعية من شاشة الزيارات", "", opp.comp); 
+                    });
+                    saveAllDataSilently();
+                }
+                localStorage.removeItem(INCOMING_KEY);
+            }
+        } catch (e) { localStorage.removeItem(INCOMING_KEY); }
+    }
+
     function loadSavedData() {
         const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) { document.getElementById('tableBody').innerHTML = ''; JSON.parse(saved).forEach(v => renderRow(v)); }
+        if (saved) { 
+            document.getElementById('tableBody').innerHTML = ''; 
+            JSON.parse(saved).forEach(v => renderRow(v)); 
+        }
+        checkIncomingOpportunities();
         renderActivityLog(); updateStats(); reorderRows();
     }
 
@@ -738,6 +798,8 @@
 
     function filterTable() {
         const q = document.getElementById('searchInput').value.toLowerCase().trim();
+        const statusQ = document.getElementById('statusFilter').value;
+        
         document.querySelectorAll('.main-row').forEach(row => {
             const comp = row.cells[1].querySelector('input').value.toLowerCase();
             const mgr = row.cells[3].querySelector('input').value.toLowerCase();
@@ -745,41 +807,18 @@
             const email = row.cells[5].querySelector('input').value.toLowerCase();
             const record = row.cells[6].querySelector('input').value.toLowerCase();
             const subRow = document.getElementById('sub-' + row.id);
-            if (comp.includes(q) || mgr.includes(q) || mob.includes(q) || email.includes(q) || record.includes(q)) { row.style.display = 'table-row'; } 
-            else { row.style.display = 'none'; if(subRow) subRow.style.display = 'none'; }
+            
+            const matchesText = comp.includes(q) || mgr.includes(q) || mob.includes(q) || email.includes(q) || record.includes(q);
+            const rowStatus = row.querySelector('.status-select').value;
+            const matchesStatus = statusQ === "" || rowStatus === statusQ;
+
+            if (matchesText && matchesStatus) { 
+                row.style.display = 'table-row'; 
+            } else { 
+                row.style.display = 'none'; 
+                if(subRow) subRow.style.display = 'none'; 
+            }
         });
-    }
-
-    function showStatusTooltip(el) {
-        const val = el.value || "فارغ";
-        let tooltip = document.getElementById('status-custom-tooltip');
-        if(!tooltip) {
-            tooltip = document.createElement('div');
-            tooltip.id = 'status-custom-tooltip';
-            tooltip.style.position = 'absolute';
-            tooltip.style.background = '#1e293b';
-            tooltip.style.color = '#fff';
-            tooltip.style.padding = '5px 10px';
-            tooltip.style.borderRadius = '4px';
-            tooltip.style.fontSize = '11px';
-            tooltip.style.fontFamily = 'Cairo';
-            tooltip.style.zIndex = '3000';
-            tooltip.style.pointerEvents = 'none';
-            tooltip.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
-            tooltip.style.display = 'none';
-            document.body.appendChild(tooltip);
-        }
-        tooltip.innerText = val;
-        tooltip.style.display = 'block';
-        
-        const rect = el.getBoundingClientRect();
-        tooltip.style.top = (rect.top + window.scrollY - tooltip.offsetHeight - 6) + 'px';
-        tooltip.style.left = (rect.left + window.scrollX + (rect.width/2) - (tooltip.offsetWidth/2)) + 'px';
-    }
-
-    function hideStatusTooltip() {
-        const tooltip = document.getElementById('status-custom-tooltip');
-        if(tooltip) tooltip.style.display = 'none';
     }
 
     function getLastNoteOnlyFromJSON(jsonStr) {
@@ -812,7 +851,6 @@
             arr.push({ user: document.querySelector('.main-row').cells[13].querySelector('input').value || "المستخدم", date: getTodayFormatted(), time: getTimeFormatted(), text: txt });
             currentActivePreview.setAttribute('data-full-notes', JSON.stringify(arr));
             currentActivePreview.innerText = txt;
-            updateEditDateField(currentActivePreview.closest('tr'));
             saveAllDataSilently();
         }
         closeNote();
