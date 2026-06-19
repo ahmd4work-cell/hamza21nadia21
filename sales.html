@@ -3,864 +3,565 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASGate - الزيارات</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <title>المبيعات | ASGate</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --nav-shiny-navy: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
             --header-shiny-purple: linear-gradient(180deg, #4c1d95 0%, #2e1065 100%);
             --nav-bg: #0f172a;
             --nav-active: #a78bfa;
-            --bg-color: #f8fafc;
+            --bg-color: #f4f7f9;
             --white: #ffffff;
             --accent-blue: #3b82f6;
-            --accent-blue-hover: #2563eb;
-            --accent-green-active: #22c55e;
-            --border-soft: #e2e8f0;
-            --text-dark: #0f172a;
-            --text-muted: #64748b;
+            --border-soft: #cbd5e1;
+            --text-dark: #1e293b;
+            --dark-yellow: #c29103;
+            --chat-yellow: #b45309;
         }
-
-        /* --- تخصيص شريط التمرير (Scrollbar) --- */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
         html, body { 
             height: 100%; margin: 0; padding: 0; overflow: hidden; 
             background-color: var(--bg-color); font-family: 'Cairo', sans-serif; 
-            font-size: 12px; line-height: 1.2; color: var(--text-dark); 
+            font-size: 12px; line-height: 1.15; color: var(--text-dark); 
         }
 
         .dashboard-container { display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; }
 
         .navbar { 
             background: var(--nav-shiny-navy); display: flex; align-items: center; padding: 0 20px; margin: 10px 10px 5px 10px; 
-            border-radius: 10px; height: 40px; flex-shrink: 0;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); 
-            border: 1px solid #1e293b;
+            border-radius: 12px; height: 37px; flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.1); border: 1px solid #1e293b;
         }
-        .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 11.5px; height: 28px; line-height: 28px; display: inline-block; transition: 0.3s; opacity: 0.85; }
-        .navbar a:hover { opacity: 1; }
-        .navbar a.active { background-color: var(--nav-active); color: #0f172a; border-radius: 6px; opacity: 1; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .navbar a { color: white; text-decoration: none; padding: 0 15px; font-weight: 700; font-size: 11px; height: 26px; line-height: 26px; display: inline-block; transition: 0.3s; }
+        .navbar a.active { background-color: var(--nav-active); color: #0f172a; border-radius: 6px; }
 
-        .main-content { flex: 1; display: flex; flex-direction: column; padding: 0 15px 10px 15px; min-height: 0; gap: 8px; }
+        .main-content { flex: 1; display: flex; flex-direction: column; padding: 0 15px; min-height: 0; }
         
-        .action-bar { display: flex; align-items: center; gap: 12px; flex-shrink: 0; margin-top: 5px; }
-        
-        .btn-top { border: none; padding: 0 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: 800; cursor: pointer; color: white; transition: all 0.2s; font-size: 12px; height: 38px; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3); }
+        .action-bar { display: flex; align-items: center; margin: 10px 0; gap: 10px; flex-shrink: 0; }
+        .btn-top { border: none; padding: 0 18px; border-radius: 8px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; font-size: 11px; height: 35px; }
         .btn-add { background-color: var(--accent-blue); }
-        .btn-add:hover { background-color: var(--accent-blue-hover); transform: translateY(-1px); box-shadow: 0 4px 6px rgba(59, 130, 246, 0.4); }
 
-        .search-wrapper { position: relative; width: 20%; display: flex; align-items: center; }
+        .search-wrapper { position: relative; width: 15%; display: flex; align-items: center; }
         .search-input {
-            width: 100%; height: 38px; padding: 0 10px; border-radius: 8px;
+            width: 100%; height: 30px; padding: 0 10px; border-radius: 8px;
             border: 1px solid var(--border-soft); background: #fff;
-            font-family: 'Cairo'; font-size: 11.5px; font-weight: 600; outline: none;
-            transition: 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+            font-family: 'Cairo'; font-size: 11px; font-weight: 700; outline: none;
         }
-        .search-input:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
 
-        .stats-bar-visit { margin-right: auto; display: flex; gap: 15px; align-items: center; background: #fff; padding: 0 18px; border-radius: 8px; height: 38px; border: 1px solid var(--border-soft); box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
-        .stat-item { font-size: 11px; font-weight: 700; color: var(--text-muted); white-space: nowrap; display: flex; gap: 5px; align-items: center; }
-        .stat-val { color: var(--text-dark); font-weight: 800; font-size: 12px; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; }
-        .stat-divider { color: var(--border-soft); margin: 0 2px; }
+        .stats-container { margin-right: auto; display: flex; gap: 10px; align-items: center; }
+        .stat-card {
+            background: #fff; padding: 5px 12px; border-radius: 8px; border: 1px solid var(--border-soft);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 1px; min-width: 180px;
+        }
+        .stat-card-title { font-size: 9px; font-weight: 800; color: #64748b; border-bottom: 1px solid #f1f5f9; padding-bottom: 2px; margin-bottom: 2px; text-align: center; }
+        .stat-content { display: flex; gap: 8px; justify-content: center; align-items: center; }
+        .stat-item { font-size: 9px; font-weight: 800; color: #475569; white-space: nowrap; }
+        .stat-val { color: var(--accent-blue); margin-right: 2px; }
+        .val-success { color: #16a34a; }
+        .val-danger { color: #dc2626; }
 
-        .bulk-action-wrapper { position: relative; display: flex; align-items: center; }
+        .bulk-action-wrapper { position: relative; display: flex; align-items: center; margin-right: 5px; }
         .btn-bulk-trigger { 
-            height: 38px; padding: 0 15px; border-radius: 8px; border: 1px solid var(--border-soft);
-            background: #fff; color: var(--text-dark); font-family: 'Cairo'; font-size: 11.5px; font-weight: 700;
-            cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.02); transition: 0.2s;
-            display: flex; align-items: center; gap: 6px;
+            height: 25px; padding: 0 12px; border-radius: 5px; border: 1px solid var(--border-soft);
+            background: #fff; color: var(--text-dark); font-family: 'Cairo'; font-size: 10px; font-weight: 800;
+            cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: 0.2s;
+            display: flex; align-items: center; gap: 5px;
         }
-        .btn-bulk-trigger:hover { border-color: var(--accent-blue); color: var(--accent-blue); background: #f8fafc; }
+        .btn-bulk-trigger:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+
+        .dropdown-menu { 
+            display: none; position: absolute; left: 0; 
+            top: 28px; background: white; border: 1px solid #e2e8f0; border-radius: 6px; 
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 1000; min-width: 110px; padding: 4px;
+        }
+        .dropdown-menu button { 
+            width: 100%; padding: 6px 10px; border: none; background: none; font-family: 'Cairo'; 
+            font-size: 9.5px; text-align: right; cursor: pointer; color: #475569; font-weight: 700; 
+            border-radius: 4px; transition: 0.2s; display: block;
+        }
+        .dropdown-menu button:hover { background: #f1f5f9; color: var(--accent-blue); }
+        .show { display: block; }
 
         .table-wrapper { 
             background: white; border-radius: 10px; overflow-y: auto; border: 1px solid var(--border-soft); 
-            flex: 1; min-height: 0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); position: relative;
+            flex: 1; min-height: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.02); position: relative;
         }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         
         th { 
-            background: var(--header-shiny-purple); color: white; padding: 0 8px; font-size: 10.5px; font-weight: 800; 
-            text-align: center; border-bottom: 3px solid #2e1065; position: sticky; top: 0; z-index: 50; height: 42px;
-            letter-spacing: 0.3px;
+            background: var(--header-shiny-purple); color: white; padding: 0 5px; font-size: 10px; font-weight: 800; 
+            text-align: center; border-bottom: 2px solid #2e1065; position: sticky; top: 0; z-index: 50; height: 40px;
         }
         
-        td { border-bottom: 1px solid #f1f5f9; text-align: center; height: 38px; max-height: 38px; font-size: 10.5px; font-weight: 600; overflow: visible; white-space: nowrap; position: relative; transition: background-color 0.2s; }
-
-        /* تأثير التمرير على الصفوف (Hover) */
-        tbody tr.main-row:hover td { background-color: #f1f5f9; }
-
-        /* تخصيص الألوان والحواف للحالة */
-        .status-yellow { background-color: #fef08a !important; color: #854d0e !important; font-weight: 800 !important; border-radius: 4px !important; }
-        .status-red { background-color: #991b1b !important; color: #ffffff !important; font-weight: 800 !important; border-radius: 4px !important; }
-
-        .lost-row td { height: 28px !important; max-height: 28px !important; font-size: 9.5px !important; opacity: 0.8; }
-        .lost-row .excel-input { font-size: 10px !important; }
-        .lost-row:hover td { opacity: 1; }
-
-        .month-separator { height: 38px; }
-        .month-separator td { padding: 5px !important; border: none !important; background: #fff !important; }
-        .sep-text { 
-            width: max-content; padding: 0 20px;
-            margin: 0 auto; 
-            color: #047857; 
-            font-weight: 800; 
-            font-size: 11px; 
-            background-color: #dcfce7;
-            border-radius: 20px; 
-            text-align: center;
-            height: 26px;
-            line-height: 26px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        td { 
+            border-bottom: 1px solid #f1f5f9; text-align: center; 
+            height: 35px; font-size: 10px; font-weight: 600; 
+            white-space: nowrap; position: relative; transition: height 0.2s ease;
         }
 
-        .sub-table-row { display: none; background-color: #f8fafc; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
-        .sub-table-container { padding: 12px 10% 15px 5%; } 
-        .inner-table { width: 70%; background: white; border: 1px solid var(--border-soft); border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden; }
-        .inner-table th { background: #334155; color: #fff; height: 28px; font-size: 9.5px; border-left: 1px solid rgba(255,255,255,0.1); border-bottom: none; }
-        .inner-table td { height: 32px; border: 1px solid #edf2f7; padding: 0; }
-        .inner-table input, .inner-table select { width: 100%; height: 100%; border: none; text-align: center; font-family: 'Cairo'; font-size: 10.5px; outline: none; background: transparent; transition: 0.2s; }
-        .inner-table input:focus, .inner-table select:focus { background: #eff6ff; }
+        tr.row-lost td { 
+            height: 20px !important; 
+            font-size: 9px; 
+        }
         
-        .header-plus-btn {
-            background: #22c55e; color: white; border: none; border-radius: 4px; width: 20px; height: 20px;
-            font-size: 14px; font-weight: bold; cursor: pointer; margin-right: 5px;
-            display: inline-flex; align-items: center; justify-content: center; transition: 0.2s;
+        tbody tr:nth-child(even) { background-color: #eff6ff; }
+        
+        .status-select {
+            font-family: 'Cairo'; font-size: 10px; font-weight: 800; padding: 2px 8px;
+            border-radius: 20px; border: 1.5px solid #e2e8f0; background: #f8fafc;
+            width: 90%; cursor: pointer; outline: none; transition: all 0.3s ease;
+            text-align: center; appearance: none;
         }
-        .header-plus-btn:hover { background: #16a34a; transform: scale(1.1); }
 
-        .sub-action-btn { 
-            width: 24px; height: 24px; border: none; border-radius: 6px; cursor: pointer; 
-            font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center;
-            transition: 0.2s; background: #fee2e2; color: #ef4444;
-        }
-        .sub-action-btn:hover { background: #fecaca; transform: scale(1.05); }
+        tr.row-lost .status-select { padding: 0px 5px; height: 16px; font-size: 8px; }
 
-        .toggle-arrow { 
-            cursor: pointer; font-size: 12px; color: #94a3b8; margin-right: 5px; 
-            display: inline-block; transition: transform 0.2s, color 0.2s; vertical-align: middle;
-            background: #f1f5f9; width: 20px; height: 20px; line-height: 20px; border-radius: 4px; text-align: center;
-        }
-        .toggle-arrow:hover { color: var(--accent-blue); background: #e0f2fe; }
-        .arrow-open { transform: rotate(90deg); color: var(--accent-blue); background: #e0f2fe; }
-
-        tbody tr.main-row:nth-child(4n+1) { background-color: #fafafa; }
-
-        .excel-input { 
-            width: 96%; border: 1px solid transparent; border-radius: 4px; text-align: center; font-family: 'Cairo'; outline: none; 
-            background: transparent; font-size: 11px; color: inherit; font-weight: inherit; 
-            height: 90%; margin: 1.5% 2%; overflow: hidden; text-overflow: ellipsis; transition: all 0.2s;
-        }
-        .excel-input:focus { border-color: var(--accent-blue); background: #fff; box-shadow: 0 0 0 2px rgba(59,130,246,0.1); }
-        .readonly-input:focus { border-color: transparent; background: transparent; box-shadow: none; }
-
-        .edit-date-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; line-height: 1.3; }
-        .edit-date-d { font-size: 10.5px; font-weight: 700; color: var(--text-dark); }
-        .edit-date-t { font-size: 9px; font-weight: 700; color: var(--text-muted); }
-
-        .select-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent-blue); vertical-align: middle; margin-left: 4px; }
-
-        .phone-cell-container { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; padding: 0; box-sizing: border-box; }
-        .whatsapp-icon-btn { color: #25d366; font-size: 16px; text-decoration: none; margin-left: 2px; cursor: pointer; transition: transform 0.2s; display: inline-flex; align-items: center; padding: 4px; border-radius: 4px; }
-        .whatsapp-icon-btn:hover { transform: scale(1.1); background: #dcfce7; }
-
-        .dropdown-menu { 
-            display: none; position: absolute; left: 0; 
-            top: 42px; background: white; border: 1px solid var(--border-soft); border-radius: 8px; 
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 1000; min-width: 120px; padding: 6px;
-        }
-        .dropdown-menu button { 
-            width: 100%; padding: 8px 12px; border: none; background: none; font-family: 'Cairo'; 
-            font-size: 10.5px; text-align: right; cursor: pointer; color: #475569; font-weight: 700; 
-            border-radius: 6px; transition: 0.2s; display: block; margin-bottom: 2px;
-        }
-        .dropdown-menu button:hover { background: #f1f5f9; color: var(--accent-blue); padding-right: 16px; }
-        .dropdown-menu .del-btn:hover { background: #fee2e2; color: #ef4444; }
-        .show { display: block; animation: fadeIn 0.2s ease; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        .status-select[data-val="مكتمل"] { background: #dcfce7; color: #166534; border-color: #16a34a; }
+        .status-select[data-val="معلق"] { background: #fef9c3; color: #854d0e; border-color: #eab308; }
+        .status-select[data-val="مرتجع"] { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+        .status-select[data-val="فقدان"] { background: #7f1d1d; color: #ffffff; border-color: #450a0a; }
+        .status-select[data-val="جاهز"] { background: #e0f2fe; color: #075985; border-color: #bae6fd; }
+        .status-select[data-val="جديد"] { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
 
         .notes-preview { 
-            width: 95%; height: 26px; border: 1px dashed #cbd5e1; border-radius: 4px; background: #f8fafc; font-family: 'Cairo'; 
-            font-size: 10.5px; text-align: center; cursor: pointer; color: var(--accent-blue); font-weight: 700; 
+            width: 95%; height: 20px; border: none; background: transparent; font-family: 'Cairo'; 
+            font-size: 10px; text-align: center; cursor: pointer; color: #3b82f6; font-weight: 700; 
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; margin: 0 auto; 
-            line-height: 26px; transition: 0.2s;
         }
-        .notes-preview:hover { background: #eff6ff; border-color: var(--accent-blue); }
+        tr.row-lost .notes-preview { height: 15px; font-size: 8px; }
 
         .activity-log-section { 
-            margin: 0; padding: 12px 20px; background: #ffffff; border-radius: 10px; border: 1px solid var(--border-soft); 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04); flex-shrink: 0; height: 100px; display: flex; 
-            flex-direction: column; box-sizing: border-box; transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin: 1px 0 0px 0; padding: 10px 18px; background: #ffffff; border-radius: 10px; 
+            border: 1px solid var(--border-soft); box-shadow: 0 -3px 10px rgba(0,0,0,0.03);
+            flex-shrink: 0; height: 95px; display: flex; flex-direction: column; box-sizing: border-box;
+            transition: height 0.3s ease;
         }
-        .activity-log-section.expanded { height: 220px; }
+        .activity-log-section.expanded { height: 200px; }
         
-        .activity-log-header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; flex-shrink: 0; }
-        .activity-log-title { color: #4c1d95; font-family: 'Cairo'; font-size: 11.5px; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 6px; }
-        .btn-toggle-expand { background: #f1f5f9; border: none; color: #64748b; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; transition: 0.2s; }
-        .btn-toggle-expand:hover { background: #e2e8f0; color: #0f172a; }
-        .activity-list { flex: 1; overflow-y: auto; font-size: 9.5px; text-align: right; padding-left: 5px; }
-        .activity-item { margin-bottom: 6px; border-bottom: 1px dashed #f1f5f9; padding-bottom: 6px; color: #1e293b; display: block; white-space: normal; text-align: right; font-weight: 600; line-height: 1.5; }
-
-        .modal-notes { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-        .modal-notes-content { background: white; padding: 24px; border-radius: 16px; width: 500px; height: 520px; display: flex; flex-direction: column; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); box-sizing: border-box; border: 1px solid var(--border-soft); }
-        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 15px; margin-bottom: 15px; box-sizing: border-box; }
-        .chat-msg-block { display: flex; flex-direction: column; align-items: flex-start; text-align: right; margin-bottom: 16px; background: white; padding: 10px 12px; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; }
-        .chat-msg-header { font-size: 10px; color: var(--accent-blue); font-weight: 800; margin-bottom: 6px; display: flex; justify-content: space-between; width: 100%; }
-        .chat-msg-text { font-size: 11px; color: var(--text-dark); font-weight: 700; line-height: 1.6; white-space: pre-wrap; }
-        .note-area { height: 100px; width: 100%; border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px; font-family: 'Cairo'; resize: none; outline: none; font-size: 11.5px; text-align: right; box-sizing: border-box; transition: 0.2s; }
-        .note-area:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
-
-        .col-select { width: 4%; }
-        .col-company { width: 12%; } 
-        .col-address { width: 9%; } 
-        .col-manager { width: 8%; } 
-        .col-mobile { width: 9%; } 
-        .col-email { width: 8%; } 
-        .col-record { width: 7%; } 
-        .col-date { width: 7%; } 
-        .col-service { width: 8%; } 
-        .col-val { width: 6%; } 
-        .col-notes { width: 9%; } 
-        .col-status { width: 7%; }
-        .col-edit { width: 6%; } 
-        .col-owner { width: 5%; }
+        .activity-log-header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; border-bottom: 1px solid #f1f5f9; padding-bottom: 4px; flex-shrink: 0; }
+        .activity-log-title { color: var(--dark-yellow); font-size: 12.5px; font-weight: 800; margin: 0; }
         
-        div:where(.swal2-container) { font-family: 'Cairo', sans-serif !important; }
+        .activity-list { flex: 1; overflow-y: auto; font-size: 10.5px; line-height: 1.3; }
+        .activity-item { margin-bottom: 2px; border-bottom: 1px dashed #f8fafc; padding-bottom: 2px; color: #475569; display: flex; align-items: center; gap: 4px; justify-content: flex-start; flex-wrap: wrap; text-align: right; }
+        .activity-header-part { font-size: 10.5px; color: var(--chat-yellow); font-weight: 800; }
+        .activity-text-part { font-size: 10.5px; color: #475569; }
+
+        .modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+        .modal-content { background: white; padding: 15px; border-radius: 12px; width: 440px; height: 460px; display: flex; flex-direction: column; gap: 6px; transition: height 0.3s ease, width 0.3s ease; }
+        
+        .modal-content.expanded { height: 600px; width: 550px; }
+        
+        .modal-header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; border-bottom: 1px solid #f1f5f9; padding-bottom: 4px; flex-shrink: 0; }
+        .btn-toggle-expand { background: none; border: none; color: #64748b; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 4px; transition: 0.2s; padding: 0; }
+        .btn-toggle-expand:hover { background: #f1f5f9; color: var(--accent-blue); }
+
+        .history-log { flex-grow: 1; overflow-y: auto; background: #f8fafc; border: 1px solid var(--border-soft); border-radius: 8px; padding: 10px; font-size: 11px; text-align: right; white-space: pre-wrap; line-height: 1.4; }
+        .note-area { height: 60px; width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 8px; font-family: 'Cairo'; resize: none; outline: none; font-size: 12px; text-align: right; box-sizing: border-box; }
+        
+        .order-modal-card { background: white; width: 350px; border-radius: 12px; padding: 20px; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); }
+        .form-group { margin-bottom: 12px; text-align: right; position: relative; }
+        .form-group label { display: block; font-weight: 700; font-size: 10px; color: #64748b; margin-bottom: 4px; }
+        .form-group input { width: 100%; padding: 8px 10px; border: 1px solid var(--border-soft); border-radius: 6px; font-family: 'Cairo'; font-size: 11px; box-sizing: border-box; }
+        
+        .modal-results { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #cbd5e1; z-index: 10005; border-radius: 6px; max-height: 150px; overflow-y: auto; display: none; }
+        .modal-results div { padding: 8px 10px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 10.5px; text-align: right; }
+        .modal-results div:hover { background: #eff6ff; }
+        
+        .select-check { width: 14px; height: 14px; cursor: pointer; accent-color: var(--accent-blue); }
+        .order-link { color: var(--accent-blue); text-decoration: none; font-weight: 800; }
+        .file-link { color: #3b82f6; text-decoration: underline; font-weight: bold; }
     </style>
 </head>
-<body onload="loadSavedData()">
+<body onload="loadSalesFromStorage(); renderGeneralLogs();">
 
 <div class="dashboard-container">
     <nav class="navbar">
         <a href="index.html">الرئيسية</a>
-        <a href="visits.html" class="active">الزيارات</a>
+        <a href="visits.html">الزيارات</a>
         <a href="opportunities.html">الفرص البيعية</a>
         <a href="customers.html">العملاء</a>
-        <a href="sales.html">المبيعات</a>
+        <a href="sales.html" class="active">المبيعات</a>
     </nav>
 
     <div class="main-content">
         <div class="action-bar">
-            <button class="btn-top btn-add" onclick="insertNewRow()"><i class="fas fa-plus"></i> إضافة زيارة جديدة</button>
+            <button class="btn-top btn-add" onclick="openOrderModal()">+ إنشاء طلب مبيعات جديد</button>
             <div class="search-wrapper">
-                <input type="text" id="searchInput" class="search-input" placeholder="بحث 🔍" onkeyup="debouncedFilterTable()">
+                <input type="text" id="globalSearch" class="search-input" placeholder="بحث 🔍" onkeyup="filterSalesTable()">
             </div>
             
-            <div class="stats-bar-visit">
-                <div class="stat-item">الكل: <span id="stat-total" class="stat-val">0</span></div>
-                <div class="stat-item">هذا الشهر: <span id="stat-month" class="stat-val">0</span></div>
-                <div class="stat-item">اليوم: <span id="stat-today" class="stat-val">0</span></div>
-                <div class="stat-divider">|</div>
-                <div class="stat-item">القيمة الإجمالية: <span id="stat-value-total" class="stat-val" style="color: #059669; background: #ecfdf5;">0</span></div>
-                <div class="stat-item">قيمة الشهر: <span id="stat-value-month" class="stat-val" style="color: #059669; background: #ecfdf5;">0</span></div>
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-card-title">الإجمالي العام</div>
+                    <div class="stat-content">
+                        <div class="stat-item">الطلبات: <span id="count-total" class="stat-val">0</span></div>
+                        <div class="stat-item">مكتمل: <span id="sum-completed" class="stat-val val-success">0.00</span></div>
+                        <div class="stat-item">معلق: <span id="sum-pending" class="stat-val val-danger">0.00</span></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-title">إحصائيات الشهر الحالي</div>
+                    <div class="stat-content">
+                        <div class="stat-item">الطلبات: <span id="month-count" class="stat-val">0</span></div>
+                        <div class="stat-item">مكتمل: <span id="month-completed" class="stat-val val-success">0.00</span></div>
+                        <div class="stat-item">معلق: <span id="month-pending" class="stat-val val-danger">0.00</span></div>
+                    </div>
+                </div>
             </div>
 
             <div class="bulk-action-wrapper">
-                <button class="btn-bulk-trigger" onclick="toggleDropdown(event, this)">إجراءات جماعية <i class="fas fa-chevron-down" style="font-size:10px;"></i></button>
+                <button class="btn-bulk-trigger" onclick="toggleDropdown(event, this)">إجراء ▾</button>
                 <div class="dropdown-menu">
-                    <button onclick="handleBulkAction('تغيير المالك')"><i class="fas fa-user-edit"></i> تغيير المالك</button>
-                    <button onclick="handleBulkAction('تصدير')"><i class="fas fa-file-excel"></i> تصدير للإكسيل</button>
-                    <button onclick="handleBulkAction('طباعة')"><i class="fas fa-print"></i> طباعة</button>
-                    <hr style="border:none; border-top:1px solid #e2e8f0; margin: 4px 0;">
-                    <button class="del-btn" onclick="handleBulkAction('حذف')"><i class="fas fa-trash-alt"></i> حذف المحدد</button>
+                    <button onclick="executeAction('تغيير المالك')">تغيير المالك</button>
+                    <button onclick="executeAction('تعديل')">تعديل</button>
+                    <button onclick="executeAction('تصدير')">تصدير</button>
+                    <button onclick="executeAction('طباعة')">طباعة</button>
                 </div>
             </div>
         </div>
         
         <div class="table-wrapper">
-            <table id="mainTable">
+            <table id="salesTable">
                 <thead>
                     <tr>
-                        <th class="col-select"><input type="checkbox" onclick="toggleAllCheckboxes(this)"></th>
-                        <th class="col-company">الشركة</th>
-                        <th class="col-address">العنوان</th> 
-                        <th class="col-manager">المسؤول</th>
-                        <th class="col-mobile">رقم التواصل</th>
-                        <th class="col-email">الإيميل</th>
-                        <th class="col-record">السجل</th>
-                        <th class="col-date">تاريخ الزيارة</th>
-                        <th class="col-service">الخدمة</th>
-                        <th class="col-val">القيمة</th>
-                        <th class="col-notes">الملاحظات</th>
-                        <th class="col-status">الحالة</th>
-                        <th class="col-edit">آخر تعديل</th>
-                        <th class="col-owner">المالك</th>
+                        <th style="width: 30px;"><input type="checkbox" class="select-check" onclick="toggleAllCheckboxes(this)"></th>
+                        <th style="width: 7%;">رقم الطلب</th>
+                        <th style="width: 11%;">اسم الطلب</th>
+                        <th style="width: 10%;">تاريخ الإنشاء</th>
+                        <th style="width: 12%;">الشركة</th>
+                        <th style="width: 9%;">السجل الرئيسي</th>
+                        <th style="width: 9%;">السجل الفرعي</th>
+                        <th style="width: 9%;">الحالة</th>
+                        <th style="width: 6%;">مكتمل</th>
+                        <th style="width: 6%;">معلق</th>
+                        <th style="width: 10%;">ملاحظات</th>
+                        <th style="width: 6%;">الفرصة</th>
+                        <th style="width: 5%;">المالك</th>
                     </tr>
                 </thead>
-                <tbody id="tableBody"></tbody>
+                <tbody id="salesBody"></tbody>
             </table>
         </div>
 
-        <div id="activityLogSection" class="activity-log-section">
+        <div class="activity-log-section" id="generalActivityLogSection">
             <div class="activity-log-header-container">
-                <div class="activity-log-title"><i class="fas fa-history"></i> سجل النشاطات الأخير</div>
-                <button id="toggleExpandBtn" class="btn-toggle-expand" onclick="toggleLogExpansion()" title="توسيع / تقليص"><i class="fas fa-expand-alt"></i></button>
+                <div class="activity-log-title">📋 سجل نشاط المبيعات</div>
+                <button class="btn-toggle-expand" onclick="toggleGeneralLogHeight()" title="توسيع / تقليص" id="toggleGeneralLogBtn">⤢</button>
             </div>
-            <div id="activityList" class="activity-list"></div>
+            <div id="activityLogs" class="activity-list"></div>
         </div>
     </div>
 </div>
 
-<div id="noteModal" class="modal-notes">
-    <div class="modal-notes-content">
-        <div style="font-weight: 800; color: #1e293b; font-size:14px; margin-bottom: 15px; display:flex; align-items:center; gap:8px;">
-            <i class="fas fa-sticky-note" style="color:var(--accent-blue)"></i> سجل ملاحظات الزيارة
+<div id="noteModal" class="modal">
+    <div class="modal-content" id="modalNoteContent">
+        <div class="modal-header-container">
+            <div style="font-weight: 800; color: #2e1065; text-align: right;">سجل ملاحظات الطلب والنتائج</div>
+            <button class="btn-toggle-expand" onclick="toggleModalSize()" title="توسيع / تقليص" id="toggleModalBtn">⤢</button>
         </div>
         <div id="historyLog" class="history-log"></div>
+        <input type="file" id="modalFileInput" style="display:none" onchange="handleFileSelection(this)">
+        <button onclick="document.getElementById('modalFileInput').click()" style="text-align:right; background:none; border:none; color:blue; cursor:pointer; font-family:Cairo; font-size:11px;">📎 إرفاق ملف</button>
+        <span id="fileNamePreview" style="font-size:10px; color:green; text-align:right;"></span>
         <textarea id="modalTextArea" class="note-area" placeholder="أدخل تفاصيل الملاحظة هنا..."></textarea>
-        <div style="display:flex; justify-content: flex-end; gap:10px; margin-top:15px;">
-            <button onclick="closeNote()" style="background:#f1f5f9; border:1px solid #cbd5e1; color:#475569; padding:8px 20px; border-radius:6px; cursor:pointer; font-family:Cairo; font-size:11.5px; font-weight:700; transition:0.2s;">إلغاء</button>
-            <button onclick="saveNote()" style="background:var(--accent-blue); border:none; color:white; padding:8px 20px; border-radius:6px; cursor:pointer; font-family:Cairo; font-size:11.5px; font-weight:800; transition:0.2s; box-shadow: 0 2px 4px rgba(59,130,246,0.3);">حفظ الملاحظة</button>
+        <div style="display:flex; justify-content: flex-end; gap:8px;">
+            <button onclick="closeNote()" style="background:#94a3b8; border:none; color:white; padding:6px 14px; border-radius:6px; cursor:pointer; font-family:Cairo;">تراجع</button>
+            <button onclick="saveNote()" style="background:#22c55e; border:none; color:white; padding:6px 14px; border-radius:6px; cursor:pointer; font-family:Cairo; font-weight:bold;">حفظ</button>
+        </div>
+    </div>
+</div>
+
+<div id="orderModal" class="modal">
+    <div class="order-modal-card">
+        <div style="font-weight: 800; margin-bottom: 15px; text-align: center;">إنشاء طلب مبيعات جديد</div>
+        <div class="form-group">
+            <label>البحث بالاسم أو السجل</label>
+            <input type="text" id="mSearchField" onkeyup="searchCustomerInModal(this)" placeholder="ابحث هنا..." autocomplete="off">
+            <div id="mResults" class="modal-results"></div>
+        </div>
+        <div class="form-group"><label>الشركة</label><input type="text" id="mComp" readonly style="background:#f1f5f9"></div>
+        <div class="form-group"><label>السجل الرئيسي</label><input type="text" id="mCr" readonly style="background:#f1f5f9"></div>
+        <div class="form-group"><label>السجل الفرعي</label><input type="text" id="mCrSub" readonly style="background:#f1f5f9"></div>
+        <div class="form-group"><label>اسم الطلب</label><input type="text" id="mType" placeholder="مثال: توريد أجهزة"></div>
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button onclick="closeOrderModal()" style="flex:1; padding:10px; border:none; border-radius:6px; cursor:pointer; font-family:Cairo;">إلغاء</button>
+            <button onclick="addOrderRow()" style="flex:1; padding:10px; background:#0f172a; color:white; border:none; border-radius:6px; cursor:pointer; font-family:Cairo; font-weight:bold;">إضافة</button>
         </div>
     </div>
 </div>
 
 <script>
     let currentActivePreview = null;
-    const STORAGE_KEY = 'asgate_visits_final_v31'; 
-    const LOGS_KEY = 'asgate_visits_logs_v32';
-    const OPPORTUNITIES_KEY = 'asgate_opportunities_final_v31'; 
+    let attachedFileData = null;
+    let attachedFileName = "";
+    const LOGS_KEY = 'asgate_general_sales_logs';
+    const CUSTOMERS_STORAGE_KEY = 'asgate_customers_v2_final'; 
 
-    let saveTimeout;
-    function debouncedSaveAllData() {
-        clearTimeout(saveTimeout);
-        saveTimeout = setTimeout(() => {
-            saveAllDataSilently();
-            updateStats();
-        }, 600);
-    }
+    function getTodayFormatted() { return new Date().toISOString().split('T')[0]; }
 
-    function getTodayFormatted() {
+    function generateStyledHeader() {
         const d = new Date();
-        return d.toISOString().split('T')[0];
+        const timeFormatted = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+        return `<span class="activity-header-part">👤 (أحمد) 🗓️ ${getTodayFormatted()} <span style="font-size:10px;">${timeFormatted}</span> </span>`;
     }
 
-    function getTimeFormatted() {
-        const d = new Date();
-        return String(d.getHours()).padStart(2, '0') + ":" + String(d.getMinutes()).padStart(2, '0');
-    }
+    function generateCustomOrderId() {
+        const now = new Date();
+        const year = String(now.getFullYear()).slice(-2); 
+        const month = String(now.getMonth() + 1).padStart(2, '0'); 
+        const prefix = year + month; 
 
-    function openWhatsAppChat(el) {
-        const inputEl = el.closest('.phone-cell-container').querySelector('input');
-        let rawPhone = inputEl.value.trim();
-
-        if (!rawPhone) {
-            Swal.fire({icon: 'warning', title: 'تنبيه', text: 'يرجى إدخال رقم الجوال أولاً', confirmButtonText: 'حسناً', confirmButtonColor: '#3b82f6'});
-            return;
-        }
-
-        let cleanNumber = rawPhone.replace(/\D/g, '');
-        if (cleanNumber.startsWith('00966')) cleanNumber = cleanNumber.substring(2);
-        else if (cleanNumber.startsWith('05')) cleanNumber = '966' + cleanNumber.substring(1);
-        else if (cleanNumber.startsWith('5') && cleanNumber.length === 9) cleanNumber = '966' + cleanNumber;
-
-        window.open("https://wa.me/" + cleanNumber, '_blank');
-    }
-
-    function toggleLogExpansion() {
-        const logSection = document.getElementById('activityLogSection');
-        const toggleBtn = document.getElementById('toggleExpandBtn');
-        if (logSection.classList.contains('expanded')) {
-            logSection.classList.remove('expanded');
-            toggleBtn.innerHTML = '<i class="fas fa-expand-alt"></i>';
-        } else {
-            logSection.classList.add('expanded');
-            toggleBtn.innerHTML = '<i class="fas fa-compress-alt"></i>';
-        }
-    }
-
-    function updateEditDateField(row) {
-        if (!row) return;
-        const d = new Date();
-        const dateFormatted = d.toISOString().split('T')[0];
-        const time24 = getTimeFormatted();
-        const fullDateTime = `${dateFormatted} ${time24}`;
-        const container = row.querySelector('.edit-date-container');
-        const hiddenInput = row.querySelector('.edit-date-val');
-        if (container) {
-            container.innerHTML = `<span class="edit-date-d">${dateFormatted}</span><span class="edit-date-t">${time24}</span>`;
-        }
-        if (hiddenInput) hiddenInput.value = fullDateTime;
-    }
-
-    function parseEditDateHTML(fullDateTime) {
-        if (!fullDateTime || !fullDateTime.includes(' ')) return `<span class="edit-date-d">${fullDateTime || ''}</span><span class="edit-date-t"></span>`;
-        const parts = fullDateTime.split(' ');
-        return `<span class="edit-date-d">${parts[0]}</span><span class="edit-date-t">${parts[1]}</span>`;
-    }
-
-    function addToActivityLog(fieldName, oldVal, newVal, companyName) {
-        if (oldVal === newVal) return; 
+        const saved = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
         
-        const days = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-        const d = new Date();
-        let dd = String(d.getDate()).padStart(2, '0'), mm = String(d.getMonth() + 1).padStart(2, '0'), yyyy = d.getFullYear();
-        const cleanCompany = (companyName && companyName.toString().trim() !== "") ? companyName : "شركة غير مسماة";
-        const v1 = (oldVal && oldVal.toString().trim() !== "") ? oldVal : "فارغ";
-        const v2 = (newVal && newVal.toString().trim() !== "") ? newVal : "فارغ";
-        
-        let actionText = (fieldName === "إجراء") ? `${oldVal} لزيارة شركة ( ${cleanCompany} )` : `تعديل ${fieldName} من [${v1}] إلى [${v2}] للعميل ( ${cleanCompany} )`;
-        const fullLogHTML = `<span style="color: #64748b; font-size: 9px;"><i class="fas fa-clock"></i> ${days[d.getDay()]} ${yyyy}-${mm}-${dd} ${getTimeFormatted()}</span> &nbsp;|&nbsp; <span style="color: #0f172a; font-weight: 700;">${actionText}</span>`;
-        
-        let logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
-        logs.unshift(fullLogHTML);
-        localStorage.setItem(LOGS_KEY, JSON.stringify(logs.slice(0, 100)));
-        renderActivityLog();
-    }
-
-    function renderActivityLog() {
-        const list = document.getElementById('activityList');
-        const logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
-        list.innerHTML = logs.map(log => {
-            if(log.includes('||')) { 
-                const parts = log.split('||');
-                return `<div class="activity-item"><span style="color: #94a3b8; font-size: 9px;">${parts[0]}</span> &nbsp;|&nbsp; <span>${parts[2]}</span></div>`;
-            }
-            return `<div class="activity-item">${log}</div>`;
-        }).join('');
-    }
-
-    function updateStats() {
-        const rows = document.querySelectorAll('#tableBody .main-row');
-        const today = getTodayFormatted();
-        const currentMonth = today.substring(0, 7);
-        let total = rows.length, tDay = 0, tMonth = 0;
-        let valTotal = 0, valMonth = 0;
-        rows.forEach(row => {
-            const dateInput = row.querySelector('.visit-date-val');
-            const visitValInput = row.querySelector('.opp-value-input');
-            const visitVal = visitValInput ? parseFloat(visitValInput.value) || 0 : 0;
-            valTotal += visitVal;
-            if(dateInput) {
-                const date = dateInput.value;
-                if (date === today) tDay++;
-                if (date.startsWith(currentMonth)) {
-                    tMonth++;
-                    valMonth += visitVal;
+        let maxSequence = 0;
+        saved.forEach(item => {
+            const idStr = String(item.id);
+            if (idStr.startsWith(prefix) && idStr.length === 8) {
+                const seq = parseInt(idStr.slice(4), 10);
+                if (seq > maxSequence) {
+                    maxSequence = seq;
                 }
             }
         });
-        document.getElementById('stat-total').innerText = total;
-        document.getElementById('stat-today').innerText = tDay;
-        document.getElementById('stat-month').innerText = tMonth;
-        document.getElementById('stat-value-total').innerText = valTotal.toLocaleString() + ' ر.س';
-        document.getElementById('stat-value-month').innerText = valMonth.toLocaleString() + ' ر.س';
+
+        const nextSequence = maxSequence + 1;
+        return prefix + String(nextSequence).padStart(4, '0');
     }
 
-    function applyStatusColor(selectEl) {
-        const val = selectEl.value;
-        const parentCell = selectEl.closest('td');
-        const mainRow = selectEl.closest('.main-row');
-        if (!parentCell) return;
-        
-        parentCell.classList.remove('status-yellow', 'status-red');
-        selectEl.classList.remove('status-yellow', 'status-red');
-        if (mainRow) mainRow.classList.remove('lost-row');
-
-        if (val === "عرض سعر") {
-            selectEl.classList.add('status-yellow');
-        } else if (val === "فقدان") {
-            selectEl.classList.add('status-red');
-            if (mainRow) mainRow.classList.add('lost-row');
+    function toggleGeneralLogHeight() {
+        const section = document.getElementById('generalActivityLogSection');
+        const btn = document.getElementById('toggleGeneralLogBtn');
+        if (section.classList.contains('expanded')) {
+            section.classList.remove('expanded');
+            btn.innerText = '⤢';
+        } else {
+            section.classList.add('expanded');
+            btn.innerText = '⤡';
         }
     }
 
-    function reorderRows() {
-        const tbody = document.getElementById('tableBody');
-        const rows = Array.from(tbody.querySelectorAll('.main-row'));
-        const today = getTodayFormatted(), currentMonth = today.substring(0, 7);
-        
-        const rowsData = rows.map(row => ({
-            row: row, subRow: document.getElementById('sub-' + row.id),
-            date: row.querySelector('.visit-date-val').value || '9999-12-31'
-        }));
-
-        rowsData.sort((a, b) => b.date.localeCompare(a.date));
-
-        const groups = {};
-        rowsData.forEach(item => {
-            const month = item.date.substring(0, 7); 
-            if (!groups[month]) groups[month] = [];
-            groups[month].push(item);
-        });
-
-        tbody.innerHTML = '';
-        const fragment = document.createDocumentFragment();
-
-        Object.keys(groups).sort((a, b) => b.localeCompare(a)).forEach(month => {
-            const sepRow = document.createElement('tr'); sepRow.className = 'month-separator';
-            const isCurrentMonth = (month === currentMonth);
-            const sepStyle = isCurrentMonth ? 'background-color: var(--accent-blue) !important; color: #ffffff !important; box-shadow: 0 2px 4px rgba(59,130,246,0.3);' : '';
-            
-            sepRow.innerHTML = `<td colspan="14"><div class="sep-text" style="${sepStyle}"><i class="far fa-calendar-alt"></i> زيارات شهر ${month}</div></td>`;
-            fragment.appendChild(sepRow);
-
-            groups[month].forEach(item => { fragment.appendChild(item.row); if(item.subRow) fragment.appendChild(item.subRow); });
-        });
-        
-        tbody.appendChild(fragment);
+    function toggleModalSize() {
+        const modalContent = document.getElementById('modalNoteContent');
+        const btn = document.getElementById('toggleModalBtn');
+        if (modalContent.classList.contains('expanded')) {
+            modalContent.classList.remove('expanded');
+            btn.innerText = '⤢';
+        } else {
+            modalContent.classList.add('expanded');
+            btn.innerText = '⤡';
+        }
     }
 
-    function insertNewRow() {
-        renderRow({}, true);
-        saveAllDataSilently();
-        document.querySelector('.table-wrapper').scrollTop = 0; 
+    function toggleDropdown(e, btn) {
+        e.stopPropagation();
+        const menu = btn.nextElementSibling;
+        menu.classList.toggle('show');
     }
 
-    function renderRow(v = {}, prepend = false) {
-        const tbody = document.getElementById('tableBody');
-        const rowId = 'row-' + Date.now() + Math.random().toString(36).substr(2, 5);
-        const mainRow = document.createElement('tr'); mainRow.className = 'main-row'; mainRow.id = rowId;
-        const subRow = document.createElement('tr'); subRow.className = 'sub-table-row'; subRow.id = 'sub-' + rowId;
+    function toggleAllCheckboxes(master) {
+        document.querySelectorAll('#salesBody .select-check').forEach(c => c.checked = master.checked);
+    }
 
-        const today = getTodayFormatted();
-        const visitDate = v.visitDate || today;
-        const notesJson = v.notes || "[]";
-        const lastNoteText = getLastNoteOnlyFromJSON(notesJson);
-        const editDateHTML = parseEditDateHTML(v.editDate || '');
+    function updateHeaderStats() {
+        const saved = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
+        const now = new Date();
+        const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        let totalComp = 0, totalPend = 0, monthCount = 0, monthComp = 0, monthPend = 0;
+        saved.forEach(item => {
+            const sums = calculateOrderSums(item.id);
+            totalComp += sums.completed; totalPend += sums.pending;
+            if (item.date && item.date.startsWith(currentMonthStr)) {
+                monthCount++; monthComp += sums.completed; monthPend += sums.pending;
+            }
+        });
+        document.getElementById('count-total').innerText = saved.length;
+        document.getElementById('sum-completed').innerText = totalComp.toLocaleString('en-US', {minimumFractionDigits: 2});
+        document.getElementById('sum-pending').innerText = totalPend.toLocaleString('en-US', {minimumFractionDigits: 2});
+        document.getElementById('month-count').innerText = monthCount;
+        document.getElementById('month-completed').innerText = monthComp.toLocaleString('en-US', {minimumFractionDigits: 2});
+        document.getElementById('month-pending').innerText = monthPend.toLocaleString('en-US', {minimumFractionDigits: 2});
+    }
 
-        mainRow.innerHTML = `
-            <td class="col-select"><input type="checkbox" class="select-check"><span class="toggle-arrow" onclick="toggleSubTable('${rowId}')"><i class="fas fa-caret-left"></i></span></td>
-            <td><input type="text" class="excel-input" value="${v.comp || ''}" data-old="${v.comp || ''}" onfocus="this.dataset.old=this.value" onkeyup="updateEditDateField(this.closest('tr')); debouncedSaveAllData();" onblur="addToActivityLog('الشركة', this.dataset.old, this.value, this.value); this.dataset.old=this.value;"></td>
-            <td><input type="text" class="excel-input" value="${v.address || ''}" data-old="${v.address || ''}" onfocus="this.dataset.old=this.value" onkeyup="updateEditDateField(this.closest('tr')); debouncedSaveAllData();" onblur="addToActivityLog('العنوان', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); this.dataset.old=this.value;"></td>
-            <td><input type="text" class="excel-input" value="${v.mgr || ''}" data-old="${v.mgr || ''}" onfocus="this.dataset.old=this.value" onkeyup="updateEditDateField(this.closest('tr')); debouncedSaveAllData();" onblur="addToActivityLog('المسؤول', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); this.dataset.old=this.value;"></td>
-            <td><div class="phone-cell-container"><a class="whatsapp-icon-btn" onclick="openWhatsAppChat(this)" title="مراسلة عبر واتساب"><i class="fa-brands fa-whatsapp"></i></a><input type="text" class="excel-input" value="${v.mob || ''}" data-old="${v.mob || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, ''); debouncedSaveAllData();" onfocus="this.dataset.old=this.value" onkeyup="updateEditDateField(this.closest('tr'));" onblur="addToActivityLog('رقم التواصل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); this.dataset.old=this.value;"></div></td>
-            <td><input type="text" class="excel-input" value="${v.email || ''}" data-old="${v.email || ''}" onfocus="this.dataset.old=this.value" onkeyup="updateEditDateField(this.closest('tr')); debouncedSaveAllData();" onblur="addToActivityLog('الإيميل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); this.dataset.old=this.value;"></td>
-            <td><input type="text" class="excel-input" value="${v.record || ''}" data-old="${v.record || ''}" oninput="this.value = this.value.replace(/[^0-9]/g, ''); debouncedSaveAllData();" onfocus="this.dataset.old=this.value" onkeyup="updateEditDateField(this.closest('tr'));" onblur="addToActivityLog('السجل', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); this.dataset.old=this.value;"></td>
-            <td><input type="text" class="excel-input readonly-input" value="${visitDate}" style="color:var(--text-muted); font-weight:700;" readonly><input type="hidden" class="visit-date-val" value="${visitDate}"></td>
-            <td><input type="text" class="excel-input cur-serv-val" value="${v.curServ || ''}" data-old="${v.curServ || ''}" onfocus="this.dataset.old=this.value" onkeyup="updateEditDateField(this.closest('tr')); debouncedSaveAllData();" onblur="addToActivityLog('الخدمة', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); this.dataset.old=this.value;" onmouseenter="showStatusTooltip(this)" onmouseleave="hideStatusTooltip()"></td>
-            <td><input type="number" class="excel-input opp-value-input readonly-input" value="${v.oppValue || ''}" readonly style="color:var(--accent-blue); font-weight:800; cursor:not-allowed; background: transparent;"></td>
-            <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${notesJson.replace(/'/g, "&apos;")}' id="preview-${Date.now()}">${lastNoteText}</div></td>
+    function calculateOrderSums(orderId) {
+        const productsDb = JSON.parse(localStorage.getItem('asgate_products_db') || '{}');
+        const products = productsDb[orderId] || [];
+        let completed = 0, pending = 0;
+        products.forEach(p => {
+            const lineTotal = (parseFloat(p.qty) || 0) * (parseFloat(String(p.sub).replace(/[^\d.]/g, '')) || 0);
+            if (p.status === "مكتمل") completed += lineTotal;
+            if (p.status === "معلق") pending += lineTotal;
+        });
+        return { completed, pending };
+    }
+
+    function handleStatusChange(el, orderId, company) {
+        const val = el.value;
+        el.setAttribute('data-val', val);
+        const row = el.closest('tr');
+        
+        if (val === "فقدان") {
+            row.classList.add('row-lost');
+        } else {
+            row.classList.remove('row-lost');
+        }
+        
+        addGeneralLog('الحالة', '', val, company, 'تغيير حالة الطلب #' + orderId);
+        autoSave();
+    }
+
+    function renderTableRow(obj) {
+        const tbody = document.getElementById('salesBody');
+        const sums = calculateOrderSums(obj.id);
+        const row = tbody.insertRow(-1);
+        
+        if (obj.status === "فقدان") row.classList.add('row-lost');
+        
+        const statusOptions = ["مكتمل", "معلق", "مرتجع", "جاهز", "جديد", "فقدان"];
+        row.innerHTML = `
+            <td><input type="checkbox" class="select-check"></td>
+            <td><a href="order_details.html?id=${obj.id}" class="order-link">#${obj.id}</a></td>
+            <td contenteditable="true" onblur="updateField(this, 'اسم الطلب', '${obj.comp}', ${obj.id})">${obj.type}</td>
+            <td style="color:#64748b;">${obj.date}</td>
+            <td>${obj.comp}</td>
+            <td>${obj.cr}</td>
+            <td>${obj.crSub}</td>
             <td>
-                <select class="excel-input status-select" data-old="${v.status || ''}" onfocus="this.dataset.old=this.value" onchange="handleStatusChange(this, '${rowId}')">
-                    <option value="" ${v.status === '' ? 'selected' : ''}>-</option>
-                    <option value="تأهيل لفرصة" ${v.status === 'تأهيل لفرصة' ? 'selected' : ''}>تأهيل لفرصة</option>
-                    <option value="عرض سعر" ${v.status === 'عرض سعر' ? 'selected' : ''}>عرض سعر</option>
-                    <option value="غير مهتم" ${v.status === 'غير مهتم' ? 'selected' : ''}>غير مهتم</option>
-                    <option value="فقدان" ${v.status === 'فقدان' ? 'selected' : ''}>فقدان</option>
+                <select class="status-select" data-val="${obj.status}" 
+                        onchange="handleStatusChange(this, ${obj.id}, '${obj.comp}')">
+                    ${statusOptions.map(opt => `<option value="${opt}" ${obj.status === opt ? 'selected' : ''}>${opt}</option>`).join('')}
                 </select>
             </td>
-            <td><div class="edit-date-container">${editDateHTML}</div><input type="hidden" class="edit-date-val" value="${v.editDate || ''}"></td>
-            <td><input type="text" class="excel-input" value="${v.owner || ''}" data-old="${v.owner || ''}" onfocus="this.dataset.old=this.value" onkeyup="debouncedSaveAllData();" onblur="addToActivityLog('المالك', this.dataset.old, this.value, this.closest('tr').cells[1].querySelector('input').value); this.dataset.old=this.value;"></td>
+            <td style="color:#16a34a; font-weight:800;">${sums.completed.toFixed(2)}</td>
+            <td style="color:#dc2626; font-weight:800;">${sums.pending.toFixed(2)}</td>
+            <td><div class="notes-preview" onclick="openNote(this)" data-full-notes='${(obj.notes || '').replace(/'/g, "&apos;")}'>${getLastNoteOnly(obj.notes || "")}</div></td>
+            <td contenteditable="true" onblur="updateField(this, 'الفرصة', '${obj.comp}', ${obj.id})">${obj.oppNum || ''}</td>
+            <td style="color:#64748b; font-weight:bold;">${obj.owner || 'أحمد'}</td>
         `;
-
-        subRow.innerHTML = `<td colspan="14"><div class="sub-table-container"><table class="inner-table"><thead><tr><th>المنتج</th><th>التفاصيل</th><th>العدد</th><th>الاشتراك</th><th>الإجمالي</th><th style="width:75px"><button class="header-plus-btn" onclick="addProductRow('${rowId}')" title="إضافة منتج"><i class="fas fa-plus"></i></button></th></tr></thead><tbody class="product-body"></tbody></table></div></td>`;
-        
-        if (prepend) { tbody.insertBefore(subRow, tbody.firstChild); tbody.insertBefore(mainRow, subRow); } 
-        else { tbody.appendChild(mainRow); tbody.appendChild(subRow); }
-
-        applyStatusColor(mainRow.querySelector('.status-select'));
-        if (v.products && v.products.length > 0) v.products.forEach(p => addProductRow(rowId, p)); 
-        else addProductRow(rowId);
-        
-        calculateMainVisitValue(rowId);
-        if(!prepend) reorderRows();
     }
 
-    async function handleStatusChange(selectEl, rowId) {
-        const newVal = selectEl.value; const oldVal = selectEl.dataset.old;
-        const companyName = selectEl.closest('tr').cells[1].querySelector('input').value;
-
-        if (newVal === "تأهيل لفرصة") {
-            const result = await Swal.fire({ title: 'نقل إلى الفرص البيعية؟', text: "سيتم تحويل هذه الزيارة إلى صفحة الفرص البيعية.", icon: 'question', showCancelButton: true, confirmButtonColor: '#3b82f6', cancelButtonColor: '#94a3b8', confirmButtonText: 'نعم، انقلها', cancelButtonText: 'إلغاء' });
-            if (result.isConfirmed) { transferToOpportunities(rowId); return; } 
-            else { selectEl.value = oldVal; applyStatusColor(selectEl); return; }
-        }
-
-        applyStatusColor(selectEl);
-        addToActivityLog('الحالة', oldVal, newVal, companyName);
-        updateEditDateField(selectEl.closest('tr'));
-        saveAllDataSilently(); updateStats(); reorderRows();
-        selectEl.dataset.old = newVal;
+    function autoSave() {
+        const rows = document.querySelectorAll('#salesBody tr');
+        const salesData = Array.from(rows).map(r => ({
+            id: r.cells[1].innerText.replace('#', ''),
+            type: r.cells[2].innerText,
+            date: r.cells[3].innerText,
+            comp: r.cells[4].innerText,
+            cr: r.cells[5].innerText,
+            crSub: r.cells[6].innerText,
+            status: r.cells[7].querySelector('select').value,
+            notes: r.cells[10].querySelector('.notes-preview').getAttribute('data-full-notes'),
+            oppNum: r.cells[11].innerText,
+            owner: r.cells[12].innerText
+        }));
+        localStorage.setItem('asgate_sales_db', JSON.stringify(salesData));
+        updateHeaderStats();
     }
 
-    function transferToOpportunities(rowId) {
-        const row = document.getElementById(rowId); const subRow = document.getElementById('sub-' + rowId);
-        const products = [];
-        subRow.querySelectorAll('.product-body tr').forEach(pRow => {
-            const inputs = pRow.querySelectorAll('input, select');
-            products.push({ type: inputs[0].value, desc: inputs[1].value, qty: inputs[2].value, sub: inputs[3].value, total: inputs[4].value });
-        });
+    function openOrderModal() { document.getElementById('orderModal').style.display = 'flex'; }
+    function closeOrderModal() { document.getElementById('orderModal').style.display = 'none'; }
 
-        const visitData = {
-            comp: row.cells[1].querySelector('input').value, address: row.cells[2].querySelector('input').value,
-            mgr: row.cells[3].querySelector('input').value, mob: row.cells[4].querySelector('input').value,
-            email: row.cells[5].querySelector('input').value, record: row.cells[6].querySelector('input').value,
-            oppDate: getTodayFormatted(), curServ: row.querySelector('.cur-serv-val').value,
-            oppValue: row.querySelector('.opp-value-input').value, notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '[]',
-            status: "مهتم", editDate: row.querySelector('.edit-date-val').value, owner: row.cells[13].querySelector('input').value, products: products
+    function searchCustomerInModal(el) {
+        const query = el.value.toLowerCase().trim();
+        const resDiv = document.getElementById('mResults');
+        const customers = JSON.parse(localStorage.getItem(CUSTOMERS_STORAGE_KEY) || '[]');
+        if (query.length < 1) { resDiv.style.display='none'; return; }
+        const filtered = customers.filter(c => (c.comp || "").toLowerCase().includes(query) || (c.mainRecord || "").includes(query));
+        resDiv.innerHTML = filtered.map(c => `<div onclick="selectCustomer('${c.comp}', '${c.mainRecord}', '${c.subRecord || '-'}')">${c.comp} (${c.mainRecord})</div>`).join('');
+        resDiv.style.display = filtered.length ? 'block' : 'none';
+    }
+
+    function selectCustomer(comp, cr, crSub) {
+        document.getElementById('mComp').value = comp;
+        document.getElementById('mCr').value = cr;
+        document.getElementById('mCrSub').value = crSub;
+        document.getElementById('mSearchField').value = comp;
+        document.getElementById('mResults').style.display = 'none';
+    }
+
+    function addOrderRow() {
+        const comp = document.getElementById('mComp').value;
+        if (!comp) return alert("اختر شركة أولاً");
+        const data = {
+            id: generateCustomOrderId(),
+            type: document.getElementById('mType').value || '-',
+            date: getTodayFormatted(),
+            comp: comp, cr: document.getElementById('mCr').value, crSub: document.getElementById('mCrSub').value,
+            status: "جديد", notes: "", oppNum: "", owner: "أحمد"
         };
-
-        let opps = JSON.parse(localStorage.getItem(OPPORTUNITIES_KEY) || '[]'); opps.unshift(visitData); localStorage.setItem(OPPORTUNITIES_KEY, JSON.stringify(opps));
-        addToActivityLog('إجراء', 'تأهيل ونقل الفرصة البيعية', '', visitData.comp);
-        row.remove(); if(subRow) subRow.remove();
-        saveAllDataSilently(); updateStats(); reorderRows();
-        Swal.fire({icon: 'success', title: 'تم النقل', text: 'تم نقل الزيارة بنجاح', showConfirmButton: false, timer: 1500});
+        let saved = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
+        saved.unshift(data);
+        localStorage.setItem('asgate_sales_db', JSON.stringify(saved));
+        loadSalesFromStorage();
+        closeOrderModal();
     }
 
-    function toggleSubTable(rowId) {
-        const subRow = document.getElementById('sub-' + rowId);
-        const arrow = document.querySelector(`#${rowId} .toggle-arrow`);
-        const isOpen = subRow.style.display === 'table-row';
-        subRow.style.display = isOpen ? 'none' : 'table-row';
-        if(isOpen) { arrow.classList.remove('arrow-open'); arrow.innerHTML = '<i class="fas fa-caret-left"></i>'; }
-        else { arrow.classList.add('arrow-open'); arrow.innerHTML = '<i class="fas fa-caret-down"></i>'; }
-    }
+    function updateField(el, field, comp, id) { autoSave(); addGeneralLog(field, '', el.innerText, comp, `تعديل ${field} للطلب #${id}`); }
 
-    function addProductRow(rowId, data = {}) {
-        const tbody = document.querySelector(`#sub-${rowId} .product-body`); const row = tbody.insertRow();
-        row.innerHTML = `<td><select onchange="debouncedSaveAllData()"><option value="">-</option><option value="جوال" ${data.type === 'جوال' ? 'selected' : ''}>جوال</option><option value="بيانات" ${data.type === 'بيانات' ? 'selected' : ''}>بيانات</option><option value="هاتف" ${data.type === 'هاتف' ? 'selected' : ''}>هاتف</option><option value="فايبر نت" ${data.type === 'فايبر نت' ? 'selected' : ''}>فايبر نت</option><option value="DIA" ${data.type === 'DIA' ? 'selected' : ''}>DIA</option><option value="IPVPN" ${data.type === 'IPVPN' ? 'selected' : ''}>IPVPN</option><option value="SIP" ${data.type === 'SIP' ? 'selected' : ''}>SIP</option></select></td><td><input type="text" value="${data.desc || ''}" onkeyup="debouncedSaveAllData()"></td><td><input type="number" class="prod-qty" min="0" value="${data.qty || ''}" onkeyup="calculateMainVisitValue('${rowId}')" oninput="calculateMainVisitValue('${rowId}')"></td><td><input type="number" class="prod-sub" min="0" value="${data.sub || ''}" onkeyup="calculateMainVisitValue('${rowId}')" oninput="calculateMainVisitValue('${rowId}')"></td><td><input type="number" class="prod-total readonly-input" value="${data.total || ''}" readonly style="color:var(--text-muted); font-weight:700; cursor:not-allowed;"></td><td><div style="display:flex; justify-content:center; gap:5px;"><button class="sub-action-btn" title="حذف" onclick="if(this.closest('tbody').rows.length > 1) { this.closest('tr').remove(); calculateMainVisitValue('${rowId}'); }"><i class="fas fa-trash-alt" style="font-size:10px;"></i></button></div></td>`;
-    }
-
-    function calculateMainVisitValue(rowId) {
-        const subRow = document.getElementById('sub-' + rowId); if (!subRow) return;
-        let grandTotal = 0;
-        subRow.querySelectorAll('.product-body tr').forEach(pRow => {
-            const qtyInput = pRow.querySelector('.prod-qty'), subInput = pRow.querySelector('.prod-sub'), totalInput = pRow.querySelector('.prod-total');
-            let qty = parseFloat(qtyInput.value) || 0, sub = parseFloat(subInput.value) || 0;
-            const rowTotal = qty * sub; totalInput.value = rowTotal > 0 ? rowTotal : ''; grandTotal += rowTotal;
-        });
-        const mainRow = document.getElementById(rowId);
-        if (mainRow) { const oppValueInput = mainRow.querySelector('.opp-value-input'); if (oppValueInput) oppValueInput.value = grandTotal > 0 ? grandTotal : ''; }
-        debouncedSaveAllData();
-    }
-
-    function toggleAllCheckboxes(source) { document.querySelectorAll('.select-check').forEach(chk => chk.checked = source.checked); }
-    function toggleDropdown(e, btn) { e.stopPropagation(); const menu = btn.nextElementSibling; document.querySelectorAll('.dropdown-menu').forEach(m => { if(m !== menu) m.classList.remove('show'); }); menu.classList.toggle('show'); }
-
-    async function handleBulkAction(action) {
-        const selected = document.querySelectorAll('.select-check:checked');
-        if (selected.length === 0) { 
-            Swal.fire({icon: 'info', text: 'يرجى تحديد صف واحد على الأقل', confirmButtonText: 'حسناً', confirmButtonColor: '#3b82f6'}); 
-            return; 
-        }
-        
-        if (action === 'حذف') {
-            const result = await Swal.fire({ title: 'تأكيد الحذف؟', text: "سيتم حذف الزيارات المحددة نهائياً!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#94a3b8', confirmButtonText: 'نعم، احذف', cancelButtonText: 'إلغاء' });
-            if (result.isConfirmed) {
-                selected.forEach(chk => { const row = chk.closest('tr'); const id = row.id; addToActivityLog('إجراء', 'حذف الزيارة', '', row.cells[1].querySelector('input').value); row.remove(); if(document.getElementById('sub-' + id)) document.getElementById('sub-' + id).remove(); });
-                saveAllDataSilently(); updateStats(); reorderRows(); Swal.fire({icon: 'success', title: 'تم الحذف', showConfirmButton: false, timer: 1500});
-            }
-        } else if (action === 'تصدير') {
-            exportToExcel(selected);
-            addToActivityLog('إجراء', 'تصدير بيانات للإكسيل', '', 'مجموعة محددة');
-        } else if (action === 'طباعة') {
-            printSelected(selected);
-            addToActivityLog('إجراء', 'طباعة بيانات', '', 'مجموعة محددة');
-        } else { 
-            selected.forEach(chk => { const row = chk.closest('tr'); addToActivityLog('إجراء', action, '', row.cells[1].querySelector('input').value); });
-            Swal.fire({icon: 'success', title: 'تم', text: 'تم تنفيذ الإجراء على ' + selected.length + ' صف', showConfirmButton: false, timer: 1500});
-        }
-    }
-
-    function exportToExcel(selectedRows) {
-        let csvContent = "\uFEFF"; 
-        csvContent += "الشركة,العنوان,المسؤول,رقم التواصل,الإيميل,السجل,تاريخ الزيارة,الخدمة,القيمة,الحالة,المالك\n";
-        
-        selectedRows.forEach(chk => {
-            const row = chk.closest('tr');
-            const getVal = (index) => {
-                const input = row.cells[index].querySelector('input, select');
-                let val = input ? input.value.replace(/"/g, '""') : '';
-                return `"${val}"`; 
-            };
-            
-            const rowData = [
-                getVal(1), getVal(2), getVal(3), getVal(4), getVal(5), 
-                getVal(6), getVal(7), getVal(8), getVal(9), getVal(11), getVal(13)
-            ];
-            csvContent += rowData.join(",") + "\n";
-        });
-
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", "تقرير_الزيارات_" + getTodayFormatted() + ".csv");
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-
-    function printSelected(selectedRows) {
-        let printWindow = window.open('', '_blank');
-        let html = `
-            <html dir="rtl">
-            <head>
-                <title>تقرير الزيارات المحددة</title>
-                <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-                <style>
-                    body { font-family: 'Cairo', sans-serif; padding: 20px; color: #0f172a; }
-                    h2 { text-align: center; color: #4c1d95; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
-                    table { width: 100%; border-collapse: collapse; font-size: 12px; }
-                    th { background-color: #f1f5f9; color: #1e293b; padding: 10px; border: 1px solid #cbd5e1; font-weight: 700; }
-                    td { padding: 8px; border: 1px solid #cbd5e1; text-align: center; }
-                    tr:nth-child(even) { background-color: #f8fafc; }
-                    .footer { margin-top: 30px; text-align: left; font-size: 10px; color: #64748b; }
-                </style>
-            </head>
-            <body>
-                <h2>تقرير الزيارات (ASGate CRM)</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>الشركة</th><th>المسؤول</th><th>رقم التواصل</th>
-                            <th>الخدمة</th><th>تاريخ الزيارة</th><th>الحالة</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        `;
-
-        selectedRows.forEach(chk => {
-            const row = chk.closest('tr');
-            const getVal = (index) => row.cells[index].querySelector('input, select')?.value || '';
-            html += `<tr>
-                <td><strong>${getVal(1)}</strong></td>
-                <td>${getVal(3)}</td>
-                <td dir="ltr">${getVal(4)}</td>
-                <td>${getVal(8)}</td>
-                <td>${getVal(7)}</td>
-                <td>${getVal(11)}</td>
-            </tr>`;
-        });
-
-        html += `
-                    </tbody>
-                </table>
-                <div class="footer">تاريخ الطباعة: ${getTodayFormatted()} - تم الإنشاء بواسطة نظام ASGate</div>
-            </body>
-            </html>
-        `;
-
-        printWindow.document.write(html);
-        printWindow.document.close();
-        
-        setTimeout(() => {
-            printWindow.print();
-            printWindow.close();
-        }, 500);
-    }
-
-    function saveAllDataSilently() {
-        const data = [];
-        document.querySelectorAll('.main-row').forEach(row => {
-            const id = row.id; const products = []; const subRow = document.getElementById('sub-' + id);
-            if(subRow) { subRow.querySelectorAll('.product-body tr').forEach(pRow => { const inputs = pRow.querySelectorAll('input, select'); products.push({ type: inputs[0].value, desc: inputs[1].value, qty: inputs[2].value, sub: inputs[3].value, total: inputs[4].value }); }); }
-            data.push({ 
-                comp: row.cells[1].querySelector('input').value, address: row.cells[2].querySelector('input').value, 
-                mgr: row.cells[3].querySelector('input').value, mob: row.cells[4].querySelector('input').value, 
-                email: row.cells[5].querySelector('input').value, record: row.cells[6].querySelector('input').value, 
-                visitDate: row.querySelector('.visit-date-val').value, curServ: row.querySelector('.cur-serv-val').value, 
-                oppValue: row.querySelector('.opp-value-input').value, notes: row.querySelector('.notes-preview').getAttribute('data-full-notes') || '[]', 
-                status: row.querySelector('.status-select').value, editDate: row.querySelector('.edit-date-val').value, 
-                owner: row.cells[13].querySelector('input').value, products: products 
-            });
-        });
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    }
-
-    function loadSavedData() {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) { document.getElementById('tableBody').innerHTML = ''; JSON.parse(saved).forEach(v => renderRow(v)); }
-        renderActivityLog(); updateStats(); reorderRows();
-    }
-
-    let searchTimeout;
-    function debouncedFilterTable() { clearTimeout(searchTimeout); searchTimeout = setTimeout(filterTable, 300); }
-
-    function filterTable() {
-        const q = document.getElementById('searchInput').value.toLowerCase().trim();
-        document.querySelectorAll('.main-row').forEach(row => {
-            const comp = row.cells[1].querySelector('input').value.toLowerCase();
-            const mgr = row.cells[3].querySelector('input').value.toLowerCase();
-            const mob = row.cells[4].querySelector('input').value.toLowerCase();
-            const email = row.cells[5].querySelector('input').value.toLowerCase();
-            const record = row.cells[6].querySelector('input').value.toLowerCase();
-            const subRow = document.getElementById('sub-' + row.id);
-            if (comp.includes(q) || mgr.includes(q) || mob.includes(q) || email.includes(q) || record.includes(q)) { row.style.display = 'table-row'; } 
-            else { row.style.display = 'none'; if(subRow) subRow.style.display = 'none'; }
-        });
-    }
-
-    function showStatusTooltip(el) {
-        const val = el.value || "فارغ";
-        let tooltip = document.getElementById('status-custom-tooltip');
-        if(!tooltip) {
-            tooltip = document.createElement('div');
-            tooltip.id = 'status-custom-tooltip';
-            tooltip.style.position = 'absolute';
-            tooltip.style.background = '#1e293b';
-            tooltip.style.color = '#fff';
-            tooltip.style.padding = '5px 10px';
-            tooltip.style.borderRadius = '4px';
-            tooltip.style.fontSize = '11px';
-            tooltip.style.fontFamily = 'Cairo';
-            tooltip.style.zIndex = '3000';
-            tooltip.style.pointerEvents = 'none';
-            tooltip.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
-            tooltip.style.display = 'none';
-            document.body.appendChild(tooltip);
-        }
-        tooltip.innerText = val;
-        tooltip.style.display = 'block';
-        
-        const rect = el.getBoundingClientRect();
-        tooltip.style.top = (rect.top + window.scrollY - tooltip.offsetHeight - 6) + 'px';
-        tooltip.style.left = (rect.left + window.scrollX + (rect.width/2) - (tooltip.offsetWidth/2)) + 'px';
-    }
-
-    function hideStatusTooltip() {
-        const tooltip = document.getElementById('status-custom-tooltip');
-        if(tooltip) tooltip.style.display = 'none';
-    }
-
-    function getLastNoteOnlyFromJSON(jsonStr) {
-        try { const arr = JSON.parse(jsonStr); return arr.length > 0 ? arr[arr.length - 1].text : 'أضف ملاحظة...'; } 
-        catch(e) { 
-            if(jsonStr && typeof jsonStr === 'string' && jsonStr.trim() !== "") { const parts = jsonStr.split('\n--------------------\n'); const last = parts[parts.length - 1]; if(last.includes('||')) return last.split('||')[1] || ""; return last; }
-            return 'أضف ملاحظة...'; 
-        }
+    function getLastNoteOnly(fullText) {
+        if (!fullText) return 'إضافة ملاحظة...';
+        const arr = fullText.split('\n--------------------\n');
+        const last = arr[arr.length - 1];
+        return last.includes('activity-text-part') ? last.split('activity-text-part">')[1].split('</span>')[0].replace(/<br>.*/, '') : 'عرض السجل...';
     }
 
     function openNote(el) {
-        currentActivePreview = el; const raw = el.getAttribute('data-full-notes') || "[]"; let arr = []; 
-        try { arr = JSON.parse(raw); } 
-        catch(e) { 
-            arr = [];
-            if(raw.trim() !== "") { raw.split('\n--------------------\n').forEach(entry => { if(entry.includes('||')) { const parts = entry.split('||'); arr.push({user: "النظام", date: "", time: "", text: parts[1]}); } else { arr.push({user: "النظام", date: "", time: "", text: entry}); } }); }
-        }
-        let htmlContent = arr.map(msg => `<div class="chat-msg-block"><span class="chat-msg-header"><span><i class="fas fa-user-circle"></i> ${msg.user}</span> <span style="font-weight: 600; color:#94a3b8; font-size:9px;">${msg.date} ${msg.time}</span></span><span class="chat-msg-text">${msg.text}</span></div>`).join('');
-        document.getElementById('historyLog').innerHTML = htmlContent;
+        currentActivePreview = el;
+        document.getElementById('modalNoteContent').classList.remove('expanded');
+        document.getElementById('toggleModalBtn').innerText = '⤢';
+        document.getElementById('historyLog').innerHTML = (el.getAttribute('data-full-notes') || "").split('\n--------------------\n').map(e => `<div style="margin-bottom:8px; border-bottom:1px dashed #eee; line-height:1.4;">${e}</div>`).join('');
         document.getElementById('noteModal').style.display = "flex";
-        document.getElementById('modalTextArea').focus();
+    }
+
+    function handleFileSelection(input) {
+        const file = input.files[0];
+        if (file) {
+            attachedFileName = file.name;
+            const reader = new FileReader();
+            reader.onload = e => { attachedFileData = e.target.result; document.getElementById('fileNamePreview').innerText = "✔ " + file.name; };
+            reader.readAsDataURL(file);
+        }
     }
 
     function saveNote() {
-        const txt = document.getElementById('modalTextArea').value.trim();
-        if (txt && currentActivePreview) {
-            const raw = currentActivePreview.getAttribute('data-full-notes') || "[]"; let arr = []; 
-            try { arr = JSON.parse(raw); } catch(e) { arr = []; }
-            const d = new Date();
-            arr.push({ user: document.querySelector('.main-row').cells[13].querySelector('input').value || "المستخدم", date: getTodayFormatted(), time: getTimeFormatted(), text: txt });
-            currentActivePreview.setAttribute('data-full-notes', JSON.stringify(arr));
-            currentActivePreview.innerText = txt;
-            updateEditDateField(currentActivePreview.closest('tr'));
-            saveAllDataSilently();
+        const text = document.getElementById('modalTextArea').value.trim();
+        if ((text || attachedFileData) && currentActivePreview) {
+            let fileHTML = attachedFileData ? `<br><a href="${attachedFileData}" download="${attachedFileName}" class="file-link">📎 ملف: ${attachedFileName}</a>` : "";
+            let entry = `${generateStyledHeader()}<span class="activity-text-part">${text}${fileHTML}</span>`;
+            let old = currentActivePreview.getAttribute('data-full-notes') || "";
+            currentActivePreview.setAttribute('data-full-notes', old ? old + "\n--------------------\n" + entry : entry);
+            currentActivePreview.innerText = text || "📎 ملف مرفق";
+            autoSave();
         }
         closeNote();
     }
 
-    function closeNote() { document.getElementById('noteModal').style.display = "none"; document.getElementById('modalTextArea').value = ""; }
+    function closeNote() { document.getElementById('noteModal').style.display = "none"; document.getElementById('modalTextArea').value = ""; attachedFileData = null; document.getElementById('fileNamePreview').innerText = ""; }
 
-    window.onclick = (e) => { if (!e.target.matches('.btn-bulk-trigger') && !e.target.matches('.fa-chevron-down')) document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show')); };
+    function filterSalesTable() {
+        const q = document.getElementById('globalSearch').value.toLowerCase();
+        document.querySelectorAll('#salesBody tr').forEach(r => r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none");
+    }
+
+    function addGeneralLog(field, old, newVal, comp, action) {
+        const logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
+        logs.unshift(`${generateStyledHeader()}<span class="activity-text-part">${action} - [${newVal}] (${comp})</span>`);
+        localStorage.setItem(LOGS_KEY, JSON.stringify(logs.slice(0, 50)));
+        renderGeneralLogs();
+    }
+
+    function renderGeneralLogs() {
+        const logs = JSON.parse(localStorage.getItem(LOGS_KEY) || '[]');
+        document.getElementById('activityLogs').innerHTML = logs.map(l => `<div class="activity-item">${l}</div>`).join('');
+    }
+
+    function loadSalesFromStorage() {
+        const saved = JSON.parse(localStorage.getItem('asgate_sales_db') || '[]');
+        document.getElementById('salesBody').innerHTML = "";
+        saved.forEach(item => renderTableRow(item));
+        updateHeaderStats();
+    }
+
+    window.onclick = e => { if (!e.target.matches('.btn-bulk-trigger')) document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show')); };
 </script>
-
 </body>
 </html>
