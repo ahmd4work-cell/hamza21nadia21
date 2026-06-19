@@ -1,0 +1,41 @@
+/* style.css */
+:root {
+    --main-color: #4a90e2; /* لونك المعتمد */
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    font-family: var(--font-family);
+    margin: 0;
+    padding: 0;
+    direction: rtl; /* دعم العربية */
+}
+
+/* تنسيق القائمة الموحد */
+nav {
+    background-color: #333;
+    padding: 15px;
+    text-align: center;
+}
+
+nav a {
+    color: white;
+    margin: 0 15px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* تنسيق الجداول الموحد */
+table {
+    width: 95%;
+    margin: 20px auto;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+th { background-color: var(--main-color); color: white; }
