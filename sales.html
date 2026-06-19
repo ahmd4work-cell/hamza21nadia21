@@ -226,11 +226,10 @@
                     <tr>
                         <th style="width: 30px;"><input type="checkbox" class="select-check" onclick="toggleAllCheckboxes(this)"></th>
                         <th style="width: 7%;">رقم الطلب</th>
-                        <th style="width: 11%;">اسم الطلب</th>
+                        <th style="width: 15%;">اسم الطلب</th>
                         <th style="width: 10%;">تاريخ الإنشاء</th>
-                        <th style="width: 12%;">الشركة</th>
+                        <th style="width: 17%;">الشركة</th>
                         <th style="width: 9%;">السجل الرئيسي</th>
-                        <th style="width: 9%;">السجل الفرعي</th>
                         <th style="width: 9%;">الحالة</th>
                         <th style="width: 6%;">مكتمل</th>
                         <th style="width: 6%;">معلق</th>
@@ -416,6 +415,9 @@
         
         if (obj.status === "فقدان") row.classList.add('row-lost');
         
+        // إخفاء قيمة السجل الفرعي في السطر لحمايتها أثناء الحفظ التلقائي
+        row.setAttribute('data-crsub', obj.crSub || '');
+        
         const statusOptions = ["مكتمل", "معلق", "فقدان"];
         row.innerHTML = `
             <td><input type="checkbox" class="select-check"></td>
@@ -424,7 +426,6 @@
             <td style="color:#64748b;">${obj.date}</td>
             <td>${obj.comp}</td>
             <td>${obj.cr}</td>
-            <td>${obj.crSub}</td>
             <td>
                 <select class="status-select" data-val="${obj.status}" 
                         onchange="handleStatusChange(this, ${obj.id}, '${obj.comp}')">
@@ -447,11 +448,11 @@
             date: r.cells[3].innerText,
             comp: r.cells[4].innerText,
             cr: r.cells[5].innerText,
-            crSub: r.cells[6].innerText,
-            status: r.cells[7].querySelector('select').value,
-            notes: r.cells[10].querySelector('.notes-preview').getAttribute('data-full-notes'),
-            lastModifiedDate: r.cells[11].innerText === '---' ? '' : r.cells[11].innerText,
-            owner: r.cells[12].innerText
+            crSub: r.getAttribute('data-crsub'), // استرجاع القيمة المخفية
+            status: r.cells[6].querySelector('select').value,
+            notes: r.cells[9].querySelector('.notes-preview').getAttribute('data-full-notes'),
+            lastModifiedDate: r.cells[10].innerText === '---' ? '' : r.cells[10].innerText,
+            owner: r.cells[11].innerText
         }));
         localStorage.setItem('asgate_sales_db', JSON.stringify(salesData));
         updateHeaderStats();
