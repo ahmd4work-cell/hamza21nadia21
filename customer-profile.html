@@ -2,7 +2,7 @@
 <html dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>ملف العميل | ASGate</title>
+    <title>تفاصيل العميل | ASGate</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -174,7 +174,6 @@
     </div>
 </div>
 
-<!-- إضافة حاوية سجل النشاط المستوحى من النظام لتتبع تعديلات ملف العميل -->
 <div class="activity-log-section">
     <div class="activity-log-title">📋 سجل النشاط</div>
     <div id="activityList" class="activity-list"></div>
@@ -243,7 +242,7 @@
         const data = JSON.parse(localStorage.getItem('asgate_customers_data') || '[]');
         const client = data.find(c => c.comp === clientName);
         if(client) {
-            document.title = `${client.comp} | ملف العميل`;
+            document.title = `${client.comp} | تفاصيل العميل`;
             document.getElementById('c-name').innerText = client.comp;
             document.getElementById('c-cr').innerText = client.cr || '0000000';
             document.getElementById('c-addr').innerText = client.address || 'غير محدد';
