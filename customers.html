@@ -221,7 +221,7 @@
                 <thead>
                     <tr>
                         <th class="col-select"><input type="checkbox" onclick="toggleAllCheckboxes(this)"></th>
-                        <th class="col-id">رقم العميل</th>
+                        <th class="col-id">كود العميل</th>
                         <th class="col-company">اسم المنشأة / الشركة</th>
                         <th class="col-address">العنوان</th> 
                         <th class="col-records">السجل الرئيسي</th>
@@ -470,7 +470,7 @@
 
     function exportToExcel(selectedRows) {
         let csvContent = "\uFEFF"; 
-        csvContent += "رقم العميل,اسم المنشأة / الشركة,العنوان,السجل الرئيسي,الشخص المسؤول,رقم التواصل,البريد الإلكتروني,التصنيف,الحالة,تاريخ الإنشاء,المالك\n";
+        csvContent += "كود العميل,اسم المنشأة / الشركة,العنوان,السجل الرئيسي,الشخص المسؤول,رقم التواصل,البريد الإلكتروني,التصنيف,الحالة,تاريخ الإنشاء,المالك\n";
         
         selectedRows.forEach(chk => {
             const row = chk.closest('tr');
@@ -521,7 +521,7 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>رقم العميل</th><th>الشركة</th><th>المسؤول</th><th>رقم التواصل</th>
+                            <th>كود العميل</th><th>الشركة</th><th>المسؤول</th><th>رقم التواصل</th>
                             <th>التصنيف</th><th>الحالة</th>
                         </tr>
                     </thead>
